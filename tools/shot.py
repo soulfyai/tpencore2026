@@ -1,6 +1,8 @@
 """Headless screenshots of index3d.html for visual checks.
 
 Usage (from repo root):
+  pip install playwright                   # once; in Claude Code cloud sessions Chromium is pre-installed
+                                           # (do NOT run "playwright install"); locally, also run "playwright install chromium"
   npm i --no-save three@0.160.0            # once; Three.js is served locally instead of the CDN
   python3 tools/shot.py '{"out/pano":"MAP3D.panorama()","out/tpe":"MAP3D.enterCity(\'taipei\')"}' [mobile]
 

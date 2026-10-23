@@ -2,6 +2,8 @@
 import json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).parent
+# 資料查核日（頁面上顯示）：人工重新查核 data/ 內容後才更新，不要自動帶當天日期
+CHECKED_AT = "2026-10-22"
 CITIES = ["taipei", "newtaipei", "keelung", "taoyuan"]
 problems = []
 
@@ -104,7 +106,7 @@ for c in cities:
 
 wp = ROOT / "data" / "weather.json"
 gp = ROOT / "data" / "geo.json"
-data = {"meta": {"checkedAt": "2026-10-22", "geo": json.loads(gp.read_text(encoding="utf-8")) if gp.exists() else None, "weather": json.loads(wp.read_text(encoding="utf-8")) if wp.exists() else None}, "cities": cities, "flows": flows}
+data = {"meta": {"checkedAt": CHECKED_AT, "geo": json.loads(gp.read_text(encoding="utf-8")) if gp.exists() else None, "weather": json.loads(wp.read_text(encoding="utf-8")) if wp.exists() else None}, "cities": cities, "flows": flows}
 html = (ROOT / "template.html").read_text(encoding="utf-8")
 blob = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 (ROOT / "index.html").write_text(html.replace("/*__DATA__*/null", blob), encoding="utf-8")
