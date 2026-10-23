@@ -3,7 +3,9 @@ const PEOPLE = { list: [], routes: [] };
 {
   const R1 = rng(41);
   const SKIN = ["#f1c9a6", "#e2b38c", "#c99772", "#f4d4b8"], HAIR = ["#2e2620", "#4a3a2e", "#6b5444", "#1f1f22", "#9a9a9a"];
-  const SHIRT = ["#ffffff", "#f8f6f1", "#ffffff", "#f4f2ec", "#ffffff", "#f8f6f1", "#ffffff", "#2f6fd6", "#e0453c", "#28c8c8"]; // mostly white, a few accents
+  const SHIRT = ["#ebe5d9", "#9aa99a", "#b8a6aa", "#81949a", "#c4ae8e", "#c2bdac"]; // muted everyday clothes, independent of city identity colors
+  const ROLES = ["commuter", "student", "elder", "parent", "worker", "hiker", "umbrella", "balloon", "runner", "shopper"];
+  PEOPLE.roles = ROLES;
   const routeOf = (pts) => { const cum = [0]; for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + pts[k].distanceTo(pts[k - 1])); return { pts, cum, total: cum[cum.length - 1] }; };
 
   /* flow routes: nearest island pair between the hub city and each partner city, walked over bridges */
@@ -23,10 +25,17 @@ const PEOPLE = { list: [], routes: [] };
   }
 
   /* people */
-  const add = (o) => { o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
+  const add = (o) => {
+    const topic = islandById.get(o.isl)?.t.name || "";
+    const local = /教育|育兒|青年/.test(topic) ? ["student", "parent", "balloon"] : /社福|長照|衛生/.test(topic) ? ["elder", "parent", "shopper"] : /工務|交通|產業/.test(topic) ? ["worker", "commuter", "shopper"] : ["hiker", "runner", "umbrella", "balloon", "parent"];
+    o.role = PEOPLE.list.length < ROLES.length ? ROLES[PEOPLE.list.length] : pick(R1, R1() < 0.7 ? local : ROLES);
+    o.size = o.role === "student" || o.role === "balloon" ? 0.76 : o.role === "elder" ? 0.93 : 1;
+    if (o.role === "elder") o.speed *= 0.65;
+    if (o.role === "runner") o.speed *= 1.45;
+    o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
   const perRoute = QUALITY === "high" ? 3 : 2;
   PEOPLE.routes.forEach((rt, ri) => {
-    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: cityHex(rt.from) });
+    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: pick(R1, SHIRT) });
   });
   for (const isl of islands.filter((i) => i.live)) {
     const ids = WORLD.ringNode.get(isl.id), n = QUALITY === "high" ? 7 : 4;
@@ -188,14 +197,86 @@ const PEOPLE = { list: [], routes: [] };
   const N = PEOPLE.list.length;
   const mk = (g, n, mat) => { const m = new THREE.InstancedMesh(g, mat, n); m.castShadow = true; m.frustumCulled = false; scene.add(m); return m; };
   const pm = new THREE.MeshStandardMaterial({ roughness: 0.8 });
-  const legG = new THREE.BoxGeometry(0.035, 0.12, 0.04).translate(0, -0.06, 0);
-  const armG = new THREE.BoxGeometry(0.028, 0.1, 0.03).translate(0, -0.05, 0);
-  const bodyG = new RoundedBoxGeometry(0.1, 0.12, 0.065, 2, 0.02);
+  const legG = new THREE.BoxGeometry(0.045, 0.1, 0.055).translate(0, -0.05, 0);
+  const armG = new THREE.BoxGeometry(0.036, 0.115, 0.04).translate(0, -0.0575, 0);
+  const bodyG = new RoundedBoxGeometry(0.125, 0.145, 0.085, 2, 0.022);
   const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), heads = mk(GEO.sphere, N, pm), hairs = mk(GEO.dome, N, pm);
   PEOPLE.list.forEach((o, i) => {
     legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.shirt); arms.setColorAt(i * 2 + 1, o.shirt);
     bodies.setColorAt(i, o.shirt); heads.setColorAt(i, o.skin); hairs.setColorAt(i, o.hair);
   });
+  /* Accessories share geometry/material batches across every citizen. Local +z is the face. */
+  const accessoryParts = [];
+  const accessory = (owner, g, xyz, scale, color, rotation = [0, 0, 0]) => {
+    const matrix = new THREE.Matrix4().compose(new THREE.Vector3(...xyz), new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)), new THREE.Vector3(...scale));
+    accessoryParts.push({ owner, g, matrix, color });
+  };
+  PEOPLE.list.forEach((o, i) => {
+    const a = (g, xyz, scale, color, rotation) => accessory(i, g, xyz, scale, color, rotation);
+    // Tiny eyes and shoes give each silhouette a face and a grounded, rounded stance.
+    for (const side of [-1, 1]) {
+      a("sphere", [side * 0.026, 0.27, 0.074], [0.012, 0.016, 0.008], "#333237");
+      a("rbox", [side * 0.03, -0.09, 0.016], [0.055, 0.032, 0.085], "#4c4b49");
+    }
+    if (o.role === "commuter") {
+      a("box", [0, 0.13, 0.047], [0.018, 0.1, 0.012], "#5a6067"); // tie
+      a("cyl", [0.115, 0.12, 0.075], [0.045, 0.07, 0.045], "#e2d4bd"); // coffee
+      a("cyl", [0.115, 0.158, 0.075], [0.049, 0.012, 0.049], "#f0e9db");
+      a("rbox", [-0.11, 0.015, 0], [0.055, 0.095, 0.09], "#6d625b"); // briefcase
+    } else if (o.role === "student") {
+      a("dome", [0, 0.32, 0], [0.18, 0.1, 0.18], "#d8bd67");
+      a("cyl", [0, 0.32, 0.015], [0.21, 0.014, 0.2], "#d8bd67"); // school hat brim
+      a("rbox", [0, 0.13, -0.07], [0.115, 0.13, 0.06], "#a18070");
+    } else if (o.role === "elder") {
+      a("cyl", [0.11, 0.015, 0.075], [0.018, 0.22, 0.018], "#89745f"); // cane
+      a("torus", [0.1, 0.128, 0.075], [0.035, 0.035, 0.018], "#89745f");
+      for (const side of [-1, 1]) a("torus", [side * 0.03, 0.27, 0.08], [0.045, 0.04, 0.012], "#77777b");
+      o.hair = col("#bdb7ad"); hairs.setColorAt(i, o.hair);
+    } else if (o.role === "parent") {
+      a("rbox", [0, 0.015, 0.25], [0.2, 0.105, 0.24], "#a6afa5"); // pram
+      a("dome", [0, 0.095, 0.21], [0.21, 0.15, 0.19], "#bba6a1");
+      a("box", [0, 0.1, 0.12], [0.18, 0.018, 0.025], "#62666a");
+      for (const side of [-1, 1]) for (const z of [0.17, 0.33]) a("cyl", [side * 0.105, -0.055, z], [0.06, 0.025, 0.06], "#54575a", [0, 0, Math.PI / 2]);
+    } else if (o.role === "worker") {
+      a("dome", [0, 0.32, 0], [0.18, 0.12, 0.18], "#d9c18a");
+      a("cyl", [0, 0.32, 0.01], [0.2, 0.018, 0.2], "#d9c18a");
+      a("box", [0, 0.13, 0.05], [0.105, 0.12, 0.014], "#c4aa7e"); // vest, reflective stripes
+      for (const x of [-0.035, 0.035]) a("box", [x, 0.13, 0.06], [0.012, 0.12, 0.008], "#e8e3cb");
+    } else if (o.role === "hiker") {
+      a("rbox", [0, 0.14, -0.085], [0.14, 0.18, 0.1], "#89977b");
+      a("box", [0, 0.18, -0.145], [0.12, 0.03, 0.02], "#c2b294");
+      a("cyl", [0.12, 0.04, 0.07], [0.013, 0.27, 0.013], "#777b78");
+      a("cyl", [0, 0.33, 0], [0.22, 0.025, 0.22], "#c2b294");
+    } else if (o.role === "umbrella") {
+      a("cyl", [0.11, 0.26, 0.03], [0.012, 0.37, 0.012], "#6f7276");
+      a("dome", [0.08, 0.44, 0.02], [0.4, 0.16, 0.4], "#8d9ba9");
+      a("sphere", [0.08, 0.525, 0.02], [0.022, 0.025, 0.022], "#6f7276");
+    } else if (o.role === "balloon") {
+      a("cyl", [0.11, 0.34, 0.02], [0.006, 0.42, 0.006], "#c4bba8");
+      a("sphere", [0.11, 0.61, 0.02], [0.16, 0.2, 0.16], "#c2a0ac");
+    } else if (o.role === "runner") {
+      a("box", [0, 0.285, 0.065], [0.13, 0.025, 0.025], "#c1b7a5"); // sweatband
+      a("cyl", [0.11, 0.05, 0.04], [0.035, 0.08, 0.035], "#9bb3b2");
+    } else if (o.role === "shopper") {
+      for (const side of [-1, 1]) {
+        a("rbox", [side * 0.12, 0.015, 0.01], [0.075, 0.12, 0.065], side > 0 ? "#c1af92" : "#a5afa1");
+        a("torus", [side * 0.12, 0.09, 0.01], [0.04, 0.04, 0.012], "#8c826f");
+      }
+    }
+  });
+  const accessoryBatches = new Map();
+  for (const item of accessoryParts) {
+    if (!accessoryBatches.has(item.g)) accessoryBatches.set(item.g, []);
+    accessoryBatches.get(item.g).push(item);
+  }
+  PEOPLE.accessories = [];
+  for (const [geo, items] of accessoryBatches) {
+    const mesh = mk(GEO[geo], items.length, pm);
+    items.forEach((item, i) => mesh.setColorAt(i, col(item.color)));
+    PEOPLE.accessories.push({ mesh, items });
+  }
+  const citizenMatrices = Array.from({ length: N }, () => new THREE.Matrix4());
+
   /* carry badges over flow walkers */
   const badgeTex = new Map();
   const badgeFor = (txt) => {
@@ -213,8 +294,14 @@ const PEOPLE = { list: [], routes: [] };
     const a = rt.pts[k - 1], b = rt.pts[k], t = (s - rt.cum[k - 1]) / Math.max(1e-6, rt.cum[k] - rt.cum[k - 1]);
     P.lerpVectors(a, b, THREE.MathUtils.clamp(t, 0, 1)); Dv.subVectors(b, a).normalize(); return P;
   };
+  const citizenPos = new THREE.Vector3(), localPos = new THREE.Vector3(), localScale = new THREE.Vector3(), sideVector = new THREE.Vector3();
+  PEOPLE.meshes = [legs, arms, bodies, heads, hairs, ...PEOPLE.accessories.map(a => a.mesh)];
   PEOPLE.filter = null;   // Set of flow ids to show, or null for all
   PEOPLE.update = (dt, time, moving) => {
+    const detailed = camera.position.distanceTo(controls.target) < (QUALITY === "high" ? 24 : 18);
+    PEOPLE.detailVisible = detailed;
+    arms.visible = hairs.visible = detailed;
+    for (const batch of PEOPLE.accessories) batch.mesh.visible = detailed;
     PEOPLE.list.forEach((o, i) => {
       if (moving) {
         if (o.wait > 0) o.wait -= dt;
@@ -223,23 +310,29 @@ const PEOPLE = { list: [], routes: [] };
       const pos = sample(o.rt, o.s);
       const isl = o.kind === "ambient" ? islandById.get(o.isl) : null;
       const lift = isl ? isl.lift : 0;
-      const dir = Dv.clone().multiplyScalar(o.dir);
-      const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(o.side);
+      const dir = Dv.multiplyScalar(o.dir);
+      const side = sideVector.set(-dir.z, 0, dir.x).multiplyScalar(o.side);
       const visible = o.kind === "ambient" || !PEOPLE.filter || PEOPLE.filter.has(o.flow);
-      const sc = visible ? 0.8 : 0.0001;
+      const sc = visible ? 0.95 * o.size : 0.0001;
       const yaw = Math.atan2(dir.x, dir.z);
-      base.compose(new THREE.Vector3(pos.x + side.x, pos.y + lift + 0.13 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
+      base.compose(citizenPos.set(pos.x + side.x, pos.y + lift + 0.105 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), localScale.set(sc, sc, sc));
+      citizenMatrices[i].copy(base);
       const walking = moving && o.wait <= 0;
       const ph = time * 9 + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.01 : 0;
-      for (const [k, sgn] of [[0, 1], [1, -1]]) {
-        loc.compose(new THREE.Vector3(sgn * 0.024, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
-        loc.compose(new THREE.Vector3(sgn * 0.066, 0.115 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+      for (let k = 0; k < 2; k++) {
+        const sgn = k === 0 ? 1 : -1;
+        loc.compose(localPos.set(sgn * 0.03, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        loc.compose(localPos.set(sgn * 0.082, 0.14 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
       }
-      loc.compose(new THREE.Vector3(0, 0.06 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(new THREE.Vector3(0, 0.165 + bob, 0), q.identity(), new THREE.Vector3(0.085, 0.085, 0.085)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(new THREE.Vector3(0, 0.18 + bob, -0.005), q.identity(), new THREE.Vector3(0.092, 0.07, 0.092)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.085 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.265 + bob, 0), q.identity(), localScale.set(0.16, 0.16, 0.16)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.29 + bob, -0.008), q.identity(), localScale.set(0.168, 0.115, 0.168)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
       if (o.badge) { o.badge.visible = visible && PEOPLE.badges; o.badge.position.set(pos.x + side.x, pos.y + 0.38, pos.z + side.z); }
     });
+    if (detailed) for (const { mesh, items } of PEOPLE.accessories) {
+      items.forEach((item, i) => mesh.setMatrixAt(i, out.multiplyMatrices(citizenMatrices[item.owner], item.matrix)));
+      mesh.instanceMatrix.needsUpdate = true;
+    }
     for (const m of [legs, arms, bodies, heads, hairs]) m.instanceMatrix.needsUpdate = true;
     if (PEOPLE.lampPools) { const on = ENV.lampsOn || 0; PEOPLE.lampPools.opacity = on * 0.55; PEOPLE.lampPools.visible = on > 0.01; PEOPLE.campusPools.opacity = on; PEOPLE.campusPools.visible = on > 0.01; PEOPLE.lampBeams.opacity = on * 0.16; PEOPLE.lampBeams.visible = on > 0.01; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); PEOPLE.updatePlanes(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
   };

@@ -27,8 +27,8 @@ const pick = (r, arr) => arr[Math.floor(r() * arr.length) % arr.length];
 
 /* renderer */
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.75 : 1.4));
-renderer.shadowMap.enabled = true;
+renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.5 : 1.25));
+renderer.shadowMap.enabled = QUALITY === "high";
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;

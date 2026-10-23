@@ -261,7 +261,7 @@ html.drawer-open aside.panel{transform:none}
   text-shadow:0 0 4px #fff,0 0 12px var(--c),0 0 26px var(--c),0 0 44px var(--c);animation:neon 3.2s ease-in-out infinite}
 .hi .clabel span{font:800 20px/1.3 var(--f-body);color:#ffe9a8;letter-spacing:.12em;margin-top:4px;text-shadow:0 0 4px #fff3c4,0 0 12px #ffb84a,0 0 22px #ff8a3c}
 @keyframes neon{0%,100%{filter:brightness(1)}48%{filter:brightness(1)}50%{filter:brightness(.82)}52%{filter:brightness(1.08)}}
-@media (max-width:860px){.hi .clabel{font-size:38px;padding:8px 18px 7px;border-width:3px}.hi .clabel span{font-size:19px}
+@media (max-width:860px){.hi .clabel{font-size:30px;padding:8px 12px 7px;border-width:3px}.hi .clabel span{font-size:16px}
   .hi .lmlabel{font-size:11px;padding:2px 7px 2px 4px}.hi .lmlabel .lm-pin{width:12px;height:12px}}
 .hi .clabel{z-index:2147483000!important}
 @media (prefers-reduced-motion:reduce){.hi .clabel{animation:none}}
@@ -554,8 +554,8 @@ const tierOf=ids=>{const ts=(ids||[]).map(i=>sources.get(i)?.tier).filter(Boolea
 function viewCands(){
   return`<div class="eyebrow">2026 縣市長選舉 · 北北基桃</div><h2 class="title">四位參選人</h2>
   <p class="lede">點地圖上的格子，或從這裡進入各城市的政策主題。每一項內容都附上原始來源連結。</p>
-  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
-    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:""} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
+  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const referenceRecords=!rec?(c.achievements||[]).length:0;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
+    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:` ／ ${referenceRecords} 項政績（參考）`} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
 }
 function viewList(){
   const q=query.toLowerCase();
@@ -616,7 +616,14 @@ function openFlow(id){
   ${f.quote?`<div class="vision quote">「${esc(f.quote)}」${f.quoteBy?`<small style="display:block;font-family:var(--f-body);font-weight:400;font-size:12.5px;color:var(--muted)">— ${esc(f.quoteBy)}</small>`:""}</div>`:""}
   <h3 class="sec">來源</h3>${srcList(f.sources)}`);
 }
-function setTab(t){tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
+function setTab(t){
+  if(t==="flows"){
+    $("#mapwrap").classList.remove("flows-off");
+    $("#toggleflows").setAttribute("aria-pressed","true");
+    $("#toggleflows").textContent="隱藏跨市協作線";
+    paint();
+  }
+  tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
   show({cands:viewCands,list:viewList,flows:viewFlows,about:viewAbout}[t]());
   const q=$("#q");if(q){q.oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;paint();setTab("list");const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
 }
@@ -665,8 +672,8 @@ const pick = (r, arr) => arr[Math.floor(r() * arr.length) % arr.length];
 
 /* renderer */
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.75 : 1.4));
-renderer.shadowMap.enabled = true;
+renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.5 : 1.25));
+renderer.shadowMap.enabled = QUALITY === "high";
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2880,7 +2887,9 @@ const PEOPLE = { list: [], routes: [] };
 {
   const R1 = rng(41);
   const SKIN = ["#f1c9a6", "#e2b38c", "#c99772", "#f4d4b8"], HAIR = ["#2e2620", "#4a3a2e", "#6b5444", "#1f1f22", "#9a9a9a"];
-  const SHIRT = ["#ffffff", "#f8f6f1", "#ffffff", "#f4f2ec", "#ffffff", "#f8f6f1", "#ffffff", "#2f6fd6", "#e0453c", "#28c8c8"]; // mostly white, a few accents
+  const SHIRT = ["#ebe5d9", "#9aa99a", "#b8a6aa", "#81949a", "#c4ae8e", "#c2bdac"]; // muted everyday clothes, independent of city identity colors
+  const ROLES = ["commuter", "student", "elder", "parent", "worker", "hiker", "umbrella", "balloon", "runner", "shopper"];
+  PEOPLE.roles = ROLES;
   const routeOf = (pts) => { const cum = [0]; for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + pts[k].distanceTo(pts[k - 1])); return { pts, cum, total: cum[cum.length - 1] }; };
 
   /* flow routes: nearest island pair between the hub city and each partner city, walked over bridges */
@@ -2900,10 +2909,17 @@ const PEOPLE = { list: [], routes: [] };
   }
 
   /* people */
-  const add = (o) => { o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
+  const add = (o) => {
+    const topic = islandById.get(o.isl)?.t.name || "";
+    const local = /教育|育兒|青年/.test(topic) ? ["student", "parent", "balloon"] : /社福|長照|衛生/.test(topic) ? ["elder", "parent", "shopper"] : /工務|交通|產業/.test(topic) ? ["worker", "commuter", "shopper"] : ["hiker", "runner", "umbrella", "balloon", "parent"];
+    o.role = PEOPLE.list.length < ROLES.length ? ROLES[PEOPLE.list.length] : pick(R1, R1() < 0.7 ? local : ROLES);
+    o.size = o.role === "student" || o.role === "balloon" ? 0.76 : o.role === "elder" ? 0.93 : 1;
+    if (o.role === "elder") o.speed *= 0.65;
+    if (o.role === "runner") o.speed *= 1.45;
+    o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
   const perRoute = QUALITY === "high" ? 3 : 2;
   PEOPLE.routes.forEach((rt, ri) => {
-    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: cityHex(rt.from) });
+    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: pick(R1, SHIRT) });
   });
   for (const isl of islands.filter((i) => i.live)) {
     const ids = WORLD.ringNode.get(isl.id), n = QUALITY === "high" ? 7 : 4;
@@ -3065,14 +3081,86 @@ const PEOPLE = { list: [], routes: [] };
   const N = PEOPLE.list.length;
   const mk = (g, n, mat) => { const m = new THREE.InstancedMesh(g, mat, n); m.castShadow = true; m.frustumCulled = false; scene.add(m); return m; };
   const pm = new THREE.MeshStandardMaterial({ roughness: 0.8 });
-  const legG = new THREE.BoxGeometry(0.035, 0.12, 0.04).translate(0, -0.06, 0);
-  const armG = new THREE.BoxGeometry(0.028, 0.1, 0.03).translate(0, -0.05, 0);
-  const bodyG = new RoundedBoxGeometry(0.1, 0.12, 0.065, 2, 0.02);
+  const legG = new THREE.BoxGeometry(0.045, 0.1, 0.055).translate(0, -0.05, 0);
+  const armG = new THREE.BoxGeometry(0.036, 0.115, 0.04).translate(0, -0.0575, 0);
+  const bodyG = new RoundedBoxGeometry(0.125, 0.145, 0.085, 2, 0.022);
   const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), heads = mk(GEO.sphere, N, pm), hairs = mk(GEO.dome, N, pm);
   PEOPLE.list.forEach((o, i) => {
     legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.shirt); arms.setColorAt(i * 2 + 1, o.shirt);
     bodies.setColorAt(i, o.shirt); heads.setColorAt(i, o.skin); hairs.setColorAt(i, o.hair);
   });
+  /* Accessories share geometry/material batches across every citizen. Local +z is the face. */
+  const accessoryParts = [];
+  const accessory = (owner, g, xyz, scale, color, rotation = [0, 0, 0]) => {
+    const matrix = new THREE.Matrix4().compose(new THREE.Vector3(...xyz), new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)), new THREE.Vector3(...scale));
+    accessoryParts.push({ owner, g, matrix, color });
+  };
+  PEOPLE.list.forEach((o, i) => {
+    const a = (g, xyz, scale, color, rotation) => accessory(i, g, xyz, scale, color, rotation);
+    // Tiny eyes and shoes give each silhouette a face and a grounded, rounded stance.
+    for (const side of [-1, 1]) {
+      a("sphere", [side * 0.026, 0.27, 0.074], [0.012, 0.016, 0.008], "#333237");
+      a("rbox", [side * 0.03, -0.09, 0.016], [0.055, 0.032, 0.085], "#4c4b49");
+    }
+    if (o.role === "commuter") {
+      a("box", [0, 0.13, 0.047], [0.018, 0.1, 0.012], "#5a6067"); // tie
+      a("cyl", [0.115, 0.12, 0.075], [0.045, 0.07, 0.045], "#e2d4bd"); // coffee
+      a("cyl", [0.115, 0.158, 0.075], [0.049, 0.012, 0.049], "#f0e9db");
+      a("rbox", [-0.11, 0.015, 0], [0.055, 0.095, 0.09], "#6d625b"); // briefcase
+    } else if (o.role === "student") {
+      a("dome", [0, 0.32, 0], [0.18, 0.1, 0.18], "#d8bd67");
+      a("cyl", [0, 0.32, 0.015], [0.21, 0.014, 0.2], "#d8bd67"); // school hat brim
+      a("rbox", [0, 0.13, -0.07], [0.115, 0.13, 0.06], "#a18070");
+    } else if (o.role === "elder") {
+      a("cyl", [0.11, 0.015, 0.075], [0.018, 0.22, 0.018], "#89745f"); // cane
+      a("torus", [0.1, 0.128, 0.075], [0.035, 0.035, 0.018], "#89745f");
+      for (const side of [-1, 1]) a("torus", [side * 0.03, 0.27, 0.08], [0.045, 0.04, 0.012], "#77777b");
+      o.hair = col("#bdb7ad"); hairs.setColorAt(i, o.hair);
+    } else if (o.role === "parent") {
+      a("rbox", [0, 0.015, 0.25], [0.2, 0.105, 0.24], "#a6afa5"); // pram
+      a("dome", [0, 0.095, 0.21], [0.21, 0.15, 0.19], "#bba6a1");
+      a("box", [0, 0.1, 0.12], [0.18, 0.018, 0.025], "#62666a");
+      for (const side of [-1, 1]) for (const z of [0.17, 0.33]) a("cyl", [side * 0.105, -0.055, z], [0.06, 0.025, 0.06], "#54575a", [0, 0, Math.PI / 2]);
+    } else if (o.role === "worker") {
+      a("dome", [0, 0.32, 0], [0.18, 0.12, 0.18], "#d9c18a");
+      a("cyl", [0, 0.32, 0.01], [0.2, 0.018, 0.2], "#d9c18a");
+      a("box", [0, 0.13, 0.05], [0.105, 0.12, 0.014], "#c4aa7e"); // vest, reflective stripes
+      for (const x of [-0.035, 0.035]) a("box", [x, 0.13, 0.06], [0.012, 0.12, 0.008], "#e8e3cb");
+    } else if (o.role === "hiker") {
+      a("rbox", [0, 0.14, -0.085], [0.14, 0.18, 0.1], "#89977b");
+      a("box", [0, 0.18, -0.145], [0.12, 0.03, 0.02], "#c2b294");
+      a("cyl", [0.12, 0.04, 0.07], [0.013, 0.27, 0.013], "#777b78");
+      a("cyl", [0, 0.33, 0], [0.22, 0.025, 0.22], "#c2b294");
+    } else if (o.role === "umbrella") {
+      a("cyl", [0.11, 0.26, 0.03], [0.012, 0.37, 0.012], "#6f7276");
+      a("dome", [0.08, 0.44, 0.02], [0.4, 0.16, 0.4], "#8d9ba9");
+      a("sphere", [0.08, 0.525, 0.02], [0.022, 0.025, 0.022], "#6f7276");
+    } else if (o.role === "balloon") {
+      a("cyl", [0.11, 0.34, 0.02], [0.006, 0.42, 0.006], "#c4bba8");
+      a("sphere", [0.11, 0.61, 0.02], [0.16, 0.2, 0.16], "#c2a0ac");
+    } else if (o.role === "runner") {
+      a("box", [0, 0.285, 0.065], [0.13, 0.025, 0.025], "#c1b7a5"); // sweatband
+      a("cyl", [0.11, 0.05, 0.04], [0.035, 0.08, 0.035], "#9bb3b2");
+    } else if (o.role === "shopper") {
+      for (const side of [-1, 1]) {
+        a("rbox", [side * 0.12, 0.015, 0.01], [0.075, 0.12, 0.065], side > 0 ? "#c1af92" : "#a5afa1");
+        a("torus", [side * 0.12, 0.09, 0.01], [0.04, 0.04, 0.012], "#8c826f");
+      }
+    }
+  });
+  const accessoryBatches = new Map();
+  for (const item of accessoryParts) {
+    if (!accessoryBatches.has(item.g)) accessoryBatches.set(item.g, []);
+    accessoryBatches.get(item.g).push(item);
+  }
+  PEOPLE.accessories = [];
+  for (const [geo, items] of accessoryBatches) {
+    const mesh = mk(GEO[geo], items.length, pm);
+    items.forEach((item, i) => mesh.setColorAt(i, col(item.color)));
+    PEOPLE.accessories.push({ mesh, items });
+  }
+  const citizenMatrices = Array.from({ length: N }, () => new THREE.Matrix4());
+
   /* carry badges over flow walkers */
   const badgeTex = new Map();
   const badgeFor = (txt) => {
@@ -3090,8 +3178,14 @@ const PEOPLE = { list: [], routes: [] };
     const a = rt.pts[k - 1], b = rt.pts[k], t = (s - rt.cum[k - 1]) / Math.max(1e-6, rt.cum[k] - rt.cum[k - 1]);
     P.lerpVectors(a, b, THREE.MathUtils.clamp(t, 0, 1)); Dv.subVectors(b, a).normalize(); return P;
   };
+  const citizenPos = new THREE.Vector3(), localPos = new THREE.Vector3(), localScale = new THREE.Vector3(), sideVector = new THREE.Vector3();
+  PEOPLE.meshes = [legs, arms, bodies, heads, hairs, ...PEOPLE.accessories.map(a => a.mesh)];
   PEOPLE.filter = null;   // Set of flow ids to show, or null for all
   PEOPLE.update = (dt, time, moving) => {
+    const detailed = camera.position.distanceTo(controls.target) < (QUALITY === "high" ? 24 : 18);
+    PEOPLE.detailVisible = detailed;
+    arms.visible = hairs.visible = detailed;
+    for (const batch of PEOPLE.accessories) batch.mesh.visible = detailed;
     PEOPLE.list.forEach((o, i) => {
       if (moving) {
         if (o.wait > 0) o.wait -= dt;
@@ -3100,23 +3194,29 @@ const PEOPLE = { list: [], routes: [] };
       const pos = sample(o.rt, o.s);
       const isl = o.kind === "ambient" ? islandById.get(o.isl) : null;
       const lift = isl ? isl.lift : 0;
-      const dir = Dv.clone().multiplyScalar(o.dir);
-      const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(o.side);
+      const dir = Dv.multiplyScalar(o.dir);
+      const side = sideVector.set(-dir.z, 0, dir.x).multiplyScalar(o.side);
       const visible = o.kind === "ambient" || !PEOPLE.filter || PEOPLE.filter.has(o.flow);
-      const sc = visible ? 0.8 : 0.0001;
+      const sc = visible ? 0.95 * o.size : 0.0001;
       const yaw = Math.atan2(dir.x, dir.z);
-      base.compose(new THREE.Vector3(pos.x + side.x, pos.y + lift + 0.13 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
+      base.compose(citizenPos.set(pos.x + side.x, pos.y + lift + 0.105 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), localScale.set(sc, sc, sc));
+      citizenMatrices[i].copy(base);
       const walking = moving && o.wait <= 0;
       const ph = time * 9 + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.01 : 0;
-      for (const [k, sgn] of [[0, 1], [1, -1]]) {
-        loc.compose(new THREE.Vector3(sgn * 0.024, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
-        loc.compose(new THREE.Vector3(sgn * 0.066, 0.115 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+      for (let k = 0; k < 2; k++) {
+        const sgn = k === 0 ? 1 : -1;
+        loc.compose(localPos.set(sgn * 0.03, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        loc.compose(localPos.set(sgn * 0.082, 0.14 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
       }
-      loc.compose(new THREE.Vector3(0, 0.06 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(new THREE.Vector3(0, 0.165 + bob, 0), q.identity(), new THREE.Vector3(0.085, 0.085, 0.085)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(new THREE.Vector3(0, 0.18 + bob, -0.005), q.identity(), new THREE.Vector3(0.092, 0.07, 0.092)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.085 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.265 + bob, 0), q.identity(), localScale.set(0.16, 0.16, 0.16)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.29 + bob, -0.008), q.identity(), localScale.set(0.168, 0.115, 0.168)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
       if (o.badge) { o.badge.visible = visible && PEOPLE.badges; o.badge.position.set(pos.x + side.x, pos.y + 0.38, pos.z + side.z); }
     });
+    if (detailed) for (const { mesh, items } of PEOPLE.accessories) {
+      items.forEach((item, i) => mesh.setMatrixAt(i, out.multiplyMatrices(citizenMatrices[item.owner], item.matrix)));
+      mesh.instanceMatrix.needsUpdate = true;
+    }
     for (const m of [legs, arms, bodies, heads, hairs]) m.instanceMatrix.needsUpdate = true;
     if (PEOPLE.lampPools) { const on = ENV.lampsOn || 0; PEOPLE.lampPools.opacity = on * 0.55; PEOPLE.lampPools.visible = on > 0.01; PEOPLE.campusPools.opacity = on; PEOPLE.campusPools.visible = on > 0.01; PEOPLE.lampBeams.opacity = on * 0.16; PEOPLE.lampBeams.visible = on > 0.01; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); PEOPLE.updatePlanes(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
   };
@@ -3222,9 +3322,11 @@ for (const isl of islands.filter((i) => i.live)) {
   WORLD.bodies.get(isl.id).g.add(o);
   islandLabels.set(isl.id, { o, el });
 }
+const citySigns = [];
 for (const c of A.cities) {
   const el = document.createElement("div");
   const live = LIVE_CITIES.has(c.city);
+  citySigns.push(el);
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
   const ci = WORLD.cities.get(c.city), top = ci.coast.reduce((m, q) => (q[1] < m[1] ? q : m));
@@ -3347,7 +3449,7 @@ function overview() {
   const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
   const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
   const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
-  const span = Math.max(sx / Math.max(aspect, 0.6), sz) * 1.02;
+  const span = Math.max(sx / Math.max(aspect, 0.25), sz) * 1.02;
   const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
   return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)), dist };
 }
@@ -3453,7 +3555,27 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
 new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
 let last = performance.now(), clock = 0;
-function loop(now) {
+function fitCitySigns() {
+  citySigns.forEach(el => { el.style.translate = ""; });
+  if (stage.clientWidth > 620 || !stage.classList.contains("pano")) return;
+  const frame = stage.getBoundingClientRect(), gap = 8;
+  const signs = citySigns.map(el => {
+    const r = el.getBoundingClientRect();
+    return { el, left: r.left - frame.left, top: r.top - frame.top, width: r.width, height: r.height };
+  }).sort((a, b) => a.top - b.top);
+  for (let i = 0; i < signs.length; i++) {
+    const s = signs[i];
+    s.x = Math.max(gap, Math.min(frame.width - s.width - gap, s.left));
+    s.y = Math.max(110, s.top);
+    for (let j = 0; j < i; j++) {
+      const p = signs[j];
+      if (s.x < p.x + p.width + gap && s.x + s.width + gap > p.x && s.y < p.y + p.height + gap) s.y = p.y + p.height + gap;
+    }
+  }
+  const overflow = Math.max(0, ...signs.map(s => s.y + s.height - (frame.height - 140)));
+  signs.forEach(s => { s.el.style.translate = `${s.x - s.left}px ${s.y - overflow - s.top}px`; });
+}
+function renderFrame(now, forceRender = false) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   let busy = false;
   if (fly) {
@@ -3476,13 +3598,21 @@ function loop(now) {
   stage.classList.toggle("pano", camDist > labelTH);
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
-  if (busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); dirty = false; }
+  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); dirty = false; }
+}
+function loop(now) {
+  renderFrame(now);
   requestAnimationFrame(loop);
 }
 resize();
 { const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
-window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV };
+window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV, snapshot() {
+  // Complete camera transitions and all dependent scene updates before a deterministic capture.
+  if (fly) { camera.position.copy(fly.p1); controls.target.copy(fly.q1); fly = null; }
+  ENV.apply(); last = performance.now(); renderFrame(last, true);
+  return { ...ENV.state, lampsOn: ENV.lampsOn };
+} };
 
 /* ---------- live weather: page db (refreshed hourly by a scheduled task), else the snapshot built into the page ---------- */
 {
