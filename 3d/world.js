@@ -51,7 +51,7 @@ const GEOM = {};
     asphalt: MESH.tex((g, R) => { g.fillStyle = "#73787f"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 2600; i++) { g.fillStyle = R() < 0.5 ? "rgba(0,0,0,.08)" : "rgba(255,255,255,.07)"; g.fillRect(R() * 256, R() * 256, 2, 2); } for (let i = 0; i < 6; i++) { g.strokeStyle = "rgba(0,0,0,.08)"; g.lineWidth = 1; g.beginPath(); g.moveTo(R() * 256, R() * 256); g.lineTo(R() * 256, R() * 256); g.stroke(); } }, 0.8),
     pavers: MESH.tex((g, R) => { g.fillStyle = "#e9e4da"; g.fillRect(0, 0, 256, 256); for (let y = 0; y < 256; y += 32) for (let x = (y / 32) % 2 ? 16 : 0; x < 256; x += 32) { g.fillStyle = `hsl(38,${12 + R() * 8}%,${84 + R() * 6}%)`; g.fillRect(x + 1, y + 1, 30, 30); } }, 1.1),
     grass: MESH.tex((g, R) => { g.fillStyle = "#93c76a"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 3000; i++) { g.fillStyle = R() < 0.5 ? "#86bb5e" : "#a6d47c"; g.fillRect(R() * 256, R() * 256, 3, 3); } for (let i = 0; i < 60; i++) { g.fillStyle = R() < 0.5 ? "#f6e9a8" : "#ffffff"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.6),
-    sand: MESH.tex((g, R) => { g.fillStyle = "#f7d98f"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 2500; i++) { g.fillStyle = R() < 0.5 ? "rgba(160,120,60,.10)" : "rgba(255,255,255,.25)"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.7),
+    sand: MESH.tex((g, R) => { g.fillStyle = "#f9e5b4"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 1600; i++) { g.fillStyle = R() < 0.5 ? "rgba(214,181,120,.12)" : "rgba(255,255,255,.22)"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.7),
   };
   MESH.ribbon = (pts, w, y, closed = false) => { // strip geometry along a polyline
     const pos = [], P = closed ? [...pts, pts[0]] : pts;
@@ -74,6 +74,7 @@ const GEOM = {};
     }
     return out;
   };
+  GEOM.relax = (P, it = 2, k = 0.5) => { let Q = P.map((p) => p.slice()); for (let n = 0; n < it; n++) { const R = Q.map((p, i) => { const a = Q[(i - 1 + Q.length) % Q.length], b = Q[(i + 1) % Q.length]; return [p[0] * (1 - k) + (a[0] + b[0]) / 2 * k, p[1] * (1 - k) + (a[1] + b[1]) / 2 * k]; }); Q = R; } return Q; };
   GEOM.smooth = (P, it = 1) => { let Q = P; for (let k = 0; k < it; k++) { const R = []; for (let i = 0; i < Q.length; i++) { const a = Q[i], b = Q[(i + 1) % Q.length]; R.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25], [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]); } Q = R; } return Q; };
 
   /* ---------- each city is an island in its real administrative outline; policy themes are neighbourhoods inside it ---------- */
@@ -84,7 +85,7 @@ const GEOM = {};
   for (const c of A.cities) {
     const rings = GD.cities[c.city]; let ring = rings.reduce((m, r) => (r.length > m.length ? r : m));
     const K = ring.map(km), cen = GEOM.centroid(K), s = CITY_SCALE[c.city] || 1;
-    outlines[c.city] = { cen, local: GEOM.smooth(K.map(([x, z]) => [(x - cen[0]) * s, (z - cen[1]) * s]), 1) };
+    outlines[c.city] = { cen, local: GEOM.relax(GEOM.smooth(K.map(([x, z]) => [(x - cen[0]) * s, (z - cen[1]) * s]), 1), 3, 0.5) }; // extra relax passes: resort-smooth shoreline, no jagged pixel steps
   }
   // place Taipei at the origin and the others outward along their real bearing, far enough to stay separate islands
   const rad = (P) => Math.max(...P.map(([x, z]) => Math.hypot(x, z)));
@@ -183,9 +184,9 @@ const GEOM = {};
       }
       const mk = (arr, mat) => { if (!arr.length) return; const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(arr, 3)); const uv = []; for (let k = 0; k < arr.length; k += 3) uv.push(arr[k] * 0.6, arr[k + 2] * 0.6); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; scene.add(m); };
       mk(pos.beach, new THREE.MeshStandardMaterial({ map: MESH.TEX.sand, roughness: 0.95, side: THREE.DoubleSide }));
-      mk(pos.wet, MESH.mat("#d8c08a", { side: THREE.DoubleSide }));
-      mk(pos.quay, MESH.mat(live ? "#c9c4b8" : "#b3b0a9", { side: THREE.DoubleSide }));
-      mk(pos.deck, MESH.mat("#e6e1d6", { side: THREE.DoubleSide }));
+      mk(pos.wet, MESH.mat("#ecd49c", { side: THREE.DoubleSide }));
+      mk(pos.quay, MESH.mat(live ? "#d9d6cd" : "#b3b0a9", { side: THREE.DoubleSide }));
+      mk(pos.deck, MESH.mat("#efece4", { side: THREE.DoubleSide }));
       mk(pos.foam, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.75, depthWrite: false, side: THREE.DoubleSide }));
       { // sand cones at every beach vertex: the union with the strips is a true offset, so concave corners and notches get beach too
         const cp = [], H0 = TOP - 0.065, H1 = WATER_Y + 0.02, SEGS = 20;
@@ -218,7 +219,7 @@ const GEOM = {};
         const sh = new THREE.Shape(pk.map(([x, z]) => new THREE.Vector2(x, -z))), g = new THREE.ShapeGeometry(sh); g.rotateX(-Math.PI / 2);
         const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: MESH.TEX.sand, roughness: 0.95, side: THREE.DoubleSide })); m.position.y = TOP - 0.055; m.receiveShadow = true; scene.add(m);
         const wall = []; for (let k = 0; k < pk.length; k++) { const a = pk[k], b = pk[(k + 1) % pk.length]; wall.push(a[0], TOP - 0.055, a[1], b[0], TOP - 0.055, b[1], b[0], WATER_Y - 0.3, b[1], a[0], TOP - 0.055, a[1], b[0], WATER_Y - 0.3, b[1], a[0], WATER_Y - 0.3, a[1]); }
-        const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(wall, 3)); wg.computeVertexNormals(); scene.add(new THREE.Mesh(wg, MESH.mat("#e8cf8a", { side: THREE.DoubleSide })));
+        const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(wall, 3)); wg.computeVertexNormals(); scene.add(new THREE.Mesh(wg, MESH.mat("#f1dfae", { side: THREE.DoubleSide })));
       }
     }
     const roadsBase = new THREE.Mesh(MESH.slab(GEOM.offset(coast, -0.15), TOP - 0.05, TOP - 0.03), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.asphalt, roughness: 0.9 }) : MESH.mat("#8d8f92")); roadsBase.receiveShadow = true; scene.add(roadsBase);

@@ -118,6 +118,7 @@ const GEO = {
 const MAT = {
   solid: new THREE.MeshStandardMaterial({ roughness: 0.82, metalness: 0.02 }),
   glow: new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0, emissive: 0xffd08a, emissiveIntensity: 0 }),
+  glowCool: new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, emissive: 0xaee8ff, emissiveIntensity: 0 }), // futuristic LED strips: cool white-blue after dark
 };
 /* ---------- procedural facade materials: window grids that keep their size on any box (UVs from instance scale) ---------- */
 const FACADE = {};
@@ -191,10 +192,10 @@ function part(ctx, g, x, y, z, sx, sy, sz, color, ry = 0, rx = 0, rz = 0, glow =
 const batches = new Map();     // key -> InstancedMesh
 function buildBatches() {
   const groups = new Map();
-  for (const p of parts) { const k = (p.glow ? "g:" : "s:") + p.g; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
+  for (const p of parts) { const k = (p.glow === "cool" ? "c:" : p.glow ? "g:" : "s:") + p.g; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
   for (const [k, list] of groups) {
     const [kind, gname] = k.split(":");
-    const im = new THREE.InstancedMesh(GEO[gname] || GEO.box, kind === "g" ? MAT.glow : FACADE[gname] || MAT.solid, list.length);
+    const im = new THREE.InstancedMesh(GEO[gname] || GEO.box, kind === "g" ? MAT.glow : kind === "c" ? MAT.glowCool : FACADE[gname] || MAT.solid, list.length);
     im.castShadow = true; im.receiveShadow = true;
     im.userData = { type: "parts", owners: list.map((p) => p.owner), isl: list.map((p) => p.isl) };
     list.forEach((p, n) => { p.mesh = im; p.index = n; im.setColorAt(n, p.c); });
