@@ -1,4 +1,4 @@
-/* ===== world: each city is one organic island; equal-size hexagonal city blocks, with compatible policy IDs and an unchanged coastal perimeter ===== */
+/* ===== world: each city is one organic island; equal-size square city blocks, with compatible policy IDs and an unchanged coastal perimeter ===== */
 const WORLD = { bodies: new Map(), graph: { nodes: [], edges: new Map() }, cities: new Map() };
 const MESH = {};
 const GEOM = {};
@@ -148,7 +148,7 @@ const GEOM = {};
     "dam": {"city": "taoyuan", "x": -43.618925, "z": 40.311337, "r": 1.5652, "sc": 1.118},
     "lala": {"city": "taoyuan", "x": -39.521005, "z": 43.210247, "r": 1.2642, "sc": 1.204}
   };
-  WORLD.hexCells = [];
+  WORLD.blockCells = [];
   WORLD.zoneFor = (theme) => {
     const name = theme.name || "";
     if (/環保|環境|工務|水利|治水|淨水|防災|韌性|農業/.test(name)) return "environment";
@@ -160,38 +160,38 @@ const GEOM = {};
   };
   const wanted = isl => (isl.t.items || []).length >= 9 ? 3 : (isl.t.items || []).length >= 5 ? 2 : 1;
   const outlinesWorld = new Map(A.cities.map(c => [c.city, outlines[c.city].local.map(([x,z]) => [x+outlines[c.city].off[0],z+outlines[c.city].off[1]])]));
-  const corners = (x,z,r) => Array.from({length:6},(_,k) => [x+Math.cos(-Math.PI/2+k*Math.PI/3)*r,z+Math.sin(-Math.PI/2+k*Math.PI/3)*r]);
+  const corners = (x,z,r) => [[x-r,z-r],[x+r,z-r],[x+r,z+r],[x-r,z+r]];
   const grid = (city, radius) => {
     const coast = outlinesWorld.get(city), xs=coast.map(p=>p[0]), zs=coast.map(p=>p[1]);
     const minx=Math.min(...xs),maxx=Math.max(...xs),minz=Math.min(...zs),maxz=Math.max(...zs);
     let best=[];
     for (const px of [0,1/3,2/3]) for (const pz of [0,1/3,2/3]) {
-      const ox=outlines[city].off[0]+px*SQ3*radius,oz=outlines[city].off[1]+pz*1.5*radius, cells=[];
-      for (let r=Math.floor((minz-oz)/(1.5*radius));r<=Math.ceil((maxz-oz)/(1.5*radius));r++) {
-        for(let q=Math.floor((minx-ox)/(SQ3*radius)-r/2);q<=Math.ceil((maxx-ox)/(SQ3*radius)-r/2);q++) {
-          const x=ox+SQ3*radius*(q+r/2),z=oz+1.5*radius*r;
-          if(!GEOM.pip(x,z,coast)||GEOM.nearestEdge(x,z,coast).d<radius+0.55)continue;
-          cells.push({id:`${city}:${q}:${r}`,city,q,r,c:[x,z],poly:corners(x,z,radius),themeId:null});
+      const step=2*radius,ox=outlines[city].off[0]+px*step,oz=outlines[city].off[1]+pz*step,cells=[];
+      for (let r=Math.floor((minz-oz)/step);r<=Math.ceil((maxz-oz)/step);r++) {
+        for(let q=Math.floor((minx-ox)/step);q<=Math.ceil((maxx-ox)/step);q++) {
+          const x=ox+step*q,z=oz+step*r,poly=corners(x,z,radius);
+          if(!GEOM.pip(x,z,coast)||!poly.every(p=>GEOM.pip(p[0],p[1],coast)&&GEOM.nearestEdge(p[0],p[1],coast).d>.55))continue;
+          cells.push({id:`${city}:${q}:${r}`,city,q,r,c:[x,z],poly,themeId:null});
         }
       }
       if(cells.length>best.length)best=cells;
     }
     return best;
   };
-  // One shared radius across all four cities. Reserve spare blocks for landmarks and normal city fabric.
-  const reserved=(cell,R)=>Object.values(WORLD.landmarkSites).some(l=>l.city===cell.city&&Math.hypot(cell.c[0]-l.x,cell.c[1]-l.z)<R+l.r+0.2);
-  let hexRadius=2.1,layouts;
-  for(;hexRadius>=0.7;hexRadius-=0.05){
-    layouts=new Map(A.cities.map(c=>[c.city,grid(c.city,hexRadius)]));
-    if(A.cities.every(c=>{const themes=islands.filter(i=>i.city===c.city);return layouts.get(c.city).filter(cell=>!reserved(cell,hexRadius)).length>=themes.reduce((n,i)=>n+wanted(i),0)+Math.max(6,Math.ceil(themes.length*0.55))}))break;
+  // One shared block size across all four cities. Reserve spare blocks for landmarks and normal city fabric.
+  const reserved=(cell,R)=>Object.values(WORLD.landmarkSites).some(l=>l.city===cell.city&&Math.hypot(Math.max(0,Math.abs(cell.c[0]-l.x)-R),Math.max(0,Math.abs(cell.c[1]-l.z)-R))<l.r+0.2);
+  let blockHalfSize=1.5,layouts;
+  for(;blockHalfSize>=0.5;blockHalfSize-=0.05){
+    layouts=new Map(A.cities.map(c=>[c.city,grid(c.city,blockHalfSize)]));
+    if(A.cities.every(c=>{const themes=islands.filter(i=>i.city===c.city);return layouts.get(c.city).filter(cell=>!reserved(cell,blockHalfSize)).length>=themes.reduce((n,i)=>n+wanted(i),0)+Math.max(6,Math.ceil(themes.length*0.55))}))break;
   }
-  if(hexRadius<0.7)throw new Error("Cannot fit complete policy hex groups inside the city coastlines");
-  WORLD.hexRadius=hexRadius;
-  const directions=[[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]];
+  if(blockHalfSize<0.5)throw new Error("Cannot fit complete policy square groups inside the city coastlines");
+  WORLD.blockHalfSize=blockHalfSize;
+  const directions=[[1,0],[0,1],[-1,0],[0,-1]];
   const boundary = cells => {
     const key=p=>p.map(n=>n.toFixed(5)).join(","),edges=new Map();
-    for(const cell of cells)for(let i=0;i<6;i++){
-      const a=cell.poly[i],b=cell.poly[(i+1)%6],k=[key(a),key(b)].sort().join("|");
+    for(const cell of cells)for(let i=0;i<cell.poly.length;i++){
+      const a=cell.poly[i],b=cell.poly[(i+1)%cell.poly.length],k=[key(a),key(b)].sort().join("|");
       if(edges.has(k))edges.delete(k);else edges.set(k,[a,b]);
     }
     const next=new Map([...edges.values()].map(e=>[key(e[0]),e[1]])),first=[...edges.values()][0][0],out=[first];
@@ -201,7 +201,7 @@ const GEOM = {};
   };
   for (const c of A.cities) {
     const mine = islands.filter((i) => i.city === c.city), live = LIVE_CITIES.has(c.city);
-    const coast=outlinesWorld.get(c.city),cells=layouts.get(c.city),available=new Set(cells.filter(cell=>!reserved(cell,hexRadius))),lookup=new Map(cells.map(cell=>[`${cell.q},${cell.r}`,cell]));
+    const coast=outlinesWorld.get(c.city),cells=layouts.get(c.city),available=new Set(cells.filter(cell=>!reserved(cell,blockHalfSize))),lookup=new Map(cells.map(cell=>[`${cell.q},${cell.r}`,cell]));
     const center0=GEOM.centroid(coast),xs=coast.map(p=>p[0]),zs=coast.map(p=>p[1]),reach=Math.min(Math.max(...xs)-Math.min(...xs),Math.max(...zs)-Math.min(...zs))*0.25;
     const zones=["commercial","technology","residential","public","culture","environment"];
     const order=[...mine].sort((a,b)=>zones.indexOf(WORLD.zoneFor(a.t))-zones.indexOf(WORLD.zoneFor(b.t))||wanted(b)-wanted(a)||a.t.no-b.t.no);
@@ -218,24 +218,24 @@ const GEOM = {};
         }
         if(picked.length===wanted(isl)){group=picked;break;}
       }
-      if(!group)throw new Error(`No contiguous hex group for ${isl.id}`);
-      isl.c.set(group[0].c[0],0,group[0].c[1]);isl.cells=group;isl.zone=zone;isl.hexRadius=hexRadius;
+      if(!group)throw new Error(`No contiguous square group for ${isl.id}`);
+      isl.c.set(group[0].c[0],0,group[0].c[1]);isl.cells=group;isl.zone=zone;isl.blockHalfSize=blockHalfSize;
       for(const cell of group){available.delete(cell);cell.themeId=isl.id;cell.zone=zone;}
     }
     // Extend the same lattice into usable coastal pockets without moving any policy block.
-    const seed=cells[0],ox=seed.c[0]-SQ3*hexRadius*(seed.q+seed.r/2),oz=seed.c[1]-1.5*hexRadius*seed.r;
+    const step=2*blockHalfSize,seed=cells[0],ox=seed.c[0]-step*seed.q,oz=seed.c[1]-step*seed.r;
     const existing=new Set(cells.map(cell=>`${cell.q},${cell.r}`));
-    for(let r=Math.floor((Math.min(...zs)-oz)/(1.5*hexRadius));r<=Math.ceil((Math.max(...zs)-oz)/(1.5*hexRadius));r++){
-      for(let q=Math.floor((Math.min(...xs)-ox)/(SQ3*hexRadius)-r/2);q<=Math.ceil((Math.max(...xs)-ox)/(SQ3*hexRadius)-r/2);q++){
+    for(let r=Math.floor((Math.min(...zs)-oz)/step);r<=Math.ceil((Math.max(...zs)-oz)/step);r++){
+      for(let q=Math.floor((Math.min(...xs)-ox)/step);q<=Math.ceil((Math.max(...xs)-ox)/step);q++){
         if(existing.has(`${q},${r}`))continue;
-        const x=ox+SQ3*hexRadius*(q+r/2),z=oz+1.5*hexRadius*r,poly=corners(x,z,hexRadius);
-        const samples=poly.flatMap((a,i)=>[a,[(a[0]+poly[(i+1)%6][0])/2,(a[1]+poly[(i+1)%6][1])/2]]);
+        const x=ox+step*q,z=oz+step*r,poly=corners(x,z,blockHalfSize);
+        const samples=poly.flatMap((a,i)=>[a,[(a[0]+poly[(i+1)%4][0])/2,(a[1]+poly[(i+1)%4][1])/2]]);
         if(!samples.every(p=>GEOM.pip(p[0],p[1],coast)&&GEOM.nearestEdge(p[0],p[1],coast).d>.16))continue;
         cells.push({id:`${c.city}:${q}:${r}`,city:c.city,q,r,c:[x,z],poly,themeId:null});
       }
     }
     for(const cell of cells.filter(cell=>!cell.themeId)){const nearest=mine.reduce((a,b)=>Math.hypot(cell.c[0]-a.c.x,cell.c[1]-a.c.z)<Math.hypot(cell.c[0]-b.c.x,cell.c[1]-b.c.z)?a:b);cell.zone=nearest.zone;}
-    WORLD.hexCells.push(...cells);
+    WORLD.blockCells.push(...cells);
     const center = GEOM.centroid(coast);
     WORLD.cities.set(c.city, { live, coast, center, hull: GEOM.hull(coast), E: 0 });
     /* ground: wide beach, grassy land */
@@ -331,19 +331,19 @@ const GEOM = {};
       }
     }
     const roadsBase = new THREE.Mesh(MESH.slab(GEOM.offset(coast, -0.15), TOP - 0.05, TOP - 0.03), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color:0xc4c2b7, roughness: 0.9 }) : MESH.mat("#aaa99f")); roadsBase.receiveShadow = true; scene.add(roadsBase);
-    // Every full hex gets the same inset; gaps form a continuous, shared street network.
+    // Every full square gets the same inset; gaps form a continuous, shared street network.
     for (const cell of cells) {
       const ids=cell.poly.map(([x,z])=>node(x,z));
-      for(let k=0;k<6;k++){
-        const a=ids[k],b=ids[(k+1)%6],key=Math.min(a,b)+"-"+Math.max(a,b);
-        if(!edgeSet.has(key))WORLD.roads.push({a:cell.poly[k],b:cell.poly[(k+1)%6],city:c.city,live});
+      for(let k=0;k<cell.poly.length;k++){
+        const a=ids[k],b=ids[(k+1)%cell.poly.length],key=Math.min(a,b)+"-"+Math.max(a,b);
+        if(!edgeSet.has(key))WORLD.roads.push({a:cell.poly[k],b:cell.poly[(k+1)%cell.poly.length],city:c.city,live});
         addEdge(a,b,{car:true});
       }
     }
     for (const isl of mine) {
       const P=boundary(isl.cells),loc=P.map(([x,z])=>[x-isl.c.x,z-isl.c.z]);
       isl.poly=loc;isl.polyWorld=P;
-      const shapes=isl.cells.map(cell=>MESH.shape(corners(cell.c[0]-isl.c.x,cell.c[1]-isl.c.z,hexRadius-0.18)));
+      const shapes=isl.cells.map(cell=>MESH.shape(corners(cell.c[0]-isl.c.x,cell.c[1]-isl.c.z,blockHalfSize-0.18)));
       const geometry=new THREE.ExtrudeGeometry(shapes,{depth:0.04,bevelEnabled:false,curveSegments:1});geometry.rotateX(-Math.PI/2);geometry.translate(0,TOP-0.04,0);
       const g=new THREE.Group();g.position.set(isl.c.x,0,isl.c.z);
       const plate=new THREE.Mesh(geometry,live?new THREE.MeshStandardMaterial({map:MESH.TEX.pavers,color:0xeedcbc,roughness:0.95}):MESH.mat("#c9c6bf"));

@@ -27,21 +27,24 @@
  const pip=(p,P)=>{let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++)if((P[i][1]>p[1])!==(P[j][1]>p[1])&&p[0]<(P[j][0]-P[i][0])*(p[1]-P[i][1])/(P[j][1]-P[i][1])+P[i][0])c=!c;return c};
  for(const b of named)for(let i=1;i<100;i++){const p=[b.a[0]+(b.b[0]-b.a[0])*i/100,b.a[1]+(b.b[1]-b.a[1])*i/100];check([...W.cities.values()].every(c=>!pip(p,c.coast)),'named bridge crosses land')}
  // Verify the generated scene, including multi-cell policies and real item hit boxes.
- check(W.hexCells.length>55&&W.hexRadius>0,'hex city fabric');
+ check(W.blockCells.length>55&&W.blockHalfSize>0,'square city fabric');
  const ids=new Set();
- for(const cell of W.hexCells){
-   check(!ids.has(cell.id),'duplicate hex');ids.add(cell.id);
-   check(cell.poly.length===6,'hex sides');
-   for(let k=0;k<6;k++){
-     check(Math.abs(dist(cell.poly[k],cell.poly[(k+1)%6])-W.hexRadius)<1e-6,'equal hex edge length');
-     check(pip(cell.poly[k],W.cities.get(cell.city).coast),'hex outside coastline');
+ for(const cell of W.blockCells){
+   check(!ids.has(cell.id),'duplicate block');ids.add(cell.id);
+   check(cell.poly.length===4,'square sides');
+   for(let k=0;k<4;k++){
+     check(Math.abs(dist(cell.poly[k],cell.poly[(k+1)%4])-W.blockHalfSize*2)<1e-6,'equal square edge length');
+     const a=cell.poly[k],b=cell.poly[(k+1)%4];
+     check(Math.abs(a[0]-b[0])<1e-6||Math.abs(a[1]-b[1])<1e-6,'axis-aligned square block');
+     check(pip(cell.poly[k],W.cities.get(cell.city).coast),'square outside coastline');
    }
  }
+ check(W.roads.every(r=>Math.abs(r.a[0]-r.b[0])<1e-6||Math.abs(r.a[1]-r.b[1])<1e-6),'orthogonal street network');
  check(new Set(C.islands.map(i=>i.id)).size===55&&W.bodies.size===55,'stable policy IDs');
  for(const isl of C.islands){
-   check(isl.cells.length>=1&&isl.cells.length<=3,'policy hex count');
+   check(isl.cells.length>=1&&isl.cells.length<=3,'policy square count');
    const seen=new Set([isl.cells[0]]);
-   for(let pass=0;pass<3;pass++)for(const cell of isl.cells)if([...seen].some(a=>Math.abs(dist(a.c,cell.c)-W.hexRadius*Math.sqrt(3))<1e-6))seen.add(cell);
+   for(let pass=0;pass<3;pass++)for(const cell of isl.cells)if([...seen].some(a=>Math.abs(dist(a.c,cell.c)-W.blockHalfSize*2)<1e-6))seen.add(cell);
    check(seen.size===isl.cells.length,'disconnected policy group');
    for(const item of isl.t.items){const box=C.ITEMS3D.get(item.id)?.box;check(box&&!box.isEmpty()&&[...box.min.toArray(),...box.max.toArray()].every(Number.isFinite),'missing item model '+item.id);}
  }
@@ -61,9 +64,9 @@
  check(new Set(plans.map(p=>p.plan)).size>=6,'distinct block organisations');
  check(new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size>=10,'distinct architecture types');
  for(const city of ['taipei','newtaipei','keelung','taoyuan'])check(new Set(plans.filter(p=>p.city===city).map(p=>p.plan)).size>=5,'city block variety '+city);
- for(const cell of W.hexCells){
+ for(const cell of W.blockCells){
    const a=byCell.get(cell.id);if(!a)continue;
-   for(const [q,r] of [[1,0],[0,1],[-1,1]]){const b=byCell.get(`${cell.city}:${cell.q+q}:${cell.r+r}`);if(b)check(a.plan!==b.plan,'repeated adjacent block layout');}
+   for(const [q,r] of [[1,0],[0,1]]){const b=byCell.get(`${cell.city}:${cell.q+q}:${cell.r+r}`);if(b)check(a.plan!==b.plan,'repeated adjacent block layout');}
  }
  check(W.streetTypes.pedestrian>0&&W.streetTypes.road>W.streetTypes.pedestrian,'street hierarchy');
  for(const city of ['taipei','newtaipei','keelung','taoyuan']){
@@ -83,5 +86,5 @@
  MAP3D.panorama();document.querySelector('.hi-brandbtn').click();
  const r=document.querySelector('.notice').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
  check(l.bottom<=r.top,'landmark control behind notice');
- return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,hexRadius:W.hexRadius,hexCells:W.hexCells.length,partBatches:C.batches.size,blockTypes:new Set(plans.map(p=>p.plan)).size,architectureTypes:new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size,streets:W.streetTypes,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
+ return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,blockHalfSize:W.blockHalfSize,blockCells:W.blockCells.length,partBatches:C.batches.size,blockTypes:new Set(plans.map(p=>p.plan)).size,architectureTypes:new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size,streets:W.streetTypes,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
 })()

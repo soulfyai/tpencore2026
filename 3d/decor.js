@@ -294,8 +294,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     if (!isl.live) { site(isl); continue; }
     const its = [...(isl.t.items || [])].sort((a, b) => MODELS.isHero(b.id) - MODELS.isHero(a.id));
     const accent = cityHex(isl.city), used = {}, zone = isl.zone;
-    // Each policy owns 1–3 adjacent, equal hexes. Distribute items evenly across them.
-    const slots=[], R=isl.hexRadius;
+    // Each policy owns 1–3 adjacent, equal squares. Distribute items evenly across them.
+    const slots=[], R=isl.blockHalfSize;
     for(let ci=0;ci<isl.cells.length;ci++){
       const cell=isl.cells[ci],items=its.filter((_,i)=>i%isl.cells.length===ci),n=items.length;
       const offsets=n===1?[[0,0]]:n===2?[[-.3,0],[.3,0]]:n===3?[[0,-.32],[-.3,.22],[.3,.22]]:n<=4?[[-.3,-.28],[.3,-.28],[-.3,.28],[.3,.28]]:Array.from({length:n},(_,i)=>[Math.cos(-Math.PI/2+i*Math.PI*2/n)*.47,Math.sin(-Math.PI/2+i*Math.PI*2/n)*.47]);
@@ -303,12 +303,12 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       items.forEach((it,i)=>slots.push({it,hero:MODELS.isHero(it.id),x:cell.c[0]-isl.c.x+offsets[i][0]*R,z:cell.c[1]-isl.c.z+offsets[i][1]*R,s:size}));
     }
     const xs=isl.cells.map(c=>c.c[0]-isl.c.x),zs=isl.cells.map(c=>c.c[1]-isl.c.z);
-    const cw=Math.max(...xs)-Math.min(...xs)+R*1.73,cd=Math.max(...zs)-Math.min(...zs)+R*2;
+    const cw=Math.max(...xs)-Math.min(...xs)+R*2,cd=Math.max(...zs)-Math.min(...zs)+R*2;
     isl.campus={w:cw,d:cd,cx:(Math.min(...xs)+Math.max(...xs))/2,cz:(Math.min(...zs)+Math.max(...zs))/2};isl.plazaR=R*.65;
     const pc=ctxFor(isl.id,null,0,0,1,0),pp=(g,...a)=>part(pc,g,...a);
-    // Fine city-colour kerbs follow all six edges, including the seams in multi-cell themes.
-    for(const cell of isl.cells)for(let k=0;k<6;k++){
-      const angle=-Math.PI/2+k*Math.PI/3, a=[Math.cos(angle)*(R-.21),Math.sin(angle)*(R-.21)],b=[Math.cos(angle+Math.PI/3)*(R-.21),Math.sin(angle+Math.PI/3)*(R-.21)];
+    // City-colour kerbs follow the four straight edges of each square block.
+    for(const cell of isl.cells)for(let k=0;k<4;k++){
+      const poly=[[-R+.21,-R+.21],[R-.21,-R+.21],[R-.21,R-.21],[-R+.21,R-.21]],a=poly[k],b=poly[(k+1)%4];
       pp("box",cell.c[0]-isl.c.x+(a[0]+b[0])/2,.018,cell.c[1]-isl.c.z+(a[1]+b[1])/2,Math.hypot(b[0]-a[0],b[1]-a[1]),.025,.025,accent,-Math.atan2(b[1]-a[1],b[0]-a[0]));
     }
     const LOT_GROUND = { school: "#e0bd8e", sport: "#a2bd82", park: "#a2bd82", nursery: "#eecfbc", hospital: "#dfe5ec", clinic: "#dfe5ec", elder: "#d9e0c2", metro: "#d6c9ab", bus: "#d6c9ab", bike: "#d6c9ab", road: "#d6c9ab" }; // mid-tone pads: one step below the cream board
@@ -328,7 +328,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       ITEMS3D.set(sl.it.id, { isl: isl.id, x: sl.x, z: sl.z, size: sl.s, box, kind, hero: sl.hero });
     }
     isl.campusTop = campusTop;
-    // One compact light pool per hex; keep the existing people/night-light interface.
+    // One compact light pool per square; keep the existing people/night-light interface.
     for(const cell of isl.cells){
       const x=cell.c[0]-isl.c.x,z=cell.c[1]-isl.c.z+R*.78;
       pp("cyl",x,.36,z,.025,.72,.025,"#3b4148");pp("box",x,.73,z,.2,.045,.12,"#fff6d8",0,0,0,true);
@@ -348,7 +348,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const mine = islands.filter((i) => i.city === city), taken = new Set(), coast = cityInfo(city).coast;
     // footprint radius of each model (model units) and which ones belong inland rather than near the shore
     const FP = { t101: 0.78, dome: 1.0, station: 0.85, shinkong: 0.42, grand: 0.8, npm: 0.98, miramar: 0.75, cks: 0.78, sysm: 0.92, longshan: 0.72, redhouse: 0.68, yangming: 1.15, elephant: 0.88, maokong: 1.25, daan: 1.02, beitou: 0.92, ntcity: 0.75, danjiang: 1.75, fort: 0.85, jiufen: 1.0, shifen: 0.9, queen: 0.85, port: 0.95, guanyin: 0.45, miaokou: 0.9, houses: 0.95, heping: 0.95, airport: 1.5, xpark: 0.85, daxi: 0.9, rainbow: 0.9, dam: 1.4, lala: 1.05 };
-    // Preserve the established geographic sites (before the hex rebuild).
+    // Preserve the established geographic sites (before the block rebuild).
     for (const [id, name, score, sc0, nature] of list) {
       let isl = null, best = null, sc = sc0;
       const saved=WORLD.landmarkSites[id];
@@ -379,14 +379,14 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     environment:{height:1.05,tint:"#b6c3a4",forms:["energy","water","laboratory","terrace"]}
   };
   // Different spatial organisations, not one repeated main tower with two small front buildings.
-  // [x,z,footprint,height,secondary] uses hex-radius units; every footprint is checked on the real site.
+  // [x,z,footprint,height,secondary] uses block half-width units; every footprint is checked on the real site.
   const layouts=[
     {name:"court",lots:[[-.34,-.22,.4,1,0],[.31,-.12,.5,.78,0],[-.1,.4,.34,.5,1]]},
     {name:"parallel",lots:[[-.36,0,.49,1.12,0],[.36,0,.49,.76,0]]},
     {name:"campus",lots:[[0,-.08,.86,.9,0]]},
     {name:"staggered",lots:[[-.31,-.29,.38,.7,0],[.31,-.29,.38,1.25,0],[-.31,.29,.38,.48,1],[.31,.29,.38,.84,0]]},
     {name:"terraced",lots:[[-.06,-.1,.91,1,0]]},
-    {name:"market",lots:Array.from({length:5},(_,i)=>[Math.cos(i*Math.PI*2/5)*.48,Math.sin(i*Math.PI*2/5)*.48,.28,.32,1])},
+    {name:"market",lots:[[-.42,-.38,.28,.32,1],[0,-.38,.28,.4,1],[.42,-.38,.28,.32,1],[-.32,.3,.32,.45,1],[.32,.3,.32,.4,1]]},
     {name:"mixed-core",lots:[[-.28,-.12,.55,1.35,0],[.35,.2,.4,.55,1]]}
   ];
   // Generic architectural signs: these depict public services, not additional policy claims.
@@ -402,9 +402,9 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   for(const [city,info] of WORLD.cities){
     const mine=islands.filter(i=>i.city===city);
     for(const spec of [{type:"fire",zones:["public","environment"]},{type:"police",zones:["public","residential"]},{type:"hospital",zones:["public","residential"]},...([10,15,20].map((floors,style)=>({type:"highrise",floors,style,zones:["commercial","technology","residential"]})))]){
-      const candidates=WORLD.hexCells.filter(c=>c.city===city&&!c.themeId&&!specialSites.has(c.id)).map(cell=>{
+      const candidates=WORLD.blockCells.filter(c=>c.city===city&&!c.themeId&&!specialSites.has(c.id)).map(cell=>{
         const near=mine.reduce((a,b)=>Math.hypot(a.c.x-cell.c[0],a.c.z-cell.c[1])<Math.hypot(b.c.x-cell.c[0],b.c.z-cell.c[1])?a:b);
-        const size=WORLD.hexRadius*.86,footprint=size*.8;
+        const size=WORLD.blockHalfSize*.86,footprint=size*.8;
         const safe=free(near.id,cell.c[0]-near.c.x,cell.c[1]-near.c.z,footprint)&&!LANDMARKS3D.some(l=>Math.hypot(l.isl.c.x+l.x-cell.c[0],l.isl.c.z+l.z-cell.c[1])<l.r+footprint+.18);
         return {cell,size,safe,score:(spec.zones.includes(cell.zone)?0:50)+Math.hypot(cell.c[0]-info.center[0],cell.c[1]-info.center[1])};
       }).filter(c=>c.safe).sort((a,b)=>a.score-b.score);
@@ -415,18 +415,17 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   WORLD.blockPlans=[];
   const chosen=new Map(),neighbours=[[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]];
   const quarter=cell=>`${cell.city}:${Math.floor(cell.q/3)}:${Math.floor(cell.r/2)}`;
-  GEO.hexTile=new THREE.CylinderGeometry(.5,.5,1,6);
-  for(const cell of WORLD.hexCells){
+  for(const cell of WORLD.blockCells){
     if(!LIVE_CITIES.has(cell.city))continue;
     const isl=cell.themeId?islandById.get(cell.themeId):islands.filter(i=>i.city===cell.city).reduce((a,b)=>Math.hypot(a.c.x-cell.c[0],a.c.z-cell.c[1])<Math.hypot(b.c.x-cell.c[0],b.c.z-cell.c[1])?a:b);
-    const R=WORLD.hexRadius,r=rng(hash(cell.id)),profile=profiles[cell.zone];
+    const R=WORLD.blockHalfSize,r=rng(hash(cell.id)),profile=profiles[cell.zone];
     const lx=cell.c[0]-isl.c.x,lz=cell.c[1]-isl.c.z;
-    const rotation=(hash(quarter(cell))%3+((cell.q-cell.r)%3+3)%3)*Math.PI/3;
+    const rotation=(hash(quarter(cell))%2+((cell.q-cell.r)%2+2)%2)*Math.PI/2;
     const rotate=(x,z)=>[x*Math.cos(rotation)+z*Math.sin(rotation),-x*Math.sin(rotation)+z*Math.cos(rotation)];
     const contextAt=(x,z,rot=0)=>cell.themeId?ctxFor(isl.id,null,lx+x,lz+z,1,rot):ctxFor("_static",null,cell.c[0]+x,cell.c[1]+z,1,rot);
     const ctx=contextAt(0,0),p=(g,...a)=>part(ctx,g,...a);
     const clear=(x,z,s)=>free(isl.id,lx+x,lz+z,s)&&!LANDMARKS3D.some(L=>Math.hypot(L.isl.c.x+L.x-cell.c[0]-x,L.isl.c.z+L.z-cell.c[1]-z)<L.r+s+.18);
-    if(!cell.themeId)p("hexTile",0,-.02,0,(R-.18)*2,.04,(R-.18)*2,profile.tint);
+    if(!cell.themeId)p("box",0,-.02,0,(R-.18)*2,.04,(R-.18)*2,profile.tint);
     const used=new Set(neighbours.map(([q,r])=>chosen.get(`${cell.city}:${cell.q+q}:${cell.r+r}`)));
     let choice=hash(cell.id+":layout")%layouts.length;
     while(used.has(choice))choice=(choice+1)%layouts.length;
@@ -462,12 +461,12 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       const [px,pz]=rotate(R*.15,0);LAMP_POOLS.push([cell.c[0]+ex+px,TOP+.012,cell.c[1]+ez+pz,.4]);
     }
   }
-  // Shared background edges within a quarter become pedestrian links, not six black roads per tile.
+  // Shared background edges within a quarter become pedestrian links, not four black roads per block.
   // Policy ring roads remain unchanged, so existing cars and citizen routes keep their contract.
   const pointKey=p=>p.map(v=>Math.round(v*1e5)).join(","),edgeKey=(a,b)=>[pointKey(a),pointKey(b)].sort().join("|");
   const owners=new Map();
-  for(const cell of WORLD.hexCells)for(let k=0;k<6;k++){
-    const key=edgeKey(cell.poly[k],cell.poly[(k+1)%6]);if(!owners.has(key))owners.set(key,[]);owners.get(key).push(cell);
+  for(const cell of WORLD.blockCells)for(let k=0;k<cell.poly.length;k++){
+    const key=edgeKey(cell.poly[k],cell.poly[(k+1)%cell.poly.length]);if(!owners.has(key))owners.set(key,[]);owners.get(key).push(cell);
   }
   WORLD.streetTypes={road:0,pedestrian:0};
   for(const rd of WORLD.roads){
@@ -810,7 +809,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   /* ---------- occupied waterfront fragments: promenade retail, mobility hubs and exhibition pavilions ---------- */
   WORLD.waterfrontPlots=[];
   for(const [city,info] of WORLD.cities){
-    const cells=WORLD.hexCells.filter(c=>c.city===city),placed=[];
+    const cells=WORLD.blockCells.filter(c=>c.city===city),placed=[];
     let distance=0;
     for(let k=0;k<info.coast.length;k++){
       const edge=info.coast[k],prev=info.coast[(k+info.coast.length-1)%info.coast.length];
