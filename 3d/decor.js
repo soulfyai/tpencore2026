@@ -572,6 +572,10 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       let arc = 0; for (let i = 1; i < byAng.length; i++) arc += Math.hypot(byAng[i][0] - byAng[i - 1][0], byAng[i][1] - byAng[i - 1][1]);
       const ptAt = (f) => { let h = arc * f; for (let i = 1; i < byAng.length; i++) { const L2 = Math.hypot(byAng[i][0] - byAng[i - 1][0], byAng[i][1] - byAng[i - 1][1]); if (h <= L2) return byAng[i - 1]; h -= L2; } return byAng[byAng.length - 1] || cA; };
       const targets = [ptAt(0.28), ptAt(0.72)], sep = Math.max(5, arc / 3);
+<<<<<<< HEAD
+=======
+      WORLD.namedBridgeSpacing = sep;
+>>>>>>> origin/claude/modest-newton-t9y5uj
       const segX = (a, b, c2, d2) => { const cr = (q1, q2, q3) => (q2[0] - q1[0]) * (q3[1] - q1[1]) - (q2[1] - q1[1]) * (q3[0] - q1[0]); return cr(a, b, c2) * cr(a, b, d2) < 0 && cr(c2, d2, a) * cr(c2, d2, b) < 0; };
       const crosses = (a, b) => WORLD.bridges.some((B2) => segX(a, b, B2.a, B2.b)) || WORLD.ferryRoutes.some((f2) => segX(a, b, [f2.ax, f2.az], [f2.bx, f2.bz]));
       const placed = [];
@@ -580,7 +584,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         for (const a of fA) for (const b of fB) cand.push([Math.hypot(a[0] - b[0], a[1] - b[1]) + 0.9 * Math.hypot(a[0] - tgt[0], a[1] - tgt[1]), a, b]);
         cand.sort((q1, q2) => q1[0] - q2[0]);
         const ok = (need) => cand.find(([, a, b]) => overWater(a, b) && !crosses(a, b) && placed.every(([pa, pb]) => Math.min(Math.hypot(a[0] - pa[0], a[1] - pa[1]), Math.hypot(b[0] - pb[0], b[1] - pb[1])) > need));
+<<<<<<< HEAD
         const hit = ok(sep) || ok(sep * 0.55); // relax only if the strict third-of-frontage gap finds no water-only line
+=======
+        const hit = ok(sep); // keep the requested minimum spacing; never silently narrow the crossings
+>>>>>>> origin/claude/modest-newton-t9y5uj
         if (!hit) return;
         const [, a, b] = hit; placed.push([a, b]);
         build(a, b, "taipei", "newtaipei", kind, name);

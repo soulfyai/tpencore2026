@@ -10,3 +10,12 @@
 - `build.py`：合併資料並輸出單檔 `index.html`（2D）與 `index3d.html`（3D）
 
 建置：`python3 build.py`
+
+驗證（已安裝 Playwright、Chromium 與本機 Three.js 後）：
+
+```bash
+CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py --check mobile
+CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py '{"out/day":"MAP3D.panorama()"}'
+```
+
+截圖工具自動啟動 UTF-8 本機 HTTP 伺服器、停用動畫排程，再呼叫完整畫格的 `CITY3D.snapshot()`，保留相機、霧距、人物與燈光更新。`--check` 會驗證十種人物角色、動態矩陣、船與飛機動畫、具名雙橋間距／過水／不交叉，以及手機招牌完整可見。手機預設降低像素倍率並停用陰影；桌機保留陰影。

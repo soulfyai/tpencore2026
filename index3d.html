@@ -8,7 +8,7 @@
 :root{
   --paper:#EEF2F8; --surface:#FBFCFE; --sunk:#E1E8F2; --ink:#14213D; --muted:#55627A; --line:#C8D2E2;
   --route:#B5122B;
-  --c-taipei:#1F4FB8; --c-newtaipei:#11A09D; --c-keelung:#23336E; --c-taoyuan:#E0523A;
+  --c-taipei:#1F4FB8; --c-newtaipei:#E5B82E; --c-keelung:#E66B9E; --c-taoyuan:#E0523A;
   --f-display:"Chiron Sung HK","Noto Serif TC","Songti TC",serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -17,22 +17,26 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px 42px} /* bottom clearance for the pinned notice */
 header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px}
 .brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 .brand h1 .subbrand{display:block;font-family:var(--f-body);font-weight:700;font-size:clamp(12px,1.4vw,14px);letter-spacing:.28em;color:var(--muted);margin-top:2px}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
-.notice{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+/* the independence notice is pinned bottom-center and must never be covered */
+.notice{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;
+  width:max-content;max-width:calc(100vw - 24px);text-align:center;
+  font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+  background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(4px)}
 .notice b{color:var(--ink);font-weight:700}
 .main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:14px}
 .mapwrap{position:relative;min-width:0;min-height:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
@@ -57,6 +61,7 @@ svg.map{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation}
 .hex text{fill:var(--ink);font-family:var(--f-body);font-size:11.5px;font-weight:700;text-anchor:middle;pointer-events:none}
 .hex text.code{font-family:var(--f-mono);font-weight:500;font-size:8.5px;fill:var(--muted)}
 .hex.sel text.code{fill:var(--surface);opacity:.8}
+.hex.sel:is([data-city="newtaipei"],[data-city="keelung"]) text{fill:#14213D}
 .border{stroke:var(--c);stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
 .citylabel{font-family:var(--f-display);font-weight:800;font-size:17px;fill:var(--c);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .citylabel tspan.cand{font-family:var(--f-body);font-weight:500;font-size:11px;fill:var(--ink)}
@@ -134,6 +139,7 @@ details.grp .rows{padding-left:18px}
   .chip{min-height:40px}
   .tabs button{min-height:44px}
   .back{min-height:40px}
+  .notice{font-size:10.5px;padding:3px 10px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ===== policy-island page shell (3D page only) ===== */
@@ -149,24 +155,32 @@ html.hi body{padding:0}
    so neon signs never cover the notice, mode buttons, timeline or drawer */
 .hi .labels{z-index:5}
 
-/* brand, top-left */
+/* brand, top-left: the neon sign is a persistent tab, the info card pops out below it */
 .hi header.top{position:absolute;left:20px;top:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(380px,calc(100% - 40px));pointer-events:none}
 .hi header.top>*{pointer-events:auto}
-.hi .brand{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:14px 18px 14px;box-shadow:0 6px 24px rgba(20,33,61,.12)}
-/* brand neon sign: same language as the city neon signs (.hi .clabel) */
-.hi .brand h1{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;
-  background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;padding:8px 16px 7px;
+.hi .brand{background:none;padding:0;box-shadow:none}
+/* brand neon sign: same language as the city neon signs (.hi .clabel); the whole sign is the toggle button */
+.hi .brand h1{display:block;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;margin:0;
+  background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;
   box-shadow:0 0 0 1.5px rgba(255,255,255,.55),0 0 14px var(--c-taipei),inset 0 0 14px color-mix(in srgb,var(--c-taipei) 55%,transparent);
   text-shadow:0 0 4px #fff,0 0 10px var(--c-taipei),0 0 24px var(--c-taipei);animation:neon 3.2s ease-in-out infinite}
+.hi-brandbtn{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-indent:inherit;padding:8px 16px 7px;margin:0;cursor:pointer}
+.hi-t{display:inline-flex;align-items:center}
+.hi-caret{font-style:normal;font-size:13px;margin-left:9px;opacity:.9;display:inline-block;transition:transform .2s}
+.hi .brand.open .hi-caret{transform:rotate(180deg)}
 .hi .brand h1 .hi-sub{font:800 12.5px var(--f-body);letter-spacing:.3em;text-indent:.3em;color:#ffe9a8;text-shadow:0 0 4px #fff3c4,0 0 10px #ffb84a,0 0 18px #ff8a3c}
-@media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}}
-.hi .brand p{font-size:13px;margin-top:6px}
-.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:10px;font:800 22px var(--f-display);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}.hi-caret{transition:none}}
+/* pop-out info card under the sign */
+.hi-pop{margin-top:8px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px 14px;box-shadow:0 10px 32px rgba(20,33,61,.18)}
+.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:0;font:800 22px var(--f-display);color:var(--ink)}
 .hi-cand i{width:15px;height:15px;border-radius:3px;display:inline-block}
 .hi-count{display:flex;align-items:center;gap:10px;margin-top:8px}
 .hi-count b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
 .hi-count span{font-size:12.5px;line-height:1.35;color:var(--muted)}
-.hi .notice{font-size:11.5px;background:color-mix(in srgb,var(--surface) 92%,transparent)}
+/* the weather element (built by main.js) docks as a block at the bottom of the popover */
+.hi .hi-pop .wx{position:static;left:auto;right:auto;top:auto;bottom:auto;max-width:none;background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:10px 0 0;margin-top:12px}
+/* the independence notice: bottom-center of the viewport, above everything (incl. drawer) */
+.hi .notice{font-size:11.5px;z-index:60;background:color-mix(in srgb,var(--surface) 94%,transparent)}
 
 /* view modes, top-right */
 .hi-modes{position:absolute;right:16px;top:16px;z-index:31;display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
@@ -228,10 +242,6 @@ html.drawer-open aside.panel{transform:none}
 .hi-close:hover{background:var(--sunk)}
 @media (prefers-reduced-motion:reduce){.hi aside.panel{transition:none}}
 
-/* weather chip, bottom-right */
-.hi .wx{left:auto;right:16px;bottom:16px;top:auto;max-width:min(420px,calc(100% - 32px))}
-html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
-
 /* toast */
 .hi-toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px);z-index:40;background:var(--ink);color:var(--surface);font:600 14px var(--f-body);padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 6px 20px rgba(20,33,61,.25)}
 .hi-toast.on{opacity:1;transform:translate(-50%,0)}
@@ -240,6 +250,7 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 .hi .tlabel{font:800 13px/1.2 var(--f-body);color:#1b2234;background:#fff;border:0;border-radius:999px;box-shadow:0 3px 10px rgba(20,33,61,.18);padding:6px 12px 6px 10px;gap:7px;transform:none}
 .hi .tlabel b{font:800 12px var(--f-mono);color:var(--c)}
 .hi .tlabel.sel{background:var(--c);color:var(--surface)}.hi .tlabel.sel b{color:var(--surface);opacity:.85}
+.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]),.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]) b{color:#14213D}
 .hi .tlabel.hot{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent),0 3px 10px rgba(20,33,61,.18)}
 .hi .stage.far .tlabel:not(.sel):not(.hot){font-size:12px;padding:4px 9px 4px 8px;gap:5px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) b{font-size:11px}
@@ -250,7 +261,7 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
   text-shadow:0 0 4px #fff,0 0 12px var(--c),0 0 26px var(--c),0 0 44px var(--c);animation:neon 3.2s ease-in-out infinite}
 .hi .clabel span{font:800 20px/1.3 var(--f-body);color:#ffe9a8;letter-spacing:.12em;margin-top:4px;text-shadow:0 0 4px #fff3c4,0 0 12px #ffb84a,0 0 22px #ff8a3c}
 @keyframes neon{0%,100%{filter:brightness(1)}48%{filter:brightness(1)}50%{filter:brightness(.82)}52%{filter:brightness(1.08)}}
-@media (max-width:860px){.hi .clabel{font-size:38px;padding:8px 18px 7px;border-width:3px}.hi .clabel span{font-size:19px}
+@media (max-width:860px){.hi .clabel{font-size:30px;padding:8px 12px 7px;border-width:3px}.hi .clabel span{font-size:16px}
   .hi .lmlabel{font-size:11px;padding:2px 7px 2px 4px}.hi .lmlabel .lm-pin{width:12px;height:12px}}
 .hi .clabel{z-index:2147483000!important}
 @media (prefers-reduced-motion:reduce){.hi .clabel{animation:none}}
@@ -260,27 +271,31 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 
 @media (max-width:860px){
   .hi header.top{left:10px;top:10px;max-width:calc(100% - 20px)}
-  .hi .brand{padding:10px 12px;border-radius:14px}
-  .hi .brand h1{font-size:21px;padding:6px 12px 5px;border-width:2px}
+  .hi .brand h1{font-size:21px;border-width:2px}
+  .hi-brandbtn{padding:6px 12px 5px}
   .hi .brand h1 .hi-sub{font-size:10.5px;letter-spacing:.24em;text-indent:.24em}
-  .hi .brand p{display:none}
-  .hi-cand{margin-top:6px;font-size:17px}
+  .hi-pop{padding:10px 12px 12px;border-radius:14px}
+  .hi-cand{font-size:17px}
   .hi-count{margin-top:4px}.hi-count b{font-size:28px}.hi-count span{font-size:11px}
-  .hi .notice{font-size:10.5px;padding:3px 9px}
+  /* keep the full weather info readable inside the popover on phones */
+  .hi .hi-pop .wx{display:flex;padding:8px 0 0;margin-top:10px}
+  .hi .hi-pop .wx span,.hi .hi-pop .wx small{display:inline-block}
+  /* notice sits above the bottom control row (tour button left, mode bar right) */
+  .hi .notice{bottom:58px;font-size:10.5px;padding:3px 9px}
+  .hi .lmbtn{bottom:100px} /* keep the landmark toggle above the pinned notice */
   .hi-modes{top:auto;bottom:12px;right:10px}
   .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:40px}
   html.drawer-open .hi-modes{right:10px}
-  .hi-intro{left:10px;right:10px;top:auto;bottom:66px;width:auto;padding:14px 16px}
+  .hi-intro{left:10px;right:10px;top:auto;bottom:92px;width:auto;padding:14px 16px}
   .hi-intro h2{font-size:18px}.hi-intro p,.hi-intro ul{font-size:13px}
-  .hi-tour{left:10px;right:10px;width:auto;bottom:62px;padding:12px 14px}
+  .hi-tour{left:10px;right:10px;width:auto;bottom:92px;padding:12px 14px}
   .hi-tour h3{font-size:16px}.hi-tour p{font-size:12.5px}
   .hi-tourbtn{left:10px;bottom:12px;min-height:40px;padding:0 14px;font-size:13px}
-  .hi-timeline{left:8px;right:8px;top:8px;bottom:62px;padding:14px 12px 0}
+  .hi-timeline{left:8px;right:8px;top:8px;bottom:86px;padding:14px 12px 0}
   .hi-tl-cols{grid-template-columns:1fr;overflow:auto;display:block}
   .hi-tl-col{margin-bottom:12px}.hi-tl-col ol{overflow:visible}
   .hi aside.panel{left:0;right:0;top:auto;bottom:0;width:auto;height:72dvh;border-radius:18px 18px 0 0;transform:translateY(105%)}
   html.drawer-open aside.panel{transform:none}
-  .hi .wx{display:none}
 }
 
 /* one list bubble per island */
@@ -306,6 +321,7 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 .hi .hi-cities{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
 .hi .hi-cities button{font:700 15px var(--f-body);padding:6px 16px;border-radius:999px;border:2px solid var(--c);background:transparent;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
 .hi .hi-cities button[aria-selected="true"]{background:var(--c);color:var(--surface);box-shadow:0 0 12px color-mix(in srgb,var(--c) 60%,transparent)}
+.hi .hi-cities button:is([data-city="newtaipei"],[data-city="keelung"])[aria-selected="true"]{color:#14213D}
 .hi .hi-cities button:focus-visible{outline:2px solid var(--route);outline-offset:2px}
 @media (max-width:860px){.hi .hi-cities{margin-top:6px;gap:5px}.hi .hi-cities button{font-size:14px;padding:5px 13px;min-height:44px}}
 
@@ -538,8 +554,8 @@ const tierOf=ids=>{const ts=(ids||[]).map(i=>sources.get(i)?.tier).filter(Boolea
 function viewCands(){
   return`<div class="eyebrow">2026 縣市長選舉 · 北北基桃</div><h2 class="title">四位參選人</h2>
   <p class="lede">點地圖上的格子，或從這裡進入各城市的政策主題。每一項內容都附上原始來源連結。</p>
-  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
-    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:""} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
+  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const referenceRecords=!rec?(c.achievements||[]).length:0;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
+    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:` ／ ${referenceRecords} 項政績（參考）`} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
 }
 function viewList(){
   const q=query.toLowerCase();
@@ -600,7 +616,14 @@ function openFlow(id){
   ${f.quote?`<div class="vision quote">「${esc(f.quote)}」${f.quoteBy?`<small style="display:block;font-family:var(--f-body);font-weight:400;font-size:12.5px;color:var(--muted)">— ${esc(f.quoteBy)}</small>`:""}</div>`:""}
   <h3 class="sec">來源</h3>${srcList(f.sources)}`);
 }
-function setTab(t){tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
+function setTab(t){
+  if(t==="flows"){
+    $("#mapwrap").classList.remove("flows-off");
+    $("#toggleflows").setAttribute("aria-pressed","true");
+    $("#toggleflows").textContent="隱藏跨市協作線";
+    paint();
+  }
+  tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
   show({cands:viewCands,list:viewList,flows:viewFlows,about:viewAbout}[t]());
   const q=$("#q");if(q){q.oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;paint();setTab("list");const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
 }
@@ -649,8 +672,8 @@ const pick = (r, arr) => arr[Math.floor(r() * arr.length) % arr.length];
 
 /* renderer */
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.75 : 1.4));
-renderer.shadowMap.enabled = true;
+renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.5 : 1.25));
+renderer.shadowMap.enabled = QUALITY === "high";
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -2841,6 +2864,10 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       let arc = 0; for (let i = 1; i < byAng.length; i++) arc += Math.hypot(byAng[i][0] - byAng[i - 1][0], byAng[i][1] - byAng[i - 1][1]);
       const ptAt = (f) => { let h = arc * f; for (let i = 1; i < byAng.length; i++) { const L2 = Math.hypot(byAng[i][0] - byAng[i - 1][0], byAng[i][1] - byAng[i - 1][1]); if (h <= L2) return byAng[i - 1]; h -= L2; } return byAng[byAng.length - 1] || cA; };
       const targets = [ptAt(0.28), ptAt(0.72)], sep = Math.max(5, arc / 3);
+<<<<<<< HEAD
+=======
+      WORLD.namedBridgeSpacing = sep;
+>>>>>>> origin/claude/modest-newton-t9y5uj
       const segX = (a, b, c2, d2) => { const cr = (q1, q2, q3) => (q2[0] - q1[0]) * (q3[1] - q1[1]) - (q2[1] - q1[1]) * (q3[0] - q1[0]); return cr(a, b, c2) * cr(a, b, d2) < 0 && cr(c2, d2, a) * cr(c2, d2, b) < 0; };
       const crosses = (a, b) => WORLD.bridges.some((B2) => segX(a, b, B2.a, B2.b)) || WORLD.ferryRoutes.some((f2) => segX(a, b, [f2.ax, f2.az], [f2.bx, f2.bz]));
       const placed = [];
@@ -2849,7 +2876,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         for (const a of fA) for (const b of fB) cand.push([Math.hypot(a[0] - b[0], a[1] - b[1]) + 0.9 * Math.hypot(a[0] - tgt[0], a[1] - tgt[1]), a, b]);
         cand.sort((q1, q2) => q1[0] - q2[0]);
         const ok = (need) => cand.find(([, a, b]) => overWater(a, b) && !crosses(a, b) && placed.every(([pa, pb]) => Math.min(Math.hypot(a[0] - pa[0], a[1] - pa[1]), Math.hypot(b[0] - pb[0], b[1] - pb[1])) > need));
+<<<<<<< HEAD
         const hit = ok(sep) || ok(sep * 0.55); // relax only if the strict third-of-frontage gap finds no water-only line
+=======
+        const hit = ok(sep); // keep the requested minimum spacing; never silently narrow the crossings
+>>>>>>> origin/claude/modest-newton-t9y5uj
         if (!hit) return;
         const [, a, b] = hit; placed.push([a, b]);
         build(a, b, "taipei", "newtaipei", kind, name);
@@ -2863,7 +2894,9 @@ const PEOPLE = { list: [], routes: [] };
 {
   const R1 = rng(41);
   const SKIN = ["#f1c9a6", "#e2b38c", "#c99772", "#f4d4b8"], HAIR = ["#2e2620", "#4a3a2e", "#6b5444", "#1f1f22", "#9a9a9a"];
-  const SHIRT = ["#ffffff", "#f8f6f1", "#ffffff", "#f4f2ec", "#ffffff", "#f8f6f1", "#ffffff", "#2f6fd6", "#e0453c", "#28c8c8"]; // mostly white, a few accents
+  const SHIRT = ["#ebe5d9", "#9aa99a", "#b8a6aa", "#81949a", "#c4ae8e", "#c2bdac"]; // muted everyday clothes, independent of city identity colors
+  const ROLES = ["commuter", "student", "elder", "parent", "worker", "hiker", "umbrella", "balloon", "runner", "shopper"];
+  PEOPLE.roles = ROLES;
   const routeOf = (pts) => { const cum = [0]; for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + pts[k].distanceTo(pts[k - 1])); return { pts, cum, total: cum[cum.length - 1] }; };
 
   /* flow routes: nearest island pair between the hub city and each partner city, walked over bridges */
@@ -2883,10 +2916,17 @@ const PEOPLE = { list: [], routes: [] };
   }
 
   /* people */
-  const add = (o) => { o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
+  const add = (o) => {
+    const topic = islandById.get(o.isl)?.t.name || "";
+    const local = /教育|育兒|青年/.test(topic) ? ["student", "parent", "balloon"] : /社福|長照|衛生/.test(topic) ? ["elder", "parent", "shopper"] : /工務|交通|產業/.test(topic) ? ["worker", "commuter", "shopper"] : ["hiker", "runner", "umbrella", "balloon", "parent"];
+    o.role = PEOPLE.list.length < ROLES.length ? ROLES[PEOPLE.list.length] : pick(R1, R1() < 0.7 ? local : ROLES);
+    o.size = o.role === "student" || o.role === "balloon" ? 0.76 : o.role === "elder" ? 0.93 : 1;
+    if (o.role === "elder") o.speed *= 0.65;
+    if (o.role === "runner") o.speed *= 1.45;
+    o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
   const perRoute = QUALITY === "high" ? 3 : 2;
   PEOPLE.routes.forEach((rt, ri) => {
-    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: cityHex(rt.from) });
+    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: pick(R1, SHIRT) });
   });
   for (const isl of islands.filter((i) => i.live)) {
     const ids = WORLD.ringNode.get(isl.id), n = QUALITY === "high" ? 7 : 4;
@@ -3048,14 +3088,86 @@ const PEOPLE = { list: [], routes: [] };
   const N = PEOPLE.list.length;
   const mk = (g, n, mat) => { const m = new THREE.InstancedMesh(g, mat, n); m.castShadow = true; m.frustumCulled = false; scene.add(m); return m; };
   const pm = new THREE.MeshStandardMaterial({ roughness: 0.8 });
-  const legG = new THREE.BoxGeometry(0.035, 0.12, 0.04).translate(0, -0.06, 0);
-  const armG = new THREE.BoxGeometry(0.028, 0.1, 0.03).translate(0, -0.05, 0);
-  const bodyG = new RoundedBoxGeometry(0.1, 0.12, 0.065, 2, 0.02);
+  const legG = new THREE.BoxGeometry(0.045, 0.1, 0.055).translate(0, -0.05, 0);
+  const armG = new THREE.BoxGeometry(0.036, 0.115, 0.04).translate(0, -0.0575, 0);
+  const bodyG = new RoundedBoxGeometry(0.125, 0.145, 0.085, 2, 0.022);
   const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), heads = mk(GEO.sphere, N, pm), hairs = mk(GEO.dome, N, pm);
   PEOPLE.list.forEach((o, i) => {
     legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.shirt); arms.setColorAt(i * 2 + 1, o.shirt);
     bodies.setColorAt(i, o.shirt); heads.setColorAt(i, o.skin); hairs.setColorAt(i, o.hair);
   });
+  /* Accessories share geometry/material batches across every citizen. Local +z is the face. */
+  const accessoryParts = [];
+  const accessory = (owner, g, xyz, scale, color, rotation = [0, 0, 0]) => {
+    const matrix = new THREE.Matrix4().compose(new THREE.Vector3(...xyz), new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)), new THREE.Vector3(...scale));
+    accessoryParts.push({ owner, g, matrix, color });
+  };
+  PEOPLE.list.forEach((o, i) => {
+    const a = (g, xyz, scale, color, rotation) => accessory(i, g, xyz, scale, color, rotation);
+    // Tiny eyes and shoes give each silhouette a face and a grounded, rounded stance.
+    for (const side of [-1, 1]) {
+      a("sphere", [side * 0.026, 0.27, 0.074], [0.012, 0.016, 0.008], "#333237");
+      a("rbox", [side * 0.03, -0.09, 0.016], [0.055, 0.032, 0.085], "#4c4b49");
+    }
+    if (o.role === "commuter") {
+      a("box", [0, 0.13, 0.047], [0.018, 0.1, 0.012], "#5a6067"); // tie
+      a("cyl", [0.115, 0.12, 0.075], [0.045, 0.07, 0.045], "#e2d4bd"); // coffee
+      a("cyl", [0.115, 0.158, 0.075], [0.049, 0.012, 0.049], "#f0e9db");
+      a("rbox", [-0.11, 0.015, 0], [0.055, 0.095, 0.09], "#6d625b"); // briefcase
+    } else if (o.role === "student") {
+      a("dome", [0, 0.32, 0], [0.18, 0.1, 0.18], "#d8bd67");
+      a("cyl", [0, 0.32, 0.015], [0.21, 0.014, 0.2], "#d8bd67"); // school hat brim
+      a("rbox", [0, 0.13, -0.07], [0.115, 0.13, 0.06], "#a18070");
+    } else if (o.role === "elder") {
+      a("cyl", [0.11, 0.015, 0.075], [0.018, 0.22, 0.018], "#89745f"); // cane
+      a("torus", [0.1, 0.128, 0.075], [0.035, 0.035, 0.018], "#89745f");
+      for (const side of [-1, 1]) a("torus", [side * 0.03, 0.27, 0.08], [0.045, 0.04, 0.012], "#77777b");
+      o.hair = col("#bdb7ad"); hairs.setColorAt(i, o.hair);
+    } else if (o.role === "parent") {
+      a("rbox", [0, 0.015, 0.25], [0.2, 0.105, 0.24], "#a6afa5"); // pram
+      a("dome", [0, 0.095, 0.21], [0.21, 0.15, 0.19], "#bba6a1");
+      a("box", [0, 0.1, 0.12], [0.18, 0.018, 0.025], "#62666a");
+      for (const side of [-1, 1]) for (const z of [0.17, 0.33]) a("cyl", [side * 0.105, -0.055, z], [0.06, 0.025, 0.06], "#54575a", [0, 0, Math.PI / 2]);
+    } else if (o.role === "worker") {
+      a("dome", [0, 0.32, 0], [0.18, 0.12, 0.18], "#d9c18a");
+      a("cyl", [0, 0.32, 0.01], [0.2, 0.018, 0.2], "#d9c18a");
+      a("box", [0, 0.13, 0.05], [0.105, 0.12, 0.014], "#c4aa7e"); // vest, reflective stripes
+      for (const x of [-0.035, 0.035]) a("box", [x, 0.13, 0.06], [0.012, 0.12, 0.008], "#e8e3cb");
+    } else if (o.role === "hiker") {
+      a("rbox", [0, 0.14, -0.085], [0.14, 0.18, 0.1], "#89977b");
+      a("box", [0, 0.18, -0.145], [0.12, 0.03, 0.02], "#c2b294");
+      a("cyl", [0.12, 0.04, 0.07], [0.013, 0.27, 0.013], "#777b78");
+      a("cyl", [0, 0.33, 0], [0.22, 0.025, 0.22], "#c2b294");
+    } else if (o.role === "umbrella") {
+      a("cyl", [0.11, 0.26, 0.03], [0.012, 0.37, 0.012], "#6f7276");
+      a("dome", [0.08, 0.44, 0.02], [0.4, 0.16, 0.4], "#8d9ba9");
+      a("sphere", [0.08, 0.525, 0.02], [0.022, 0.025, 0.022], "#6f7276");
+    } else if (o.role === "balloon") {
+      a("cyl", [0.11, 0.34, 0.02], [0.006, 0.42, 0.006], "#c4bba8");
+      a("sphere", [0.11, 0.61, 0.02], [0.16, 0.2, 0.16], "#c2a0ac");
+    } else if (o.role === "runner") {
+      a("box", [0, 0.285, 0.065], [0.13, 0.025, 0.025], "#c1b7a5"); // sweatband
+      a("cyl", [0.11, 0.05, 0.04], [0.035, 0.08, 0.035], "#9bb3b2");
+    } else if (o.role === "shopper") {
+      for (const side of [-1, 1]) {
+        a("rbox", [side * 0.12, 0.015, 0.01], [0.075, 0.12, 0.065], side > 0 ? "#c1af92" : "#a5afa1");
+        a("torus", [side * 0.12, 0.09, 0.01], [0.04, 0.04, 0.012], "#8c826f");
+      }
+    }
+  });
+  const accessoryBatches = new Map();
+  for (const item of accessoryParts) {
+    if (!accessoryBatches.has(item.g)) accessoryBatches.set(item.g, []);
+    accessoryBatches.get(item.g).push(item);
+  }
+  PEOPLE.accessories = [];
+  for (const [geo, items] of accessoryBatches) {
+    const mesh = mk(GEO[geo], items.length, pm);
+    items.forEach((item, i) => mesh.setColorAt(i, col(item.color)));
+    PEOPLE.accessories.push({ mesh, items });
+  }
+  const citizenMatrices = Array.from({ length: N }, () => new THREE.Matrix4());
+
   /* carry badges over flow walkers */
   const badgeTex = new Map();
   const badgeFor = (txt) => {
@@ -3073,8 +3185,14 @@ const PEOPLE = { list: [], routes: [] };
     const a = rt.pts[k - 1], b = rt.pts[k], t = (s - rt.cum[k - 1]) / Math.max(1e-6, rt.cum[k] - rt.cum[k - 1]);
     P.lerpVectors(a, b, THREE.MathUtils.clamp(t, 0, 1)); Dv.subVectors(b, a).normalize(); return P;
   };
+  const citizenPos = new THREE.Vector3(), localPos = new THREE.Vector3(), localScale = new THREE.Vector3(), sideVector = new THREE.Vector3();
+  PEOPLE.meshes = [legs, arms, bodies, heads, hairs, ...PEOPLE.accessories.map(a => a.mesh)];
   PEOPLE.filter = null;   // Set of flow ids to show, or null for all
   PEOPLE.update = (dt, time, moving) => {
+    const detailed = camera.position.distanceTo(controls.target) < (QUALITY === "high" ? 24 : 18);
+    PEOPLE.detailVisible = detailed;
+    arms.visible = hairs.visible = detailed;
+    for (const batch of PEOPLE.accessories) batch.mesh.visible = detailed;
     PEOPLE.list.forEach((o, i) => {
       if (moving) {
         if (o.wait > 0) o.wait -= dt;
@@ -3083,23 +3201,29 @@ const PEOPLE = { list: [], routes: [] };
       const pos = sample(o.rt, o.s);
       const isl = o.kind === "ambient" ? islandById.get(o.isl) : null;
       const lift = isl ? isl.lift : 0;
-      const dir = Dv.clone().multiplyScalar(o.dir);
-      const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(o.side);
+      const dir = Dv.multiplyScalar(o.dir);
+      const side = sideVector.set(-dir.z, 0, dir.x).multiplyScalar(o.side);
       const visible = o.kind === "ambient" || !PEOPLE.filter || PEOPLE.filter.has(o.flow);
-      const sc = visible ? 0.8 : 0.0001;
+      const sc = visible ? 0.95 * o.size : 0.0001;
       const yaw = Math.atan2(dir.x, dir.z);
-      base.compose(new THREE.Vector3(pos.x + side.x, pos.y + lift + 0.13 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
+      base.compose(citizenPos.set(pos.x + side.x, pos.y + lift + 0.105 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), localScale.set(sc, sc, sc));
+      citizenMatrices[i].copy(base);
       const walking = moving && o.wait <= 0;
       const ph = time * 9 + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.01 : 0;
-      for (const [k, sgn] of [[0, 1], [1, -1]]) {
-        loc.compose(new THREE.Vector3(sgn * 0.024, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
-        loc.compose(new THREE.Vector3(sgn * 0.066, 0.115 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+      for (let k = 0; k < 2; k++) {
+        const sgn = k === 0 ? 1 : -1;
+        loc.compose(localPos.set(sgn * 0.03, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        loc.compose(localPos.set(sgn * 0.082, 0.14 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
       }
-      loc.compose(new THREE.Vector3(0, 0.06 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(new THREE.Vector3(0, 0.165 + bob, 0), q.identity(), new THREE.Vector3(0.085, 0.085, 0.085)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(new THREE.Vector3(0, 0.18 + bob, -0.005), q.identity(), new THREE.Vector3(0.092, 0.07, 0.092)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.085 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.265 + bob, 0), q.identity(), localScale.set(0.16, 0.16, 0.16)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      loc.compose(localPos.set(0, 0.29 + bob, -0.008), q.identity(), localScale.set(0.168, 0.115, 0.168)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
       if (o.badge) { o.badge.visible = visible && PEOPLE.badges; o.badge.position.set(pos.x + side.x, pos.y + 0.38, pos.z + side.z); }
     });
+    if (detailed) for (const { mesh, items } of PEOPLE.accessories) {
+      items.forEach((item, i) => mesh.setMatrixAt(i, out.multiplyMatrices(citizenMatrices[item.owner], item.matrix)));
+      mesh.instanceMatrix.needsUpdate = true;
+    }
     for (const m of [legs, arms, bodies, heads, hairs]) m.instanceMatrix.needsUpdate = true;
     if (PEOPLE.lampPools) { const on = ENV.lampsOn || 0; PEOPLE.lampPools.opacity = on * 0.55; PEOPLE.lampPools.visible = on > 0.01; PEOPLE.campusPools.opacity = on; PEOPLE.campusPools.visible = on > 0.01; PEOPLE.lampBeams.opacity = on * 0.16; PEOPLE.lampBeams.visible = on > 0.01; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); PEOPLE.updatePlanes(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
   };
@@ -3195,6 +3319,7 @@ const islandLabels = new Map();
 for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
+  el.dataset.city = isl.city;
   el.style.setProperty("--c", `var(--c-${isl.city})`);
   el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
@@ -3204,9 +3329,11 @@ for (const isl of islands.filter((i) => i.live)) {
   WORLD.bodies.get(isl.id).g.add(o);
   islandLabels.set(isl.id, { o, el });
 }
+const citySigns = [];
 for (const c of A.cities) {
   const el = document.createElement("div");
   const live = LIVE_CITIES.has(c.city);
+  citySigns.push(el);
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
   const ci = WORLD.cities.get(c.city), top = ci.coast.reduce((m, q) => (q[1] < m[1] ? q : m));
@@ -3329,7 +3456,7 @@ function overview() {
   const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
   const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
   const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
-  const span = Math.max(sx / Math.max(aspect, 0.6), sz) * 1.02;
+  const span = Math.max(sx / Math.max(aspect, 0.25), sz) * 1.02;
   const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
   return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)), dist };
 }
@@ -3435,7 +3562,27 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
 new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
 let last = performance.now(), clock = 0;
-function loop(now) {
+function fitCitySigns() {
+  citySigns.forEach(el => { el.style.translate = ""; });
+  if (stage.clientWidth > 620 || !stage.classList.contains("pano")) return;
+  const frame = stage.getBoundingClientRect(), gap = 8;
+  const signs = citySigns.map(el => {
+    const r = el.getBoundingClientRect();
+    return { el, left: r.left - frame.left, top: r.top - frame.top, width: r.width, height: r.height };
+  }).sort((a, b) => a.top - b.top);
+  for (let i = 0; i < signs.length; i++) {
+    const s = signs[i];
+    s.x = Math.max(gap, Math.min(frame.width - s.width - gap, s.left));
+    s.y = Math.max(110, s.top);
+    for (let j = 0; j < i; j++) {
+      const p = signs[j];
+      if (s.x < p.x + p.width + gap && s.x + s.width + gap > p.x && s.y < p.y + p.height + gap) s.y = p.y + p.height + gap;
+    }
+  }
+  const overflow = Math.max(0, ...signs.map(s => s.y + s.height - (frame.height - 140)));
+  signs.forEach(s => { s.el.style.translate = `${s.x - s.left}px ${s.y - overflow - s.top}px`; });
+}
+function renderFrame(now, forceRender = false) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   let busy = false;
   if (fly) {
@@ -3458,13 +3605,21 @@ function loop(now) {
   stage.classList.toggle("pano", camDist > labelTH);
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
-  if (busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); dirty = false; }
+  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); dirty = false; }
+}
+function loop(now) {
+  renderFrame(now);
   requestAnimationFrame(loop);
 }
 resize();
 { const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
-window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV };
+window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV, snapshot() {
+  // Complete camera transitions and all dependent scene updates before a deterministic capture.
+  if (fly) { camera.position.copy(fly.p1); controls.target.copy(fly.q1); fly = null; }
+  ENV.apply(); last = performance.now(); renderFrame(last, true);
+  return { ...ENV.state, lampsOn: ENV.lampsOn };
+} };
 
 /* ---------- live weather: page db (refreshed hourly by a scheduled task), else the snapshot built into the page ---------- */
 {
@@ -3538,16 +3693,31 @@ const UI = {};
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const statusOf2 = (it, t) => (t.kind === "record" || it.phase === "已實施" ? "done" : /施工|興建|擴線|驗收|機電|擴區|推動中|延續推動|試辦|已宣布/.test(it.phase || "") ? "build" : "plan");
 
-  /* ---------- brand block ---------- */
+  /* ---------- brand block: the neon sign is a persistent tab, details pop out below it ---------- */
   const brand = document.querySelector("header.top .brand");
-  const h1 = brand.querySelector("h1"); if (h1) h1.innerHTML = `台北安可<span class="hi-sub">北北基桃政策市</span>`; // neon sign, styled in page.css
-  const lede = brand.querySelector("p"); if (lede) lede.textContent = "開始探索屬於你我的城市";
+  const h1 = brand.querySelector("h1");
+  const brandBtn = el("button", "hi-brandbtn", `<span class="hi-t">台北安可<i class="hi-caret" aria-hidden="true">▾</i></span><span class="hi-sub">一起打造你我的北北基桃</span>`);
+  brandBtn.type = "button"; brandBtn.setAttribute("aria-expanded", "false"); brandBtn.setAttribute("aria-controls", "hi-pop");
+  if (h1) { h1.innerHTML = ""; h1.appendChild(brandBtn); }
+  brand.querySelector("p")?.remove(); // no lede under the sign
+  // the independence notice always sits bottom-center of the viewport; move it out of the
+  // header's stacking context (z 30) so nothing — drawer (35) included — can cover it
+  const notice = document.querySelector("header.top .notice"); if (notice) document.body.appendChild(notice);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
+  // City switcher colors match the map and city signs.
   for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
-  brand.append(cand, count, chips);
+  const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
+  pop.append(cand, count, chips);
+  // re-home the live weather element (built and updated by main.js) into the popover; keeping
+  // the same node means ENV/weather updates keep flowing into it unchanged
+  const wxEl = document.querySelector(".stage .wx"); if (wxEl) pop.appendChild(wxEl);
+  brand.append(pop);
+  const setPop = (on) => { pop.hidden = !on; brandBtn.setAttribute("aria-expanded", String(on)); brand.classList.toggle("open", on); };
+  brandBtn.onclick = () => setPop(pop.hidden);
+  document.addEventListener("pointerdown", (e) => { if (!pop.hidden && !brand.contains(e.target)) setPop(false); }); // tap outside collapses
+  UI.togglePop = setPop;
   function paintBrand() {
-    count.style.setProperty("--c", `var(--c-${LIVE})`); // the big number follows the current city's color
     cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
     count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
@@ -3666,8 +3836,12 @@ const UI = {};
   const toast = el("div", "hi-toast"); toast.setAttribute("role", "status"); document.querySelector(".mapwrap").appendChild(toast);
   let tt = 0; UI.toast = (msg) => { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 2600); };
 
-  // Escape closes the drawer once the 2D page's handler has cleared any selection
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer(); });
+  // Escape: first collapse the brand popover, then (once the 2D page's handler has cleared any selection) close the drawer
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!pop.hidden) { setPop(false); return; }
+    if (html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer();
+  });
 
   for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano"));
   paintBrand(); A.setCity(LIVE);

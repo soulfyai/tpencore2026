@@ -8,7 +8,7 @@
 :root{
   --paper:#EEF2F8; --surface:#FBFCFE; --sunk:#E1E8F2; --ink:#14213D; --muted:#55627A; --line:#C8D2E2;
   --route:#B5122B;
-  --c-taipei:#1F4FB8; --c-newtaipei:#11A09D; --c-keelung:#23336E; --c-taoyuan:#E0523A;
+  --c-taipei:#1F4FB8; --c-newtaipei:#E5B82E; --c-keelung:#E66B9E; --c-taoyuan:#E0523A;
   --f-display:"Chiron Sung HK","Noto Serif TC","Songti TC",serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -17,22 +17,26 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px 42px} /* bottom clearance for the pinned notice */
 header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px}
 .brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 .brand h1 .subbrand{display:block;font-family:var(--f-body);font-weight:700;font-size:clamp(12px,1.4vw,14px);letter-spacing:.28em;color:var(--muted);margin-top:2px}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
-.notice{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+/* the independence notice is pinned bottom-center and must never be covered */
+.notice{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;
+  width:max-content;max-width:calc(100vw - 24px);text-align:center;
+  font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+  background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(4px)}
 .notice b{color:var(--ink);font-weight:700}
 .main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:14px}
 .mapwrap{position:relative;min-width:0;min-height:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
@@ -57,6 +61,7 @@ svg.map{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation}
 .hex text{fill:var(--ink);font-family:var(--f-body);font-size:11.5px;font-weight:700;text-anchor:middle;pointer-events:none}
 .hex text.code{font-family:var(--f-mono);font-weight:500;font-size:8.5px;fill:var(--muted)}
 .hex.sel text.code{fill:var(--surface);opacity:.8}
+.hex.sel:is([data-city="newtaipei"],[data-city="keelung"]) text{fill:#14213D}
 .border{stroke:var(--c);stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
 .citylabel{font-family:var(--f-display);font-weight:800;font-size:17px;fill:var(--c);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .citylabel tspan.cand{font-family:var(--f-body);font-weight:500;font-size:11px;fill:var(--ink)}
@@ -134,6 +139,7 @@ details.grp .rows{padding-left:18px}
   .chip{min-height:40px}
   .tabs button{min-height:44px}
   .back{min-height:40px}
+  .notice{font-size:10.5px;padding:3px 10px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -305,8 +311,8 @@ const tierOf=ids=>{const ts=(ids||[]).map(i=>sources.get(i)?.tier).filter(Boolea
 function viewCands(){
   return`<div class="eyebrow">2026 縣市長選舉 · 北北基桃</div><h2 class="title">四位參選人</h2>
   <p class="lede">點地圖上的格子，或從這裡進入各城市的政策主題。每一項內容都附上原始來源連結。</p>
-  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
-    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:""} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
+  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const referenceRecords=!rec?(c.achievements||[]).length:0;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
+    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:` ／ ${referenceRecords} 項政績（參考）`} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
 }
 function viewList(){
   const q=query.toLowerCase();
@@ -367,7 +373,14 @@ function openFlow(id){
   ${f.quote?`<div class="vision quote">「${esc(f.quote)}」${f.quoteBy?`<small style="display:block;font-family:var(--f-body);font-weight:400;font-size:12.5px;color:var(--muted)">— ${esc(f.quoteBy)}</small>`:""}</div>`:""}
   <h3 class="sec">來源</h3>${srcList(f.sources)}`);
 }
-function setTab(t){tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
+function setTab(t){
+  if(t==="flows"){
+    $("#mapwrap").classList.remove("flows-off");
+    $("#toggleflows").setAttribute("aria-pressed","true");
+    $("#toggleflows").textContent="隱藏跨市協作線";
+    paint();
+  }
+  tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
   show({cands:viewCands,list:viewList,flows:viewFlows,about:viewAbout}[t]());
   const q=$("#q");if(q){q.oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;paint();setTab("list");const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
 }
