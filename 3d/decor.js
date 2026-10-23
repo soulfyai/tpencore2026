@@ -31,7 +31,6 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   };
 
 
-  const ZONE = (name) => { for (const [re, z] of [[/環保|運動|體育|賽事/, "P"], [/交通|軌道|工務|水利|治水|防災|治安|消防|城市建設/, "I"], [/產業|AI|科技|就業|觀光|港市|文化|族群|地方|其他/, "C"]]) if (re.test(name)) return z; return "R"; };
   const pk = (r, a) => a[(r() * a.length) | 0];
   const GLASS = ["#7fd4ec", "#5fa8e4", "#9fd2f2", "#bfe6f6", "#6fc2dc", "#8fb8e8"]; // glass-curtain blues
   const NEON = ["#33e1ff", "#7fb4ff", "#b8f0ff", "#9f8bff"];                          // cool LED accents
@@ -124,24 +123,24 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   for (const isl of islands) {
     if (!isl.live) { site(isl); continue; }
     const its = [...(isl.t.items || [])].sort((a, b) => MODELS.isHero(b.id) - MODELS.isHero(a.id));
-    const accent = cityHex(isl.city), used = {}, zone = ZONE(isl.t.name);
-    // layout: heroes in the back row (big lots), the rest in rows of 2-3 in front
-    const heroes = its.filter((i) => MODELS.isHero(i.id)), rest = its.filter((i) => !MODELS.isHero(i.id));
-    const LOT = rest.length <= 2 ? 1.8 : rest.length <= 4 ? 1.5 : 1.3, HLOT = 2.3, GAP = 0.24, perRow = rest.length > 4 ? 3 : 2;
-    const rows = []; if (heroes.length) rows.push(heroes.map((it) => ({ it, s: HLOT, hero: true })));
-    for (let k = 0; k < rest.length; k += perRow) rows.push(rest.slice(k, k + perRow).map((it) => ({ it, s: LOT, hero: false })));
-    const rowW = rows.map((r) => r.reduce((a, l) => a + l.s, 0) + GAP * (r.length - 1)), rowD = rows.map((r) => Math.max(...r.map((l) => l.s)));
-    const W = Math.max(...rowW), D = rowD.reduce((a, b) => a + b, 0) + GAP * (rows.length - 1);
-    // shrink to fit the neighbourhood
-    let inR = 1e9; for (let k = 0; k < isl.poly.length; k++) inR = Math.min(inR, GEOM.segDist(0, 0, isl.poly[k], isl.poly[(k + 1) % isl.poly.length]));
-    const fit = Math.min(1, (inR * 1.55) / Math.hypot(W + 0.5, D + 0.5));
-    const slots = []; let z = -D / 2;
-    rows.forEach((r, i) => { let x = -rowW[i] / 2; for (const l of r) { slots.push({ ...l, x: (x + l.s / 2) * fit, z: (z + rowD[i] / 2) * fit, s: l.s * fit }); x += l.s + GAP; } z += rowD[i] + GAP; });
-    const cw = (W + 0.4) * fit, cd = (D + 0.4) * fit;
-    isl.campus = { w: cw, d: cd }; isl.plazaR = Math.hypot(cw, cd) / 2;
-    const pc = ctxFor(isl.id, null, 0, 0, 1, 0, zone, null), pp = (g, ...a) => part(pc, g, ...a);
-    pp("rbox", 0, 0.02, 0, cw + 0.1, 0.04, cd + 0.1, accent);          // thin city-colour frame, nothing louder
-    pp("rbox", 0, 0.036, 0, cw + 0.02, 0.05, cd + 0.02, "#f6eedb");     // one clean cream board per theme
+    const accent = cityHex(isl.city), used = {}, zone = isl.zone;
+    // Each policy owns 1–3 adjacent, equal hexes. Distribute items evenly across them.
+    const slots=[], R=isl.hexRadius;
+    for(let ci=0;ci<isl.cells.length;ci++){
+      const cell=isl.cells[ci],items=its.filter((_,i)=>i%isl.cells.length===ci),n=items.length;
+      const offsets=n===1?[[0,0]]:n===2?[[-.3,0],[.3,0]]:n===3?[[0,-.32],[-.3,.22],[.3,.22]]:n<=4?[[-.3,-.28],[.3,-.28],[-.3,.28],[.3,.28]]:Array.from({length:n},(_,i)=>[Math.cos(-Math.PI/2+i*Math.PI*2/n)*.47,Math.sin(-Math.PI/2+i*Math.PI*2/n)*.47]);
+      const size=R*(n===1?.95:n<=3?.67:n<=4?.56:.44);
+      items.forEach((it,i)=>slots.push({it,hero:MODELS.isHero(it.id),x:cell.c[0]-isl.c.x+offsets[i][0]*R,z:cell.c[1]-isl.c.z+offsets[i][1]*R,s:size}));
+    }
+    const xs=isl.cells.map(c=>c.c[0]-isl.c.x),zs=isl.cells.map(c=>c.c[1]-isl.c.z);
+    const cw=Math.max(...xs)-Math.min(...xs)+R*1.73,cd=Math.max(...zs)-Math.min(...zs)+R*2;
+    isl.campus={w:cw,d:cd,cx:(Math.min(...xs)+Math.max(...xs))/2,cz:(Math.min(...zs)+Math.max(...zs))/2};isl.plazaR=R*.65;
+    const pc=ctxFor(isl.id,null,0,0,1,0),pp=(g,...a)=>part(pc,g,...a);
+    // Fine city-colour kerbs follow all six edges, including the seams in multi-cell themes.
+    for(const cell of isl.cells)for(let k=0;k<6;k++){
+      const angle=-Math.PI/2+k*Math.PI/3, a=[Math.cos(angle)*(R-.16),Math.sin(angle)*(R-.16)],b=[Math.cos(angle+Math.PI/3)*(R-.16),Math.sin(angle+Math.PI/3)*(R-.16)];
+      pp("box",cell.c[0]-isl.c.x+(a[0]+b[0])/2,.018,cell.c[1]-isl.c.z+(a[1]+b[1])/2,Math.hypot(b[0]-a[0],b[1]-a[1]),.025,.025,accent,-Math.atan2(b[1]-a[1],b[0]-a[0]));
+    }
     const LOT_GROUND = { school: "#e0bd8e", sport: "#a2bd82", park: "#a2bd82", nursery: "#eecfbc", hospital: "#dfe5ec", clinic: "#dfe5ec", elder: "#d9e0c2", metro: "#d6c9ab", bus: "#d6c9ab", bike: "#d6c9ab", road: "#d6c9ab" }; // mid-tone pads: one step below the cream board
     let campusTop = TOP;
     for (const sl of slots) {
@@ -153,24 +152,20 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       const vs = MODELS.variants[kind], k = (used[kind] = (used[kind] || 0) + 1) - 1;
       (sl.hero ? MODELS.heroes[sl.it.id] : vs ? vs[k % vs.length] : MODELS.kinds[kind])(p, MODELS.helpers(p, accent), accent, r);
       const box = new THREE.Box3(); for (let q = start; q < parts.length; q++) box.union(unit.clone().applyMatrix4(parts[q].m));
+      hold(isl.id,sl.x,sl.z,sl.s*.65);
       campusTop = Math.max(campusTop, box.max.y);
       box.translate(new THREE.Vector3(isl.c.x, 0, isl.c.z));
       ITEMS3D.set(sl.it.id, { isl: isl.id, x: sl.x, z: sl.z, size: sl.s, box, kind, hero: sl.hero });
     }
     isl.campusTop = campusTop;
-    // stadium-style floodlights on the campus corners: hooded heads aimed at the middle, lit after 17:00
-    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
-      const px = sx * (cw / 2 + 0.12), pz = sz * (cd / 2 + 0.12), H = 1.15, a = Math.atan2(-pz, -px);
-      pp("cyl", px, H / 2, pz, 0.035, H, 0.035, "#3b4148"); pp("cyl", px, 0.03, pz, 0.1, 0.06, 0.1, "#3b4148");
-      const hx = px + Math.cos(a) * 0.12, hz = pz + Math.sin(a) * 0.12;
-      pp("box", (px + hx) / 2, H, (pz + hz) / 2, 0.16, 0.025, 0.025, "#3b4148", -a);
-      pp("box", hx, H + 0.02, hz, 0.2, 0.08, 0.16, "#2b3036", -a, 0, -0.5);          // hood
-      pp("box", hx + Math.cos(a) * 0.02, H - 0.02, hz + Math.sin(a) * 0.02, 0.16, 0.02, 0.12, "#fff6d8", -a, 0, -0.5, true); // lamp face
-      LAMP_BEAMS.push([isl.c.x + hx, TOP + H - 0.03, isl.c.z + hz, isl.c.x + px * 0.25, TOP + 0.07, isl.c.z + pz * 0.25, Math.max(cw, cd) * 0.46]);
+    // One compact light pool per hex; keep the existing people/night-light interface.
+    for(const cell of isl.cells){
+      const x=cell.c[0]-isl.c.x,z=cell.c[1]-isl.c.z+R*.78;
+      pp("cyl",x,.36,z,.025,.72,.025,"#3b4148");pp("box",x,.73,z,.2,.045,.12,"#fff6d8",0,0,0,true);
+      LAMP_POOLS.push([cell.c[0],TOP+.075,cell.c[1],R*.8]);
     }
-    LAMP_POOLS.push([isl.c.x, TOP + 0.075, isl.c.z, Math.max(cw, cd) * 0.5]); // campus flood pool: wider than a street lamp so people.js can light it separately
-    hold(isl.id, 0, 0, Math.hypot(cw, cd) / 2 + 0.1);
-    const body = WORLD.bodies.get(isl.id); body.anchor.set(0, TOP, cd / 2 + 0.28);
+    const body=WORLD.bodies.get(isl.id);body.anchor.set(isl.campus.cx,TOP,isl.campus.cz+R*.58);
+
   }
 
   /* ---------- city landmarks for the live city ---------- */
@@ -183,24 +178,14 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const mine = islands.filter((i) => i.city === city), taken = new Set(), coast = cityInfo(city).coast;
     // footprint radius of each model (model units) and which ones belong inland rather than near the shore
     const FP = { t101: 0.78, dome: 1.0, station: 0.85, shinkong: 0.42, grand: 0.8, npm: 0.98, miramar: 0.75, cks: 0.78, sysm: 0.92, longshan: 0.72, redhouse: 0.68, yangming: 1.15, elephant: 0.88, maokong: 1.25, daan: 1.02, beitou: 0.92, ntcity: 0.75, danjiang: 1.75, fort: 0.85, jiufen: 1.0, shifen: 0.9, queen: 0.85, port: 0.95, guanyin: 0.45, miaokou: 0.9, houses: 0.95, heping: 0.95, airport: 1.5, xpark: 0.85, daxi: 0.9, rainbow: 0.9, dam: 1.4, lala: 1.05 };
-    // real positions (lon, lat): each landmark goes to the nearest spot on land where its whole footprint fits
-    const GEO_LL = { t101: [121.5645, 25.034], dome: [121.5606, 25.0437], station: [121.517, 25.0478], shinkong: [121.515, 25.0461], grand: [121.5262, 25.0784], npm: [121.5485, 25.1024], miramar: [121.5575, 25.0835], cks: [121.5219, 25.035], sysm: [121.5603, 25.04], longshan: [121.4999, 25.0372], redhouse: [121.5068, 25.042], yangming: [121.545, 25.155], elephant: [121.5767, 25.0275], maokong: [121.588, 24.968], daan: [121.5355, 25.03], beitou: [121.508, 25.137],
-      ntcity: [121.4648, 25.0123], danjiang: [121.429, 25.168], fort: [121.433, 25.1753], jiufen: [121.8445, 25.1092], shifen: [121.787, 25.0475], queen: [121.69, 25.2063],
-      port: [121.74, 25.133], guanyin: [121.7445, 25.1290], miaokou: [121.7435, 25.1285], houses: [121.774, 25.15], heping: [121.769, 25.163],
-      airport: [121.233, 25.0797], xpark: [121.215, 25.0137], daxi: [121.287, 24.883], rainbow: [121.013, 24.989], dam: [121.24, 24.815], lala: [121.44, 24.718] };
+    // Preserve the established geographic sites (before the hex rebuild).
     for (const [id, name, score, sc0, nature] of list) {
       let isl = null, best = null, sc = sc0;
-      const [tx, tz] = GEO_LL[id] ? WORLD.geo(city, ...GEO_LL[id]) : [0, 0];
-      // spiral out from the real spot: the footprint must sit on land and clear every policy campus and other landmark (it may span a street)
-      const cells = []; for (let x = -14; x <= 14; x += 0.25) for (let z = -14; z <= 14; z += 0.25) cells.push([tx + x, tz + z, Math.hypot(x, z)]); cells.sort((p, q) => p[2] - q[2]);
-      const LPAD = { heping: 1.1 }; // extra label clearance: 和平島 sits right by 大觀音 on the Keelung shore, so its tag needs more room
-      const okAt = (wx, wz, R) => GEOM.pip(wx, wz, coast) && GEOM.nearestEdge(wx, wz, coast).d >= R + 0.35 &&
-        mine.every((m) => Math.hypot(wx - m.c.x, wz - m.c.z) - m.plazaR >= R * 0.92) &&
-        !LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - wx, L.isl.c.z + L.z - wz) < R + L.r + (LPAD[id] || 0.7)); // generous gaps so labels never stack
-      for (const f of [1, 0.93, 0.86, 0.8]) { // keep sizes consistent: move a landmark further before shrinking it much
-        const s2 = sc0 * f, R = (FP[id] || 0.8) * s2, lim = f === 1 ? 3 : f > 0.9 ? 5 : f > 0.85 ? 8 : 99;
-        const hit = cells.find(([wx, wz, dd]) => dd <= lim && okAt(wx, wz, R));
-        if (hit) { const [wx, wz] = hit; isl = mine.find((m) => GEOM.pip(wx - m.c.x, wz - m.c.z, m.poly)) || mine.reduce((p, m) => (Math.hypot(m.c.x - wx, m.c.z - wz) < Math.hypot(p.c.x - wx, p.c.z - wz) ? m : p)); best = [wx - isl.c.x, wz - isl.c.z]; sc = s2; break; }
+      const saved=WORLD.landmarkSites[id];
+      if(saved){
+        const wx=saved.x,wz=saved.z;
+        isl=mine.reduce((a,b)=>Math.hypot(a.c.x-wx,a.c.z-wz)<Math.hypot(b.c.x-wx,b.c.z-wz)?a:b);
+        best=[wx-isl.c.x,wz-isl.c.z];sc=saved.sc;
       }
       if (!best) continue; if (!nature) taken.add(isl.id);
       const ctx = { isl: isl.id, owner: null, base: new THREE.Matrix4().compose(new THREE.Vector3(best[0], TOP, best[1]), new THREE.Quaternion(), new THREE.Vector3(sc, sc, sc)), s: sc, zone: "L" };
@@ -214,52 +199,54 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     }
   }
 
-  /* ---------- skyline: fill every live neighbourhood around its plaza ---------- */
-  for (const c of A.cities) {
-    if (!LIVE_CITIES.has(c.city)) continue;
-    const info = cityInfo(c.city), mine = islands.filter((i) => i.city === c.city);
-    const maxD = Math.max(...mine.map((i) => Math.hypot(i.c.x - info.center[0], i.c.z - info.center[1]))) || 1;
-    for (const isl of mine) {
-      const r = rng(hash(isl.id) + 5), dd = Math.hypot(isl.c.x - info.center[0], isl.c.z - info.center[1]) / maxD, zone = ZONE(isl.t.name);
-      const cand = []; for (let x = -6; x <= 6; x += 0.5) for (let z = -6; z <= 6; z += 0.5) cand.push([x + (r() - 0.5) * 0.2, z + (r() - 0.5) * 0.2]);
-      cand.sort(() => r() - 0.5);
-      for (const [x, z] of cand) {
-        if (!GEOM.pip(x, z, isl.poly)) continue;
-        const ne = GEOM.nearestEdge(x, z, isl.poly); if (ne.d < 0.22) continue;
-        const v = r(), downtown = dd < 0.42;
-        if (r() < (downtown ? 0.22 : 0.4)) { // leave room for greenery: a small grove instead of another building
-          if (!free(isl.id, x, z, 0.22)) continue; hold(isl.id, x, z, 0.22);
-          const gp = (g, ...a) => part(ctxFor(isl.id, null, x, z, 1, 0, zone, null), g, ...a), nT = 1 + ((r() * 3) | 0);
-          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#689659", "#7aa567", "#5e8750", "#8bab6f"])); }
-          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#739c5f");
-          continue;
-        }
-        let type = downtown ? (v < 0.5 ? "tower" : v < 0.84 ? "office" : v < 0.93 ? "shop" : "park") : (v < 0.16 ? "tower" : v < 0.52 ? "office" : v < 0.76 ? "house" : v < 0.88 ? "shop" : "park");
-        if (zone === "P" && v > 0.6) type = "park";
-        let s = type === "tower" ? 0.5 + r() * 0.25 : type === "office" ? 0.5 + r() * 0.3 : type === "park" ? 0.55 + r() * 0.3 : 0.4 + r() * 0.3;
-        s = Math.min(s, ne.d * 1.6);
-        if (s < 0.3 || !free(isl.id, x, z, s * 0.62)) continue;
-        // keep the plaza visible: nothing tall in front of it (south = +z)
-        const front = z > -0.3 && Math.abs(x) < isl.campus.w / 2 + 1.6;
-        let h = type === "tower" ? (downtown ? 1.8 + r() * 2.6 : 1.2 + r() * 1.0) : 0.55 + r() * 0.8;
-        if (front) { if (type === "tower") type = z > 0.8 ? "shop" : "office"; h = Math.min(h, z > 0.8 ? 0.4 : 0.6); }
-        if (type === "tower") type = "office"; h = Math.min(h, 1.0);
-        if (LANDMARKS3D.some((L) => L.isl === isl && Math.hypot(L.x - x, L.z - z) < 3.2)) { if (type === "tower") type = "office"; h = Math.min(h, 0.9); }
-        const ctx = ctxFor(isl.id, null, x, z, 1, -ne.ang, zone, null), p = (g, ...a) => part(ctx, g, ...a);
-        B[type](p, s, h, r); hold(isl.id, x, z, s * 0.62);
-      }
-      // street trees along the kerb
-      const P = isl.poly, tc = ctxFor(isl.id, null, 0, 0, 1, 0, zone, null), tp = (g, ...a) => part(tc, g, ...a);
-      for (let k = 0; k < P.length; k++) {
-        const a = P[k], b = P[(k + 1) % P.length], L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L;
-        for (let t = 0.25, j = 0; t < L - 0.15; t += 0.42, j++) {
-          let x = a[0] + ux * t - uz * 0.14, z = a[1] + uz * t + ux * 0.14; if (!GEOM.pip(x, z, P)) { x = a[0] + ux * t + uz * 0.14; z = a[1] + uz * t - ux * 0.14; }
-          if (!GEOM.pip(x, z, P) || (Math.abs(x) < isl.campus.w / 2 + 0.15 && Math.abs(z) < isl.campus.d / 2 + 0.15)) continue;
-          if (LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - isl.c.x - x, L.isl.c.z + L.z - isl.c.z - z) < L.r + 0.2)) continue;
-          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#689659", "#7aa567", "#5e8750"])); }
-          else { tp("cyl", x, 0.17, z, 0.018, 0.34, 0.018, "#3b4148"); tp("sphere", x, 0.35, z, 0.045, 0.045, 0.045, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([isl.c.x + x, TOP + 0.012, isl.c.z + z, 0.42]); }
-        }
-      }
+  /* ---------- planned city fabric: six distinct functional skylines ---------- */
+  const profiles={
+    commercial:{types:["tower","tower","office","shop"],height:2.8,tint:"#e8dfce"},
+    technology:{types:["office","tower","office","office"],height:1.8,tint:"#d7e4e7"},
+    residential:{types:["office","house","office","shop"],height:1.1,tint:"#eadfce"},
+    public:{types:["office","office","park","shop"],height:.85,tint:"#e3dfd1"},
+    culture:{types:["shop","shop","office","park"],height:.7,tint:"#e9d9d0"},
+    environment:{types:["office","park","office","park"],height:.8,tint:"#d9dfc9"}
+  };
+  WORLD.buildingCounts=Object.fromEntries(Object.keys(profiles).map(k=>[k,0]));
+  GEO.hexTile=new THREE.CylinderGeometry(.5,.5,1,6);
+  for(const cell of WORLD.hexCells){
+    if(!LIVE_CITIES.has(cell.city))continue;
+    const isl=cell.themeId?islandById.get(cell.themeId):islands.filter(i=>i.city===cell.city).reduce((a,b)=>Math.hypot(a.c.x-cell.c[0],a.c.z-cell.c[1])<Math.hypot(b.c.x-cell.c[0],b.c.z-cell.c[1])?a:b);
+    const R=WORLD.hexRadius,r=rng(hash(cell.id)),profile=profiles[cell.zone];
+    const lx=cell.c[0]-isl.c.x,lz=cell.c[1]-isl.c.z;
+    const contextAt=(x,z)=>cell.themeId?ctxFor(isl.id,null,lx+x,lz+z,1,0):ctxFor("_static",null,cell.c[0]+x,cell.c[1]+z,1,0);
+    const ctx=contextAt(0,0),p=(g,...a)=>part(ctx,g,...a);
+    const clear=(x,z,s)=>free(isl.id,lx+x,lz+z,s)&&!LANDMARKS3D.some(L=>Math.hypot(L.isl.c.x+L.x-cell.c[0]-x,L.isl.c.z+L.z-cell.c[1]-z)<L.r+s+.18);
+    if(!cell.themeId)p("hexTile",0,-.02,0,(R-.12)*2,.04,(R-.12)*2,profile.tint);
+    const candidates=[];
+    for(let row=-3;row<=3;row++)for(let col=-3;col<=3;col++){
+      const x=col*R*.34+(row%2)*R*.17,z=row*R*.30;
+      if(GEOM.pip(cell.c[0]+x,cell.c[1]+z,cell.poly)&&GEOM.nearestEdge(cell.c[0]+x,cell.c[1]+z,cell.poly).d>R*.22)candidates.push([x,z]);
+    }
+    // Back-row towers and lower frontages keep policy models readable from the default view.
+    for(const [x,z] of candidates){
+      const s=R*(.27+r()*.05);if(!clear(x,z,s*.68))continue;
+      const type=profile.types[Math.floor(r()*profile.types.length)],h=(.65+r()*.35)*profile.height*(z>0?.65:1)*(isl.rec?1.12:1);
+      const bp=(g,...a)=>part(contextAt(x,z),g,...a);
+      const start=parts.length;B[type](bp,s,h,r);
+      // Zone-specific roof silhouettes: clean-room plant, terraces, civic beacons and energy stacks.
+      if(cell.zone==="technology"&&type==="office")SOLAR(bp,0,h+.15,0,s*.75,s*.6);
+      if(cell.zone==="public"&&type==="office"){bp("box",0,h+.16,0,s*.15,.18,.025,"#69bac5");bp("box",0,h+.16,0,s*.45,.045,.025,"#69bac5");}
+      if(cell.zone==="culture"&&type==="shop")bp("cone",0,.65,0,s*1.1,.3,s*1.1,"#bd877d");
+      if(cell.zone==="environment"&&type==="office"){SOLAR(bp,0,h+.15,0,s*.9,s*.7);bp("cyl",s*.25,h+.4,0,.035,.5,.035,"#dfe8ec");bp("box",s*.25,h+.65,0,s*.7,.035,.04,"#a9d4dc");}
+      for(let i=start;i<parts.length;i++){parts[i].tall=h>1.2;parts[i].fabric=!cell.themeId;}
+      hold(isl.id,lx+x,lz+z,s*.68);WORLD.buildingCounts[cell.zone]++;
+    }
+  }
+  // Narrow, deliberately planted waterfront fragments outside the full hex grid.
+  for(const [city,info] of WORLD.cities){
+    const cells=WORLD.hexCells.filter(c=>c.city===city);
+    for(let k=0;k<info.coast.length;k+=7){
+      const edge=info.coast[k],dx=info.center[0]-edge[0],dz=info.center[1]-edge[1],d=Math.hypot(dx,dz),wx=edge[0]+dx/d*.6,wz=edge[1]+dz/d*.6;
+      if(!GEOM.pip(wx,wz,info.coast)||cells.some(c=>GEOM.pip(wx,wz,c.poly))||LANDMARKS3D.some(L=>Math.hypot(L.isl.c.x+L.x-wx,L.isl.c.z+L.z-wz)<L.r+.35))continue;
+      const p=(g,...a)=>part(ctxFor("_static",null,wx,wz,1,0),g,...a);
+      B.park(p,.4,.4,rng(k+hash(city)));
     }
   }
 

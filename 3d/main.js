@@ -45,7 +45,7 @@ function showPins(id) {
     b.onmouseleave = () => { hoverItem = null; placeBeam(); dirty = true; };
   });
   let topY = TOP; for (const it of its) { const i = ITEMS3D.get(it.id); if (i) topY = Math.max(topY, i.box.max.y); }
-  const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(0, (isl.campusTop || TOP + 0.6) + 0.35, -(isl.campus?.d || 1) * 0.2); body.g.add(o); pins.push(o); callout = el;
+  const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(isl.campus?.cx || 0, (isl.campusTop || TOP + 0.6) + 0.35, (isl.campus?.cz || 0) - (isl.campus?.d || 1) * 0.2); body.g.add(o); pins.push(o); callout = el;
 }
 
 /* city landmark tags */
@@ -99,6 +99,12 @@ function setOccluders(id) {
   for (const isl of islands) {
     const occ = !!t && isl !== t && isl.live && isl.c.z > t.c.z - 0.5 && isl.c.z - t.c.z < 7 && Math.abs(isl.c.x - t.c.x) < 6;
     if (!!isl.occluding !== occ) { isl.occluding = occ; placeIslandParts(isl); }
+  }
+  // Background blocks stay fixed when a policy lifts; step tall foreground fabric aside in close views.
+  const hiddenMatrix=new THREE.Matrix4().makeScale(0,0,0);
+  for(const p of parts)if(p.fabric&&p.tall){
+    const e=p.m.elements,hide=!!t&&e[14]>t.c.z-.5&&e[14]-t.c.z<7&&Math.abs(e[12]-t.c.x)<6;
+    p.mesh.setMatrixAt(p.index,hide?hiddenMatrix:p.m);p.mesh.instanceMatrix.needsUpdate=true;
   }
   dirty = true;
 }
@@ -154,7 +160,7 @@ function flyTo(target, pos) {
 let entered = null;   // city whose archipelago the camera is in (null = all four)
 const drawerShift = (t, dist) => { if (!document.documentElement.classList.contains("drawer-open") || narrowScreen()) return t.clone(); const right = new THREE.Vector3().subVectors(camera.position, controls.target).cross(new THREE.Vector3(0, 1, 0)).normalize(); return t.clone().add(right.multiplyScalar(-dist * 0.16)); };
 function cityFrame(city) {
-  const box = new THREE.Box3(); for (const i of islands) if (i.city === city) box.expandByPoint(i.c); box.expandByScalar(R + 0.4);
+  const box = new THREE.Box3(); for (const [x,z] of WORLD.cities.get(city).coast) box.expandByPoint(new THREE.Vector3(x,0,z)); box.expandByScalar(0.8);
   const size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3()).setY(0.3), aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
   const span = Math.max(size.x / Math.max(aspect, 0.6), size.z) * 1.05, dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.25 : 1.1);
   return { target: c, pos: c.clone().add(new THREE.Vector3(0, 0.62, 0.79).normalize().multiplyScalar(dist)), dist };
@@ -168,7 +174,7 @@ function focusTheme(id) {
   entered = isl.city;
   const D = isl.campus ? Math.hypot(isl.campus.w, isl.campus.d) : 3.5;
   const off = new THREE.Vector3(1.2, 6.4, 6.6).multiplyScalar(Math.max(0.85, D / 3.6) * (narrowScreen() ? 1.5 : 1));
-  let t = isl.c.clone().setY(TOP).add(new THREE.Vector3(0, 0, -D * 0.32)); t = drawerShift(t, off.length() * 0.9);
+  let t = isl.c.clone().setY(TOP).add(new THREE.Vector3(isl.campus?.cx || 0, 0, (isl.campus?.cz || 0) - D * 0.16)); t = drawerShift(t, off.length() * 0.9);
   flyTo(t, t.clone().add(off));
 }
 function focusItem(id) {

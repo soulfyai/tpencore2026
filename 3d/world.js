@@ -1,4 +1,4 @@
-/* ===== world: each city is one organic island; policy themes are neighbourhoods (irregular Voronoi districts) cut by real-looking streets ===== */
+/* ===== world: each city is one organic island; equal-size hexagonal city blocks, with compatible policy IDs and an unchanged coastal perimeter ===== */
 const WORLD = { bodies: new Map(), graph: { nodes: [], edges: new Map() }, cities: new Map() };
 const MESH = {};
 const GEOM = {};
@@ -113,21 +113,117 @@ const GEOM = {};
   const addEdge = (a, b, info) => { if (a === b) return; const k = Math.min(a, b) + "-" + Math.max(a, b); if (edgeSet.has(k)) return; edgeSet.add(k); const d = G.nodes[a].p.distanceTo(G.nodes[b].p); (G.edges.get(a) || G.edges.set(a, []).get(a)).push([b, d, info]); (G.edges.get(b) || G.edges.set(b, []).get(b)).push([a, d, info]); };
   WORLD.roads = [];
   const ringNode = new Map(), ringPts = new Map();
+  // Freeze the existing landmark sites while rebuilding the surrounding city fabric.
+  WORLD.landmarkSites = {
+    "t101": {"city": "taipei", "x": -2.032513, "z": 5.843775, "r": 1.794, "sc": 2.3},
+    "dome": {"city": "taipei", "x": 1.837932, "z": 2.877729, "r": 1.767, "sc": 1.767},
+    "station": {"city": "taipei", "x": -6.950167, "z": 6.65239, "r": 1.3158, "sc": 1.548},
+    "shinkong": {"city": "taipei", "x": -9.523016, "z": 4.45314, "r": 0.84, "sc": 2},
+    "grand": {"city": "taipei", "x": -5.215064, "z": -0.511118, "r": 1.44, "sc": 1.8},
+    "npm": {"city": "taipei", "x": -3.615302, "z": -4.757006, "r": 1.568, "sc": 1.6},
+    "miramar": {"city": "taipei", "x": 1.337517, "z": -2.413369, "r": 1.116, "sc": 1.488},
+    "cks": {"city": "taipei", "x": -4.659188, "z": 12.416863, "r": 1.07328, "sc": 1.376},
+    "sysm": {"city": "taipei", "x": -0.710495, "z": 9.782303, "r": 1.2834, "sc": 1.395},
+    "longshan": {"city": "taipei", "x": -9.210522, "z": 1.027657, "r": 0.9288, "sc": 1.29},
+    "redhouse": {"city": "taipei", "x": -3.346695, "z": 2.678479, "r": 0.8772, "sc": 1.29},
+    "yangming": {"city": "taipei", "x": -3.180287, "z": -12.312577, "r": 1.725, "sc": 1.5},
+    "elephant": {"city": "taipei", "x": 2.436863, "z": 10.743703, "r": 1.232, "sc": 1.4},
+    "maokong": {"city": "taipei", "x": -0.239042, "z": 17.269967, "r": 1.3975, "sc": 1.118},
+    "daan": {"city": "taipei", "x": 1.786182, "z": 13.801423, "r": 1.0608, "sc": 1.04},
+    "beitou": {"city": "taipei", "x": -10.152986, "z": -9.378161, "r": 1.196, "sc": 1.3},
+    "ntcity": {"city": "newtaipei", "x": 15.034505, "z": 51.441223, "r": 1.35, "sc": 1.8},
+    "fort": {"city": "newtaipei", "x": 14.687015, "z": 43.871601, "r": 1.36, "sc": 1.6},
+    "jiufen": {"city": "newtaipei", "x": 32.873866, "z": 49.441245, "r": 1.29, "sc": 1.29},
+    "shifen": {"city": "newtaipei", "x": 27.687368, "z": 51.056556, "r": 1.26, "sc": 1.4},
+    "queen": {"city": "newtaipei", "x": 20.327102, "z": 45.68198, "r": 1.1696, "sc": 1.376},
+    "port": {"city": "keelung", "x": 52.358077, "z": -18.848294, "r": 1.425, "sc": 1.5},
+    "guanyin": {"city": "keelung", "x": 50.266385, "z": -16.706988, "r": 0.81, "sc": 1.8},
+    "miaokou": {"city": "keelung", "x": 49.120094, "z": -13.876825, "r": 1.2555, "sc": 1.395},
+    "houses": {"city": "keelung", "x": 47.831963, "z": -18.073845, "r": 1.14, "sc": 1.2},
+    "heping": {"city": "keelung", "x": 44.600509, "z": -16.908089, "r": 1.064, "sc": 1.12},
+    "airport": {"city": "taoyuan", "x": -46.507352, "z": 27.464004, "r": 1.677, "sc": 1.118},
+    "xpark": {"city": "taoyuan", "x": -53.506165, "z": 28.727695, "r": 1.2648, "sc": 1.488},
+    "daxi": {"city": "taoyuan", "x": -45.760914, "z": 34.426019, "r": 1.44, "sc": 1.6},
+    "rainbow": {"city": "taoyuan", "x": -51.965065, "z": 31.479788, "r": 1.152, "sc": 1.28},
+    "dam": {"city": "taoyuan", "x": -43.618925, "z": 40.311337, "r": 1.5652, "sc": 1.118},
+    "lala": {"city": "taoyuan", "x": -39.521005, "z": 43.210247, "r": 1.2642, "sc": 1.204}
+  };
+  WORLD.hexCells = [];
+  WORLD.zoneFor = (theme) => {
+    const name = theme.name || "";
+    if (/環保|環境|工務|水利|治水|淨水|防災|韌性|農業/.test(name)) return "environment";
+    if (/產業|數位|科技|AI|創新|就業/.test(name)) return "technology";
+    if (/居住|都更|住宅/.test(name)) return "residential";
+    if (/教育|衛生|醫療|健康|社福|托育|育兒|生養|長照|銀髮|長者|高齡|照顧|照護|食安|無菸|親子|好孕|勞動|治安|消防/.test(name)) return "public";
+    if (/文化|觀光|體育|運動|賽事|族群|原民|客家|港市/.test(name)) return "culture";
+    return "commercial";
+  };
+  const wanted = isl => (isl.t.items || []).length >= 9 ? 3 : (isl.t.items || []).length >= 5 ? 2 : 1;
+  const outlinesWorld = new Map(A.cities.map(c => [c.city, outlines[c.city].local.map(([x,z]) => [x+outlines[c.city].off[0],z+outlines[c.city].off[1]])]));
+  const corners = (x,z,r) => Array.from({length:6},(_,k) => [x+Math.cos(-Math.PI/2+k*Math.PI/3)*r,z+Math.sin(-Math.PI/2+k*Math.PI/3)*r]);
+  const grid = (city, radius) => {
+    const coast = outlinesWorld.get(city), xs=coast.map(p=>p[0]), zs=coast.map(p=>p[1]);
+    const minx=Math.min(...xs),maxx=Math.max(...xs),minz=Math.min(...zs),maxz=Math.max(...zs);
+    let best=[];
+    for (const px of [0,1/3,2/3]) for (const pz of [0,1/3,2/3]) {
+      const ox=outlines[city].off[0]+px*SQ3*radius,oz=outlines[city].off[1]+pz*1.5*radius, cells=[];
+      for (let r=Math.floor((minz-oz)/(1.5*radius));r<=Math.ceil((maxz-oz)/(1.5*radius));r++) {
+        for(let q=Math.floor((minx-ox)/(SQ3*radius)-r/2);q<=Math.ceil((maxx-ox)/(SQ3*radius)-r/2);q++) {
+          const x=ox+SQ3*radius*(q+r/2),z=oz+1.5*radius*r;
+          if(!GEOM.pip(x,z,coast)||GEOM.nearestEdge(x,z,coast).d<radius+0.55)continue;
+          cells.push({id:`${city}:${q}:${r}`,city,q,r,c:[x,z],poly:corners(x,z,radius),themeId:null});
+        }
+      }
+      if(cells.length>best.length)best=cells;
+    }
+    return best;
+  };
+  // One shared radius across all four cities. Reserve spare blocks for landmarks and normal city fabric.
+  const reserved=(cell,R)=>Object.values(WORLD.landmarkSites).some(l=>l.city===cell.city&&Math.hypot(cell.c[0]-l.x,cell.c[1]-l.z)<R+l.r+0.2);
+  let hexRadius=2.1,layouts;
+  for(;hexRadius>=0.7;hexRadius-=0.05){
+    layouts=new Map(A.cities.map(c=>[c.city,grid(c.city,hexRadius)]));
+    if(A.cities.every(c=>{const themes=islands.filter(i=>i.city===c.city);return layouts.get(c.city).filter(cell=>!reserved(cell,hexRadius)).length>=themes.reduce((n,i)=>n+wanted(i),0)+Math.max(6,Math.ceil(themes.length*0.55))}))break;
+  }
+  if(hexRadius<0.7)throw new Error("Cannot fit complete policy hex groups inside the city coastlines");
+  WORLD.hexRadius=hexRadius;
+  const directions=[[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]];
+  const boundary = cells => {
+    const key=p=>p.map(n=>n.toFixed(5)).join(","),edges=new Map();
+    for(const cell of cells)for(let i=0;i<6;i++){
+      const a=cell.poly[i],b=cell.poly[(i+1)%6],k=[key(a),key(b)].sort().join("|");
+      if(edges.has(k))edges.delete(k);else edges.set(k,[a,b]);
+    }
+    const next=new Map([...edges.values()].map(e=>[key(e[0]),e[1]])),first=[...edges.values()][0][0],out=[first];
+    let current=next.get(key(first));
+    while(current&&key(current)!==key(first)&&out.length<=edges.size){out.push(current);current=next.get(key(current));}
+    return GEOM.ccw(out);
+  };
   for (const c of A.cities) {
-    const mine = islands.filter((i) => i.city === c.city), live = LIVE_CITIES.has(c.city), R1 = rng(hash(c.city) + 11);
-    const o = outlines[c.city], coast = o.local.map(([x, z]) => [x + o.off[0], z + o.off[1]]);
-    const [minx, minz, maxx, maxz] = coast.reduce((m, [x, z]) => [Math.min(m[0], x), Math.min(m[1], z), Math.max(m[2], x), Math.max(m[3], z)], [1e9, 1e9, -1e9, -1e9]);
-    /* neighbourhood sites: k-means over the land so every theme gets a similar share */
-    const samp = []; const st = Math.sqrt(((maxx - minx) * (maxz - minz)) / 1600);
-    for (let x = minx; x <= maxx; x += st) for (let z = minz; z <= maxz; z += st) if (GEOM.pip(x, z, coast) && GEOM.pip(x, z, GEOM.offset(coast, -0.8))) samp.push([x, z]);
-    let sites = []; sites.push(samp[(R1() * samp.length) | 0]);
-    while (sites.length < mine.length) { let best = null, bd = -1; for (const q of samp) { const d = Math.min(...sites.map((s) => Math.hypot(s[0] - q[0], s[1] - q[1]))); if (d > bd) { bd = d; best = q; } } sites.push(best); }
-    for (let it = 0; it < 18; it++) { const acc = sites.map(() => [0, 0, 0]); for (const q of samp) { let k = 0, bd = 1e9; sites.forEach((s, j) => { const d = (s[0] - q[0]) ** 2 + (s[1] - q[1]) ** 2; if (d < bd) { bd = d; k = j; } }); acc[k][0] += q[0]; acc[k][1] += q[1]; acc[k][2]++; } sites = acc.map((a, j) => (a[2] ? [a[0] / a[2], a[1] / a[2]] : sites[j])); }
-    // keep the 2D map's reading order: themes in row order take sites in row order
-    const order = [...mine].sort((a, b) => a.r - b.r || a.q - b.q);
-    const rows = Math.max(1, Math.round(Math.sqrt(mine.length * ((maxz - minz) / Math.max(1, maxx - minx))))), byZ = [...sites].sort((a, b) => a[1] - b[1]), per = Math.ceil(byZ.length / rows), siteOrder = [];
-    for (let rI = 0; rI < rows; rI++) siteOrder.push(...byZ.slice(rI * per, (rI + 1) * per).sort((a, b) => a[0] - b[0]));
-    order.forEach((isl, k) => { const sP = siteOrder[k]; isl.c.set(sP[0], 0, sP[1]); });
+    const mine = islands.filter((i) => i.city === c.city), live = LIVE_CITIES.has(c.city);
+    const coast=outlinesWorld.get(c.city),cells=layouts.get(c.city),available=new Set(cells.filter(cell=>!reserved(cell,hexRadius))),lookup=new Map(cells.map(cell=>[`${cell.q},${cell.r}`,cell]));
+    const center0=GEOM.centroid(coast),xs=coast.map(p=>p[0]),zs=coast.map(p=>p[1]),reach=Math.min(Math.max(...xs)-Math.min(...xs),Math.max(...zs)-Math.min(...zs))*0.25;
+    const zones=["commercial","technology","residential","public","culture","environment"];
+    const order=[...mine].sort((a,b)=>zones.indexOf(WORLD.zoneFor(a.t))-zones.indexOf(WORLD.zoneFor(b.t))||wanted(b)-wanted(a)||a.t.no-b.t.no);
+    for(const isl of order){
+      const zone=WORLD.zoneFor(isl.t),zi=zones.indexOf(zone),angle=-Math.PI/2+zi*Math.PI/3;
+      const target=[center0[0]+Math.cos(angle)*reach,center0[1]+Math.sin(angle)*reach];
+      const score=cell=>Math.hypot(cell.c[0]-target[0],cell.c[1]-target[1]);
+      const candidates=[...available].sort((a,b)=>score(a)-score(b));let group=null;
+      for(const seed of candidates){
+        const picked=[seed],seen=new Set(picked);
+        for(let k=0;k<picked.length&&picked.length<wanted(isl);k++){
+          const a=picked[k],adj=directions.map(([dq,dr])=>lookup.get(`${a.q+dq},${a.r+dr}`)).filter(b=>b&&available.has(b)&&!seen.has(b)).sort((a,b)=>score(a)-score(b));
+          for(const b of adj){picked.push(b);seen.add(b);if(picked.length===wanted(isl))break;}
+        }
+        if(picked.length===wanted(isl)){group=picked;break;}
+      }
+      if(!group)throw new Error(`No contiguous hex group for ${isl.id}`);
+      isl.c.set(group[0].c[0],0,group[0].c[1]);isl.cells=group;isl.zone=zone;isl.hexRadius=hexRadius;
+      for(const cell of group){available.delete(cell);cell.themeId=isl.id;cell.zone=zone;}
+    }
+    for(const cell of cells.filter(cell=>!cell.themeId)){const nearest=mine.reduce((a,b)=>Math.hypot(cell.c[0]-a.c.x,cell.c[1]-a.c.z)<Math.hypot(cell.c[0]-b.c.x,cell.c[1]-b.c.z)?a:b);cell.zone=nearest.zone;}
+    WORLD.hexCells.push(...cells);
     const center = GEOM.centroid(coast);
     WORLD.cities.set(c.city, { live, coast, center, hull: GEOM.hull(coast), E: 0 });
     /* ground: wide beach, grassy land */
@@ -223,24 +319,27 @@ const GEOM = {};
       }
     }
     const roadsBase = new THREE.Mesh(MESH.slab(GEOM.offset(coast, -0.15), TOP - 0.05, TOP - 0.03), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.asphalt, roughness: 0.9 }) : MESH.mat("#8d8f92")); roadsBase.receiveShadow = true; scene.add(roadsBase);
-    const inner = GEOM.offset(coast, -0.15);
+    // Every full hex gets the same inset; gaps form a continuous, shared street network.
+    for (const cell of cells) {
+      const ids=cell.poly.map(([x,z])=>node(x,z));
+      for(let k=0;k<6;k++){
+        const a=ids[k],b=ids[(k+1)%6],key=Math.min(a,b)+"-"+Math.max(a,b);
+        if(!edgeSet.has(key))WORLD.roads.push({a:cell.poly[k],b:cell.poly[(k+1)%6],city:c.city,live});
+        addEdge(a,b,{car:true});
+      }
+    }
     for (const isl of mine) {
-      let P = inner.slice();
-      for (const q of mine) if (q !== isl) P = GEOM.halfPlane(P, [isl.c.x, isl.c.z], [q.c.x, q.c.z]);
-      P = GEOM.ccw(P);
-      const ins = GEOM.offset(P, -0.22);
-      const loc = ins.map(([x, z]) => [x - isl.c.x, z - isl.c.z]);
-      isl.poly = loc; isl.polyWorld = P;
-      const g = new THREE.Group(); g.position.set(isl.c.x, 0, isl.c.z);
-      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color: 0xeedcbc, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true; // cream paving: green is the garnish, not the base
-      plate.userData = { type: "island", id: isl.id };
-      const outline = new THREE.Mesh(MESH.ribbon(loc, 0.12, TOP + 0.012, true), new THREE.MeshBasicMaterial({ color: live ? col(cityHex(isl.city)) : col("#9a9a9a"), side: THREE.DoubleSide }));
-      outline.visible = false;
-      g.add(plate, outline); scene.add(g);
-      WORLD.bodies.set(isl.id, { g, top: plate, cliff: plate, outline, baseTop: plate.material.color.clone(), anchor: new THREE.Vector3(0, TOP, 0) });
-      const ids = P.map(([x, z]) => node(x, z));
-      for (let k = 0; k < P.length; k++) { const a = ids[k], b = ids[(k + 1) % P.length]; if (!edgeSet.has(Math.min(a, b) + "-" + Math.max(a, b))) WORLD.roads.push({ a: P[k], b: P[(k + 1) % P.length], city: c.city, live }); addEdge(a, b, { car: true }); }
-      ringNode.set(isl.id, ids); ringPts.set(isl.id, P.map(([x, z]) => [x - isl.c.x, z - isl.c.z]));
+      const P=boundary(isl.cells),loc=P.map(([x,z])=>[x-isl.c.x,z-isl.c.z]);
+      isl.poly=loc;isl.polyWorld=P;
+      const shapes=isl.cells.map(cell=>MESH.shape(corners(cell.c[0]-isl.c.x,cell.c[1]-isl.c.z,hexRadius-0.12)));
+      const geometry=new THREE.ExtrudeGeometry(shapes,{depth:0.04,bevelEnabled:false,curveSegments:1});geometry.rotateX(-Math.PI/2);geometry.translate(0,TOP-0.04,0);
+      const g=new THREE.Group();g.position.set(isl.c.x,0,isl.c.z);
+      const plate=new THREE.Mesh(geometry,live?new THREE.MeshStandardMaterial({map:MESH.TEX.pavers,color:0xeedcbc,roughness:0.95}):MESH.mat("#c9c6bf"));
+      plate.receiveShadow=true;plate.userData={type:"island",id:isl.id};
+      const outline=new THREE.Mesh(MESH.ribbon(loc,0.045,TOP+0.012,true),new THREE.MeshBasicMaterial({color:live?col(cityHex(isl.city)):col("#9a9a9a"),side:THREE.DoubleSide}));outline.visible=false;
+      g.add(plate,outline);scene.add(g);
+      WORLD.bodies.set(isl.id,{g,top:plate,cliff:plate,outline,baseTop:plate.material.color.clone(),anchor:new THREE.Vector3(0,TOP,0)});
+      const ids=P.map(([x,z])=>node(x,z));ringNode.set(isl.id,ids);ringPts.set(isl.id,loc);
     }
   }
   WORLD.ringNode = ringNode; WORLD.ringPts = ringPts; WORLD.bridges = [];

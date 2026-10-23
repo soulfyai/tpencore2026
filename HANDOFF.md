@@ -9,6 +9,7 @@
 > 第二次交接。上一輪（§0 前版）的工作已全數完成合併；本節為當前唯一有效的快照。
 
 ### 0.1 現況
+- **Codex 接手進度（2026-10-23 UTC）**：§0.3 六邊形重構與 §0.4 行人檢查已完成，詳見 §0.7。程式以 `claude/modest-newton-t9y5uj` 最新 commit 為準；下列線上 V34 尚未重新發佈。
 - **線上**：<https://claude.ai/artifact/Ssboakje3hi8UHQp4nHQQA> Version 34 ＝ 主分支 `claude/modest-newton-t9y5uj` @ `c3a9e99`（已推送，工作樹乾淨，無未合併 WIP）。
 - 自上次快照後完成並上線：網頁品牌卡縮放式（霓虹 tab 預設收合、彈出卡含天氣、聲明置底置中、四市鈕統一藍）；3D 美術六軸（精緻沙灘、建築細緻化、未來感 LED、真實客機、乾淨底盤、關渡/淡江雙橋移至兩島正面）；Codex 端角色/四市識別色（台北藍/新北黃/基隆粉紅/桃園紅）/手機取景；G–L 連環修正（去綠暖色基底、中間調對比、夜光收斂、星空常駐、月球、夜光距離 LOD、**天氣與場景完全脫鉤**）；飛機防撞排程；**人物定案「積木人偶 v2」**（圓潤積木輪廓×柔霧質感、11 身分、12 draw call，取代 Codex 版角色）。
 - 舊 `wip/art-upgrade`、`wip/web-brandcard` 分支內容已全部合入主分支，可刪。
@@ -17,7 +18,7 @@
 ### 0.2 今日新增設計定案（不可回頭改）
 - 人物＝積木人偶 v2（people.js 現版）；天氣不得影響場景視覺；**政策區塊幾何改為六邊形**（推翻先前「方形」，使用者明示）；城市要 SimCity 式機能分區與高建築密度、未來感；品牌卡預設收合；「獨立整理」聲明永遠置底可見。
 
-### 0.3 下一個大工程：六邊形城市重構（已核准規格、尚未動工）
+### 0.3 六邊形城市重構規格（Codex 已完成，見 §0.7）
 使用者方向：「不是單純去綠，要置入更多建築設計。城市要有未來感、現代科技感。參考 SimCity 的城市規劃——商業區/住宅區/科技工業區等劃分。政策區現在是不規則多邊形，視覺上很沒規劃。」幾何選定六邊形。規格：
 1. **六邊形街區**（world.js）：等大正六邊形鋪滿各島現有輪廓內部（海岸、沙灘、環島高架、港口、橋接點不動）。每政策主題＝1 格（內容多時 2–3 相鄰格群組）；島緣畸零地做綠帶/水岸公園。WORLD 對外介面（geo/bridges/ferryRoutes/highways/islands id+c）盡量相容，必要變動同步修 main.js 並記錄。參考 heart-island「等大六邊形拼成城市輪廓」。
 2. **機能分區**（decor.js）：主題語意→分區型態，各有專屬建築組合/密度/配色——商業核心（交通樞紐、市政效能→玻璃塔群+LED+廣場）、科技工業（產業/數位/AI→園區廠辦+太陽能+研發樓）、住宅（居住都更→中低層社區+中庭+街角店）、公共設施（教育/衛生/社福/托育→校園醫院+開放空間）、文創觀光（文化觀光/體育→場館市集步行街）、綠能環境（環保/工務水利→淨水+風機+濕地）。政績主題（kind=record）用對應型態的成熟樣貌。
@@ -26,7 +27,7 @@
 5. 驗證：build no problems＋五張截圖（日全景/日進城/單格近景/夜全景/夜近景）＋泡泡 focusTheme 正常。
 
 ### 0.4 其他待辦
-- **tools/check_scene.js 行人段過時**（必修）：它斷言舊 Codex 角色介面（PEOPLE.meshes/accessories/detailVisible/恰 10 role/LOD 隱藏配件）；現版 brick2 是 7 基本 InstancedMesh＋5 道具池、11 role、配件常駐。請改寫該段以符合現版，其餘（車/船/飛機）斷言保留。頁面與 build.py 本身正常，只有這個測試工具會 fail。
+- **tools/check_scene.js 行人段過時**（Codex 已修復，見 §0.7；以下為原問題）：它斷言舊 Codex 角色介面（PEOPLE.meshes/accessories/detailVisible/恰 10 role/LOD 隱藏配件）；現版 brick2 是 7 基本 InstancedMesh＋5 道具池、11 role、配件常駐。請改寫該段以符合現版，其餘（車/船/飛機）斷言保留。頁面與 build.py 本身正常，只有這個測試工具會 fail。
 - 近景海色偏深（可調 env.js 水色 smoothstep(16,70,d) 起點外推或調亮 uDeep，一行）；淺色模式政黨色白字對比（方案：選中態背景 color-mix 加深 20%，待拍板）；2D 跨市協作分頁自動開線；新北候選人卡補「N 項政績（參考）」；手機實機效能；公開部署與回報表單。
 
 ### 0.5 工作流程（同前，重點重述）
@@ -35,6 +36,17 @@
 ### 0.6 只有 Claude 能做的事（Codex 邊界）
 - **Artifact 發佈**：更新線上連結只能用 Claude 的 Artifact 工具——Codex 完成後 commit+push，回到任一 Claude session 貼上 Artifact 連結請它「用最新 index3d.html 重新發佈」。
 - Artifact 天氣 db 讀寫、每小時天氣排程（綁原 Claude session，放著即可）同理。
+
+### 0.7 Codex 六邊形重構完成快照（2026-10-23 UTC）
+- **已完成**：四市同尺寸的 351 格正六邊形，外接半徑約 1.1。55 個政策 ID 不變；依項目數分配 1／2／3 格的連通群組（現有資料使用 1 或 2 格），主題以外的完整格補入機能街廓，島緣碎地做水岸綠帶。商業／科技工業／住宅／公共設施／文創觀光／綠能環境採不同高度、建築組合與屋頂配件；政績街廓用成熟樣貌。
+- **相容介面**：`WORLD.geo`、海岸／環島高架／港口／橋接座標、主題 `id`、`ringNode`／`ringPts` 保留。新增 `WORLD.hexCells`／`hexRadius`／`zoneFor`／`buildingCounts`；每個 island 新增 `cells`／`zone`／`hexRadius`，`poly` 是群組的外輪廓，`campus.cx/cz` 是群組中心。`main.js` 已同步泡泡與 focusTheme 取景中心，進城取景改按完整海岸範圍計算。
+- **地標保護**：32 個島上地標沿用重構前位置與比例，位置存於 `WORLD.landmarkSites`（六位小數）；政策格配置先避開其足跡，後續補充建築也避開地標。另 2 座海上橋梁地標沿用原生成程式，共 34 個。若日後改城市輪廓，需同步重新檢視這些固定站點。
+- **效能與互動**：所有新增建築走 part/buildBatches instancing；幾何批次 23 → 25。補充街廓放 `_static`，不會隨政策選取浮起；近景前方高樓沿用遮擋退讓。people.js、env.js、星月、夜光距離 LOD、天氣脫鉤均未修改；保留積木人偶桌機 578 位／手機 413 位、11 身分、7 基本＋5 道具池。
+- **檢查工具已修**：`tools/check_scene.js` 改用現版 `stats`／`list[].parts`／局部矩陣與場景 InstancedMesh 驗證 12 批次，近遠距離配件常駐；船／飛機動態與橋梁斷言保留。另檢查等邊與島內邊界、主題群組連通、全部項目模型、34 地標，以及單格／多格泡泡實際點選。
+- **驗證**：`python3 build.py` 輸出 `no problems`；桌機 `tools/shot.py --check` 通過（6 橋、65 船、3 飛機、11 角色）；手機 `--check mobile` 通過（413 人、47 船、3 飛機、關閉陰影），四市標籤無裁切／重疊。五張指定日夜截圖與手機截圖已完成並檢視，泡泡可點選。外圍基準比對：coast、shore、rings、port、bridges 完全一致，島上地標位置差 < 0.000001。
+- **產物**：`out/hex-day-panorama.png`、`hex-day-city.png`、`hex-day-block.png`、`hex-night-panorama.png`、`hex-night-block.png`；手機 `out/check-scene-mobile.png`。out 已由 gitignore 排除，重拍命令沿用 §2 的 tools/shot.py。
+- **2D**：template.html、build.py、data 未動。兩份 HTML 都已重建；index.html 內容與原版相同，Git 不會為相同內容產生檔案差異。
+- **上線待辦**：仍需 Claude 依 §0.6 以最新 index3d.html 重新發佈原 Artifact；Codex 沒有執行 Artifact 發佈，也未變更 DNS 或部署設定。
 
 ## 1. 專案是什麼
 
