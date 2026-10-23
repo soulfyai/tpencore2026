@@ -386,7 +386,7 @@ const WEATHER_UI = {};
   document.head.appendChild(st);
   const btn = document.createElement("button");
   btn.type = "button"; btn.className = "lmbtn"; btn.setAttribute("aria-pressed", "false"); btn.title = "顯示或隱藏地標標籤";
-  btn.innerHTML = "<i></i>地標標籤";
+  btn.innerHTML = '<i aria-hidden="true"></i>地標';
   btn.onclick = () => { const on = stage.classList.toggle("lm-on"); btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", String(on)); dirty = true; };
   stage.appendChild(btn);
 }

@@ -66,6 +66,17 @@
    for(const [q,r] of [[1,0],[0,1],[-1,1]]){const b=byCell.get(`${cell.city}:${cell.q+q}:${cell.r+r}`);if(b)check(a.plan!==b.plan,'repeated adjacent block layout');}
  }
  check(W.streetTypes.pedestrian>0&&W.streetTypes.road>W.streetTypes.pedestrian,'street hierarchy');
+ for(const city of ['taipei','newtaipei','keelung','taoyuan']){
+   const buildings=plans.filter(p=>p.city===city).flatMap(p=>p.buildings);
+   for(const type of ['fire','police','hospital'])check(buildings.some(b=>b.type===type),'public facility '+city+' '+type);
+   for(const floors of [10,15,20])check(buildings.some(b=>b.type==='highrise'&&b.floors===floors),'high-rise floors '+city+' '+floors);
+ }
+ const toolbar=document.querySelector('.hi-toolbar'),landmarks=toolbar.querySelector('.lmbtn'),tour=toolbar.querySelector('.hi-tourbtn'),modes=toolbar.querySelector('.hi-modes');
+ check(landmarks&&tour&&modes,'integrated map tools');
+ if(innerWidth>860){const a=landmarks.getBoundingClientRect(),b=tour.getBoundingClientRect(),c=modes.getBoundingClientRect();check(a.right<=b.left&&b.right<=c.left&&Math.abs(a.top-c.top)<8,'desktop toolbar order');}
+ landmarks.click();check(landmarks.getAttribute('aria-pressed')==='true','landmark toggle');landmarks.click();
+ tour.click();check(!document.querySelector('.hi-tour').hidden,'tour start');document.querySelector('.hi-tour [data-a=end]').click();check(document.querySelector('.hi-tour').hidden&&!tour.hidden,'tour end');
+ check(modes.querySelector('[data-mode=list]').getAttribute('aria-label')==='政策清單'&&modes.querySelector('[data-mode=time]').getAttribute('aria-label')==='政策進度','policy mode labels');
  C.ENV.forced={minute:660,w:{code:1,cloud:10,wind:10,temp:25}};C.ENV.apply();MAP3D.panorama();check(C.ENV.state.minute===660&&C.ENV.lampsOn===0,'day mode reset');
  document.querySelector('.hi-brandbtn').click();
  for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch');const wx=document.querySelector('.hi-pop .wx');check(wx.dataset.city===city&&wx.querySelectorAll(':scope > span').length===2,'selected-city weather only')}

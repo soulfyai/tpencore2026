@@ -182,8 +182,18 @@ html.hi body{padding:0}
 /* the independence notice: bottom-center of the viewport, above everything (incl. drawer) */
 .hi .notice{font-size:11.5px;z-index:60;background:color-mix(in srgb,var(--surface) 94%,transparent)}
 
-/* view modes, top-right */
-.hi-modes{position:absolute;right:16px;top:16px;z-index:31;display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
+/* Shared desktop toolbar: landmark / tour controls precede the three policy view modes. */
+.hi-toolbar{position:absolute;right:16px;top:16px;z-index:31;display:flex;align-items:flex-start;justify-content:flex-end;gap:8px;max-width:calc(100% - 290px)}
+.hi-maptools{display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
+.hi-maptools .lmbtn,.hi-maptools .hi-tourbtn{position:static;display:flex;align-items:center;gap:7px;min-height:40px;min-width:58px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 13.5px var(--f-body);box-shadow:none;white-space:nowrap}
+.hi-maptools button:hover{background:var(--sunk)}
+.hi-maptools button:focus-visible,.hi-modes button:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
+.hi-maptools .lmbtn.on{background:var(--ink);color:var(--surface)}
+.hi-mode-short{display:none}
+html.drawer-open .hi-toolbar{right:calc(min(420px,94vw) + 28px)}
+@media (min-width:861px) and (max-width:1180px){html.drawer-open .hi-toolbar{top:104px;flex-wrap:wrap;max-width:calc(100% - min(420px,94vw) - 32px)}}
+/* view modes */
+.hi-modes{position:static;z-index:31;display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
 .hi-modes button{font:700 13.5px var(--f-body);min-height:40px;min-width:52px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);cursor:pointer}
 .hi-modes button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
 .hi-modes .hi-help{min-width:40px;font-size:15px;border:1.5px solid var(--line)}
@@ -283,7 +293,12 @@ html.drawer-open aside.panel{transform:none}
   /* notice sits above the bottom control row (tour button left, mode bar right) */
   .hi .notice{bottom:58px;font-size:10.5px;padding:3px 9px}
   .hi .lmbtn{bottom:100px} /* keep the landmark toggle above the pinned notice */
-  .hi-modes{top:auto;bottom:12px;right:10px}
+  .hi-toolbar,.hi-maptools{display:contents;position:static}
+  .hi-modes{position:absolute;top:auto;bottom:12px;right:10px}
+  .hi-mode-label{display:none}.hi-mode-short{display:inline}
+  .hi .hi-maptools .lmbtn{position:absolute;left:10px;bottom:100px;padding:0 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px}
+  .hi .hi-maptools .lmbtn.on{background:var(--ink)}
+  .hi .hi-maptools .hi-tourbtn{position:absolute;left:10px;bottom:12px;padding:0 14px;border-radius:999px;background:var(--ink);color:var(--surface);font-size:13px}
   .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:40px}
   html.drawer-open .hi-modes{right:10px}
   .hi-intro{left:10px;right:10px;top:auto;bottom:92px;width:auto;padding:14px 16px}
@@ -2543,6 +2558,68 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       }
       return h+.2;
     },
+    highrise(p,s,floors,style) {
+      const h=floors*.20,d=s*.78,glass=["#386c86","#54798b","#607e8a"][style%3];
+      p("foffice",0,.13,0,s*1.06,.26,d*1.08,"#c6c5b8");
+      p("box",0,.29,0,s*1.1,.055,d*1.12,"#849aa4");
+      for(let floor=0;floor<floors;floor++){
+        const tier=style===1?(floor/floors>.75?.68:floor/floors>.5?.82:1):1;
+        const x=style===1?(1-tier)*s*.3:0,y=.32+floor*.2;
+        if(style===2){
+          p("cyl",0,y+.1,0,s*.85,.2,s*.85,glass);
+          p("cyl",0,y+.195,0,s*.87,.015,s*.87,"#afc2c8");
+          for(let side=0;side<6;side++){const a=side*Math.PI/3,lit=(floor+side)%4!==0;p("box",Math.sin(a)*s*.423,y+.1,Math.cos(a)*s*.423,s*.22,.115,.015,lit?"#c9e1e4":"#608b9c",a,0,0,lit);}
+        }else{
+          p("fglass",x,y+.1,0,s*.84*tier,.2,d*.9,glass);
+          p("box",x,y+.195,0,s*.88*tier,.015,d*.94,"#bfcbce");
+        }
+      }
+      const top=.32+h;
+      p("box",0,top+.06,0,s*.55,.12,d*.55,"#6b808d");
+      p("box",0,top+.14,0,s*.6,.035,d*.6,"#cad2d2");
+      p("cyl",s*.18,top+.3,0,.018,.3,.018,"#b8c9cf");
+      p("box",0,.22,d*.56,s*.65,.025,.018,"#91cfdc",0,0,0,"cool");
+      return top+.5;
+    },
+    facility(p,s,type) {
+      const q=(g,x,y,z,w,h,d,c,...rest)=>p(g,x*s,y*s,z*s,w*s,h*s,d*s,c,...rest);
+      const car=(x,z,c,ladder=false)=>{
+        q("rbox",x,.10,z,.18,.12,.31,c);q("box",x,.19,z+.035,.16,.1,.15,c);
+        q("box",x,.19,z+.116,.13,.06,.008,"#a9d8e5");
+        q("box",x,.252,z+.025,.13,.025,.04,ladder?"#f2bb48":"#4f97df",0,0,0,true);
+        for(const dx of [-.1,.1])for(const dz of [-.09,.1])q("cyl",x+dx,.055,z+dz,.055,.03,.055,"#34424d",0,0,Math.PI/2);
+        if(ladder)for(const dx of [-.045,.045])q("box",x+dx,.25,z-.05,.018,.025,.26,"#d8dede");
+      };
+      q("box",0,.015,.04,1.12,.03,1.12,"#bab7aa");
+      if(type==="fire"){
+        q("foffice",-.1,.24,-.16,.84,.46,.56,"#c58d6e");q("box",-.1,.49,-.16,.88,.045,.6,"#9a4e3d");
+        for(const x of [-.34,-.06,.22]){
+          q("box",x,.17,.13,.22,.27,.012,"#58646b");
+          for(let y=.07;y<.3;y+=.05)q("box",x,y,.14,.2,.012,.014,"#a3adb0");
+        }
+        q("foffice",.39,.51,-.24,.23,1.0,.3,"#b77355");
+        for(let y=.18;y<1;y+=.18)q("box",.39,y,-.082,.08,.09,.012,"#536b79");
+        q("box",0,.05,.4,.96,.015,.37,"#949992");car(-.22,.37,"#c4483c",true);car(.14,.37,"#cf5141",true);
+        q("fireSign",-.1,.385,.128,.52,.1,1,"#ffffff");
+      }else if(type==="police"){
+        q("foffice",0,.34,-.15,.93,.66,.56,"#bbc9d3");
+        q("box",0,.57,.137,.95,.055,.02,"#386398");q("box",0,.69,-.15,.97,.045,.6,"#556f8b");
+        q("box",0,.27,.27,.53,.04,.3,"#456f9b");
+        for(const x of [-.22,.22])q("cyl",x,.135,.36,.025,.27,.025,"#c7d2d7");
+        q("cyl6",0,.45,.148,.13,.02,.13,"#c9b87c",0,Math.PI/2);
+        q("policeSign",0,.61,.15,.48,.09,1,"#ffffff");car(-.28,.44,"#e6edf0");car(.28,.44,"#4c75a6");
+      }else{
+        q("foffice",-.24,.61,-.12,.44,1.18,.6,"#d9e1dc");q("foffice",.25,.47,-.16,.44,.9,.58,"#c8d9dc");
+        q("fglass",0,.25,.04,.93,.48,.34,"#86abb7");
+        q("box",0,.29,.29,.66,.04,.27,"#578c9d");
+        q("box",-.24,1.22,-.12,.48,.035,.64,"#84999a");
+        q("cyl",-.24,1.25,-.12,.4,.025,.4,"#597b7d");
+        for(const x of [-.31,-.17])q("box",x,1.266,-.12,.028,.006,.19,"#e6e4d5");q("box",-.24,1.267,-.12,.14,.006,.028,"#e6e4d5");
+        q("box",.25,.75,.14,.07,.23,.012,"#5e95a4");q("box",.25,.75,.15,.23,.07,.012,"#5e95a4");
+        q("hospitalSign",0,.36,.435,.52,.1,1,"#ffffff");car(.26,.43,"#e5e7de");
+        q("box",.26,.19,.553,.025,.065,.009,"#5397a7");q("box",.26,.19,.56,.065,.025,.009,"#5397a7");
+      }
+    },
     architecture(p,s,h,r,form,zone) {
       const d=s*.8,wall=pk(r,["#d5bd9c","#acbec7","#c9c9bb","#c39d80"]),glass=pk(r,["#47788a","#5b8698","#69949e"]);
       const facade=zone==="residential"?"fapt":"foffice";
@@ -2751,6 +2828,28 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     {name:"market",lots:Array.from({length:5},(_,i)=>[Math.cos(i*Math.PI*2/5)*.48,Math.sin(i*Math.PI*2/5)*.48,.28,.32,1])},
     {name:"mixed-core",lots:[[-.28,-.12,.55,1.35,0],[.35,.2,.4,.55,1]]}
   ];
+  // Generic architectural signs: these depict public services, not additional policy claims.
+  for(const [key,label,bg] of [["fireSign","消防局","#973d31"],["policeSign","警察局","#315a86"],["hospitalSign","醫院・急診","#376f7b"]]){
+    const canvas=document.createElement("canvas");canvas.width=512;canvas.height=96;
+    const g=canvas.getContext("2d");g.fillStyle=bg;g.fillRect(0,0,512,96);g.fillStyle="#f2f5ec";
+    g.font='700 62px "Noto Sans TC",sans-serif';g.textAlign="center";g.textBaseline="middle";g.fillText(label,256,48);
+    const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+    GEO[key]=new THREE.PlaneGeometry(1,1);
+    FACADE[key]=new THREE.MeshStandardMaterial({map:texture,emissiveMap:texture,emissive:0xffffff,emissiveIntensity:0,roughness:.6,side:THREE.DoubleSide});
+  }
+  const specialSites=new Map();
+  for(const [city,info] of WORLD.cities){
+    const mine=islands.filter(i=>i.city===city);
+    for(const spec of [{type:"fire",zones:["public","environment"]},{type:"police",zones:["public","residential"]},{type:"hospital",zones:["public","residential"]},...([10,15,20].map((floors,style)=>({type:"highrise",floors,style,zones:["commercial","technology","residential"]})))]){
+      const candidates=WORLD.hexCells.filter(c=>c.city===city&&!c.themeId&&!specialSites.has(c.id)).map(cell=>{
+        const near=mine.reduce((a,b)=>Math.hypot(a.c.x-cell.c[0],a.c.z-cell.c[1])<Math.hypot(b.c.x-cell.c[0],b.c.z-cell.c[1])?a:b);
+        const size=WORLD.hexRadius*.86,footprint=size*.8;
+        const safe=free(near.id,cell.c[0]-near.c.x,cell.c[1]-near.c.z,footprint)&&!LANDMARKS3D.some(l=>Math.hypot(l.isl.c.x+l.x-cell.c[0],l.isl.c.z+l.z-cell.c[1])<l.r+footprint+.18);
+        return {cell,size,safe,score:(spec.zones.includes(cell.zone)?0:50)+Math.hypot(cell.c[0]-info.center[0],cell.c[1]-info.center[1])};
+      }).filter(c=>c.safe).sort((a,b)=>a.score-b.score);
+      if(candidates.length)specialSites.set(candidates[0].cell.id,{...spec,size:candidates[0].size});
+    }
+  }
   WORLD.buildingCounts=Object.fromEntries(Object.keys(profiles).map(k=>[k,0]));
   WORLD.blockPlans=[];
   const chosen=new Map(),neighbours=[[1,0],[0,1],[-1,1],[-1,0],[0,-1],[1,-1]];
@@ -2772,19 +2871,22 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     while(used.has(choice))choice=(choice+1)%layouts.length;
     chosen.set(`${cell.city}:${cell.q}:${cell.r}`,choice);
     const plan=layouts[choice],form=profile.forms[(hash(cell.id+":form")+choice)%profile.forms.length];
-    const lots=cell.themeId?[[-.48,-.24,.32,.48,1],[.45,.3,.3,.65,1]]:plan.lots;
+    const special=specialSites.get(cell.id);
+    const lots=cell.themeId?[[-.48,-.24,.32,.48,1],[.45,.3,.3,.65,1]]:special?[[0,0,special.size/R,1,0]]:plan.lots;
     const record={cell:cell.id,city:cell.city,zone:cell.zone,plan:plan.name,form,rotation,buildings:[]};
     for(let li=0;li<lots.length;li++){
-      const [u,v,w,hf,secondary]=lots[li],[x,z]=rotate(u*R,v*R),size=w*R,footprint=size*.68;
+      const [u,v,w,hf,secondary]=lots[li],[x,z]=rotate(u*R,v*R),size=w*R,footprint=size*(special ? .8 : .68);
       if(!clear(x,z,footprint)||GEOM.nearestEdge(cell.c[0]+x,cell.c[1]+z,cell.poly).d<footprint+.04)continue;
-      const type=plan.name==="terraced"&&!secondary?"terrace":secondary?(cell.zone==="culture"||plan.name==="market"?"shop":li%2?"arcade":"workshop"):profile.forms[(profile.forms.indexOf(form)+li)%profile.forms.length];
+      const type=special?.type||(plan.name==="terraced"&&!secondary?"terrace":secondary?(cell.zone==="culture"||plan.name==="market"?"shop":li%2?"arcade":"workshop"):profile.forms[(profile.forms.indexOf(form)+li)%profile.forms.length]);
       const aspect=type==="tower"?3.3:["arcade","workshop","hall","energy","datacenter"].includes(type)?1.45:2.25;
-      const h=Math.min(profile.height*hf*(.86+r()*.28)*(isl.rec?1.08:1),size*aspect),start=parts.length;
+      const h=special?.floors?special.floors*.2:Math.min(profile.height*hf*(.86+r()*.28)*(isl.rec?1.08:1),size*aspect),start=parts.length;
       const bp=(g,...a)=>part(contextAt(x,z,rotation),g,...a);
-      if(type==="shop")B.shop(bp,size,h,r);else B.architecture(bp,size,h,r,type,cell.zone);
+      if(type==="highrise")B.highrise(bp,size,special.floors,special.style);
+      else if(["fire","police","hospital"].includes(type))B.facility(bp,size,type);
+      else if(type==="shop")B.shop(bp,size,h,r);else B.architecture(bp,size,h,r,type,cell.zone);
       for(let i=start;i<parts.length;i++)parts[i].fabric=!cell.themeId;
       hold(isl.id,lx+x,lz+z,footprint);WORLD.buildingCounts[cell.zone]++;
-      record.buildings.push({x:cell.c[0]+x,z:cell.c[1]+z,type,height:h,size});
+      record.buildings.push({x:cell.c[0]+x,z:cell.c[1]+z,type,height:h,size,floors:special?.floors||null});
     }
     if(!cell.themeId)WORLD.blockPlans.push(record);
     // Each organisation has its own forecourt/walk axis; avoid an identical tree-and-lamp stamp.
@@ -4039,7 +4141,7 @@ const WEATHER_UI = {};
   document.head.appendChild(st);
   const btn = document.createElement("button");
   btn.type = "button"; btn.className = "lmbtn"; btn.setAttribute("aria-pressed", "false"); btn.title = "顯示或隱藏地標標籤";
-  btn.innerHTML = "<i></i>地標標籤";
+  btn.innerHTML = '<i aria-hidden="true"></i>地標';
   btn.onclick = () => { const on = stage.classList.toggle("lm-on"); btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", String(on)); dirty = true; };
   stage.appendChild(btn);
 }
@@ -4100,11 +4202,14 @@ const UI = {};
 
   /* ---------- view modes ---------- */
   const modes = el("div", "hi-modes"); modes.setAttribute("role", "toolbar"); modes.setAttribute("aria-label", "檢視方式");
-  const MODES = [["pano", "全景"], ["list", "清單"], ["time", "時間"]];
+  const toolbar=el("div","hi-toolbar"),mapTools=el("div","hi-maptools");
+  mapTools.setAttribute("role","group");mapTools.setAttribute("aria-label","地圖輔助工具");
+  const landmarkButton=document.querySelector(".lmbtn");if(landmarkButton)mapTools.appendChild(landmarkButton);
+  const MODES = [["pano", "全景"], ["list", "政策清單"], ["time", "政策進度"]];
   const btn = {};
-  for (const [id, name] of MODES) { const b = el("button", null, name); b.type = "button"; b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
+  for (const [id, name] of MODES) { const b = el("button", null, `<span class="hi-mode-label">${name}</span><span class="hi-mode-short">${id==="list"?"清單":id==="time"?"進度":name}</span>`); b.type = "button"; b.setAttribute("aria-label",name); b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
   const help = el("button", "hi-help", "?"); help.type = "button"; help.setAttribute("aria-label", "使用說明"); help.onclick = () => showIntro(true); modes.appendChild(help);
-  document.querySelector(".mapwrap").appendChild(modes);
+  toolbar.append(mapTools,modes);document.querySelector(".mapwrap").appendChild(toolbar);
   let mode = "pano";
   function setMode(m) {
     mode = m; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === m));
@@ -4141,7 +4246,7 @@ const UI = {};
     <div class="hi-eyebrow">使用說明</div>
     <h2>一個政策區塊，一個政策主題。</h2>
     <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
-    <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>清單</b>：用文字一項一項瀏覽</li><li><b>時間</b>：依已完成、推動中、規劃中排好</li></ul>
+    <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>政策清單</b>：用文字一項一項瀏覽</li><li><b>政策進度</b>：依已完成、推動中、規劃中排好</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
   intro.setAttribute("aria-label", "使用說明");
@@ -4159,8 +4264,8 @@ const UI = {};
   tour.innerHTML = `<div class="hi-tour-head"><span class="hi-eyebrow">城市導覽</span><span class="hi-step"></span></div>
     <h3></h3><p></p>
     <div class="hi-tour-btns"><button type="button" data-a="prev" aria-label="上一站">←</button><button type="button" data-a="more" class="hi-ghost">看細節</button><button type="button" data-a="next" class="hi-primary">下一站 →</button><button type="button" data-a="end" class="hi-ghost">結束</button></div>`;
-  const tourBtn = el("button", "hi-tourbtn", "▶ 城市導覽"); tourBtn.type = "button"; tourBtn.onclick = () => startTour();
-  document.querySelector(".mapwrap").append(tour, tourBtn);
+  const tourBtn = el("button", "hi-tourbtn", "▶ 導覽"); tourBtn.type = "button"; tourBtn.onclick = () => startTour();
+  document.querySelector(".mapwrap").appendChild(tour);mapTools.appendChild(tourBtn);
   tour.hidden = true;
   let STEPS = [];
   function renderStep() {

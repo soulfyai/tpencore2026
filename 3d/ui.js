@@ -49,11 +49,14 @@ const UI = {};
 
   /* ---------- view modes ---------- */
   const modes = el("div", "hi-modes"); modes.setAttribute("role", "toolbar"); modes.setAttribute("aria-label", "檢視方式");
-  const MODES = [["pano", "全景"], ["list", "清單"], ["time", "時間"]];
+  const toolbar=el("div","hi-toolbar"),mapTools=el("div","hi-maptools");
+  mapTools.setAttribute("role","group");mapTools.setAttribute("aria-label","地圖輔助工具");
+  const landmarkButton=document.querySelector(".lmbtn");if(landmarkButton)mapTools.appendChild(landmarkButton);
+  const MODES = [["pano", "全景"], ["list", "政策清單"], ["time", "政策進度"]];
   const btn = {};
-  for (const [id, name] of MODES) { const b = el("button", null, name); b.type = "button"; b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
+  for (const [id, name] of MODES) { const b = el("button", null, `<span class="hi-mode-label">${name}</span><span class="hi-mode-short">${id==="list"?"清單":id==="time"?"進度":name}</span>`); b.type = "button"; b.setAttribute("aria-label",name); b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
   const help = el("button", "hi-help", "?"); help.type = "button"; help.setAttribute("aria-label", "使用說明"); help.onclick = () => showIntro(true); modes.appendChild(help);
-  document.querySelector(".mapwrap").appendChild(modes);
+  toolbar.append(mapTools,modes);document.querySelector(".mapwrap").appendChild(toolbar);
   let mode = "pano";
   function setMode(m) {
     mode = m; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === m));
@@ -90,7 +93,7 @@ const UI = {};
     <div class="hi-eyebrow">使用說明</div>
     <h2>一個政策區塊，一個政策主題。</h2>
     <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
-    <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>清單</b>：用文字一項一項瀏覽</li><li><b>時間</b>：依已完成、推動中、規劃中排好</li></ul>
+    <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>政策清單</b>：用文字一項一項瀏覽</li><li><b>政策進度</b>：依已完成、推動中、規劃中排好</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
   intro.setAttribute("aria-label", "使用說明");
@@ -108,8 +111,8 @@ const UI = {};
   tour.innerHTML = `<div class="hi-tour-head"><span class="hi-eyebrow">城市導覽</span><span class="hi-step"></span></div>
     <h3></h3><p></p>
     <div class="hi-tour-btns"><button type="button" data-a="prev" aria-label="上一站">←</button><button type="button" data-a="more" class="hi-ghost">看細節</button><button type="button" data-a="next" class="hi-primary">下一站 →</button><button type="button" data-a="end" class="hi-ghost">結束</button></div>`;
-  const tourBtn = el("button", "hi-tourbtn", "▶ 城市導覽"); tourBtn.type = "button"; tourBtn.onclick = () => startTour();
-  document.querySelector(".mapwrap").append(tour, tourBtn);
+  const tourBtn = el("button", "hi-tourbtn", "▶ 導覽"); tourBtn.type = "button"; tourBtn.onclick = () => startTour();
+  document.querySelector(".mapwrap").appendChild(tour);mapTools.appendChild(tourBtn);
   tour.hidden = true;
   let STEPS = [];
   function renderStep() {

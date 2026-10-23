@@ -38,8 +38,18 @@ html.hi body{padding:0}
 /* the independence notice: bottom-center of the viewport, above everything (incl. drawer) */
 .hi .notice{font-size:11.5px;z-index:60;background:color-mix(in srgb,var(--surface) 94%,transparent)}
 
-/* view modes, top-right */
-.hi-modes{position:absolute;right:16px;top:16px;z-index:31;display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
+/* Shared desktop toolbar: landmark / tour controls precede the three policy view modes. */
+.hi-toolbar{position:absolute;right:16px;top:16px;z-index:31;display:flex;align-items:flex-start;justify-content:flex-end;gap:8px;max-width:calc(100% - 290px)}
+.hi-maptools{display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
+.hi-maptools .lmbtn,.hi-maptools .hi-tourbtn{position:static;display:flex;align-items:center;gap:7px;min-height:40px;min-width:58px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 13.5px var(--f-body);box-shadow:none;white-space:nowrap}
+.hi-maptools button:hover{background:var(--sunk)}
+.hi-maptools button:focus-visible,.hi-modes button:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
+.hi-maptools .lmbtn.on{background:var(--ink);color:var(--surface)}
+.hi-mode-short{display:none}
+html.drawer-open .hi-toolbar{right:calc(min(420px,94vw) + 28px)}
+@media (min-width:861px) and (max-width:1180px){html.drawer-open .hi-toolbar{top:104px;flex-wrap:wrap;max-width:calc(100% - min(420px,94vw) - 32px)}}
+/* view modes */
+.hi-modes{position:static;z-index:31;display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
 .hi-modes button{font:700 13.5px var(--f-body);min-height:40px;min-width:52px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);cursor:pointer}
 .hi-modes button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
 .hi-modes .hi-help{min-width:40px;font-size:15px;border:1.5px solid var(--line)}
@@ -139,7 +149,12 @@ html.drawer-open aside.panel{transform:none}
   /* notice sits above the bottom control row (tour button left, mode bar right) */
   .hi .notice{bottom:58px;font-size:10.5px;padding:3px 9px}
   .hi .lmbtn{bottom:100px} /* keep the landmark toggle above the pinned notice */
-  .hi-modes{top:auto;bottom:12px;right:10px}
+  .hi-toolbar,.hi-maptools{display:contents;position:static}
+  .hi-modes{position:absolute;top:auto;bottom:12px;right:10px}
+  .hi-mode-label{display:none}.hi-mode-short{display:inline}
+  .hi .hi-maptools .lmbtn{position:absolute;left:10px;bottom:100px;padding:0 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px}
+  .hi .hi-maptools .lmbtn.on{background:var(--ink)}
+  .hi .hi-maptools .hi-tourbtn{position:absolute;left:10px;bottom:12px;padding:0 14px;border-radius:999px;background:var(--ink);color:var(--surface);font-size:13px}
   .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:40px}
   html.drawer-open .hi-modes{right:10px}
   .hi-intro{left:10px;right:10px;top:auto;bottom:92px;width:auto;padding:14px 16px}
