@@ -65,6 +65,21 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
         state = pg.evaluate("CITY3D.snapshot()")
         out.append(f"{name} environment: {json.dumps(state, ensure_ascii=False)}")
         if checking:
+            for city, key in [("taipei", None), ("newtaipei", None), ("keelung", "Enter"), ("taoyuan", "Space")]:
+                pg.evaluate("MAP3D.panorama(); CITY3D.snapshot()")
+                sign = pg.locator(f'button.clabel[data-city="{city}"]')
+                if key:
+                    sign.focus()
+                    sign.press(key)
+                else:
+                    sign.click()
+                pg.evaluate("CITY3D.snapshot()")
+                pg.evaluate("""city => {
+                  if (document.getElementById('stage').classList.contains('pano')) throw new Error('City sign did not enter city: '+city);
+                  if (document.querySelector('.hi-cities [aria-selected="true"]').dataset.city !== city || document.querySelector('.hi-pop .wx').dataset.city !== city) throw new Error('City sign did not sync selection/weather: '+city);
+                }""", city)
+            pg.evaluate("MAP3D.panorama(); CITY3D.snapshot()")
+            out.append("City signs: pointer clicks and Enter/Space passed for all four cities")
             pg.evaluate("""()=>{
               if (!CITY3D.renderer.info.render.triangles) throw new Error('Scene did not render');
               const f=document.getElementById('stage').getBoundingClientRect();

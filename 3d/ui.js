@@ -27,7 +27,8 @@ const UI = {};
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
   // City switcher colors match the map and city signs.
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  UI.enterCity = (c) => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); };
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => UI.enterCity(c); chips.appendChild(b); }
   const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
   pop.append(cand, count, chips);
   // re-home the live weather element (built and updated by main.js) into the popover; keeping

@@ -18,8 +18,15 @@ for (const isl of islands.filter((i) => i.live)) {
 }
 const citySigns = [];
 for (const c of A.cities) {
-  const el = document.createElement("div");
   const live = LIVE_CITIES.has(c.city);
+  const el = document.createElement(live ? "button" : "div");
+  if (live) {
+    el.type = "button";
+    el.dataset.city = c.city;
+    el.setAttribute("aria-label", `進入${c.cityName}`);
+    el.title = `進入${c.cityName}`;
+    el.onclick = () => UI.enterCity(c.city);
+  }
   citySigns.push(el);
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
