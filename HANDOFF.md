@@ -7,6 +7,8 @@
 
 ### 0.0 Codex 接手更新（2026-10-24）
 
+網站部署接續：已新增 GitHub Actions Pages 工作流程及 `tools/package_site.py`，推送目前開發分支後自動發布；首頁為 3D，另有 2d.html 與 version.json。Pages 是否啟用與首次正式部署結果尚待線上確認；環境目前阻擋 api.github.com、soulfyai.github.io，已儲存兩個網域的設定草稿，需要儲存／發布套用後才能由此環境管理及驗證。操作見 README。
+
 以下 0.1–0.6 保留移轉時的歷史背景；最新工作以本節及 Git log 為準。
 
 遠端同步更新：原先 GitHub 回覆 403 的寫入權限已由使用者開放。重試時已整合遠端新增的網頁組合併提交，保留雙方歷史；以 claude/modest-newton-t9y5uj 最新提交為準。尚未更新線上 Artifact。
