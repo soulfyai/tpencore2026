@@ -1,0 +1,380 @@
+<title>北北基桃政見地圖</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+Sung+HK:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one-screen map app — hex atlas on the left, reading panel on the right; stacks on phones */
+:root{
+  --paper:#EEF2F8; --surface:#FBFCFE; --sunk:#E1E8F2; --ink:#14213D; --muted:#55627A; --line:#C8D2E2;
+  --route:#B5122B;
+  --c-taipei:#1F4FB8; --c-newtaipei:#11A09D; --c-keelung:#23336E; --c-taoyuan:#E0523A;
+  --f-display:"Chiron Sung HK","Noto Serif TC","Songti TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --hex-mix:20%;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
+  --route:#F05A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --hex-mix:26%; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
+  --route:#F05A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --hex-mix:26%; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px}
+header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px}
+.brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.notice{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+.notice b{color:var(--ink);font-weight:700}
+.main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:14px}
+.mapwrap{position:relative;min-width:0;min-height:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.maptools{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+.chip{font:500 13px/1 var(--f-body);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:7px 12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--route);outline-offset:2px}
+.spacer{flex:1}
+svg.map{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation}
+.hex{cursor:pointer}
+.hex polygon{fill:color-mix(in srgb,var(--c) var(--hex-mix),var(--surface));stroke:var(--surface);stroke-width:2;transition:fill .15s}
+.hex:hover polygon,.hex:focus polygon{fill:color-mix(in srgb,var(--c) calc(var(--hex-mix) + 18%),var(--surface))}
+.hex.sel polygon{fill:var(--c)}
+.hex.sel text{fill:var(--surface)}
+.hex.dim{opacity:.22}
+.hex.record polygon{fill:var(--hatch);stroke:var(--c);stroke-dasharray:4 3;stroke-width:1.6}
+.hex.record.sel polygon{fill:var(--c);stroke-dasharray:none}
+.hex.hit polygon{stroke:var(--route);stroke-width:3}
+.hex:focus{outline:none}
+.hex:focus-visible polygon{stroke:var(--ink);stroke-width:3}
+.hex text{fill:var(--ink);font-family:var(--f-body);font-size:11.5px;font-weight:700;text-anchor:middle;pointer-events:none}
+.hex text.code{font-family:var(--f-mono);font-weight:500;font-size:8.5px;fill:var(--muted)}
+.hex.sel text.code{fill:var(--surface);opacity:.8}
+.border{stroke:var(--c);stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
+.citylabel{font-family:var(--f-display);font-weight:800;font-size:17px;fill:var(--c);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
+.citylabel tspan.cand{font-family:var(--f-body);font-weight:500;font-size:11px;fill:var(--ink)}
+.flow{fill:none;stroke:var(--route);stroke-width:1.8;opacity:.38;cursor:pointer}
+.flow.tier-news{stroke-dasharray:7 5}
+.flow.tier-interview{stroke-dasharray:1.5 5;stroke-linecap:round}
+.flow:hover,.flow.on{opacity:1;stroke-width:3.4}
+.flowhit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+.flowdot{fill:var(--route)}
+.flows-off .flowlayer g{display:none}.flows-off .flowlayer g.picked{display:inline}
+.flows-off .legend{display:none}.legend{position:absolute;left:12px;bottom:10px;font-size:11.5px;color:var(--muted);background:color-mix(in srgb,var(--surface) 88%,transparent);padding:6px 10px;border-radius:8px;display:flex;gap:12px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend svg{width:26px;height:6px}
+/* panel */
+.panel{min-width:0;min-height:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{flex:1;font:500 13.5px var(--f-body);background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:11px 6px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+.pbody{flex:1;min-height:0;overflow:auto;padding:16px 18px 22px}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2.title{font-family:var(--f-display);font-weight:800;font-size:23px;line-height:1.25;margin:4px 0 8px;text-wrap:balance}
+h3.sec{font-size:12.5px;letter-spacing:.06em;color:var(--muted);font-weight:700;margin:20px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+.lede{margin:0 0 6px;max-width:62ch}
+.vision{margin:8px 0;padding:8px 12px;border-left:3px solid var(--c,var(--ink));background:var(--paper);font-family:var(--f-display);font-weight:600;border-radius:0 8px 8px 0}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.pill{font-size:12px;border-radius:999px;padding:2px 10px;background:var(--paper);border:1px solid var(--line);color:var(--muted)}
+.pill.city{background:color-mix(in srgb,var(--c) 18%,var(--surface));border-color:transparent;color:var(--ink)}
+.pill.t-official{color:var(--ink);border-color:var(--ink)}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 2px;font:inherit;color:inherit;cursor:pointer}
+.row:hover{background:var(--paper)}
+.row .no{font-family:var(--f-mono);font-size:11px;color:var(--muted);min-width:2.4em}
+.row .nm{font-weight:500;min-width:0}
+.row .sub{display:block;font-size:12.5px;color:var(--muted);font-weight:400}
+.row .go{color:var(--muted)}
+.facts{margin:0;padding-left:1.1em}
+.facts li{margin:3px 0}
+.kv{display:grid;grid-template-columns:5.5em 1fr;gap:4px 10px;font-size:14px;margin:8px 0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0}
+.src{display:flex;flex-direction:column;gap:8px}
+.src a{color:var(--ink);text-decoration:none;display:block;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper)}
+.src a:hover{border-color:var(--ink)}
+.src small{display:block;color:var(--muted);font-size:12px}
+.back{font:500 13px var(--f-body);background:none;border:0;color:var(--muted);cursor:pointer;padding:0;margin-bottom:8px}
+.cands{display:grid;gap:10px}
+.cand{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;text-align:left;font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:10px 12px;cursor:pointer}
+.cand:hover{border-color:var(--c)}
+.cand .cn{font-family:var(--f-display);font-weight:800;font-size:19px}
+.cand .ct{font-size:12.5px;color:var(--muted)}
+.cand .stats{grid-column:1/-1;font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.search{width:100%;font:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:var(--paper);color:var(--ink);margin-bottom:10px}
+details.grp{border-bottom:1px solid var(--line)}
+details.grp>summary{list-style:none;cursor:pointer;padding:10px 2px;display:flex;gap:8px;align-items:center;font-weight:700}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary i{width:10px;height:10px;border-radius:3px;background:var(--c);flex:none}
+details.grp>summary .cnt{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400}
+details.grp .rows{padding-left:18px}
+.flowitem{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-bottom:1px solid var(--line);padding:10px 2px;cursor:pointer}
+.flowitem:hover{background:var(--paper)}
+.flowitem b{font-family:var(--f-mono);font-size:12px;color:var(--route);margin-right:6px}
+.flowitem .sub{display:block;font-size:12.5px;color:var(--muted)}
+.method p{margin:0 0 10px;max-width:62ch}
+.quote{font-family:var(--f-display);font-weight:600}
+.empty{color:var(--muted)}
+.dots{display:inline-flex;gap:4px;vertical-align:middle}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+@media (max-width:860px){
+  html,body{height:auto}
+  .app{height:auto}
+  .main{grid-template-columns:1fr}
+  svg.map{flex:none;aspect-ratio:var(--ar,1/1);height:auto;max-width:100%}
+  .pbody{overflow:visible}
+  .legend{position:static;margin:0 12px 10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">
+      <h1>北北基桃政見地圖</h1>
+      <p>2026 地方選舉・中國國民黨四位直轄市與基隆市長參選人的公開政見，一格一個政策主題</p>
+    </div>
+    <div class="notice"><b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 <span id="checked"></span></div>
+  </header>
+  <div class="main">
+    <section class="mapwrap flows-off" id="mapwrap" aria-label="政見地圖">
+      <div class="maptools" role="toolbar" aria-label="篩選">
+        <button class="chip" data-city="" aria-pressed="true">全部</button>
+        <span id="citychips" style="display:contents"></span>
+        <span class="spacer"></span>
+        <button class="chip" id="toggleflows" aria-pressed="false">顯示跨市協作線</button>
+      </div>
+      <svg class="map" id="map" role="img" aria-label="六角格地圖：台北、新北、基隆、桃園，每格是一位候選人的一項政策主題；完整內容請用右側清單"></svg>
+      <div class="legend" aria-label="協作線依據">
+        <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2"/></svg>官方發布</span>
+        <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2" stroke-dasharray="7 5"/></svg>媒體報導</span>
+        <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2" stroke-dasharray="1.5 5" stroke-linecap="round"/></svg>受訪發言</span>
+      </div>
+    </section>
+    <aside class="panel" aria-label="政見內容">
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="cands" aria-selected="true">候選人</button>
+        <button role="tab" data-tab="list" aria-selected="false">政策清單</button>
+        <button role="tab" data-tab="flows" aria-selected="false">跨市協作</button>
+        <button role="tab" data-tab="about" aria-selected="false">資料說明</button>
+      </div>
+      <div class="pbody" id="pbody" tabindex="-1"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const ORDER=["taipei","newtaipei","keelung","taoyuan"];
+const CODE={taipei:"TPE",newtaipei:"NTP",keelung:"KEL",taoyuan:"TYN"};
+const TIER={official:"官方發布",news:"媒體報導",interview:"受訪發言"};
+const cities=ORDER.map(id=>D.cities.find(c=>c.city===id)).filter(Boolean);
+const cityById=new Map(cities.map(c=>[c.city,c]));
+const sources=new Map();
+for(const c of cities) for(const s of c.sources||[]) sources.set(s.id,s);
+for(const s of D.flows.sources||[]) sources.set(s.id,s);
+const themes=[], items=new Map(), themeById=new Map();
+for(const c of cities) (c.themes||[]).forEach((t,i)=>{t.city=c.city;t.no=i+1;themes.push(t);themeById.set(t.id,t);(t.items||[]).forEach((it,k)=>{it.theme=t.id;it.city=c.city;it.no=k+1;items.set(it.id,it)})});
+const flows=(D.flows.flows||[]).filter(f=>(f.cities||[]).filter(x=>cityById.has(x)).length>=2);
+$("#checked").textContent=D.meta.checkedAt;
+const cvar=c=>`--c:var(--c-${c})`;
+
+/* ---------- hex layout ---------- */
+const S=40, SQ=Math.sqrt(3);
+const px=(q,r)=>[S*SQ*(q+r/2),S*1.5*r];
+const ANCH={taipei:[0,0],newtaipei:[-30,40],keelung:[170,-125],taoyuan:[-235,80]};
+const cells=[];for(let q=-14;q<=14;q++)for(let r=-14;r<=14;r++)cells.push([q,r]);
+const used=new Map(), hexOf=new Map();
+for(const c of cities){
+  const [ax,ay]=ANCH[c.city];
+  const n=c.themes.length;
+  let placed=0;
+  const pool=cells.filter(([q,r])=>!used.has(q+","+r)).map(([q,r])=>{const [x,y]=px(q,r);return{q,r,d:Math.hypot(x-ax,y-ay*1)}}).sort((a,b)=>a.d-b.d);
+  const mine=[];
+  // grow contiguously from the nearest free cell
+  const isNb=(a,b)=>{const dq=a.q-b.q,dr=a.r-b.r;return Math.abs(dq)+Math.abs(dr)+Math.abs(dq+dr)===2};
+  for(const p of pool){ if(placed>=n)break; if(mine.length&&!mine.some(m=>isNb(m,p)))continue; mine.push(p);used.set(p.q+","+p.r,c.city);placed++; }
+  mine.sort((a,b)=>a.r-b.r||a.q-b.q);
+  c.themes.forEach((t,i)=>{hexOf.set(t.id,mine[i])});
+}
+const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]], EDGE=[[0,1],[5,0],[4,5],[3,4],[2,3],[1,2]];
+const corner=(x,y,i)=>{const a=Math.PI/180*(60*i-30);return[x+S*Math.cos(a),y+S*Math.sin(a)]};
+function wrapName(n){n=String(n);if(n.length<=5)return[n];
+  const mid=n.length/2;let best=-1;
+  for(let i=1;i<n.length;i++){const ch=n[i],prev=n[i-1];const ok=ch==="與"||ch==="×"||prev==="、"||ch===" ";if(ok&&(best<0||Math.abs(i-mid)<Math.abs(best-mid)))best=i}
+  if(best>0&&best<=6&&n.length-best<=6)return[n.slice(0,best).trim(),n.slice(best).trim()];
+  const m=Math.ceil(n.length/2);return[n.slice(0,m),n.slice(m,m+6)]}
+
+const svg=$("#map");
+function drawMap(){
+  const pts=[...hexOf.values()].map(h=>px(h.q,h.r));
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  const pad=S*1.6, minx=Math.min(...xs)-pad, maxx=Math.max(...xs)+pad, miny=Math.min(...ys)-pad-18, maxy=Math.max(...ys)+pad+26;
+  svg.setAttribute("viewBox",`${minx} ${miny} ${maxx-minx} ${maxy-miny}`);svg.style.setProperty("--ar",`${(maxx-minx).toFixed(0)}/${(maxy-miny).toFixed(0)}`);
+  let hexes="",borders="",labels="";
+  for(const t of themes){
+    const h=hexOf.get(t.id),[x,y]=px(h.q,h.r);
+    const poly=[0,1,2,3,4,5].map(i=>corner(x,y,i).map(v=>v.toFixed(1)).join(",")).join(" ");
+    const lines=wrapName(t.name);
+    const ty0=y+(lines.length>1?-1:6);
+    hexes+=`<g class="hex${t.kind==="record"?" record":""}" tabindex="0" role="button" data-theme="${t.id}" data-city="${t.city}" style="${cvar(t.city)};--hatch:url(#hatch-${t.city})" aria-label="${esc(cityById.get(t.city).cityName+" "+t.name)}"><polygon points="${poly}"/><text class="code" x="${x}" y="${y-(lines.length>1?20:14)}">${CODE[t.city]}·${String(t.no).padStart(2,"0")}</text>${lines.map((l,i)=>`<text x="${x}" y="${ty0+i*14}">${esc(l)}</text>`).join("")}</g>`;
+    DIRS.forEach(([dq,dr],k)=>{const nb=used.get((h.q+dq)+","+(h.r+dr));if(nb!==t.city){const[a,b]=EDGE[k];const p1=corner(x,y,a),p2=corner(x,y,b);borders+=`<line class="border" style="${cvar(t.city)}" x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}"/>`}});
+  }
+  // city labels: above the top-most hex of each cluster
+  const cent=new Map();
+  for(const c of cities){
+    const hs=c.themes.map(t=>{const h=hexOf.get(t.id);return px(h.q,h.r)});
+    cent.set(c.city,[hs.reduce((s,p)=>s+p[0],0)/hs.length,hs.reduce((s,p)=>s+p[1],0)/hs.length]);
+    // New Taipei wraps Taipei, so its name goes under the cluster; the others sit above theirs
+    const south=c.city==="newtaipei";
+    const top=hs.reduce((a,b)=>(south?b[1]>a[1]:b[1]<a[1])?b:a);
+    const lx=c.city==="taoyuan"?Math.min(...hs.map(p=>p[0])):top[0];
+    labels+=`<text class="citylabel" style="${cvar(c.city)}" x="${lx}" y="${south?top[1]+S*1.75:top[1]-S*1.15}" text-anchor="middle">${esc(c.cityName)}<tspan class="cand" dx="6">${esc(c.candidate)}</tspan></text>`;
+  }
+  // flows: arcs between cluster centroids
+  let fl="";const pairCount={};
+  flows.forEach(f=>{
+    const cs=f.cities.filter(x=>cityById.has(x)), hub=cs[0];
+    for(const other of cs.slice(1)){
+      const key=[hub,other].sort().join("|");const n=pairCount[key]=(pairCount[key]||0)+1;
+      const [x1,y1]=cent.get(hub),[x2,y2]=cent.get(other);
+      const mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1;
+      const off=(n%2?1:-1)*Math.ceil(n/2)*26+ (n===1?14:0);
+      const cx=mx-dy/len*off,cy=my+dx/len*off;
+      const d=`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
+      fl+=`<g data-flow="${esc(f.id)}"><path class="flow tier-${esc(f.tier)}" d="${d}"/><path class="flowhit" d="${d}"><title>${esc(f.title)}</title></path></g>`;
+    }
+  });
+  const dots=[...cent.entries()].map(([c,[x,y]])=>`<circle class="flowdot" cx="${x}" cy="${y}" r="3"/>`).join("");
+  svg.innerHTML=`<defs>${cities.map(c=>`<pattern id="hatch-${c.city}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="var(--surface)"/><line x1="0" y1="0" x2="0" y2="7" stroke="var(--c-${c.city})" stroke-width="2.4" opacity=".3"/></pattern>`).join("")}</defs><g>${hexes}</g><g>${borders}</g><g class="flowlayer">${fl}</g><g>${labels}</g>`;
+  $$(".hex").forEach(g=>{g.onclick=()=>openTheme(g.dataset.theme);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openTheme(g.dataset.theme)}}});
+  $$("[data-flow]").forEach(g=>g.onclick=()=>openFlow(g.dataset.flow));
+}
+
+/* ---------- state ---------- */
+let cityFilter="", selTheme=null, selFlow=null, selItem=null, tab="cands", query="";
+function paint(){
+  $$(".hex").forEach(g=>{
+    const t=themeById.get(g.dataset.theme);
+    g.classList.toggle("sel",t.id===selTheme);
+    let dim=!!cityFilter&&t.city!==cityFilter;
+    if(selFlow){const f=flows.find(x=>x.id===selFlow);dim=!f.cities.includes(t.city)}
+    g.classList.toggle("dim",dim);
+    g.classList.toggle("hit",!!query&&matches(t));
+  });
+  $$("[data-flow]").forEach(g=>{
+    const f=flows.find(x=>x.id===g.dataset.flow);
+    const on=selFlow===f.id||(!!selTheme&&f.cities.includes(themeById.get(selTheme).city)&&!selFlow&&false);
+    g.querySelector(".flow").classList.toggle("on",on);g.classList.toggle("picked",on);
+    g.style.display=cityFilter&&!f.cities.includes(cityFilter)?"none":"";
+  });
+  $$("[data-city]").forEach(b=>{if(b.classList.contains("chip"))b.setAttribute("aria-pressed",String(b.dataset.city===cityFilter))});
+  window.MAP3D&&window.MAP3D.paint();
+}
+const matches=t=>{const q=query.toLowerCase();return JSON.stringify([t.name,t.summary,(t.items||[]).map(i=>[i.name,i.plain,i.facts])]).toLowerCase().includes(q)};
+
+/* ---------- panel views ---------- */
+const body=$("#pbody");
+function show(html){body.innerHTML=html;body.scrollTop=0;
+  body.querySelectorAll("[data-open-theme]").forEach(b=>b.onclick=()=>openTheme(b.dataset.openTheme));
+  body.querySelectorAll("[data-open-item]").forEach(b=>b.onclick=()=>openItem(b.dataset.openItem));
+  body.querySelectorAll("[data-open-flow]").forEach(b=>b.onclick=()=>openFlow(b.dataset.openFlow));
+  body.querySelectorAll("[data-open-city]").forEach(b=>b.onclick=()=>{setCity(b.dataset.openCity);setTab("list")});
+  body.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{selTheme=null;selFlow=null;selItem=null;paint();window.MAP3D&&window.MAP3D.home();setTab(tab)});
+}
+function srcList(ids){
+  const u=[...new Set(ids||[])].map(id=>sources.get(id)).filter(s=>s&&s.url);
+  if(!u.length)return`<p class="empty">此項未附可連結的來源。</p>`;
+  return`<div class="src">${u.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title||s.url)}<small>${esc([s.publisher,s.date,TIER[s.tier]].filter(Boolean).join(" · "))}</small></a>`).join("")}</div>`;
+}
+const tierOf=ids=>{const ts=(ids||[]).map(i=>sources.get(i)?.tier).filter(Boolean);return ts.includes("official")?"official":ts.includes("news")?"news":ts[0]};
+function viewCands(){
+  return`<div class="eyebrow">2026 縣市長選舉 · 北北基桃</div><h2 class="title">四位參選人</h2>
+  <p class="lede">點地圖上的格子，或從這裡進入各城市的政策主題。每一項內容都附上原始來源連結。</p>
+  <div class="cands">${cities.map(c=>{const pol=c.themes.filter(t=>t.kind!=="record"),recs=c.themes.filter(t=>t.kind==="record"),rec=recs.length?{items:recs.flatMap(t=>t.items)}:null;const n=pol.reduce((s,t)=>s+(t.items||[]).length,0);const fc=flows.filter(f=>f.cities.includes(c.city)).length;
+    return`<button class="cand" style="${cvar(c.city)}" data-open-city="${c.city}"><span class="cn">${esc(c.candidate)}</span><span class="ct">${esc(c.cityName)}・${esc(c.status||"")}${c.slogan?`<br>主軸：${esc(c.slogan)}`:""}</span><span class="stats">${pol.length} 個主題 ／ ${n} 項政見${rec?` ／ ${rec.items.length} 項政績`:""} ／ ${fc} 條跨市協作</span></button>`}).join("")}</div>`;
+}
+function viewList(){
+  const q=query.toLowerCase();
+  const groups=cities.filter(c=>!cityFilter||c.city===cityFilter).map(c=>{
+    const ts=c.themes.filter(t=>!q||matches(t));
+    if(!ts.length)return"";
+    return`<h3 class="sec" style="${cvar(c.city)};margin-top:8px"><span class="dots"><i></i></span> ${esc(c.cityName)}・${esc(c.candidate)}</h3>`+ts.map(t=>{
+      const its=(t.items||[]).filter(i=>!q||JSON.stringify([i.name,i.plain,i.facts,t.name]).toLowerCase().includes(q));
+      return`<details class="grp" style="${cvar(c.city)}" ${q?"open":""}><summary><i></i>${esc(t.name)}<span class="cnt">${its.length}</span></summary><div class="rows"><button class="row" data-open-theme="${t.id}"><span class="no">${CODE[c.city]}</span><span class="nm">看這個主題</span><span class="go">›</span></button>${its.map(i=>`<button class="row" data-open-item="${i.id}"><span class="no">${String(t.no).padStart(2,"0")}.${i.no}</span><span class="nm">${esc(i.name)}</span><span class="go">›</span></button>`).join("")}</div></details>`}).join("")
+    +((c.achievements||[]).length&&!q&&!c.recordShown?`<details class="grp ach" style="${cvar(c.city)}"><summary><i style="background:none;border:2px solid var(--c)"></i>任內已實施（參考，不列入地圖）<span class="cnt">${c.achievements.length}</span></summary><ul class="facts" style="padding:4px 0 12px 2.2em">${c.achievements.map(a=>`<li><b>${esc(a.name)}</b>${a.plain?`：${esc(a.plain)}`:""}</li>`).join("")}</ul></details>`:"");
+  }).join("");
+  return`<input class="search" id="q" type="search" placeholder="搜尋政見，例如 捷運、托育、長照" value="${esc(query)}" aria-label="搜尋政見">${groups||`<p class="empty">沒有符合「${esc(query)}」的政見。</p>`}`;
+}
+function viewFlows(){
+  return`<div class="eyebrow">Cross-city</div><h2 class="title">跨市協作</h2><p class="lede">參選人公開提到、需要兩個以上城市一起推動的計畫。地圖上的紅線連接相關城市；線型代表依據來源。</p>
+  ${flows.filter(f=>!cityFilter||f.cities.includes(cityFilter)).map(f=>`<button class="flowitem" data-open-flow="${esc(f.id)}"><b>${esc(f.id)}</b>${esc(f.title)}<span class="sub">${f.cities.map(c=>cityById.get(c)?.cityName||c).join(" ↔ ")}・${TIER[f.tier]||""}</span></button>`).join("")||`<p class="empty">目前沒有整理到跨市協作。</p>`}`;
+}
+function viewAbout(){
+  const unk=cities.flatMap(c=>(c.unknowns||[]).map(u=>`<li><b>${esc(c.candidate)}：</b>${esc(u)}</li>`)).concat((D.flows.unknowns||[]).map(u=>`<li><b>跨市：</b>${esc(u)}</li>`));
+  return`<div class="method"><div class="eyebrow">Method</div><h2 class="title">資料怎麼來的</h2>
+  <p>這是一份獨立整理的政見索引，不代表任何候選人、政黨或競選團隊，也沒有接受其委託。內容只收錄公開來源中明確提到的政見，以白話改寫，不加評價。</p>
+  <p>每一項都標示依據：<b>官方發布</b>指候選人或競選團隊自己的網站、社群或記者會資料；<b>媒體報導</b>指新聞對其政見發表的報導；<b>受訪發言</b>指訪談或辯論中的說法。數字、時程與金額只在來源有寫時列出。</p>
+  <p>資料查核日期：${esc(D.meta.checkedAt)}。選舉期間政見仍可能增修，請以候選人最新公開資訊為準。</p>
+  ${unk.length?`<h3 class="sec">尚待補齊</h3><ul class="facts">${unk.join("")}</ul>`:""}
+  <h3 class="sec">來源數</h3><p>${sources.size} 個公開來源</p></div>`;
+}
+function openTheme(id){
+  const t=themeById.get(id);if(!t)return;const c=cityById.get(t.city);
+  selTheme=id;selFlow=null;selItem=null;paint();window.MAP3D&&window.MAP3D.focusTheme(id);
+  const fl=flows.filter(f=>f.cities.includes(t.city));
+  show(`<button class="back" data-back>← 返回</button><div style="${cvar(t.city)}"><div class="eyebrow">${CODE[t.city]}·${String(t.no).padStart(2,"0")} · ${esc(c.cityName)} · ${esc(c.candidate)}</div><h2 class="title">${esc(t.name)}</h2>
+  ${t.summary?`<p class="lede">${esc(t.summary)}</p>`:""}${t.vision?`<div class="vision">${esc(t.vision)}</div>`:""}
+  <div class="pills"><span class="pill city">${esc(c.cityName)}</span><span class="pill">${(t.items||[]).length} 項${t.kind==="record"?"已實施施政":"政見"}</span></div>
+  ${(()=>{const row=i=>`<button class="row" data-open-item="${i.id}"><span class="no">${String(t.no).padStart(2,"0")}.${i.no}</span><span class="nm">${esc(i.name)}${i.who?`<span class="sub">對象：${esc(i.who)}</span>`:""}</span><span class="go">›</span></button>`;
+    if(t.kind!=="record")return`<h3 class="sec">政見細項</h3><div class="rows">${(t.items||[]).map(row).join("")}</div>`;
+    const g=new Map();for(const i of t.items||[]){const k=i.area||"其他";if(!g.has(k))g.set(k,[]);g.get(k).push(i)}
+    return[...g.entries()].map(([k,v])=>`<h3 class="sec">${esc(k)}<span style="font-family:var(--f-mono);font-weight:400;margin-left:6px">${v.length}</span></h3><div class="rows">${v.map(row).join("")}</div>`).join("")})()}
+  ${fl.length?`<h3 class="sec">${esc(c.cityName)}參與的跨市協作</h3>${fl.map(f=>`<button class="flowitem" data-open-flow="${esc(f.id)}"><b>${esc(f.id)}</b>${esc(f.title)}<span class="sub">${f.cities.map(x=>cityById.get(x)?.cityName||x).join(" ↔ ")}</span></button>`).join("")}`:""}
+  <h3 class="sec">來源</h3>${srcList([...(t.sources||[]),...(t.items||[]).flatMap(i=>i.sources||[])])}</div>`);
+}
+function openItem(id){
+  const i=items.get(id);if(!i)return;const t=themeById.get(i.theme),c=cityById.get(i.city);
+  selTheme=t.id;selFlow=null;selItem=id;paint();window.MAP3D&&window.MAP3D.focusItem(id);
+  const tier=tierOf(i.sources);
+  show(`<button class="back" data-open-theme="${t.id}">← ${esc(t.name)}</button><div style="${cvar(i.city)}"><div class="eyebrow">${CODE[i.city]}·${String(t.no).padStart(2,"0")}.${i.no} · ${esc(c.candidate)} · ${esc(t.name)}</div><h2 class="title">${esc(i.name)}</h2>
+  <div class="pills"><span class="pill city">${esc(c.cityName)}</span>${tier?`<span class="pill t-${tier}">${TIER[tier]}</span>`:""}${(i.tags||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
+  ${i.plain?`<p class="lede">${esc(i.plain)}</p>`:""}
+  <dl class="kv">${i.who?`<dt>對象</dt><dd>${esc(i.who)}</dd>`:""}${i.phase?`<dt>時程</dt><dd>${esc(i.phase)}</dd>`:""}</dl>
+  ${(i.facts||[]).length?`<h3 class="sec">重點</h3><ul class="facts">${i.facts.map(f=>`<li>${esc(f)}</li>`).join("")}</ul>`:""}
+  <h3 class="sec">來源</h3>${srcList(i.sources)}</div>`);
+}
+function openFlow(id){
+  const f=flows.find(x=>x.id===id);if(!f)return;
+  selFlow=id;selTheme=null;selItem=null;paint();window.MAP3D&&window.MAP3D.focusFlow(id);
+  show(`<button class="back" data-back>← 返回</button><div class="eyebrow">跨市協作 ${esc(f.id)}</div><h2 class="title">${esc(f.title)}</h2>
+  <div class="pills">${f.cities.map(c=>`<span class="pill city" style="${cvar(c)}">${esc(cityById.get(c)?.cityName||c)}</span>`).join("")}<span class="pill t-${esc(f.tier)}">${TIER[f.tier]||""}</span></div>
+  <p class="lede">${esc(f.text)}</p>
+  <dl class="kv">${(f.proposedBy||[]).length?`<dt>提出者</dt><dd>${esc(f.proposedBy.join("、"))}</dd>`:""}${f.carry?`<dt>流動的是</dt><dd>${esc(f.carry)}</dd>`:""}</dl>
+  ${f.quote?`<div class="vision quote">「${esc(f.quote)}」${f.quoteBy?`<small style="display:block;font-family:var(--f-body);font-weight:400;font-size:12.5px;color:var(--muted)">— ${esc(f.quoteBy)}</small>`:""}</div>`:""}
+  <h3 class="sec">來源</h3>${srcList(f.sources)}`);
+}
+function setTab(t){tab=t;$$(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
+  show({cands:viewCands,list:viewList,flows:viewFlows,about:viewAbout}[t]());
+  const q=$("#q");if(q){q.oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;paint();setTab("list");const n=$("#q");n.focus();n.setSelectionRange(pos,pos)}}
+}
+function setCity(c){cityFilter=c;selFlow=null;paint();if(tab==="list"||tab==="flows")setTab(tab)}
+$$(".tabs button").forEach(b=>b.onclick=()=>{selTheme=null;selFlow=null;paint();setTab(b.dataset.tab)});
+$("#citychips").innerHTML=cities.map(c=>`<button class="chip" data-city="${c.city}" style="${cvar(c.city)}" aria-pressed="false"><i></i>${esc(c.cityName)}</button>`).join("");
+$$(".chip[data-city]").forEach(b=>b.onclick=()=>setCity(b.dataset.city));
+$("#toggleflows").onclick=e=>{const on=e.currentTarget.getAttribute("aria-pressed")!=="true";e.currentTarget.setAttribute("aria-pressed",String(on));e.currentTarget.textContent=on?"隱藏跨市協作線":"顯示跨市協作線";$("#mapwrap").classList.toggle("flows-off",!on);paint()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&(selTheme||selFlow)){selTheme=null;selFlow=null;selItem=null;paint();window.MAP3D&&window.MAP3D.home();setTab(tab)}});
+if(svg)drawMap();
+window.APP={D,cities,cityById,themes,themeById,items,flows,hexOf,used,px,S,CODE,wrapName,openTheme,openItem,openFlow,setTab,setCity,
+  get state(){return{cityFilter,selTheme,selFlow,selItem,query,tab,flowsOn:!$("#mapwrap").classList.contains("flows-off")}},matches};
+paint();setTab("cands");
+const h=location.hash.slice(1);
+if(h){if(themeById.has(h))openTheme(h);else if(items.has(h))openItem(h);else if(cityById.has(h)){setCity(h);setTab("list")}}
+</script>

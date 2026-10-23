@@ -1,0 +1,8 @@
+*_backup/
+index3d_blocks.html
+index3d_grid.html
+index3d_islands.html
+build_superblock.py
+map3d_smooth.js
+__pycache__/
+node_modules/

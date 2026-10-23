@@ -1,0 +1,514 @@
+{
+ "sources": [
+  {
+   "id": "fl-s1",
+   "url": "https://news.ltn.com.tw/news/NewTaipei/breakingnews/5437743",
+   "title": "李四川：要和蔣萬安一起 讓雙北交通進步到30分鐘生活圈",
+   "publisher": "自由時報",
+   "date": "2026-05-15",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s2",
+   "url": "https://udn.com/news/story/124652/9507230",
+   "title": "打造雙北30分鐘生活圈 李四川高喊：新北要成為最有希望城市",
+   "publisher": "聯合報",
+   "date": "2026-05-16",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s3",
+   "url": "https://www.ettoday.net/news/20260517/3167254.htm",
+   "title": "蘇巧慧酸李四川恐讓新北變細漢　蔣萬安：川伯看起來像我細漢？",
+   "publisher": "ETtoday新聞雲",
+   "date": "2026-05-17",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s4",
+   "url": "https://www.cna.com.tw/news/aloc/202603200066.aspx",
+   "title": "李四川提校校有公托 蔣萬安：減輕育兒家庭負擔",
+   "publisher": "中央社",
+   "date": "2026-03-20",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s5",
+   "url": "https://udn.com/news/story/124652/9515797",
+   "title": "雙北共治 李四川取經北市無菸城市 商圈做起",
+   "publisher": "聯合報",
+   "date": "2026-05-21",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s6",
+   "url": "https://www.mirrormedia.mg/story/20260709inv001",
+   "title": "時事焦點／拋5方針強化新北醫療量能 李四川：雙北升級30分鐘生活圈",
+   "publisher": "鏡週刊",
+   "date": "2026-07-18",
+   "checkedAt": "2026-10-22",
+   "tier": "interview"
+  },
+  {
+   "id": "fl-s7",
+   "url": "https://udn.com/news/story/124652/9541339",
+   "title": "綠民代質疑蘆社大橋4年蓋不完 川辦反嗆：難道蘇巧慧反對蓋嗎？",
+   "publisher": "聯合報",
+   "date": "2026-06-02",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s8",
+   "url": "https://www.nownews.com/news/6865278",
+   "title": "李四川拋「軌道建設123」政見！打造30分鐘雙北生活圈 3路線曝光",
+   "publisher": "NOWnews今日新聞",
+   "date": "2026-08-12",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s9",
+   "url": "https://udn.com/news/story/124652/9675853",
+   "title": "前往汐止再拜關公廟 李四川：加速汐止民生線打造30分鐘通勤生活圈",
+   "publisher": "聯合報",
+   "date": "2026-08-06",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s10",
+   "url": "https://ctinews.com/news/items/q6xVpA5BW7",
+   "title": "基北北桃大串聯！李四川合體謝國樑 喊出「汐東線再延3站」",
+   "publisher": "中天新聞網",
+   "date": "2026-09-06",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s11",
+   "url": "https://udn.com/news/story/7266/9738199",
+   "title": "李四川：加速軌道建設 串連基北北桃",
+   "publisher": "聯合報",
+   "date": "2026-09-07",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s12",
+   "url": "https://udn.com/news/story/124652/9737453",
+   "title": "李四川訪基隆交流 謝國樑：從基捷到兒童樂園 攜手為城市下一步努力",
+   "publisher": "聯合報",
+   "date": "2026-09-06",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s13",
+   "url": "https://www.ftnn.com.tw/news/576594",
+   "title": "李四川謝國樑交流捷運、育兒政見 推「基北北桃做事連線」",
+   "publisher": "台灣好新聞FTNN",
+   "date": "2026-09-06",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s14",
+   "url": "https://wantrich.chinatimes.com/news/20260315900060-420501",
+   "title": "不打負面選舉 李四川推觀光周遊券",
+   "publisher": "中國時報／旺得富",
+   "date": "2026-03-15",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s15",
+   "url": "https://udn.com/news/story/6656/9442891",
+   "title": "北北基桃減碳存摺2.0 蔣萬安宣布新亮點 劉和然火力全開砲轟中央",
+   "publisher": "聯合報",
+   "date": "2026-04-15",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s16",
+   "url": "https://wantrich.chinatimes.com/news/20260113900075-420501",
+   "title": "北北基桃TPASS不斷炊 可撐到6月初",
+   "publisher": "中國時報／旺得富",
+   "date": "2026-01-13",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s17",
+   "url": "https://udn.com/news/story/124652/9821326",
+   "title": "李四川到桃園站台張善政 主張捷運可從基隆到桃園",
+   "publisher": "聯合報",
+   "date": "2026-10-17",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s18",
+   "url": "https://cnews.com.tw/248261018a01/",
+   "title": "張善政、蔣萬安、謝國樑齊聲力挺 「理工男」李四川串聯4市交通",
+   "publisher": "匯流新聞網",
+   "date": "2026-10-18",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s19",
+   "url": "https://tyenews.com/2026/10/1417913/",
+   "title": "張善政可負擔住宅政策獲肯定 李四川盼將桃園經驗帶進新北",
+   "publisher": "桃園電子報",
+   "date": "2026-10-14",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s20",
+   "url": "https://udn.com/vote2026/story/124652/9817031",
+   "title": "助攻雙北？接連同台李四川、蔣萬安 張善政：北台灣應共同努力",
+   "publisher": "聯合報",
+   "date": "2026-10-15",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s21",
+   "url": "https://www.ctee.com.tw/news/20261018700294-431204",
+   "title": "選戰升溫 張善政攜手邱奕勝合體出擊 北台灣政壇大咖齊聚桃園",
+   "publisher": "工商時報",
+   "date": "2026-10-18",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  },
+  {
+   "id": "fl-s22",
+   "url": "https://udn.com/news/story/7324/9433677",
+   "title": "桃園、新北跨市整合輕軌新桃林線出爐 解林口嚴重塞車",
+   "publisher": "聯合報",
+   "date": "2026-04-10",
+   "checkedAt": "2026-10-22",
+   "tier": "news"
+  }
+ ],
+ "flows": [
+  {
+   "id": "X1",
+   "title": "雙北共治框架",
+   "text": "李四川主張雙北在交通、捷運、河川治理、垃圾處理等議題共同治理；蔣萬安公開表態支持共治，並陪同李四川視察北市吸菸室設計作為合作示範。",
+   "cities": [
+    "taipei",
+    "newtaipei"
+   ],
+   "proposedBy": [
+    "李四川",
+    "蔣萬安"
+   ],
+   "carry": "市政經驗",
+   "tier": "news",
+   "quote": "雙北就是一體",
+   "sources": [
+    "fl-s3",
+    "fl-s5",
+    "fl-s6"
+   ],
+   "quoteBy": "蔣萬安"
+  },
+  {
+   "id": "X2",
+   "title": "雙北30分鐘生活圈",
+   "text": "李四川表示若與蔣萬安搭配，要讓新北各區原則上與台北捷運系統相連，把雙北從一日生活圈縮短為30分鐘生活圈。",
+   "cities": [
+    "taipei",
+    "newtaipei"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "通勤族",
+   "tier": "news",
+   "quote": "要進步到30分鐘生活圈",
+   "sources": [
+    "fl-s1",
+    "fl-s2",
+    "fl-s8"
+   ]
+  },
+  {
+   "id": "X3",
+   "title": "汐東線南延接東環段",
+   "text": "李四川提出汐東線由東湖往南延伸三站、銜接台北環狀線東環段，紓解汐止進入台北市區的瓶頸，並表示會與蔣萬安配合推動汐止相關軌道。",
+   "cities": [
+    "newtaipei",
+    "taipei"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "捷運",
+   "tier": "news",
+   "sources": [
+    "fl-s9",
+    "fl-s11",
+    "fl-s8"
+   ]
+  },
+  {
+   "id": "X4",
+   "title": "基捷接汐東線入北市",
+   "text": "李四川構想基隆捷運接上汐東線，再經東環段、板南線進入台北信義區；謝國樑在雙方交流時表示基捷規劃一直有新北市府協助。",
+   "cities": [
+    "keelung",
+    "newtaipei",
+    "taipei"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "捷運",
+   "tier": "news",
+   "sources": [
+    "fl-s10",
+    "fl-s11",
+    "fl-s18"
+   ]
+  },
+  {
+   "id": "X5",
+   "title": "三鶯線接桃園八德",
+   "text": "李四川在桃園為張善政站台時，提出三鶯線延伸至桃園八德並與桃園捷運銜接，作為新北與桃園軌道串聯的一環。",
+   "cities": [
+    "newtaipei",
+    "taoyuan"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "捷運",
+   "tier": "news",
+   "sources": [
+    "fl-s17",
+    "fl-s18"
+   ]
+  },
+  {
+   "id": "X6",
+   "title": "林口與桃園軌道銜接",
+   "text": "張善政與新北市府共同宣布把林口線與桃園長庚線整合推動；李四川表示將與張善政協調桃林線及林口、鶯歌一帶的捷運銜接。",
+   "cities": [
+    "newtaipei",
+    "taoyuan"
+   ],
+   "proposedBy": [
+    "張善政",
+    "李四川"
+   ],
+   "carry": "輕軌",
+   "tier": "news",
+   "sources": [
+    "fl-s22",
+    "fl-s10"
+   ]
+  },
+  {
+   "id": "X7",
+   "title": "基北北桃一條線",
+   "text": "李四川主張以軌道建設把基隆、台北、新北、桃園串成一條線，並稱將與謝國樑、蔣萬安、張善政密切合作。",
+   "cities": [
+    "keelung",
+    "taipei",
+    "newtaipei",
+    "taoyuan"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "捷運",
+   "tier": "news",
+   "quote": "捷運可以從基隆到桃園",
+   "sources": [
+    "fl-s17",
+    "fl-s11"
+   ]
+  },
+  {
+   "id": "X8",
+   "title": "蘆社大橋雙北連線",
+   "text": "李四川陣營表示一定會興建連接蘆洲與社子島的蘆社大橋，並在當選後與蔣萬安攜手推動；北市府是否同意共推未見其回應。",
+   "cities": [
+    "newtaipei",
+    "taipei"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "車流",
+   "tier": "news",
+   "quote": "雙北連線、盡速推動",
+   "sources": [
+    "fl-s7",
+    "fl-s6"
+   ]
+  },
+  {
+   "id": "X9",
+   "title": "雙北AI產業廊帶",
+   "text": "李四川提出串聯北士科、內科、南港與新北產業帶形成AI產業鏈；蔣萬安在站台時呼籲共同為北台灣打造科技產業廊帶。",
+   "cities": [
+    "taipei",
+    "newtaipei"
+   ],
+   "proposedBy": [
+    "李四川",
+    "蔣萬安"
+   ],
+   "carry": "AI產業",
+   "tier": "news",
+   "quote": "把握AI浪潮",
+   "sources": [
+    "fl-s2",
+    "fl-s6",
+    "fl-s18"
+   ]
+  },
+  {
+   "id": "X10",
+   "title": "雙北校校有公托",
+   "text": "李四川提出運用閒置教室設公托，希望與蔣萬安一起推動；蔣萬安回應雙北會攜手減輕育兒負擔，但具體方案需兩市再討論。",
+   "cities": [
+    "newtaipei",
+    "taipei"
+   ],
+   "proposedBy": [
+    "李四川",
+    "蔣萬安"
+   ],
+   "carry": "托育名額",
+   "tier": "news",
+   "quote": "雙北是共同生活圈",
+   "sources": [
+    "fl-s4"
+   ]
+  },
+  {
+   "id": "X11",
+   "title": "TPASS月票四市撐住",
+   "text": "中央補助延遲時，北北基桃四市達成由地方先墊付、維持TPASS的共識；張善政表態不能中斷，謝國樑站台時也肯定基北北桃月票成果。",
+   "cities": [
+    "taipei",
+    "newtaipei",
+    "keelung",
+    "taoyuan"
+   ],
+   "proposedBy": [
+    "張善政",
+    "蔣萬安",
+    "謝國樑"
+   ],
+   "carry": "通勤族",
+   "tier": "news",
+   "quote": "絕對不能讓TPASS中斷",
+   "sources": [
+    "fl-s16",
+    "fl-s21"
+   ]
+  },
+  {
+   "id": "X12",
+   "title": "北北基桃減碳存摺",
+   "text": "蔣萬安與謝國樑等四市代表宣布減碳存摺升級，納入步行並降低兌換門檻，主張四縣市先行帶動其他縣市。",
+   "cities": [
+    "taipei",
+    "newtaipei",
+    "keelung",
+    "taoyuan"
+   ],
+   "proposedBy": [
+    "蔣萬安",
+    "謝國樑"
+   ],
+   "carry": "減碳點數",
+   "tier": "news",
+   "quote": "北台四縣市先做",
+   "sources": [
+    "fl-s15"
+   ]
+  },
+  {
+   "id": "X13",
+   "title": "北北基桃觀光周遊券",
+   "text": "李四川提出四市共通的觀光周遊券，讓旅客可跨四地使用住宿與景點；蔣萬安、謝國樑、張善政同場強調四市合作。",
+   "cities": [
+    "taipei",
+    "newtaipei",
+    "keelung",
+    "taoyuan"
+   ],
+   "proposedBy": [
+    "李四川"
+   ],
+   "carry": "觀光客",
+   "tier": "news",
+   "sources": [
+    "fl-s14"
+   ]
+  },
+  {
+   "id": "X14",
+   "title": "桃園住宅經驗進新北",
+   "text": "張善政邀李四川參觀桃園可負擔住宅，李四川表示當選後將參考桃園做法；張善政另主張北北桃交通、就業與居住應跨城市整體規畫。",
+   "cities": [
+    "taoyuan",
+    "newtaipei"
+   ],
+   "proposedBy": [
+    "張善政",
+    "李四川"
+   ],
+   "carry": "住宅經驗",
+   "tier": "news",
+   "quote": "將參考桃園經驗",
+   "sources": [
+    "fl-s19",
+    "fl-s20"
+   ]
+  },
+  {
+   "id": "X15",
+   "title": "基隆親子館經驗交流",
+   "text": "李四川參訪基隆七堵室內兒童樂園，表示會把做法帶回新北評估；謝國樑表示樂見基隆兒童友善建設與新北交流。",
+   "cities": [
+    "keelung",
+    "newtaipei"
+   ],
+   "proposedBy": [
+    "李四川",
+    "謝國樑"
+   ],
+   "carry": "親子空間",
+   "tier": "news",
+   "sources": [
+    "fl-s12",
+    "fl-s13"
+   ]
+  }
+ ],
+ "unknowns": [
+  "蔣萬安本人未見明確背書「雙北30分鐘生活圈」字眼或特定新捷運路線的共同承諾；相關說法多出自李四川或記者分析（鏡週刊 2026-05-31 將其列為蔣團隊政績，但無直接引述）。",
+  "張善政本人的跨市政見很少，多為站台致詞與經驗交流；他與蔣萬安在行政院討論松山機場規畫時主張中央與地方共同評估，但未見明確的台北—桃園合作承諾，故未列為協作線。",
+  "謝國樑僅見經驗交流、肯定TPASS與「聯合治理最緊密」等表態，未查到他提出新的跨市具體政見。",
+  "萬大線、環狀線北環、民生汐止線台北段、機捷延伸等，未查到候選人以「跨市共同承諾」形式提出。",
+  "跨市長照、敬老卡互通、防災治水的具體合作承諾未查到；河川治理僅見李四川概略提及。",
+  "2026年北北基桃首長會議除TPASS因應外，未查到新的正式合作機制或聯合宣言。",
+  "華視、自由時報（李四川合體謝國樑）、中央日報網路報等數頁無法擷取，可能有未收錄的細節。",
+  "新桃林線（X6）的共同宣布者為張善政與現任新北市長侯友宜，李四川是表態延續協調，並非原始提案人。"
+ ]
+}
