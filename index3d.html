@@ -558,12 +558,11 @@ function viewFlows(){
   ${flows.filter(f=>!cityFilter||f.cities.includes(cityFilter)).map(f=>`<button class="flowitem" data-open-flow="${esc(f.id)}"><b>${esc(f.id)}</b>${esc(f.title)}<span class="sub">${f.cities.map(c=>cityById.get(c)?.cityName||c).join(" ↔ ")}・${TIER[f.tier]||""}</span></button>`).join("")||`<p class="empty">目前沒有整理到跨市協作。</p>`}`;
 }
 function viewAbout(){
-  const unk=cities.flatMap(c=>(c.unknowns||[]).map(u=>`<li><b>${esc(c.candidate)}：</b>${esc(u)}</li>`)).concat((D.flows.unknowns||[]).map(u=>`<li><b>跨市：</b>${esc(u)}</li>`));
   return`<div class="method"><div class="eyebrow">Method</div><h2 class="title">資料怎麼來的</h2>
   <p>這是一份獨立整理的政見索引，不代表任何候選人、政黨或競選團隊，也沒有接受其委託。內容只收錄公開來源中明確提到的政見，以白話改寫，不加評價。</p>
   <p>每一項都標示依據：<b>官方發布</b>指候選人或競選團隊自己的網站、社群或記者會資料；<b>媒體報導</b>指新聞對其政見發表的報導；<b>受訪發言</b>指訪談或辯論中的說法。數字、時程與金額只在來源有寫時列出。</p>
   <p>資料查核日期：${esc(D.meta.checkedAt)}。選舉期間政見仍可能增修，請以候選人最新公開資訊為準。</p>
-  ${unk.length?`<h3 class="sec">尚待補齊</h3><ul class="facts">${unk.join("")}</ul>`:""}
+
   <h3 class="sec">來源數</h3><p>${sources.size} 個公開來源</p></div>`;
 }
 function openTheme(id){
