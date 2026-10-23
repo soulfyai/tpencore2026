@@ -102,12 +102,12 @@ html.drawer-open aside.panel{transform:none}
 .hi-toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px);z-index:40;background:var(--ink);color:var(--surface);font:600 14px var(--f-body);padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 6px 20px rgba(20,33,61,.25)}
 .hi-toast.on{opacity:1;transform:translate(-50%,0)}
 
-/* island name pills, policy-island style */
-.hi .tlabel{font:800 13px/1.2 var(--f-body);color:#1b2234;background:#fff;border:0;border-radius:999px;box-shadow:0 3px 10px rgba(20,33,61,.18);padding:6px 12px 6px 10px;gap:7px;transform:none}
-.hi .tlabel b{font:800 12px var(--f-mono);color:var(--c)}
-.hi .tlabel.sel{background:var(--c);color:var(--surface)}.hi .tlabel.sel b{color:var(--surface);opacity:.85}
-.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]),.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]) b{color:#14213D}
-.hi .tlabel.hot{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent),0 3px 10px rgba(20,33,61,.18)}
+/* Policy titles share the city signs' neon motif at a quieter, readable scale. */
+.hi .tlabel{font:800 13px/1.2 var(--f-body);color:#f4f7ff;background:#101d38;border:1px solid var(--c);border-radius:8px;box-shadow:0 0 0 1px rgba(231,240,255,.22),0 0 8px color-mix(in srgb,var(--c) 50%,transparent),inset 0 0 8px color-mix(in srgb,var(--c) 18%,transparent);text-shadow:0 0 2px #fff,0 0 7px var(--c);padding:6px 12px 6px 10px;gap:7px;transform:none;transition:box-shadow .18s ease,background-color .18s ease}
+.hi .tlabel b{font:800 12px var(--f-mono);color:color-mix(in srgb,var(--c) 55%,#fff);text-shadow:0 0 6px var(--c)}
+.hi .tlabel:hover,.hi .tlabel.sel,.hi .tlabel.hot{background:#192a49;box-shadow:0 0 0 1px #e6efff,0 0 12px color-mix(in srgb,var(--c) 75%,transparent),inset 0 0 10px color-mix(in srgb,var(--c) 25%,transparent)}
+.hi .tlabel:focus-visible{outline:2px solid #f4f7ff;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.hi .tlabel{transition:none}}
 .hi .stage.far .tlabel:not(.sel):not(.hot){font-size:12px;padding:4px 9px 4px 8px;gap:5px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) b{font-size:11px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) span{font-size:11px}
@@ -157,9 +157,9 @@ html.drawer-open aside.panel{transform:none}
 /* one list bubble per island */
 .callout{pointer-events:auto;min-width:210px;max-width:290px;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(20,33,61,.28);padding:9px 10px 7px;font-family:var(--f-body);color:#1b2234;position:relative;margin-bottom:12px}
 .callout::after{content:"";position:absolute;left:50%;bottom:-8px;width:16px;height:16px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:3px}
-.co-head{display:flex;align-items:baseline;gap:7px;font:800 14.5px/1.3 var(--f-display);padding:2px 4px 7px;border-bottom:1px solid #edf0f4;margin-bottom:4px}
-.co-head b{font:800 13px var(--f-mono);color:var(--c)}
-.co-head span{margin-left:auto;font:600 11.5px var(--f-body);color:#6b7486}
+.co-head{display:flex;align-items:baseline;gap:7px;font:800 14.5px/1.4 var(--f-display);padding:8px 9px;margin-bottom:7px;border:1px solid var(--c);border-radius:9px;background:#101d38;color:#f4f7ff;text-shadow:0 0 2px #fff,0 0 7px var(--c);box-shadow:0 0 7px color-mix(in srgb,var(--c) 40%,transparent),inset 0 0 10px color-mix(in srgb,var(--c) 18%,transparent)}
+.co-head b{font:800 13px var(--f-mono);color:color-mix(in srgb,var(--c) 55%,#fff);text-shadow:0 0 6px var(--c);flex:none}
+.co-head span{margin-left:auto;font:600 11.5px var(--f-body);color:#d8e3f5;text-shadow:none;white-space:nowrap}
 .callout ol{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto;position:relative;z-index:1}
 .callout li button{width:100%;display:flex;align-items:center;gap:8px;text-align:left;border:0;background:transparent;border-radius:9px;padding:6px 6px;font:600 13px/1.35 var(--f-body);color:#1b2234;cursor:pointer;min-height:34px}
 .callout li button:hover,.callout li button.sel{background:color-mix(in srgb,var(--c) 12%,#fff)}
