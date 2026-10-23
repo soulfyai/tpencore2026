@@ -27,12 +27,16 @@
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px 42px} /* bottom clearance for the pinned notice */
 header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px}
 .brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
 .brand h1 .subbrand{display:block;font-family:var(--f-body);font-weight:700;font-size:clamp(12px,1.4vw,14px);letter-spacing:.28em;color:var(--muted);margin-top:2px}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
-.notice{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
+/* the independence notice is pinned bottom-center and must never be covered */
+.notice{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;
+  width:max-content;max-width:calc(100vw - 24px);text-align:center;
+  font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+  background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(4px)}
 .notice b{color:var(--ink);font-weight:700}
 .main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);gap:14px}
 .mapwrap{position:relative;min-width:0;min-height:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
@@ -134,6 +138,7 @@ details.grp .rows{padding-left:18px}
   .chip{min-height:40px}
   .tabs button{min-height:44px}
   .back{min-height:40px}
+  .notice{font-size:10.5px;padding:3px 10px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ===== policy-island page shell (3D page only) ===== */
@@ -149,24 +154,32 @@ html.hi body{padding:0}
    so neon signs never cover the notice, mode buttons, timeline or drawer */
 .hi .labels{z-index:5}
 
-/* brand, top-left */
+/* brand, top-left: the neon sign is a persistent tab, the info card pops out below it */
 .hi header.top{position:absolute;left:20px;top:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(380px,calc(100% - 40px));pointer-events:none}
 .hi header.top>*{pointer-events:auto}
-.hi .brand{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:14px 18px 14px;box-shadow:0 6px 24px rgba(20,33,61,.12)}
-/* brand neon sign: same language as the city neon signs (.hi .clabel) */
-.hi .brand h1{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;
-  background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;padding:8px 16px 7px;
+.hi .brand{background:none;padding:0;box-shadow:none}
+/* brand neon sign: same language as the city neon signs (.hi .clabel); the whole sign is the toggle button */
+.hi .brand h1{display:block;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;margin:0;
+  background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;
   box-shadow:0 0 0 1.5px rgba(255,255,255,.55),0 0 14px var(--c-taipei),inset 0 0 14px color-mix(in srgb,var(--c-taipei) 55%,transparent);
   text-shadow:0 0 4px #fff,0 0 10px var(--c-taipei),0 0 24px var(--c-taipei);animation:neon 3.2s ease-in-out infinite}
+.hi-brandbtn{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-indent:inherit;padding:8px 16px 7px;margin:0;cursor:pointer}
+.hi-t{display:inline-flex;align-items:center}
+.hi-caret{font-style:normal;font-size:13px;margin-left:9px;opacity:.9;display:inline-block;transition:transform .2s}
+.hi .brand.open .hi-caret{transform:rotate(180deg)}
 .hi .brand h1 .hi-sub{font:800 12.5px var(--f-body);letter-spacing:.3em;text-indent:.3em;color:#ffe9a8;text-shadow:0 0 4px #fff3c4,0 0 10px #ffb84a,0 0 18px #ff8a3c}
-@media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}}
-.hi .brand p{font-size:13px;margin-top:6px}
-.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:10px;font:800 22px var(--f-display);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}.hi-caret{transition:none}}
+/* pop-out info card under the sign */
+.hi-pop{margin-top:8px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px 14px;box-shadow:0 10px 32px rgba(20,33,61,.18)}
+.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:0;font:800 22px var(--f-display);color:var(--ink)}
 .hi-cand i{width:15px;height:15px;border-radius:3px;display:inline-block}
 .hi-count{display:flex;align-items:center;gap:10px;margin-top:8px}
 .hi-count b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
 .hi-count span{font-size:12.5px;line-height:1.35;color:var(--muted)}
-.hi .notice{font-size:11.5px;background:color-mix(in srgb,var(--surface) 92%,transparent)}
+/* the weather element (built by main.js) docks as a block at the bottom of the popover */
+.hi .hi-pop .wx{position:static;left:auto;right:auto;top:auto;bottom:auto;max-width:none;background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:10px 0 0;margin-top:12px}
+/* the independence notice: bottom-center of the viewport, above everything (incl. drawer) */
+.hi .notice{font-size:11.5px;z-index:60;background:color-mix(in srgb,var(--surface) 94%,transparent)}
 
 /* view modes, top-right */
 .hi-modes{position:absolute;right:16px;top:16px;z-index:31;display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
@@ -228,10 +241,6 @@ html.drawer-open aside.panel{transform:none}
 .hi-close:hover{background:var(--sunk)}
 @media (prefers-reduced-motion:reduce){.hi aside.panel{transition:none}}
 
-/* weather chip, bottom-right */
-.hi .wx{left:auto;right:16px;bottom:16px;top:auto;max-width:min(420px,calc(100% - 32px))}
-html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
-
 /* toast */
 .hi-toast{position:absolute;left:50%;bottom:90px;transform:translate(-50%,20px);z-index:40;background:var(--ink);color:var(--surface);font:600 14px var(--f-body);padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 6px 20px rgba(20,33,61,.25)}
 .hi-toast.on{opacity:1;transform:translate(-50%,0)}
@@ -260,27 +269,30 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 
 @media (max-width:860px){
   .hi header.top{left:10px;top:10px;max-width:calc(100% - 20px)}
-  .hi .brand{padding:10px 12px;border-radius:14px}
-  .hi .brand h1{font-size:21px;padding:6px 12px 5px;border-width:2px}
+  .hi .brand h1{font-size:21px;border-width:2px}
+  .hi-brandbtn{padding:6px 12px 5px}
   .hi .brand h1 .hi-sub{font-size:10.5px;letter-spacing:.24em;text-indent:.24em}
-  .hi .brand p{display:none}
-  .hi-cand{margin-top:6px;font-size:17px}
+  .hi-pop{padding:10px 12px 12px;border-radius:14px}
+  .hi-cand{font-size:17px}
   .hi-count{margin-top:4px}.hi-count b{font-size:28px}.hi-count span{font-size:11px}
-  .hi .notice{font-size:10.5px;padding:3px 9px}
+  /* keep the full weather info readable inside the popover on phones */
+  .hi .hi-pop .wx{display:flex;padding:8px 0 0;margin-top:10px}
+  .hi .hi-pop .wx span,.hi .hi-pop .wx small{display:inline-block}
+  /* notice sits above the bottom control row (tour button left, mode bar right) */
+  .hi .notice{bottom:58px;font-size:10.5px;padding:3px 9px}
   .hi-modes{top:auto;bottom:12px;right:10px}
   .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:40px}
   html.drawer-open .hi-modes{right:10px}
-  .hi-intro{left:10px;right:10px;top:auto;bottom:66px;width:auto;padding:14px 16px}
+  .hi-intro{left:10px;right:10px;top:auto;bottom:92px;width:auto;padding:14px 16px}
   .hi-intro h2{font-size:18px}.hi-intro p,.hi-intro ul{font-size:13px}
-  .hi-tour{left:10px;right:10px;width:auto;bottom:62px;padding:12px 14px}
+  .hi-tour{left:10px;right:10px;width:auto;bottom:92px;padding:12px 14px}
   .hi-tour h3{font-size:16px}.hi-tour p{font-size:12.5px}
   .hi-tourbtn{left:10px;bottom:12px;min-height:40px;padding:0 14px;font-size:13px}
-  .hi-timeline{left:8px;right:8px;top:8px;bottom:62px;padding:14px 12px 0}
+  .hi-timeline{left:8px;right:8px;top:8px;bottom:86px;padding:14px 12px 0}
   .hi-tl-cols{grid-template-columns:1fr;overflow:auto;display:block}
   .hi-tl-col{margin-bottom:12px}.hi-tl-col ol{overflow:visible}
   .hi aside.panel{left:0;right:0;top:auto;bottom:0;width:auto;height:72dvh;border-radius:18px 18px 0 0;transform:translateY(105%)}
   html.drawer-open aside.panel{transform:none}
-  .hi .wx{display:none}
 }
 
 /* one list bubble per island */
@@ -3454,17 +3466,32 @@ const UI = {};
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const statusOf2 = (it, t) => (t.kind === "record" || it.phase === "已實施" ? "done" : /施工|興建|擴線|驗收|機電|擴區|推動中|延續推動|試辦|已宣布/.test(it.phase || "") ? "build" : "plan");
 
-  /* ---------- brand block ---------- */
+  /* ---------- brand block: the neon sign is a persistent tab, details pop out below it ---------- */
   const brand = document.querySelector("header.top .brand");
-  const h1 = brand.querySelector("h1"); if (h1) h1.innerHTML = `台北安可<span class="hi-sub">北北基桃政策市</span>`; // neon sign, styled in page.css
-  const lede = brand.querySelector("p"); if (lede) lede.textContent = "開始探索屬於你我的城市";
+  const h1 = brand.querySelector("h1");
+  const brandBtn = el("button", "hi-brandbtn", `<span class="hi-t">台北安可<i class="hi-caret" aria-hidden="true">▾</i></span><span class="hi-sub">一起打造你我的北北基桃</span>`);
+  brandBtn.type = "button"; brandBtn.setAttribute("aria-expanded", "false"); brandBtn.setAttribute("aria-controls", "hi-pop");
+  if (h1) { h1.innerHTML = ""; h1.appendChild(brandBtn); }
+  brand.querySelector("p")?.remove(); // no lede under the sign
+  // the independence notice always sits bottom-center of the viewport; move it out of the
+  // header's stacking context (z 30) so nothing — drawer (35) included — can cover it
+  const notice = document.querySelector("header.top .notice"); if (notice) document.body.appendChild(notice);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
-  brand.append(cand, count, chips);
+  // the top-left switcher is uniformly party blue (solid = selected, outline = not); city colors stay everywhere else
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", "var(--c-taipei)"); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
+  pop.append(cand, count, chips);
+  // re-home the live weather element (built and updated by main.js) into the popover; keeping
+  // the same node means ENV/weather updates keep flowing into it unchanged
+  const wxEl = document.querySelector(".stage .wx"); if (wxEl) pop.appendChild(wxEl);
+  brand.append(pop);
+  const setPop = (on) => { pop.hidden = !on; brandBtn.setAttribute("aria-expanded", String(on)); brand.classList.toggle("open", on); };
+  brandBtn.onclick = () => setPop(pop.hidden);
+  document.addEventListener("pointerdown", (e) => { if (!pop.hidden && !brand.contains(e.target)) setPop(false); }); // tap outside collapses
+  UI.togglePop = setPop;
   function paintBrand() {
-    count.style.setProperty("--c", `var(--c-${LIVE})`); // the big number follows the current city's color
-    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
+    cand.innerHTML = `<i style="background:var(--c-taipei)"></i>${esc(city.cityName)}・${esc(city.candidate)}`; // card keeps to the one blue
     count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
   }
@@ -3582,8 +3609,12 @@ const UI = {};
   const toast = el("div", "hi-toast"); toast.setAttribute("role", "status"); document.querySelector(".mapwrap").appendChild(toast);
   let tt = 0; UI.toast = (msg) => { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 2600); };
 
-  // Escape closes the drawer once the 2D page's handler has cleared any selection
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer(); });
+  // Escape: first collapse the brand popover, then (once the 2D page's handler has cleared any selection) close the drawer
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!pop.hidden) { setPop(false); return; }
+    if (html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer();
+  });
 
   for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano"));
   paintBrand(); A.setCity(LIVE);
