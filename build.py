@@ -123,8 +123,6 @@ def sub(a, b, count=1):
     assert a in page, a[:60]
     page = page.replace(a, b, count)
 
-sub("<title>北北基桃政見地圖</title>", "<title>北北基桃政策城市</title>")
-sub("<h1>北北基桃政見地圖</h1>", "<h1>北北基桃政策城市</h1>")
 sub("的公開政見，一格一個政策主題</p>", "的公開政見與任內政績</p>")
 sub("--hex-mix:20%;", "--hex-mix:20%; --water:#A8CBDF; --water-deep:#86AFC7; --bldg:#F3EFE8; --bldg-shade:#D8D2C8; --sky-top:#7FB0EC; --sky-bottom:#D4E8FA; --f-pixel:\"DotGothic16\",\"Noto Sans TC\",monospace;")
 sub("--hex-mix:26%; color-scheme:dark", "--hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark", 2)
