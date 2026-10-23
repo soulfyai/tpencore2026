@@ -1284,9 +1284,10 @@ const ENV = {};
     const W = ENV.forced?.w || ENV.weather || { cloud: 20, code: 1, precip: 0, wind: 10, temp: 25 };
     const minute = ENV.forced?.minute ?? taipeiMinutes();
     const k = lerpKey(minute), kind = WMO(W.code);
-    const cloud = THREE.MathUtils.clamp(W.cloud / 100, 0, 1), wet = kind === "drizzle" ? 0.45 : kind === "rain" ? 0.85 : kind === "storm" ? 1 : 0;
+    // 使用者決定：即時天氣只是「資訊」，不改變城市樣貌——場景永遠是晴朗好天氣，
+    // 只有台北時間驅動日夜；真實天氣只寫進 ENV.state 給 UI 文字用。
+    const cloud = 0.2, wet = 0, gray = 0; // fixed fine-weather visuals (a few decorative clouds, no rain, no grey wash)
     const grey = col(k.night > 0.5 ? "#2a3142" : "#aeb7c2");
-    const gray = Math.max(cloud * 0.55, wet * 0.75, kind === "fog" ? 0.7 : 0);
     skyMat.uniforms.uTop.value.copy(k.top).lerp(grey, gray);
     skyMat.uniforms.uHorizon.value.copy(k.hor).lerp(grey.clone().lerp(col("#ffffff"), 0.2), gray * 0.85);
     skyMat.uniforms.uSunCol.value.copy(k.sun);
@@ -1302,11 +1303,11 @@ const ENV = {};
     hemi.intensity = k.hi * (1 - gray * 0.34); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
     sun.castShadow = sun.intensity > 0.6;
     scene.fog.color.copy(skyMat.uniforms.uHorizon.value);
-    scene.fog.near = kind === "fog" ? 12 : wet > 0.5 ? 40 : 70; scene.fog.far = kind === "fog" ? 70 : wet > 0.5 ? 150 : 210;
+    scene.fog.near = 70; scene.fog.far = 210; // fixed clear-day fog; weather never thickens it
     ENV.fog0 = { near: scene.fog.near, far: scene.fog.far }; // base values: main.js scales them up when the camera pulls far back
     waterMat.uniforms.uColor.value.copy(col("#7fc0d4")).lerp(col("#8a9aa6"), gray * 0.7);
     waterMat.uniforms.uDeep.value.copy(col("#2f7aa3")).lerp(col("#4d5c68"), gray * 0.6);
-    waterMat.uniforms.uChop.value = THREE.MathUtils.clamp((W.wind || 10) / 40, 0.1, 1.2);
+    waterMat.uniforms.uChop.value = 0.3; // fixed gentle sea; live wind no longer stirs it
     waterMat.uniforms.uGlint.value = (1 - gray) * (1 - k.night);
     waterMat.uniforms.uNight.value = k.night * 0.8;
     waterMat.uniforms.uRain.value = wet;
@@ -1337,7 +1338,7 @@ const ENV = {};
   ENV.retheme = () => apply();
   ENV.update = (dt, t) => {
     waterMat.uniforms.uTime.value = t;
-    const wind = (ENV.forced?.w || ENV.weather)?.wind || 10;
+    const wind = 12; // fixed breeze: cloud drift is decorative, decoupled from live weather
     for (const g of clouds.children) { const dx = g.position.x - MID.x, dz = g.position.z - MID.z + 8, d = Math.hypot(dx, dz), w = dt * g.userData.v * (0.6 + wind / 25) / Math.max(d, 1); g.position.x = MID.x + dx * Math.cos(w) - dz * Math.sin(w); g.position.z = MID.z - 8 + dx * Math.sin(w) + dz * Math.cos(w); }
     for (const b of boats) { b.a += b.v * dt; b.g.position.set(MID.x + Math.cos(b.a) * b.r, WATER_Y + Math.sin(t * 1.3 + b.r) * 0.04, MID.z + Math.sin(b.a) * b.r * 0.8 - 6); b.g.rotation.y = -b.a + (b.v > 0 ? 0 : Math.PI); }
     if (rain.visible) {
@@ -1349,11 +1350,6 @@ const ENV = {};
       }
       rainG.attributes.position.needsUpdate = true;
       rainG.setDrawRange(0, Math.round(DROPS * ENV.rainRate) * 2);
-    }
-    if (ENV.state?.storm) { // lightning
-      nextFlash -= dt;
-      if (nextFlash < 0) { flash = 1; nextFlash = 4 + Math.random() * 7; }
-      if (flash > 0) { flash = Math.max(0, flash - dt * 4); hemi.intensity += flash * 2.5; skyMat.uniforms.uTop.value.lerp(col("#dfe6ff"), flash * 0.5); }
     }
   };
   ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };
