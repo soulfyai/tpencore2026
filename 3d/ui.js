@@ -2,6 +2,8 @@
 const UI = {};
 {
   const html = document.documentElement; html.classList.add("hi");
+  // role="img" (set by build.py on #stage) would hide the island-label buttons from assistive tech
+  const stageEl = document.getElementById("stage"); if (stageEl) stageEl.setAttribute("role", "group");
   // the city being explored; everything below (brand, tour, list, timeline) follows it
   const CITIES = ["taipei", "newtaipei", "keelung", "taoyuan"].filter((c) => LIVE_CITIES.has(c) && A.cityById.get(c));
   let LIVE = CITIES[0], city, liveThemes, rows, nPlan, nRec;
@@ -14,14 +16,16 @@ const UI = {};
 
   /* ---------- brand block ---------- */
   const brand = document.querySelector("header.top .brand");
-  const lede = brand.querySelector("p"); if (lede) lede.textContent = "一座島一個政策主題・點一座島，開始探索";
+  const h1 = brand.querySelector("h1"); if (h1) h1.innerHTML = `台北安可<span class="hi-sub">北北基桃政策市</span>`; // neon sign, styled in page.css
+  const lede = brand.querySelector("p"); if (lede) lede.textContent = "開始探索屬於你我的城市";
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
   brand.append(cand, count, chips);
   function paintBrand() {
-    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}<span>北北基桃四市・拖曳地圖或點城市切換</span>`;
-    count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 座政策島</span>`;
+    count.style.setProperty("--c", `var(--c-${LIVE})`); // the big number follows the current city's color
+    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
+    count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
   }
   function setCur(c) { if (!c || !CITIES.includes(c)) return; const changed = c !== LIVE; load(c); paintBrand(); if (changed) { A.setCity(c); if (!timeline.hidden) renderTimeline(); } }
@@ -47,11 +51,12 @@ const UI = {};
   const aside = document.querySelector("aside.panel");
   const close = el("button", "hi-close", "✕"); close.type = "button"; close.setAttribute("aria-label", "關閉"); close.onclick = () => closeDrawer();
   aside.prepend(close);
-  function openDrawer() { html.classList.add("drawer-open"); }
+  aside.inert = true; // the drawer starts off-screen; keep its contents out of the tab order until it opens
+  function openDrawer() { html.classList.add("drawer-open"); aside.inert = false; }
   const clearSel = () => { if (A.state.selTheme || A.state.selItem || A.state.selFlow) document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); };
   function closeDrawer(keepMode) {
     if (!html.classList.contains("drawer-open")) return;
-    html.classList.remove("drawer-open");
+    html.classList.remove("drawer-open"); aside.inert = true;
     if (A.state.selItem && A.state.selTheme) A.openTheme(A.state.selTheme); // back to the island's list bubble
     if (!keepMode && mode === "list") { mode = "pano"; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano")); }
   }
@@ -67,11 +72,12 @@ const UI = {};
   const intro = el("section", "hi-intro", `
     <button type="button" class="hi-x" aria-label="關閉說明">✕</button>
     <div class="hi-eyebrow">使用說明</div>
-    <h2>一座島，一個政策主題。</h2>
-    <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 座政策區，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
+    <h2>一個政策區塊，一個政策主題。</h2>
+    <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
     <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>清單</b>：用文字一項一項瀏覽</li><li><b>時間</b>：依已完成、推動中、規劃中排好</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
+  intro.setAttribute("aria-label", "使用說明");
   document.querySelector(".mapwrap").appendChild(intro);
   const showIntro = (on) => { intro.hidden = !on; try { localStorage.setItem("hi-intro-seen", "1"); } catch {} };
   intro.querySelector(".hi-x").onclick = () => showIntro(false);
@@ -82,7 +88,7 @@ const UI = {};
 
   /* ---------- guided tour ---------- */
   let touring = false, step = 0;
-  const tour = el("section", "hi-tour");
+  const tour = el("section", "hi-tour"); tour.setAttribute("aria-label", "城市導覽");
   tour.innerHTML = `<div class="hi-tour-head"><span class="hi-eyebrow">城市導覽</span><span class="hi-step"></span></div>
     <h3></h3><p></p>
     <div class="hi-tour-btns"><button type="button" data-a="prev" aria-label="上一站">←</button><button type="button" data-a="more" class="hi-ghost">看細節</button><button type="button" data-a="next" class="hi-primary">下一站 →</button><button type="button" data-a="end" class="hi-ghost">結束</button></div>`;
@@ -95,7 +101,7 @@ const UI = {};
     tour.querySelector(".hi-step").textContent = `${String(step).padStart(2, "0")} / ${STEPS.length - 1}`;
     if (s.intro) {
       tour.querySelector("h3").textContent = `${city.cityName}・${city.candidate}`;
-      tour.querySelector("p").textContent = `從全景開始。接下來 ${liveThemes.length} 站，每站一座政策島，帶你看島上的重點。`;
+      tour.querySelector("p").textContent = `從全景開始。接下來 ${liveThemes.length} 站，每站一個政策區塊，帶你看區塊裡的重點。`;
       MAP3D.enterCity(LIVE); closeDrawer(true); clearSel();
     } else {
       const its = s.t.items || [], done = its.filter((i) => statusOf2(i, s.t) === "done").length;
@@ -119,7 +125,7 @@ const UI = {};
   });
 
   /* ---------- timeline ---------- */
-  const timeline = el("section", "hi-timeline"); timeline.hidden = true; document.querySelector(".mapwrap").appendChild(timeline);
+  const timeline = el("section", "hi-timeline"); timeline.setAttribute("aria-label", "時間檢視"); timeline.hidden = true; document.querySelector(".mapwrap").appendChild(timeline);
   const COLS = [["done", "已完成", "任內已實施或已上路"], ["build", "推動中", "施工、試辦或已啟動"], ["plan", "規劃中", "競選政見，尚待推動"]];
   const yearOf = (p) => { const m = String(p || "").match(/20\d\d/); return m ? +m[0] : 9999; };
   function renderTimeline() {
@@ -135,6 +141,9 @@ const UI = {};
   /* ---------- toast ---------- */
   const toast = el("div", "hi-toast"); toast.setAttribute("role", "status"); document.querySelector(".mapwrap").appendChild(toast);
   let tt = 0; UI.toast = (msg) => { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 2600); };
+
+  // Escape closes the drawer once the 2D page's handler has cleared any selection
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer(); });
 
   for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano"));
   paintBrand(); A.setCity(LIVE);

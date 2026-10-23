@@ -31,7 +31,7 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 3D 模組依序串接成**同一個 module script**（共用頂層 const），順序寫在 `build.py`：
   `core, world, env, models, models2, models3, landmarks, ships, decor, people, coaster, main, ui`。
   `3d/page.css` 會被插在 3D CSS 最前面。
-- `3d/lots.js` 是舊檔，**沒有被建置使用**。
+- 舊檔 `map3d.js`（根目錄）與 `3d/lots.js` 未被建置使用，已於 2026-10-23 刪除；`3d/` 內現存檔案全部都有用到。
 - 視覺檢查：`tools/shot.py`（Playwright + swiftshader，需先 `npm i --no-save three@0.160.0`）。
   場景大，軟體渲染單張截圖約 1–3 分鐘，請給長 timeout，放背景跑。
   頁面暴露的除錯介面：`window.MAP3D`（panorama / enterCity / focusTheme / focusItem / flyTo）、
@@ -81,4 +81,4 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - `taipei.json` / `newtaipei.json` / `keelung.json` / `taoyuan.json`：政見主題與項目（含來源、依據等級、phase）。
 - `records-*.json`：現任市長任內政績（主題 kind = `record`）。
 - `flows.json`：15 條跨市協作線。`geo.json`：行政區輪廓。`weather.json`：天氣快照。
-- 資料查核日標示在頁面：2026-10-22。
+- 資料查核日標示在頁面，唯一來源是 `build.py` 開頭的 `CHECKED_AT` 常數（人工重新查核後才更新）。

@@ -2,6 +2,8 @@
 import json, pathlib, sys
 
 ROOT = pathlib.Path(__file__).parent
+# 資料查核日（頁面上顯示）：人工重新查核 data/ 內容後才更新，不要自動帶當天日期
+CHECKED_AT = "2026-10-22"
 CITIES = ["taipei", "newtaipei", "keelung", "taoyuan"]
 problems = []
 
@@ -104,7 +106,7 @@ for c in cities:
 
 wp = ROOT / "data" / "weather.json"
 gp = ROOT / "data" / "geo.json"
-data = {"meta": {"checkedAt": "2026-10-22", "geo": json.loads(gp.read_text(encoding="utf-8")) if gp.exists() else None, "weather": json.loads(wp.read_text(encoding="utf-8")) if wp.exists() else None}, "cities": cities, "flows": flows}
+data = {"meta": {"checkedAt": CHECKED_AT, "geo": json.loads(gp.read_text(encoding="utf-8")) if gp.exists() else None, "weather": json.loads(wp.read_text(encoding="utf-8")) if wp.exists() else None}, "cities": cities, "flows": flows}
 html = (ROOT / "template.html").read_text(encoding="utf-8")
 blob = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 (ROOT / "index.html").write_text(html.replace("/*__DATA__*/null", blob), encoding="utf-8")
@@ -121,8 +123,6 @@ def sub(a, b, count=1):
     assert a in page, a[:60]
     page = page.replace(a, b, count)
 
-sub("<title>北北基桃政見地圖</title>", "<title>北北基桃政策城市</title>")
-sub("<h1>北北基桃政見地圖</h1>", "<h1>北北基桃政策城市</h1>")
 sub("的公開政見，一格一個政策主題</p>", "的公開政見與任內政績</p>")
 sub("--hex-mix:20%;", "--hex-mix:20%; --water:#A8CBDF; --water-deep:#86AFC7; --bldg:#F3EFE8; --bldg-shade:#D8D2C8; --sky-top:#7FB0EC; --sky-bottom:#D4E8FA; --f-pixel:\"DotGothic16\",\"Noto Sans TC\",monospace;")
 sub("--hex-mix:26%; color-scheme:dark", "--hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark", 2)

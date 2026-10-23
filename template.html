@@ -1,4 +1,4 @@
-<title>北北基桃政見地圖</title>
+<title>台北安可｜北北基桃政策市</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +30,7 @@ body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-siz
 .app{height:100%;display:grid;grid-template-rows:auto 1fr;gap:12px;padding-block:14px}
 header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px}
 .brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(24px,3.2vw,34px);line-height:1.15;margin:0;letter-spacing:.02em;text-wrap:balance}
+.brand h1 .subbrand{display:block;font-family:var(--f-body);font-weight:700;font-size:clamp(12px,1.4vw,14px);letter-spacing:.28em;color:var(--muted);margin-top:2px}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
 .notice{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--surface)}
 .notice b{color:var(--ink);font-weight:700}
@@ -129,6 +130,10 @@ details.grp .rows{padding-left:18px}
   svg.map{flex:none;aspect-ratio:var(--ar,1/1);height:auto;max-width:100%}
   .pbody{overflow:visible}
   .legend{position:static;margin:0 12px 10px}
+  /* touch targets ≥40px on phones */
+  .chip{min-height:40px}
+  .tabs button{min-height:44px}
+  .back{min-height:40px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -136,7 +141,7 @@ details.grp .rows{padding-left:18px}
 <div class="app" id="app">
   <header class="top">
     <div class="brand">
-      <h1>北北基桃政見地圖</h1>
+      <h1>台北安可<small class="subbrand">北北基桃政策市</small></h1>
       <p>2026 地方選舉・中國國民黨四位直轄市與基隆市長參選人的公開政見，一格一個政策主題</p>
     </div>
     <div class="notice"><b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 <span id="checked"></span></div>
@@ -158,12 +163,12 @@ details.grp .rows{padding-left:18px}
     </section>
     <aside class="panel" aria-label="政見內容">
       <div class="tabs" role="tablist">
-        <button role="tab" data-tab="cands" aria-selected="true">候選人</button>
-        <button role="tab" data-tab="list" aria-selected="false">政策清單</button>
-        <button role="tab" data-tab="flows" aria-selected="false">跨市協作</button>
-        <button role="tab" data-tab="about" aria-selected="false">資料說明</button>
+        <button role="tab" data-tab="cands" aria-selected="true" aria-controls="pbody">候選人</button>
+        <button role="tab" data-tab="list" aria-selected="false" aria-controls="pbody">政策清單</button>
+        <button role="tab" data-tab="flows" aria-selected="false" aria-controls="pbody">跨市協作</button>
+        <button role="tab" data-tab="about" aria-selected="false" aria-controls="pbody">資料說明</button>
       </div>
-      <div class="pbody" id="pbody" tabindex="-1"></div>
+      <div class="pbody" id="pbody" role="tabpanel" tabindex="-1"></div>
     </aside>
   </div>
 </div>
@@ -213,6 +218,8 @@ function wrapName(n){n=String(n);if(n.length<=5)return[n];
   const m=Math.ceil(n.length/2);return[n.slice(0,m),n.slice(m,m+6)]}
 
 const svg=$("#map");
+// role="img" would hide the interactive hexes from assistive tech; group keeps the aria-label and exposes them
+if(svg)svg.setAttribute("role","group");
 function drawMap(){
   const pts=[...hexOf.values()].map(h=>px(h.q,h.r));
   const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
@@ -318,12 +325,11 @@ function viewFlows(){
   ${flows.filter(f=>!cityFilter||f.cities.includes(cityFilter)).map(f=>`<button class="flowitem" data-open-flow="${esc(f.id)}"><b>${esc(f.id)}</b>${esc(f.title)}<span class="sub">${f.cities.map(c=>cityById.get(c)?.cityName||c).join(" ↔ ")}・${TIER[f.tier]||""}</span></button>`).join("")||`<p class="empty">目前沒有整理到跨市協作。</p>`}`;
 }
 function viewAbout(){
-  const unk=cities.flatMap(c=>(c.unknowns||[]).map(u=>`<li><b>${esc(c.candidate)}：</b>${esc(u)}</li>`)).concat((D.flows.unknowns||[]).map(u=>`<li><b>跨市：</b>${esc(u)}</li>`));
   return`<div class="method"><div class="eyebrow">Method</div><h2 class="title">資料怎麼來的</h2>
   <p>這是一份獨立整理的政見索引，不代表任何候選人、政黨或競選團隊，也沒有接受其委託。內容只收錄公開來源中明確提到的政見，以白話改寫，不加評價。</p>
   <p>每一項都標示依據：<b>官方發布</b>指候選人或競選團隊自己的網站、社群或記者會資料；<b>媒體報導</b>指新聞對其政見發表的報導；<b>受訪發言</b>指訪談或辯論中的說法。數字、時程與金額只在來源有寫時列出。</p>
   <p>資料查核日期：${esc(D.meta.checkedAt)}。選舉期間政見仍可能增修，請以候選人最新公開資訊為準。</p>
-  ${unk.length?`<h3 class="sec">尚待補齊</h3><ul class="facts">${unk.join("")}</ul>`:""}
+
   <h3 class="sec">來源數</h3><p>${sources.size} 個公開來源</p></div>`;
 }
 function openTheme(id){
