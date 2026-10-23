@@ -35,7 +35,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   const pk = (r, a) => a[(r() * a.length) | 0];
   const GLASS = ["#7fd4ec", "#5fa8e4", "#9fd2f2", "#bfe6f6", "#6fc2dc", "#8fb8e8"]; // glass-curtain blues
   const NEON = ["#33e1ff", "#7fb4ff", "#b8f0ff", "#9f8bff"];                          // cool LED accents
-  const WALLS = ["#ffffff", "#f7f9fb", "#eef3f8", "#f4f6f2", "#f9f7f2"];              // future white
+  const WALLS = ["#fdfaf2", "#f8f5ec", "#f1efe6", "#f6f2e8", "#faf6ea"];              // warm future white
   const ROOFS = ["#dfe8f0", "#cfd8e2", "#9fc8e0", "#8fb4c8", "#b9c4ce"];              // pale steel/glass tones
   /* rooftop solar array: one dark cell slab with a lighter grid sheet, slightly tilted toward the sun */
   const SOLAR = (p, x, y, z, w, d, ry = 0) => { p("box", x, y + 0.028, z, w, 0.016, d, "#22304e", ry, 0, -0.1); p("box", x, y + 0.04, z, w * 0.94, 0.006, d * 0.86, "#3f6cae", ry, 0, -0.1); };
@@ -45,19 +45,18 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     tower(p, s, h, r) {
       const gl = pk(r, GLASS), round = r() < 0.22, d = s * (0.82 + r() * 0.18);
       // two-step white podium: glass lobby, LED name band, entrance canopy
-      p("rbox", 0, 0.05, 0, s * 1.3, 0.1, d * 1.3, "#f4f7fa");
-      p("rbox", 0, 0.21, 0, s * 1.16, 0.22, d * 1.16, "#eef2f6");
+      p("rbox", 0, 0.05, 0, s * 1.3, 0.1, d * 1.3, "#f6f4ec");
+      p("rbox", 0, 0.21, 0, s * 1.16, 0.22, d * 1.16, "#f1efe7");
       p("box", 0, 0.19, d * 0.58 + 0.004, s * 1.0, 0.16, 0.01, "#dff4ff", 0, 0, 0, true);
-      p("box", 0, 0.335, d * 0.58 + 0.035, s * 0.56, 0.018, 0.1, "#f4f7fa");
+      p("box", 0, 0.335, d * 0.58 + 0.035, s * 0.56, 0.018, 0.1, "#f6f4ec");
       p("box", 0, 0.3, d * 0.58 + 0.012, s * 0.48, 0.02, 0.014, pk(r, NEON), 0, 0, 0, "cool");
       if (round) { p("cyl", 0, 0.32 + h / 2, 0, s, h, s, gl); for (let y = 0.55; y < h + 0.2; y += 0.26) p("cyl", 0, y, 0, s * 1.03, 0.022, s * 1.03, "#f2f8fd"); }
       else {
         p("fglass", 0, 0.32 + h / 2, 0, s, h, d, gl);
-        p("box", 0, 0.32 + h * 0.5, 0, s * 0.16, h * 0.99, d * 1.012, "#f2f6fa");    // white service spine
-        for (const sd of [-1, 1]) p("box", sd * (s / 2 + 0.005), 0.32 + h / 2, d * 0.2, 0.01, h * 0.96, 0.018, "#bfeaff", 0, 0, 0, "cool"); // corner LED strips
+        p("box", 0, 0.32 + h * 0.5, 0, s * 0.16, h * 0.99, d * 1.012, "#f4f2e9");    // white service spine
       }
       const top = 0.32 + h, k = r();
-      p("box", 0, top + 0.035, 0, s * 1.05, 0.07, d * 1.05, "#f2f6fa");              // parapet cap
+      p("box", 0, top + 0.035, 0, s * 1.05, 0.07, d * 1.05, "#f4f2e9");              // parapet cap
       if (k < 0.35) { // glass crown + spire
         p("box", 0, top + h * 0.08 + 0.07, 0, s * 0.68, h * 0.16, d * 0.68, gl);
         p("box", 0, top + h * 0.16 + 0.1, 0, s * 0.52, 0.02, d * 0.52, "#bfeaff", 0, 0, 0, "cool");
@@ -67,21 +66,21 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         SOLAR(p, s * 0.3, top + 0.07, -d * 0.3, s * 0.3, d * 0.26);
       } else { // stepped mech crown with an LED ring and a sky garden
         p("box", 0, top + 0.19, 0, s * 0.88, 0.26, d * 0.88, gl); p("box", 0, top + 0.33, 0, s * 0.92, 0.02, d * 0.92, "#bfeaff", 0, 0, 0, "cool");
-        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#5fa752");
+        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#7da26e");
       }
       return top + 0.9;
     },
     office(p, s, h, r) {
       const d = s * (0.78 + r() * 0.22), wall = pk(r, WALLS), band = pk(r, ROOFS);
-      p("rbox", 0, 0.035, 0, s * 1.14, 0.07, d * 1.14, "#f4f7fa");                   // plinth
+      p("rbox", 0, 0.035, 0, s * 1.14, 0.07, d * 1.14, "#f6f4ec");                   // plinth
       p(r() < 0.55 ? "foffice" : "fapt", 0, 0.07 + h / 2, 0, s, h, d, wall);
-      p("box", 0, 0.07 + h + 0.028, 0, s * 1.05, 0.056, d * 1.05, "#f2f6fa");        // parapet
+      p("box", 0, 0.07 + h + 0.028, 0, s * 1.05, 0.056, d * 1.05, "#f4f2e9");        // parapet
       p("box", 0, 0.07 + h + 0.06, 0, s * 0.96, 0.012, d * 0.96, band);             // roof trim band
       const roof = 0.07 + h + 0.075, kk = r();
       if (kk < 0.4) SOLAR(p, 0, roof, 0, s * 0.68, d * 0.58);                        // rooftop solar farm
-      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#6fb85a"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#8fcf6a"); } // sky garden
+      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#88ab74"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#a3bf8a"); } // sky garden
       else { p("box", -s * 0.2, roof + 0.05, -d * 0.15, s * 0.3, 0.1, d * 0.3, "#dfe5ec"); p("cyl", s * 0.24, roof + 0.06, d * 0.18, 0.1, 0.12, 0.1, "#c9ced3"); } // mech penthouse
-      p("box", 0, 0.17, d / 2 + 0.045, s * 0.5, 0.016, 0.1, "#f4f7fa", 0, -0.25);    // entrance canopy
+      p("box", 0, 0.17, d / 2 + 0.045, s * 0.5, 0.016, 0.1, "#f6f4ec", 0, -0.25);    // entrance canopy
       p("box", 0, 0.1, d / 2 + 0.008, s * 0.32, 0.15, 0.012, "#cfeefc", 0, 0, 0, true); // glass lobby door
       if (r() < 0.55) p("box", s * 0.18, 0.07 + h * 0.82, d / 2 + 0.012, s * 0.42, 0.045, 0.012, pk(r, NEON), 0, 0, 0, "cool");
       return h + 0.3;
@@ -99,9 +98,9 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     },
     shop(p, s, h, r) {
       const hh = 0.34 + r() * 0.18, d = s * 0.8, aw = pk(r, ["#6fd0dc", "#5fa8e0", "#f8f6f1", "#9fd0f0"]);
-      p("rbox", 0, 0.025, 0, s * 1.08, 0.05, d * 1.08, "#f4f7fa");
+      p("rbox", 0, 0.025, 0, s * 1.08, 0.05, d * 1.08, "#f6f4ec");
       p("rbox", 0, 0.05 + hh / 2, 0, s, hh, d, pk(r, WALLS));
-      p("box", 0, 0.05 + hh + 0.02, 0, s * 1.03, 0.04, d * 1.03, "#f2f6fa");         // parapet
+      p("box", 0, 0.05 + hh + 0.02, 0, s * 1.03, 0.04, d * 1.03, "#f4f2e9");         // parapet
       p("box", 0, 0.17, d / 2 + 0.006, s * 0.86, 0.2, 0.012, "#cfeefc", 0, 0, 0, true); // storefront glass
       p("box", 0, 0.28, d / 2 + 0.05, s * 0.92, 0.016, 0.1, aw, 0, -0.3);            // awning
       p("box", 0, 0.05 + hh * 0.82, d / 2 + 0.012, s * 0.55, 0.05, 0.012, pk(r, NEON), 0, 0, 0, "cool"); // LED sign
@@ -109,9 +108,9 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       return hh + 0.18;
     },
     park(p, s, h, r) {
-      p("cyl", 0, 0.01, 0, s * 1.1, 0.02, s * 1.1, "#8ccf68");
+      p("cyl", 0, 0.01, 0, s * 1.1, 0.02, s * 1.1, "#a9bf8d");
       if (r() < 0.5) { p("cyl", 0, 0.03, 0, s * 0.5, 0.04, s * 0.5, "#e8ecef"); p("cyl", 0, 0.05, 0, s * 0.42, 0.03, s * 0.42, "#6fd3f0", 0, 0, 0, true); p("cyl", 0, 0.16, 0, 0.05, 0.22, 0.05, "#bff2ff", 0, 0, 0, "cool"); }
-      for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#5fa752", "#7cc062", "#4f9a3f"])); }
+      for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#7da26e", "#92b47e", "#6f9460"])); }
       return 0.5;
     },
   };
@@ -143,7 +142,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const pc = ctxFor(isl.id, null, 0, 0, 1, 0, zone, null), pp = (g, ...a) => part(pc, g, ...a);
     pp("rbox", 0, 0.02, 0, cw + 0.1, 0.04, cd + 0.1, accent);          // thin city-colour frame, nothing louder
     pp("rbox", 0, 0.036, 0, cw + 0.02, 0.05, cd + 0.02, "#f6eedb");     // one clean cream board per theme
-    const LOT_GROUND = { school: "#eccfa8", sport: "#aad68c", park: "#aad68c", nursery: "#f6e2d6", hospital: "#eef2f6", clinic: "#eef2f6", elder: "#e9eedb", metro: "#e4dccb", bus: "#e4dccb", bike: "#e4dccb", road: "#e4dccb" }; // low-saturation board-game tints
+    const LOT_GROUND = { school: "#eccfa8", sport: "#b7c89b", park: "#b7c89b", nursery: "#f6e2d6", hospital: "#f1efe7", clinic: "#f1efe7", elder: "#e9eedb", metro: "#e4dccb", bus: "#e4dccb", bike: "#e4dccb", road: "#e4dccb" }; // low-saturation board-game tints
     let campusTop = TOP;
     for (const sl of slots) {
       const r = (hash(sl.it.id) % 1000) / 1000, kind = MODELS.kindFor(sl.it, isl.t);
@@ -231,8 +230,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         if (r() < (downtown ? 0.22 : 0.4)) { // leave room for greenery: a small grove instead of another building
           if (!free(isl.id, x, z, 0.22)) continue; hold(isl.id, x, z, 0.22);
           const gp = (g, ...a) => part(ctxFor(isl.id, null, x, z, 1, 0, zone, null), g, ...a), nT = 1 + ((r() * 3) | 0);
-          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#5fa752", "#7cc062", "#4f9a3f", "#8fcf6a"])); }
-          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#6fb85a");
+          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#7da26e", "#92b47e", "#6f9460", "#a3bf8a"])); }
+          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#88ab74");
           continue;
         }
         let type = downtown ? (v < 0.5 ? "tower" : v < 0.84 ? "office" : v < 0.93 ? "shop" : "park") : (v < 0.16 ? "tower" : v < 0.52 ? "office" : v < 0.76 ? "house" : v < 0.88 ? "shop" : "park");
@@ -257,7 +256,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
           let x = a[0] + ux * t - uz * 0.14, z = a[1] + uz * t + ux * 0.14; if (!GEOM.pip(x, z, P)) { x = a[0] + ux * t + uz * 0.14; z = a[1] + uz * t - ux * 0.14; }
           if (!GEOM.pip(x, z, P) || (Math.abs(x) < isl.campus.w / 2 + 0.15 && Math.abs(z) < isl.campus.d / 2 + 0.15)) continue;
           if (LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - isl.c.x - x, L.isl.c.z + L.z - isl.c.z - z) < L.r + 0.2)) continue;
-          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#5fa752", "#7cc062", "#4f9a3f"])); }
+          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#7da26e", "#92b47e", "#6f9460"])); }
           else { tp("cyl", x, 0.17, z, 0.018, 0.34, 0.018, "#3b4148"); tp("sphere", x, 0.35, z, 0.045, 0.045, 0.045, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([isl.c.x + x, TOP + 0.012, isl.c.z + z, 0.42]); }
         }
       }
@@ -316,7 +315,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         const a = rp[k], b = rp[(k + 1) % rp.length], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 0.05) continue;
         const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
         sp("box", mx, TOP + RH, mz, L + 0.2, 0.08, 0.52, "#8b9097", -ang); sp("box", mx, TOP + RH + 0.045, mz, L + 0.2, 0.012, 0.46, "#5d6168", -ang);
-        for (const o of [-0.25, 0.25]) { sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.09, mz + Math.cos(ang) * o, L + 0.12, 0.08, 0.03, "#eef1f5", -ang); sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.136, mz + Math.cos(ang) * o, L + 0.12, 0.014, 0.014, "#bfeaff", -ang, 0, 0, "cool"); }
+        for (const o of [-0.25, 0.25]) sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.09, mz + Math.cos(ang) * o, L + 0.12, 0.08, 0.03, "#eef1f5", -ang);
+        if (k % 5 === 0) for (const o of [-0.25, 0.25]) sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.136, mz + Math.cos(ang) * o, 0.05, 0.016, 0.016, "#bfeaff", -ang, 0, 0, "cool"); // sparse cool markers, not a light bar
         if (k % 2 === 0) sp("box", mx, TOP + RH + 0.052, mz, L * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 3 === 0) { const ph = TOP + RH - base; sp("cyl", mx, base + ph / 2 - 0.05, mz, 0.13, ph, 0.13, "#cfc9bd"); sp("box", mx, TOP + RH - 0.08, mz, 0.12, 0.08, 0.52, "#cfc9bd", -ang); sp("cyl", mx, base + 0.02, mz, 0.22, 0.05, 0.22, "#ffffff"); }
         if (k % 2 === 0) for (const o of [k % 4 === 0 ? -0.26 : 0.26]) { LAMP_POOLS.push([mx - Math.sin(ang) * o * 0.4, TOP + RH + 0.055, mz + Math.cos(ang) * o * 0.4, 0.42]); sp("cyl", mx - Math.sin(ang) * o, TOP + RH + 0.3, mz + Math.cos(ang) * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx - Math.sin(ang) * o, TOP + RH + 0.5, mz + Math.cos(ang) * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); }
@@ -341,7 +341,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const yAt = (o) => TOP - 0.06 + (WATER_Y + 0.02 - TOP + 0.06) * Math.min(1, o / W);
     const UMB = ["#f8f6f1", "#6fd0dc"];                       // resort canvas: white + aqua only
     const TOWEL = ["#bfeef4", "#f8f6f1", "#ffd9c0"];           // lounger towels, low-saturation
-    const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#4f9a3f" : "#62b04e", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
+    const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#6f9460" : "#7fa368", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
     const umbrella = (x, y, z, cc) => { sp("cyl", x, y + 0.22, z, 0.018, 0.44, 0.018, "#f8f6f1"); sp("cone", x, y + 0.46, z, 0.48, 0.13, 0.48, cc); sp("sphere", x, y + 0.535, z, 0.028, 0.028, 0.028, "#f8f6f1"); };
     const lounger = (x, y, z, a2, cc) => { const ca = Math.cos(a2), sa = Math.sin(a2);
       sp("box", x, y + 0.035, z, 0.3, 0.028, 0.13, "#f8f6f1", -a2);
@@ -474,7 +474,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       for (let k = 0; k < n; k++) {
         const f0 = k / n, f1 = (k + 1) / n, mx = a[0] + (b[0] - a[0]) * (f0 + f1) / 2, mz = a[1] + (b[1] - a[1]) * (f0 + f1) / 2, seg = L / n;
         sp("box", mx, Y, mz, seg + 0.08, 0.1, 0.58, "#8b9097", -ang); sp("box", mx, Y + 0.05, mz, seg + 0.08, 0.012, 0.5, "#5d6168", -ang);
-        for (const o of [-0.28, 0.28]) { sp("box", mx + nx * o, Y + 0.1, mz + nz * o, seg + 0.08, 0.08, 0.03, "#eef1f5", -ang); sp("box", mx + nx * o, Y + 0.146, mz + nz * o, seg + 0.08, 0.014, 0.014, "#bfeaff", -ang, 0, 0, "cool"); }
+        for (const o of [-0.28, 0.28]) sp("box", mx + nx * o, Y + 0.1, mz + nz * o, seg + 0.08, 0.08, 0.03, "#eef1f5", -ang);
+        if (k % 4 === 0) for (const o of [-0.28, 0.28]) sp("box", mx + nx * o, Y + 0.146, mz + nz * o, 0.05, 0.016, 0.016, "#bfeaff", -ang, 0, 0, "cool");
         if (k % 2 === 0) sp("box", mx, Y + 0.058, mz, seg * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 4 === 0 && k > 0) { const ph = Y - WATER_Y; sp("cyl", mx, WATER_Y + ph / 2 - 0.05, mz, 0.16, ph, 0.16, "#cfc9bd"); sp("cyl", mx, WATER_Y + 0.02, mz, 0.26, 0.05, 0.26, "#ffffff"); }
         if (k % 2 === 1) { const o = k % 4 === 1 ? -0.3 : 0.3; sp("cyl", mx + nx * o, Y + 0.3, mz + nz * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx + nx * o, Y + 0.5, mz + nz * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([mx + nx * o * 0.4, Y + 0.06, mz + nz * o * 0.4, 0.42]); }

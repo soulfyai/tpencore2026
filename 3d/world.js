@@ -50,7 +50,7 @@ const GEOM = {};
   MESH.TEX = {
     asphalt: MESH.tex((g, R) => { g.fillStyle = "#73787f"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 2600; i++) { g.fillStyle = R() < 0.5 ? "rgba(0,0,0,.08)" : "rgba(255,255,255,.07)"; g.fillRect(R() * 256, R() * 256, 2, 2); } for (let i = 0; i < 6; i++) { g.strokeStyle = "rgba(0,0,0,.08)"; g.lineWidth = 1; g.beginPath(); g.moveTo(R() * 256, R() * 256); g.lineTo(R() * 256, R() * 256); g.stroke(); } }, 0.8),
     pavers: MESH.tex((g, R) => { g.fillStyle = "#e9e4da"; g.fillRect(0, 0, 256, 256); for (let y = 0; y < 256; y += 32) for (let x = (y / 32) % 2 ? 16 : 0; x < 256; x += 32) { g.fillStyle = `hsl(38,${12 + R() * 8}%,${84 + R() * 6}%)`; g.fillRect(x + 1, y + 1, 30, 30); } }, 1.1),
-    grass: MESH.tex((g, R) => { g.fillStyle = "#93c76a"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 3000; i++) { g.fillStyle = R() < 0.5 ? "#86bb5e" : "#a6d47c"; g.fillRect(R() * 256, R() * 256, 3, 3); } for (let i = 0; i < 60; i++) { g.fillStyle = R() < 0.5 ? "#f6e9a8" : "#ffffff"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.6),
+    grass: MESH.tex((g, R) => { g.fillStyle = "#bcc9a0"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 3000; i++) { g.fillStyle = R() < 0.5 ? "#aebe92" : "#ccd8ae"; g.fillRect(R() * 256, R() * 256, 3, 3); } for (let i = 0; i < 60; i++) { g.fillStyle = R() < 0.5 ? "#f6e9a8" : "#ffffff"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.6), // sage lawn, low saturation
     sand: MESH.tex((g, R) => { g.fillStyle = "#f9e5b4"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 1600; i++) { g.fillStyle = R() < 0.5 ? "rgba(214,181,120,.12)" : "rgba(255,255,255,.22)"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.7),
   };
   MESH.ribbon = (pts, w, y, closed = false) => { // strip geometry along a polyline
@@ -232,7 +232,7 @@ const GEOM = {};
       const loc = ins.map(([x, z]) => [x - isl.c.x, z - isl.c.z]);
       isl.poly = loc; isl.polyWorld = P;
       const g = new THREE.Group(); g.position.set(isl.c.x, 0, isl.c.z);
-      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.grass, color: 0xe8ffe0, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true;
+      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color: 0xfff3dd, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true; // cream paving: green is the garnish, not the base
       plate.userData = { type: "island", id: isl.id };
       const outline = new THREE.Mesh(MESH.ribbon(loc, 0.12, TOP + 0.012, true), new THREE.MeshBasicMaterial({ color: live ? col(cityHex(isl.city)) : col("#9a9a9a"), side: THREE.DoubleSide }));
       outline.visible = false;

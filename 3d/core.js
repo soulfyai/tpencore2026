@@ -156,8 +156,8 @@ const FACADE = {};
     FACADE[name] = m;
   }
   /* turf: lawn texture mapped in world XZ so it tiles evenly on bases of any size; instance colour tints it */
-  const turfTex = cv((g, R) => { g.fillStyle = "#7cc35a"; g.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 2200; i++) { const x = R() * 256, y = R() * 256; g.fillStyle = R() < 0.5 ? "rgba(60,130,40,.35)" : "rgba(190,235,140,.35)"; g.fillRect(x, y, 2, 4); }
+  const turfTex = cv((g, R) => { g.fillStyle = "#a9bd87"; g.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 2200; i++) { const x = R() * 256, y = R() * 256; g.fillStyle = R() < 0.5 ? "rgba(100,125,75,.3)" : "rgba(214,226,180,.35)"; g.fillRect(x, y, 2, 4); }
     g.fillStyle = "rgba(255,255,255,.06)"; for (let y = 0; y < 256; y += 64) g.fillRect(0, y, 256, 32); });
   const tm = new THREE.MeshStandardMaterial({ map: turfTex, roughness: 0.95 });
   tm.onBeforeCompile = (sh) => {
