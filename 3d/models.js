@@ -1,7 +1,7 @@
 /* ===== model library: one small diorama per policy item (model space: ~1x1 footprint, y up from 0) ===== */
 const MODELS = {};
 {
-  const C = { wall: "#f3ebdf", white: "#f8f6f1", cream: "#efe1c8", stone: "#cfc8bb", dark: "#3b4148", road: "#5d6168", line: "#f5f1e6", glass: "#a8cfe0",
+  const C = { wall: "#f3ebdf", white: "#f8f6f1", cream: "#efe1c8", stone: "#cfc8bb", dark: "#3b4148", road: "#5d6168", line: "#f5f1e6", glass: "#9fd4ec",
     wood: "#a8794f", woodD: "#7d5a3a", leaf: "#6f9e57", leafL: "#8db96a", red: "#d9573f", yellow: "#f0c64a", skin: "#f1c9a6", hair: "#3a2e28", grass: "#9cc27c", water: "#7fc0d4", pink: "#f2b3b0", sky: "#8fc6e8", steel: "#9aa3ab" };
   const SHIRTS = ["#1f4fb8", "#c8102e", "#f8f6f1", "#28c8c8", "#14213d", "#e48b5c", "#4f6fa8"];
 
@@ -21,15 +21,20 @@ const MODELS = {};
       }
     },
     house(x, z, w, d, h, wall, roof, opt = {}) {
+      p("box", x, 0.015, z, w + 0.07, 0.03, d + 0.07, "#f1ede2");                                  // plinth
       p("box", x, h / 2, z, w, h, d, wall);
-      if (opt.roof === "flat") { p("box", x, h + 0.02, z, w + 0.04, 0.04, d + 0.04, roof); }
-      else p("prism", x, h + d * 0.24, z, w + 0.06, d * 0.48, d + 0.06, roof, opt.ridgeZ ? Math.PI / 2 : 0);
-      if (opt.door !== false) p("box", x, 0.09, z + d / 2 + 0.006, 0.09, 0.18, 0.012, C.woodD);
+      if (opt.roof === "flat") { p("box", x, h - 0.004, z, w + 0.045, 0.012, d + 0.045, "#ffffff"); p("box", x, h + 0.02, z, w + 0.04, 0.04, d + 0.04, roof); }
+      else { p("box", x, h + 0.006, z, w + 0.075, 0.014, d + 0.075, "#ffffff"); p("prism", x, h + d * 0.24, z, w + 0.06, d * 0.48, d + 0.06, roof, opt.ridgeZ ? Math.PI / 2 : 0); }
+      if (opt.door !== false) { p("box", x, 0.09, z + d / 2 + 0.006, 0.09, 0.18, 0.012, C.woodD); p("box", x, 0.2, z + d / 2 + 0.028, 0.16, 0.012, 0.055, "#ffffff"); }
       if (opt.win !== false) this.windows(x, h * 0.25, z, w * 0.9, h * 0.7, d, Math.max(2, Math.round(w / 0.16)), Math.max(1, Math.round(h / 0.2)));
     },
     tower(x, z, w, d, h, wall, cap, floors) {
+      p("box", x, 0.025, z, w * 1.14, 0.05, d * 1.14, "#f4f7fa");                   // plinth
       p("foffice", x, h / 2, z, w, h, d, wall);
-      p("box", x, h + 0.02, z, w * 1.04, 0.04, d * 1.04, cap);
+      p("box", x, h + 0.02, z, w * 1.05, 0.04, d * 1.05, "#f2f6fa");                // white parapet
+      p("box", x, h + 0.048, z, w * 0.94, 0.012, d * 0.94, cap);                    // trim band keeps the accent colour
+      p("box", x, 0.055, z + d / 2 + 0.007, w * 0.3, 0.1, 0.01, C.glass, 0, 0, 0, true); // glass lobby door
+      p("box", x, 0.115, z + d / 2 + 0.03, w * 0.46, 0.012, 0.06, "#f4f7fa");       // entrance canopy
     },
     person(x, z, shirt, ry = 0, sc = 1) {
       const s = 0.62 * sc;

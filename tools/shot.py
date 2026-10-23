@@ -4,13 +4,19 @@ Usage (from repo root):
   pip install playwright                   # once; in Claude Code cloud sessions Chromium is pre-installed
                                            # (do NOT run "playwright install"); locally, also run "playwright install chromium"
   npm i --no-save three@0.160.0            # once; Three.js is served locally instead of the CDN
-  python3 tools/shot.py '{"out/pano":"MAP3D.panorama()","out/tpe":"MAP3D.enterCity(\'taipei\')"}' [mobile]
+  CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py '{"out/pano":"MAP3D.panorama()","out/tpe":"MAP3D.enterCity(\'taipei\')"}' [mobile]
+
+Use --check [mobile] instead of the JSON argument to verify scene geometry and animation.
 
 Each key is an output path (".png" is appended), each value is JS evaluated in the page before the shot.
 Weather/time are forced to 11:00 clear; set CITY3D.ENV.forced = {minute: 1140, ...} inside a shot for night.
 """
 import sys, json, os
 from playwright.sync_api import sync_playwright
+from contextlib import contextmanager
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 T = os.path.join(ROOT, "node_modules/three")
@@ -19,20 +25,58 @@ def route(r):
     rel = r.request.url.split("three@0.160.0/")[1]
     r.fulfill(path=os.path.join(T, rel), content_type="application/javascript")
 
-shots = json.loads(sys.argv[1]); mobile = "mobile" in sys.argv
-with sync_playwright() as p:
-    b = p.chromium.launch(args=["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"])
-    pg = b.new_page(viewport={"width": 400, "height": 860} if mobile else {"width": 1400, "height": 860})
+@contextmanager
+def serve():
+    class Handler(SimpleHTTPRequestHandler):
+        extensions_map = {**SimpleHTTPRequestHandler.extensions_map, ".html": "text/html; charset=utf-8"}
+        def log_message(self, *args): pass
+    server = ThreadingHTTPServer(("127.0.0.1", 0), partial(Handler, directory=ROOT))
+    thread = Thread(target=server.serve_forever, daemon=True); thread.start()
+    try: yield f"http://127.0.0.1:{server.server_port}/index3d.html"
+    finally: server.shutdown(); server.server_close(); thread.join()
+
+mobile = "mobile" in sys.argv
+checking = "--check" in sys.argv
+if checking:
+    with open(os.path.join(ROOT, "tools/check_scene.js"), encoding="utf-8") as f:
+        shots = {"out/check-scene-mobile" if mobile else "out/check-scene-desktop": f.read()}
+else:
+    shots = json.loads(sys.argv[1])
+with serve() as url, sync_playwright() as p:
+    options = {"args": ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"]}
+    if os.environ.get("CHROMIUM_EXECUTABLE"): options["executable_path"] = os.environ["CHROMIUM_EXECUTABLE"]
+    b = p.chromium.launch(**options)
+    pg = b.new_page(viewport={"width": 400, "height": 860} if mobile else {"width": 1400, "height": 860}, reduced_motion="reduce")
+    # Pause the animation scheduler, but snapshot() runs the complete production frame pipeline.
+    pg.add_init_script("""window.requestAnimationFrame = () => 0;
+const getContext = HTMLCanvasElement.prototype.getContext;
+HTMLCanvasElement.prototype.getContext = function(type, options) {
+  return getContext.call(this, type, type.startsWith('webgl') ? {...options, preserveDrawingBuffer:true} : options);
+};""")
     out = []
     pg.on("pageerror", lambda e: out.append("ERR " + str(e)))
     pg.route("**/three@0.160.0/**", route); pg.route("**/fonts.g*/**", lambda r: r.abort())
-    pg.goto("file://" + os.path.join(ROOT, "index3d.html"), wait_until="commit")
-    pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')", timeout=300000)
+    pg.goto(url, wait_until="commit")
+    pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')", timeout=300000, polling=100)
     pg.evaluate("(()=>{const E=CITY3D.ENV;E.forced={minute:660,w:{code:1,cloud:20,wind:10,temp:27}};E.apply();const i=document.querySelector('.hi-intro');if(i)i.hidden=true;})()")
     for name, js in shots.items():
         r = pg.evaluate(js)
         if r is not None: out.append(f"{name}: {str(r)[:600]}")
-        pg.wait_for_timeout(2500)
+        state = pg.evaluate("CITY3D.snapshot()")
+        out.append(f"{name} environment: {json.dumps(state, ensure_ascii=False)}")
+        if checking:
+            pg.evaluate("""()=>{
+              if (!CITY3D.renderer.info.render.triangles) throw new Error('Scene did not render');
+              const f=document.getElementById('stage').getBoundingClientRect();
+              if (f.width>620) return;
+              const signs=[...document.querySelectorAll('.clabel')].map(e=>e.getBoundingClientRect());
+              for (const r of signs) if (r.left<f.left||r.right>f.right||r.top<f.top||r.bottom>f.bottom) throw new Error('City sign clipped');
+              for(let i=0;i<signs.length;i++)for(let j=i+1;j<signs.length;j++){
+                const a=signs[i],b=signs[j];
+                if(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top)throw new Error('City signs overlap');
+              }
+            }""")
         os.makedirs(os.path.dirname(name) or ".", exist_ok=True)
         pg.screenshot(path=f"{name}.png", timeout=240000)
     print("\n".join(out)); b.close()
+    if any(line.startswith("ERR ") for line in out): sys.exit(1)

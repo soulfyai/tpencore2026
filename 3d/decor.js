@@ -33,52 +33,84 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
 
   const ZONE = (name) => { for (const [re, z] of [[/環保|運動|體育|賽事/, "P"], [/交通|軌道|工務|水利|治水|防災|治安|消防|城市建設/, "I"], [/產業|AI|科技|就業|觀光|港市|文化|族群|地方|其他/, "C"]]) if (re.test(name)) return z; return "R"; };
   const pk = (r, a) => a[(r() * a.length) | 0];
-  const GLASS = ["#5fc4d4", "#4f8fe0", "#7f8ff0", "#9fd0f0", "#6fb7c9", "#a7b8d8"];
-  const NEON = ["#ff4fa3", "#33e1ff", "#ffd23f", "#b06bff", "#ff6b3d"];
-  const WALLS = ["#fdf6ea", "#f6efe3", "#fbe8d0", "#eef4fa", "#e9eef5"];
-  const ROOFS = ["#e0453c", "#2f6fd6", "#38a9c9", "#f08a3c", "#5b6b7d"];
+  const GLASS = ["#7fd4ec", "#5fa8e4", "#9fd2f2", "#bfe6f6", "#6fc2dc", "#8fb8e8"]; // glass-curtain blues
+  const NEON = ["#33e1ff", "#7fb4ff", "#b8f0ff", "#9f8bff"];                          // cool LED accents
+  const WALLS = ["#ffffff", "#f7f9fb", "#eef3f8", "#f4f6f2", "#f9f7f2"];              // future white
+  const ROOFS = ["#dfe8f0", "#cfd8e2", "#9fc8e0", "#8fb4c8", "#b9c4ce"];              // pale steel/glass tones
+  /* rooftop solar array: one dark cell slab with a lighter grid sheet, slightly tilted toward the sun */
+  const SOLAR = (p, x, y, z, w, d, ry = 0) => { p("box", x, y + 0.028, z, w, 0.016, d, "#22304e", ry, 0, -0.1); p("box", x, y + 0.04, z, w * 0.94, 0.006, d * 0.86, "#3f6cae", ry, 0, -0.1); };
 
   /* ---------- building kit (local to the building, y=0 at street level + curb) ---------- */
   const B = {
     tower(p, s, h, r) {
-      const gl = pk(r, GLASS), round = r() < 0.25, d = s * (0.8 + r() * 0.2);
-      p("rbox", 0, 0.16, 0, s * 1.18, 0.32, d * 1.18, "#eef1f5"); p("box", 0, 0.12, d * 0.59 + 0.004, s * 1.0, 0.14, 0.01, "#ffe9b0", 0, 0, 0, true);
-      p("box", s * 0.25, 0.27, d * 0.59 + 0.012, s * 0.45, 0.09, 0.012, pk(r, NEON), 0, 0, 0, true);
-      if (round) { p("cyl", 0, 0.32 + h / 2, 0, s, h, s, gl); for (let y = 0.5; y < h + 0.2; y += 0.2) p("cyl", 0, y, 0, s * 1.02, 0.03, s * 1.02, "#e8f6ff", 0, 0, 0, true); }
-      else { p("fglass", 0, 0.32 + h / 2, 0, s, h, d, gl); p("box", 0, 0.32 + h * 0.5, 0, s * 0.18, h * 0.98, d * 1.01, "#e9eef4"); }
-      if (r() < 0.25) { p("cyl", 0, 0.32 + h + 0.04, 0, s * 0.6, 0.05, s * 0.6, "#5d6168"); p("cyl", 0, 0.32 + h + 0.07, 0, s * 0.42, 0.01, s * 0.42, "#f0c64a"); }
+      const gl = pk(r, GLASS), round = r() < 0.22, d = s * (0.82 + r() * 0.18);
+      // two-step white podium: glass lobby, LED name band, entrance canopy
+      p("rbox", 0, 0.05, 0, s * 1.3, 0.1, d * 1.3, "#f4f7fa");
+      p("rbox", 0, 0.21, 0, s * 1.16, 0.22, d * 1.16, "#eef2f6");
+      p("box", 0, 0.19, d * 0.58 + 0.004, s * 1.0, 0.16, 0.01, "#dff4ff", 0, 0, 0, true);
+      p("box", 0, 0.335, d * 0.58 + 0.035, s * 0.56, 0.018, 0.1, "#f4f7fa");
+      p("box", 0, 0.3, d * 0.58 + 0.012, s * 0.48, 0.02, 0.014, pk(r, NEON), 0, 0, 0, "cool");
+      if (round) { p("cyl", 0, 0.32 + h / 2, 0, s, h, s, gl); for (let y = 0.55; y < h + 0.2; y += 0.26) p("cyl", 0, y, 0, s * 1.03, 0.022, s * 1.03, "#f2f8fd"); }
+      else {
+        p("fglass", 0, 0.32 + h / 2, 0, s, h, d, gl);
+        p("box", 0, 0.32 + h * 0.5, 0, s * 0.16, h * 0.99, d * 1.012, "#f2f6fa");    // white service spine
+        for (const sd of [-1, 1]) p("box", sd * (s / 2 + 0.005), 0.32 + h / 2, d * 0.2, 0.01, h * 0.96, 0.018, "#bfeaff", 0, 0, 0, "cool"); // corner LED strips
+      }
       const top = 0.32 + h, k = r();
-      if (k < 0.35) { p("box", 0, top + h * 0.09, 0, s * 0.7, h * 0.18, d * 0.7, gl); p("cone4", 0, top + h * 0.18 + 0.2, 0, s * 0.7, 0.4, d * 0.7, "#dfe8f2"); }
-      else if (k < 0.65) { p("box", 0, top + 0.05, 0, s * 1.04, 0.1, d * 1.04, "#dfe8f2"); p("cyl", 0, top + 0.4, 0, 0.03, 0.7, 0.03, "#dfe3e6"); p("sphere", 0, top + 0.76, 0, 0.06, 0.06, 0.06, "#ff5a5a", 0, 0, 0, true); }
-      else { p("frust", 0, top + 0.18, 0, s * 0.9, 0.36, d * 0.9, gl); p("box", 0, top + 0.4, 0, s * 0.4, 0.1, d * 0.4, pk(r, NEON), 0, 0, 0, true); }
-      return top + 0.8;
+      p("box", 0, top + 0.035, 0, s * 1.05, 0.07, d * 1.05, "#f2f6fa");              // parapet cap
+      if (k < 0.35) { // glass crown + spire
+        p("box", 0, top + h * 0.08 + 0.07, 0, s * 0.68, h * 0.16, d * 0.68, gl);
+        p("box", 0, top + h * 0.16 + 0.1, 0, s * 0.52, 0.02, d * 0.52, "#bfeaff", 0, 0, 0, "cool");
+        p("cyl", 0, top + h * 0.16 + 0.36, 0, 0.022, 0.5, 0.022, "#dfe3e6"); p("sphere", 0, top + h * 0.16 + 0.62, 0, 0.05, 0.05, 0.05, "#ff5a5a", 0, 0, 0, true);
+      } else if (k < 0.62) { // helipad + solar corner
+        p("cyl", 0, top + 0.09, 0, s * 0.62, 0.05, s * 0.62, "#5d6168"); p("cyl", 0, top + 0.122, 0, s * 0.44, 0.012, s * 0.44, "#bfeaff", 0, 0, 0, "cool");
+        SOLAR(p, s * 0.3, top + 0.07, -d * 0.3, s * 0.3, d * 0.26);
+      } else { // stepped mech crown with an LED ring and a sky garden
+        p("box", 0, top + 0.19, 0, s * 0.88, 0.26, d * 0.88, gl); p("box", 0, top + 0.33, 0, s * 0.92, 0.02, d * 0.92, "#bfeaff", 0, 0, 0, "cool");
+        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#5fa752");
+      }
+      return top + 0.9;
     },
     office(p, s, h, r) {
-      const d = s * (0.75 + r() * 0.25), wall = pk(r, WALLS);
-      p(r() < 0.5 ? "foffice" : "fapt", 0, h / 2, 0, s, h, d, wall); p("box", 0, h + 0.03, 0, s * 1.03, 0.06, d * 1.03, pk(r, ROOFS));
-      if (r() < 0.4) { p("cyl", s * 0.25, h + 0.16, d * 0.2, 0.14, 0.2, 0.14, "#b9a58c"); p("cone", s * 0.25, h + 0.3, d * 0.2, 0.16, 0.08, 0.16, "#8a7458"); }
-      p("box", 0, 0.08, d / 2 + 0.06, s * 0.9, 0.02, 0.12, pk(r, ROOFS), 0, -0.3);
-      if (r() < 0.5) p("box", s * 0.2, h * 0.7, d / 2 + 0.012, s * 0.4, 0.1, 0.012, pk(r, NEON), 0, 0, 0, true);
-      p("box", -s * 0.2, h + 0.1, -d * 0.15, s * 0.25, 0.1, d * 0.25, "#d7dbe0");
-      return h + 0.2;
+      const d = s * (0.78 + r() * 0.22), wall = pk(r, WALLS), band = pk(r, ROOFS);
+      p("rbox", 0, 0.035, 0, s * 1.14, 0.07, d * 1.14, "#f4f7fa");                   // plinth
+      p(r() < 0.55 ? "foffice" : "fapt", 0, 0.07 + h / 2, 0, s, h, d, wall);
+      p("box", 0, 0.07 + h + 0.028, 0, s * 1.05, 0.056, d * 1.05, "#f2f6fa");        // parapet
+      p("box", 0, 0.07 + h + 0.06, 0, s * 0.96, 0.012, d * 0.96, band);             // roof trim band
+      const roof = 0.07 + h + 0.075, kk = r();
+      if (kk < 0.4) SOLAR(p, 0, roof, 0, s * 0.68, d * 0.58);                        // rooftop solar farm
+      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#6fb85a"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#8fcf6a"); } // sky garden
+      else { p("box", -s * 0.2, roof + 0.05, -d * 0.15, s * 0.3, 0.1, d * 0.3, "#dfe5ec"); p("cyl", s * 0.24, roof + 0.06, d * 0.18, 0.1, 0.12, 0.1, "#c9ced3"); } // mech penthouse
+      p("box", 0, 0.17, d / 2 + 0.045, s * 0.5, 0.016, 0.1, "#f4f7fa", 0, -0.25);    // entrance canopy
+      p("box", 0, 0.1, d / 2 + 0.008, s * 0.32, 0.15, 0.012, "#cfeefc", 0, 0, 0, true); // glass lobby door
+      if (r() < 0.55) p("box", s * 0.18, 0.07 + h * 0.82, d / 2 + 0.012, s * 0.42, 0.045, 0.012, pk(r, NEON), 0, 0, 0, "cool");
+      return h + 0.3;
     },
     house(p, s, h, r) {
       const n = s > 0.6 ? 2 : 1;
-      for (let k = 0; k < n; k++) { const x = n > 1 ? (k - 0.5) * s * 0.5 : 0, w = n > 1 ? s * 0.46 : s * 0.8, hh = 0.22 + r() * 0.12;
-        p("rbox", x, hh / 2, 0, w, hh, s * 0.7, pk(r, WALLS)); p("prism", x, hh + 0.08, 0, w + 0.05, 0.16, s * 0.74, pk(r, ROOFS));
-        p("box", x, hh * 0.45, s * 0.35 + 0.006, w * 0.5, hh * 0.3, 0.012, "#fff1c8", 0, 0, 0, true); }
-      return 0.5;
+      p("rbox", 0, 0.02, 0, s * 1.05, 0.04, s * 0.92, "#f2f4f0");                    // tidy plot base
+      for (let k = 0; k < n; k++) { const x = n > 1 ? (k - 0.5) * s * 0.5 : 0, w = n > 1 ? s * 0.46 : s * 0.8, hh = 0.24 + r() * 0.12, roof = pk(r, ROOFS);
+        p("rbox", x, 0.04 + hh / 2, 0, w, hh, s * 0.7, pk(r, WALLS));
+        if (r() < 0.45) { p("box", x, 0.04 + hh + 0.02, 0, w + 0.04, 0.04, s * 0.72, roof); SOLAR(p, x, 0.04 + hh + 0.04, 0, w * 0.58, s * 0.38); } // flat roof + home solar
+        else { p("prism", x, 0.04 + hh + 0.075, 0, w + 0.05, 0.15, s * 0.74, roof); p("box", x, 0.04 + hh + 0.006, 0, w + 0.07, 0.014, s * 0.76, "#ffffff"); } // gable + white eave trim
+        p("box", x, 0.04 + hh * 0.45, s * 0.35 + 0.006, w * 0.5, hh * 0.32, 0.012, "#fff1c8", 0, 0, 0, true);
+        p("box", x, 0.115, s * 0.35 + 0.03, w * 0.3, 0.012, 0.07, "#ffffff"); }      // door canopy
+      return 0.55;
     },
     shop(p, s, h, r) {
-      const hh = 0.32 + r() * 0.2, d = s * 0.8;
-      p("rbox", 0, hh / 2, 0, s, hh, d, pk(r, WALLS)); p("box", 0, 0.1, d / 2 + 0.006, s * 0.86, 0.14, 0.012, "#bfe3f5", 0, 0, 0, true);
-      p("box", 0, 0.2, d / 2 + 0.05, s * 0.92, 0.02, 0.1, pk(r, ["#e0453c", "#2f6fd6", "#f0c64a", "#28c8c8"]), 0, -0.35);
-      p("box", 0, hh * 0.8, d / 2 + 0.01, s * 0.55, 0.09, 0.012, pk(r, NEON), 0, 0, 0, true);
-      return hh + 0.1;
+      const hh = 0.34 + r() * 0.18, d = s * 0.8, aw = pk(r, ["#6fd0dc", "#5fa8e0", "#f8f6f1", "#9fd0f0"]);
+      p("rbox", 0, 0.025, 0, s * 1.08, 0.05, d * 1.08, "#f4f7fa");
+      p("rbox", 0, 0.05 + hh / 2, 0, s, hh, d, pk(r, WALLS));
+      p("box", 0, 0.05 + hh + 0.02, 0, s * 1.03, 0.04, d * 1.03, "#f2f6fa");         // parapet
+      p("box", 0, 0.17, d / 2 + 0.006, s * 0.86, 0.2, 0.012, "#cfeefc", 0, 0, 0, true); // storefront glass
+      p("box", 0, 0.28, d / 2 + 0.05, s * 0.92, 0.016, 0.1, aw, 0, -0.3);            // awning
+      p("box", 0, 0.05 + hh * 0.82, d / 2 + 0.012, s * 0.55, 0.05, 0.012, pk(r, NEON), 0, 0, 0, "cool"); // LED sign
+      if (r() < 0.4) SOLAR(p, 0, 0.05 + hh + 0.045, -d * 0.1, s * 0.5, d * 0.38);
+      return hh + 0.18;
     },
     park(p, s, h, r) {
       p("cyl", 0, 0.01, 0, s * 1.1, 0.02, s * 1.1, "#8ccf68");
-      if (r() < 0.5) { p("cyl", 0, 0.03, 0, s * 0.5, 0.04, s * 0.5, "#cfc9bd"); p("cyl", 0, 0.05, 0, s * 0.42, 0.03, s * 0.42, "#6fd3f0", 0, 0, 0, true); p("cyl", 0, 0.16, 0, 0.05, 0.22, 0.05, "#bff2ff", 0, 0, 0, true); }
+      if (r() < 0.5) { p("cyl", 0, 0.03, 0, s * 0.5, 0.04, s * 0.5, "#e8ecef"); p("cyl", 0, 0.05, 0, s * 0.42, 0.03, s * 0.42, "#6fd3f0", 0, 0, 0, true); p("cyl", 0, 0.16, 0, 0.05, 0.22, 0.05, "#bff2ff", 0, 0, 0, "cool"); }
       for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#5fa752", "#7cc062", "#4f9a3f"])); }
       return 0.5;
     },
@@ -96,7 +128,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const accent = cityHex(isl.city), used = {}, zone = ZONE(isl.t.name);
     // layout: heroes in the back row (big lots), the rest in rows of 2-3 in front
     const heroes = its.filter((i) => MODELS.isHero(i.id)), rest = its.filter((i) => !MODELS.isHero(i.id));
-    const LOT = rest.length <= 2 ? 1.8 : rest.length <= 4 ? 1.5 : 1.3, HLOT = 2.3, GAP = 0.18, perRow = rest.length > 4 ? 3 : 2;
+    const LOT = rest.length <= 2 ? 1.8 : rest.length <= 4 ? 1.5 : 1.3, HLOT = 2.3, GAP = 0.24, perRow = rest.length > 4 ? 3 : 2;
     const rows = []; if (heroes.length) rows.push(heroes.map((it) => ({ it, s: HLOT, hero: true })));
     for (let k = 0; k < rest.length; k += perRow) rows.push(rest.slice(k, k + perRow).map((it) => ({ it, s: LOT, hero: false })));
     const rowW = rows.map((r) => r.reduce((a, l) => a + l.s, 0) + GAP * (r.length - 1)), rowD = rows.map((r) => Math.max(...r.map((l) => l.s)));
@@ -109,13 +141,13 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const cw = (W + 0.4) * fit, cd = (D + 0.4) * fit;
     isl.campus = { w: cw, d: cd }; isl.plazaR = Math.hypot(cw, cd) / 2;
     const pc = ctxFor(isl.id, null, 0, 0, 1, 0, zone, null), pp = (g, ...a) => part(pc, g, ...a);
-    pp("rbox", 0, 0.025, 0, cw + 0.14, 0.05, cd + 0.14, accent);
-    pp("turf", 0, 0.035, 0, cw, 0.05, cd, "#ffffff");
-    const LOT_GROUND = { school: "#d8b49a", sport: "#7fbf5a", park: "#8ccf68", nursery: "#f3d6cf", hospital: "#e9eef3", clinic: "#e9eef3", elder: "#e8f0dc", metro: "#d9d4ca", bus: "#d9d4ca", bike: "#d9d4ca", road: "#d9d4ca" };
+    pp("rbox", 0, 0.02, 0, cw + 0.1, 0.04, cd + 0.1, accent);          // thin city-colour frame, nothing louder
+    pp("rbox", 0, 0.036, 0, cw + 0.02, 0.05, cd + 0.02, "#f6eedb");     // one clean cream board per theme
+    const LOT_GROUND = { school: "#eccfa8", sport: "#aad68c", park: "#aad68c", nursery: "#f6e2d6", hospital: "#eef2f6", clinic: "#eef2f6", elder: "#e9eedb", metro: "#e4dccb", bus: "#e4dccb", bike: "#e4dccb", road: "#e4dccb" }; // low-saturation board-game tints
     let campusTop = TOP;
     for (const sl of slots) {
       const r = (hash(sl.it.id) % 1000) / 1000, kind = MODELS.kindFor(sl.it, isl.t);
-      pp(LOT_GROUND[kind] ? "box" : "turf", sl.x, 0.065, sl.z, sl.s - 0.06, 0.012, sl.s - 0.06, LOT_GROUND[kind] || "#f2ffe8");
+      pp("box", sl.x, 0.066, sl.z, sl.s - 0.12, 0.01, sl.s - 0.12, LOT_GROUND[kind] || "#efe4c8"); // slim lot pad, generous margins between lots
       const ctx = ctxFor(isl.id, sl.it.id, sl.x, sl.z, sl.s * 0.95, 0, zone, null);
       ctx.base.premultiply(new THREE.Matrix4().makeTranslation(0, 0.07, 0));
       const start = parts.length, p = (g, ...a) => part(ctx, g, ...a);
@@ -284,7 +316,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         const a = rp[k], b = rp[(k + 1) % rp.length], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 0.05) continue;
         const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
         sp("box", mx, TOP + RH, mz, L + 0.2, 0.08, 0.52, "#8b9097", -ang); sp("box", mx, TOP + RH + 0.045, mz, L + 0.2, 0.012, 0.46, "#5d6168", -ang);
-        for (const o of [-0.25, 0.25]) sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.09, mz + Math.cos(ang) * o, L + 0.12, 0.08, 0.03, "#eef1f5", -ang);
+        for (const o of [-0.25, 0.25]) { sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.09, mz + Math.cos(ang) * o, L + 0.12, 0.08, 0.03, "#eef1f5", -ang); sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.136, mz + Math.cos(ang) * o, L + 0.12, 0.014, 0.014, "#bfeaff", -ang, 0, 0, "cool"); }
         if (k % 2 === 0) sp("box", mx, TOP + RH + 0.052, mz, L * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 3 === 0) { const ph = TOP + RH - base; sp("cyl", mx, base + ph / 2 - 0.05, mz, 0.13, ph, 0.13, "#cfc9bd"); sp("box", mx, TOP + RH - 0.08, mz, 0.12, 0.08, 0.52, "#cfc9bd", -ang); sp("cyl", mx, base + 0.02, mz, 0.22, 0.05, 0.22, "#ffffff"); }
         if (k % 2 === 0) for (const o of [k % 4 === 0 ? -0.26 : 0.26]) { LAMP_POOLS.push([mx - Math.sin(ang) * o * 0.4, TOP + RH + 0.055, mz + Math.cos(ang) * o * 0.4, 0.42]); sp("cyl", mx - Math.sin(ang) * o, TOP + RH + 0.3, mz + Math.cos(ang) * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx - Math.sin(ang) * o, TOP + RH + 0.5, mz + Math.cos(ang) * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); }
@@ -307,10 +339,31 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const seg = WORLD.shore.get(c.city), R3 = rng(hash(c.city) + 99), W = 2.0, info = cityInfo(c.city);
     const north = info.coast.reduce((m, p) => (p[1] < m[1] ? p : m));
     const yAt = (o) => TOP - 0.06 + (WATER_Y + 0.02 - TOP + 0.06) * Math.min(1, o / W);
-    const UMB = ["#e0453c", "#2f6fd6", "#f0c64a", "#28c8c8", "#f8f6f1", "#ff7aa8", "#ff9a3c"];
+    const UMB = ["#f8f6f1", "#6fd0dc"];                       // resort canvas: white + aqua only
+    const TOWEL = ["#bfeef4", "#f8f6f1", "#ffd9c0"];           // lounger towels, low-saturation
     const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#4f9a3f" : "#62b04e", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
-    const umbrella = (x, y, z, a, cc = pk(R3, UMB)) => { sp("cyl", x, y + 0.2, z, 0.02, 0.4, 0.02, "#f8f6f1"); sp("cone", x, y + 0.42, z, 0.46, 0.12, 0.46, cc); sp("sphere", x, y + 0.49, z, 0.03, 0.03, 0.03, "#f8f6f1"); for (const sd of [-0.11, 0.11]) sp("box", x + Math.cos(a) * 0.2 - Math.sin(a) * sd, y + 0.02, z + Math.sin(a) * 0.2 + Math.cos(a) * sd, 0.26, 0.03, 0.1, pk(R3, ["#f8f6f1", "#f0c64a", "#28c8c8", "#ff7aa8"]), -a); if (R3() < 0.6) { const px = x + Math.cos(a) * 0.2 + Math.sin(a) * 0.11, pz = z + Math.sin(a) * 0.2 - Math.cos(a) * 0.11; sp("box", px, y + 0.06, pz, 0.2, 0.05, 0.06, pk(R3, ["#e0453c", "#2f6fd6", "#3e7c8c", "#f0c64a"]), -a); sp("sphere", px - Math.cos(a) * 0.12, y + 0.07, pz - Math.sin(a) * 0.12, 0.06, 0.06, 0.06, "#f1c9a6"); } };
-    const kiosk = (x, y, z, a) => { const cc = pk(R3, ["#e0453c", "#2f6fd6", "#28c8c8", "#ff9a3c"]); sp("rbox", x, y + 0.14, z, 0.42, 0.28, 0.3, "#f8f6f1", -a); for (let k = -2; k <= 2; k++) sp("box", x - Math.sin(a) * k * 0.085 + Math.cos(a) * 0.2, y + 0.32, z + Math.cos(a) * k * 0.085 + Math.sin(a) * 0.2, 0.18, 0.025, 0.085, k % 2 ? cc : "#f8f6f1", -a, 0, 0.35); sp("box", x, y + 0.3, z, 0.46, 0.04, 0.34, cc, -a); for (const sd of [-0.3, 0.3]) { sp("cyl", x + Math.cos(a) * 0.32 - Math.sin(a) * sd, y + 0.08, z + Math.sin(a) * 0.32 + Math.cos(a) * sd, 0.08, 0.02, 0.08, "#f8f6f1"); sp("cyl", x + Math.cos(a) * 0.32 - Math.sin(a) * sd, y + 0.2, z + Math.sin(a) * 0.32 + Math.cos(a) * sd, 0.01, 0.24, 0.01, "#f8f6f1"); sp("cone", x + Math.cos(a) * 0.32 - Math.sin(a) * sd, y + 0.32, z + Math.sin(a) * 0.32 + Math.cos(a) * sd, 0.22, 0.06, 0.22, cc); } };
+    const umbrella = (x, y, z, cc) => { sp("cyl", x, y + 0.22, z, 0.018, 0.44, 0.018, "#f8f6f1"); sp("cone", x, y + 0.46, z, 0.48, 0.13, 0.48, cc); sp("sphere", x, y + 0.535, z, 0.028, 0.028, 0.028, "#f8f6f1"); };
+    const lounger = (x, y, z, a2, cc) => { const ca = Math.cos(a2), sa = Math.sin(a2);
+      sp("box", x, y + 0.035, z, 0.3, 0.028, 0.13, "#f8f6f1", -a2);
+      sp("box", x - ca * 0.1, y + 0.085, z - sa * 0.1, 0.1, 0.028, 0.13, "#f8f6f1", -a2, 0, -0.6);
+      sp("box", x + ca * 0.03, y + 0.054, z + sa * 0.03, 0.2, 0.01, 0.1, cc, -a2); };
+    const kiosk = (x, y, z, a) => { const cc = pk(R3, ["#6fd0dc", "#5fa8e0"]);
+      sp("rbox", x, y + 0.15, z, 0.44, 0.3, 0.32, "#f8f6f1", -a);
+      sp("box", x + Math.cos(a) * 0.17, y + 0.18, z + Math.sin(a) * 0.17, 0.02, 0.1, 0.26, "#cfeefc", -a, 0, 0, true);
+      for (let k = -2; k <= 2; k++) sp("box", x - Math.sin(a) * k * 0.09 + Math.cos(a) * 0.21, y + 0.34, z + Math.cos(a) * k * 0.09 + Math.sin(a) * 0.21, 0.2, 0.025, 0.09, k % 2 ? cc : "#f8f6f1", -a, 0, 0.35);
+      sp("box", x, y + 0.315, z, 0.48, 0.04, 0.36, "#f8f6f1", -a);
+      sp("box", x - Math.cos(a) * 0.1, y + 0.38, z - Math.sin(a) * 0.1, 0.2, 0.035, 0.012, cc, -a, 0, 0, "cool");
+      for (const sd of [-0.32, 0.32]) { const tx = x + Math.cos(a) * 0.34 - Math.sin(a) * sd, tz = z + Math.sin(a) * 0.34 + Math.cos(a) * sd;
+        sp("cyl", tx, y + 0.08, tz, 0.08, 0.02, 0.08, "#f8f6f1"); sp("cyl", tx, y + 0.2, tz, 0.01, 0.24, 0.01, "#f8f6f1"); sp("cone", tx, y + 0.33, tz, 0.22, 0.06, 0.22, cc); } };
+    /* one resort cluster: a tilted sun deck, two umbrellas, a row of three loungers facing the sea, a plank walk to the boardwalk */
+    const cluster = (x0, z0, nx, nz, ux, uz, an, ci) => {
+      const tilt = Math.atan2(yAt(1.45) - yAt(0.55), 0.9);
+      const at = (o, sdd) => [x0 + nx * o + ux * sdd, z0 + nz * o + uz * sdd];
+      { const [px, pz] = at(1.0, 0); sp("box", px, yAt(1.0) + 0.012, pz, 0.9, 0.022, 1.1, "#f3ddb0", -an, 0, tilt); }
+      { const [px, pz] = at(0.5, 0); sp("box", px, yAt(0.5) + 0.02, pz, 0.55, 0.02, 0.16, "#e4c08b", -an, 0, tilt); }
+      for (const sdd of [-0.26, 0.26]) { const [px, pz] = at(0.82, sdd); umbrella(px, yAt(0.82) + 0.02, pz, UMB[(ci + (sdd > 0 ? 1 : 0)) % 2]); }
+      for (let k = -1; k <= 1; k++) { const [px, pz] = at(1.22, k * 0.32); lounger(px, yAt(1.22) + 0.02, pz, an, TOWEL[(ci + k + 1) % TOWEL.length]); }
+    };
     // longest beach stretch gets the pleasure pier, the longest harbour stretch away from the port gets the marina
     const runs = []; let cur = null;
     for (const sg of seg) { if (!cur || cur.type !== sg.type) { cur = { type: sg.type, list: [], len: 0 }; runs.push(cur); } const L = Math.hypot(sg.b[0] - sg.a[0], sg.b[1] - sg.a[1]); cur.list.push(sg); cur.len += L; }
@@ -318,62 +371,68 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const bR = runs.filter((r) => r.type === "beach").sort((a, b) => b.len - a.len), hR = runs.filter((r) => r.type === "harbour" && (() => { const m = mid(r); return m && Math.hypot(m.x - north[0], m.z - north[1]) > 6; })()).sort((a, b) => b.len - a.len);
     const pierAt = bR[0] && mid(bR[0]), marinaAt = (hR[0] && mid(hR[0])) || (bR[1] && mid(bR[1]));
     const nearPier = (x, z) => pierAt && Math.hypot(x - pierAt.x, z - pierAt.z) < 1.2;
-    let acc = 0, accH = 0, accK = 0, ci = 0;
+    let acc = 1.2, accH = 0, accK = 3.5, ci = 0, buoyAcc = 0;
     for (const sg of seg) {
       const L = Math.hypot(sg.b[0] - sg.a[0], sg.b[1] - sg.a[1]); if (!L) continue;
       const ux = (sg.b[0] - sg.a[0]) / L, uz = (sg.b[1] - sg.a[1]) / L, nx = (sg.na[0] + sg.nb[0]) / 2, nz = (sg.na[1] + sg.nb[1]) / 2, ang = Math.atan2(uz, ux), an = Math.atan2(nz, nx);
-      if (sg.type === "beach") { // boardwalk along the land edge
+      if (sg.type === "beach") { // boardwalk along the land edge: pale planks with a white rail curb
         const mx = (sg.a[0] + sg.b[0]) / 2 + nx * 0.28, mz = (sg.a[1] + sg.b[1]) / 2 + nz * 0.28;
-        sp("box", mx, yAt(0.28) + 0.03, mz, L + 0.06, 0.04, 0.36, "#d6a874", -ang);
+        sp("box", mx, yAt(0.28) + 0.03, mz, L + 0.06, 0.04, 0.36, "#e4c08b", -ang);
+        sp("box", mx - nx * 0.19, yAt(0.28) + 0.058, mz - nz * 0.19, L + 0.06, 0.016, 0.028, "#f8f6f1", -ang);
       }
       for (let t = 0; t < L; t += 0.1) {
         const x0 = sg.a[0] + ux * t, z0 = sg.a[1] + uz * t;
         if (sg.type === "beach") {
-          acc += 0.1; accK += 0.1;
-          if (acc >= 0.44) { acc = 0; ci++;
-            if (ci % 2 === 0 && !nearPier(x0, z0)) palm(x0 + nx * 0.06, TOP - 0.05, z0 + nz * 0.06, 1.05);
-            for (let row = 0; row < 3; row++) { // umbrellas in tidy rows, colours stepping diagonally like a resort beach
-              const o = 0.82 + row * 0.38, x = x0 + nx * o + ux * (row % 2) * 0.2, z = z0 + nz * o + uz * (row % 2) * 0.2;
-              if (nearPier(x, z) || (ci + row) % 9 === 4) continue; umbrella(x, yAt(o), z, an + Math.PI / 2, UMB[(ci + row * 2) % UMB.length]);
+          acc += 0.1; accK += 0.1; buoyAcc += 0.1;
+          if (acc >= 2.1) { acc = 0; ci++; // resort rhythm: one cluster, then open sand; palms between every other pair
+            if (!nearPier(x0, z0)) {
+              cluster(x0, z0, nx, nz, ux, uz, an, ci);
+              if (ci % 2 === 0) { palm(x0 + nx * 0.16 + ux * 0.85, TOP - 0.05, z0 + nz * 0.16 + uz * 0.85, 1.05); palm(x0 + nx * 0.3 + ux * 1.1, TOP - 0.05, z0 + nz * 0.3 + uz * 1.1, 0.85); }
             }
-            if (ci % 3 === 0) { const o = W + 0.15 + R3() * 0.5, x = x0 + nx * o, z = z0 + nz * o; sp("torus", x, WATER_Y + 0.02, z, 0.16, 0.16, 0.05, pk(R3, ["#ff7aa8", "#f0c64a", "#28c8c8", "#e0453c"]), 0, Math.PI / 2); sp("sphere", x, WATER_Y + 0.06, z, 0.07, 0.07, 0.07, pk(R3, ["#2e2620", "#4a3a2e", "#f1c9a6"])); }
-            if (ci % 4 === 1) { const o = W - 0.05, x = x0 + nx * o, z = z0 + nz * o, y = yAt(o); sp("cyl", x, y + 0.08, z, 0.05, 0.14, 0.05, pk(R3, ["#e0453c", "#2f6fd6", "#f0c64a", "#28c8c8"])); sp("sphere", x, y + 0.19, z, 0.06, 0.06, 0.06, "#f1c9a6"); }
           }
-          if (accK >= 4.2 && !nearPier(x0, z0)) { accK = 0; const o = 0.55; kiosk(x0 + nx * o, yAt(o), z0 + nz * o, an);
-            if (R3() < 0.5) { const x = x0 + nx * 0.6 + ux * 0.8, z = z0 + nz * 0.6 + uz * 0.8, y = yAt(0.6); sp("rbox", x, y + 0.03, z, 0.7, 0.06, 0.42, "#f8f6f1", -ang); sp("box", x, y + 0.065, z, 0.6, 0.01, 0.32, "#38d0e8", -ang); for (const sd of [-0.45, 0.45]) sp("box", x + ux * sd, y + 0.05, z + uz * sd, 0.12, 0.02, 0.2, "#f8f6f1", -ang); } }
-          if (Math.abs(t - 0.05) < 0.051 && R3() < 0.12) { const o = 1.3; for (const [dx, dz] of [[-0.08, -0.08], [0.08, -0.08], [-0.08, 0.08], [0.08, 0.08]]) sp("box", x0 + nx * o + dx, yAt(o) + 0.25, z0 + nz * o + dz, 0.02, 0.5, 0.02, "#f8f6f1"); sp("box", x0 + nx * o, yAt(o) + 0.52, z0 + nz * o, 0.26, 0.12, 0.26, "#e0453c"); sp("cone4", x0 + nx * o, yAt(o) + 0.66, z0 + nz * o, 0.3, 0.14, 0.3, "#f8f6f1"); }
+          if (buoyAcc >= 1.4) { buoyAcc = 0; const o = W + 0.55; sp("sphere", x0 + nx * o, WATER_Y + 0.045, z0 + nz * o, 0.07, 0.07, 0.07, ci % 2 ? "#f8f6f1" : "#6fd0dc"); } // swim-line buoys
+          if (accK >= 7.5 && !nearPier(x0, z0)) { accK = 0; const o = 0.5; kiosk(x0 + nx * o, yAt(o), z0 + nz * o, an);
+            const fx = x0 + nx * 0.4 + ux * 0.9, fz = z0 + nz * 0.4 + uz * 0.9; // beach shower + flag beside the kiosk
+            sp("cyl", fx, yAt(0.4) + 0.2, fz, 0.016, 0.4, 0.016, "#f8f6f1"); sp("box", fx + ux * 0.06, yAt(0.4) + 0.4, fz + uz * 0.06, 0.12, 0.05, 0.01, "#6fd0dc", -ang); }
+          if (Math.abs(t - 0.05) < 0.051 && R3() < 0.12 && !nearPier(x0, z0)) { // lifeguard tower: white frame, aqua cabin
+            const o = 1.35, lx = x0 + nx * o, lz = z0 + nz * o, ly = yAt(o);
+            for (const [dx, dz] of [[-0.08, -0.08], [0.08, -0.08], [-0.08, 0.08], [0.08, 0.08]]) sp("box", lx + dx, ly + 0.25, lz + dz, 0.02, 0.5, 0.02, "#f8f6f1");
+            sp("box", lx, ly + 0.52, lz, 0.26, 0.12, 0.26, "#6fd0dc"); sp("cone4", lx, ly + 0.66, lz, 0.3, 0.14, 0.3, "#f8f6f1"); }
         } else if (sg.type === "harbour") {
           accH += 0.1;
           if (accH >= 0.55) { accH = 0; sp("cyl", x0 - nx * 0.02, TOP - 0.01, z0 - nz * 0.02, 0.06, 0.08, 0.06, "#3b4148"); if (R3() < 0.3) sp("cyl", x0 - nx * 0.25, TOP + 0.17, z0 - nz * 0.25, 0.018, 0.34, 0.018, "#3b4148"), sp("sphere", x0 - nx * 0.25, TOP + 0.35, z0 - nz * 0.25, 0.045, 0.045, 0.045, "#fff3c4", 0, 0, 0, true); }
         } else {
-          acc += 0.1; if (acc < 0.35) continue; acc = 0;
-          const o = 0.2 + R3() * 0.5; sp("ico", x0 + nx * o, WATER_Y + 0.05 + R3() * 0.08, z0 + nz * o, 0.22 + R3() * 0.2, 0.18 + R3() * 0.12, 0.22 + R3() * 0.2, pk(R3, ["#a59d8e", "#b8b2a6", "#8f887c"]), R3() * 3);
+          acc += 0.1; if (acc < 0.65) continue; acc = 0; // sparser, lighter rocks: tidy outcrops, not rubble
+          const o = 0.2 + R3() * 0.45; sp("ico", x0 + nx * o, WATER_Y + 0.05 + R3() * 0.06, z0 + nz * o, 0.2 + R3() * 0.16, 0.15 + R3() * 0.1, 0.2 + R3() * 0.16, pk(R3, ["#b8b2a6", "#c6c0b4", "#a9a396"]), R3() * 3);
         }
       }
     }
-    // bridged pockets become sandy coves: umbrellas in tidy rows, a kiosk and a few sunbathers
-    for (const pk of (WORLD.pockets && WORLD.pockets.get(c.city)) || []) {
-      let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9; for (const [x, z] of pk) { minx = Math.min(minx, x); maxx = Math.max(maxx, x); minz = Math.min(minz, z); maxz = Math.max(maxz, z); }
+    // bridged pockets become quiet coves: one kiosk, a few neat umbrella-and-lounger spots, palms, open sand
+    for (const pkt of (WORLD.pockets && WORLD.pockets.get(c.city)) || []) {
+      let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9; for (const [x, z] of pkt) { minx = Math.min(minx, x); maxx = Math.max(maxx, x); minz = Math.min(minz, z); maxz = Math.max(maxz, z); }
       let k = 0, kioskDone = false;
-      for (let x = minx + 0.3; x < maxx; x += 0.42) for (let z = minz + 0.3; z < maxz; z += 0.42) {
-        if (!GEOM.pip(x, z, pk) || GEOM.nearestEdge(x, z, pk).d < 0.3) continue; k++;
-        if (!kioskDone && GEOM.nearestEdge(x, z, pk).d > 0.6) { kioskDone = true; kiosk(x, TOP - 0.055, z, 0); continue; }
-        if (k % 5 === 2) continue; umbrella(x, TOP - 0.055, z, 0, UMB[k % UMB.length]);
+      for (let x = minx + 0.45; x < maxx; x += 1.0) for (let z = minz + 0.45; z < maxz; z += 1.0) {
+        if (!GEOM.pip(x, z, pkt) || GEOM.nearestEdge(x, z, pkt).d < 0.45) continue; k++;
+        if (!kioskDone && GEOM.nearestEdge(x, z, pkt).d > 0.6) { kioskDone = true; kiosk(x, TOP - 0.055, z, 0); continue; }
+        if (k % 3 === 0) { palm(x, TOP - 0.05, z, 1.0); continue; }
+        umbrella(x - 0.12, TOP - 0.055, z, UMB[k % 2]);
+        lounger(x + 0.26, TOP - 0.055, z - 0.12, Math.PI / 2, TOWEL[k % 3]);
+        lounger(x + 0.26, TOP - 0.055, z + 0.14, Math.PI / 2, TOWEL[(k + 1) % 3]);
       }
     }
     // pleasure pier: a long boardwalk into the sea, shops on it and a ferris wheel at the end
     if (pierAt) {
       const { x, z, nx, nz, ux, uz } = pierAt, an = Math.atan2(nz, nx), len = 4.4, yP = TOP - 0.02;
       const at = (f, s2 = 0) => [x + nx * f - nz * s2 * 0 + ux * s2, z + nz * f + uz * s2];
-      { const [mx, mz] = at(len / 2); sp("box", mx, yP, mz, len, 0.07, 0.62, "#c99a68", -an); }
+      { const [mx, mz] = at(len / 2); sp("box", mx, yP, mz, len, 0.07, 0.62, "#e2bd8c", -an); }
       for (let f = 0.4; f <= len; f += 0.5) for (const s2 of [-0.26, 0.26]) { const [px, pz] = at(f, s2); sp("cyl", px, (yP + WATER_Y) / 2 - 0.15, pz, 0.05, yP - WATER_Y + 0.3, 0.05, "#8a6a4a"); }
       for (let f = 0.3; f <= len; f += 0.3) for (const s2 of [-0.3, 0.3]) { const [px, pz] = at(f, s2); sp("box", px, yP + 0.08, pz, 0.025, 0.12, 0.025, "#f8f6f1"); }
       { const [a1, a2] = at(len / 2, -0.31), [b1, b2] = at(len / 2, 0.31); sp("box", a1, yP + 0.14, a2, len, 0.02, 0.02, "#f8f6f1", -an); sp("box", b1, yP + 0.14, b2, len, 0.02, 0.02, "#f8f6f1", -an); }
       // gate on the beach
-      { const [gx, gz] = at(0.3); for (const s2 of [-0.32, 0.32]) { const [px, pz] = at(0.3, s2); sp("box", px, yP + 0.3, pz, 0.08, 0.6, 0.08, "#f8f6f1"); } sp("box", gx, yP + 0.62, gz, 0.1, 0.14, 0.8, "#e0453c", -an); }
-      for (const [f, s2, cc] of [[1.0, -0.17, "#ff9a3c"], [1.4, 0.17, "#28c8c8"], [1.8, -0.17, "#ff7aa8"]]) { const [px, pz] = at(f, s2); sp("rbox", px, yP + 0.17, pz, 0.32, 0.28, 0.24, "#f8f6f1", -an); sp("cone4", px, yP + 0.38, pz, 0.36, 0.14, 0.3, cc, -an + Math.PI / 4); }
+      { const [gx, gz] = at(0.3); for (const s2 of [-0.32, 0.32]) { const [px, pz] = at(0.3, s2); sp("box", px, yP + 0.3, pz, 0.08, 0.6, 0.08, "#f8f6f1"); } sp("box", gx, yP + 0.62, gz, 0.1, 0.14, 0.8, "#6fd0dc", -an); }
+      for (const [f, s2, cc] of [[1.0, -0.17, "#6fd0dc"], [1.4, 0.17, "#5fa8e0"], [1.8, -0.17, "#ffb3a0"]]) { const [px, pz] = at(f, s2); sp("rbox", px, yP + 0.17, pz, 0.32, 0.28, 0.24, "#f8f6f1", -an); sp("cone4", px, yP + 0.38, pz, 0.36, 0.14, 0.3, cc, -an + Math.PI / 4); }
       // platform + ferris wheel
-      const [ex, ez] = at(len - 0.3); sp("cyl", ex, yP, ez, 1.5, 0.07, 1.5, "#c99a68");
+      const [ex, ez] = at(len - 0.3); sp("cyl", ex, yP, ez, 1.5, 0.07, 1.5, "#e2bd8c");
       const [wx, wz] = at(len - 0.15), R = 0.78, hub = yP + R + 0.18, ca = Math.cos(an + Math.PI / 2), sa = Math.sin(an + Math.PI / 2);
       for (const s2 of [-0.12, 0.12]) { const px = wx + nx * s2, pz = wz + nz * s2; sp("box", px + ca * 0.3, (yP + hub) / 2, pz + sa * 0.3, 0.04, hub - yP, 0.04, "#f8f6f1", 0, 0, 0); sp("box", px - ca * 0.3, (yP + hub) / 2, pz - sa * 0.3, 0.04, hub - yP, 0.04, "#f8f6f1"); }
       const N = 16; for (let k = 0; k < N; k++) { const a = (k / N) * Math.PI * 2, a2 = ((k + 1) / N) * Math.PI * 2;
@@ -383,7 +442,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         sp("rbox", wx + ca * p1[0], hub + p1[1] - 0.08, wz + sa * p1[0], 0.13, 0.12, 0.13, UMB[k % UMB.length]);
         sp("sphere", wx + ca * p1[0], hub + p1[1], wz + sa * p1[0], 0.03, 0.03, 0.03, "#fff3c4", 0, 0, 0, true);
       }
-      sp("sphere", wx, hub, wz, 0.08, 0.08, 0.08, "#e0453c");
+      sp("sphere", wx, hub, wz, 0.08, 0.08, 0.08, "#5fa8e0");
     }
     // marina: floating docks with finger slips and yachts
     if (marinaAt) {
@@ -415,7 +474,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       for (let k = 0; k < n; k++) {
         const f0 = k / n, f1 = (k + 1) / n, mx = a[0] + (b[0] - a[0]) * (f0 + f1) / 2, mz = a[1] + (b[1] - a[1]) * (f0 + f1) / 2, seg = L / n;
         sp("box", mx, Y, mz, seg + 0.08, 0.1, 0.58, "#8b9097", -ang); sp("box", mx, Y + 0.05, mz, seg + 0.08, 0.012, 0.5, "#5d6168", -ang);
-        for (const o of [-0.28, 0.28]) sp("box", mx + nx * o, Y + 0.1, mz + nz * o, seg + 0.08, 0.08, 0.03, "#eef1f5", -ang);
+        for (const o of [-0.28, 0.28]) { sp("box", mx + nx * o, Y + 0.1, mz + nz * o, seg + 0.08, 0.08, 0.03, "#eef1f5", -ang); sp("box", mx + nx * o, Y + 0.146, mz + nz * o, seg + 0.08, 0.014, 0.014, "#bfeaff", -ang, 0, 0, "cool"); }
         if (k % 2 === 0) sp("box", mx, Y + 0.058, mz, seg * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 4 === 0 && k > 0) { const ph = Y - WATER_Y; sp("cyl", mx, WATER_Y + ph / 2 - 0.05, mz, 0.16, ph, 0.16, "#cfc9bd"); sp("cyl", mx, WATER_Y + 0.02, mz, 0.26, 0.05, 0.26, "#ffffff"); }
         if (k % 2 === 1) { const o = k % 4 === 1 ? -0.3 : 0.3; sp("cyl", mx + nx * o, Y + 0.3, mz + nz * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx + nx * o, Y + 0.5, mz + nz * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([mx + nx * o * 0.4, Y + 0.06, mz + nz * o * 0.4, 0.42]); }
@@ -500,24 +559,33 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         WORLD.ferryRoutes.push({ ax: sx + d.ux * 1.2, az: sz + d.uz * 1.2, bx: ex - d.ux * 1.2, bz: ez - d.uz * 1.2 });
       }
     }
-    /* Taipei–New Taipei: the two real crossings, each anchored by its true coordinates on both shores */
+    /* Taipei–New Taipei: the two named crossings span the strait face-to-face — picked on the stretches of each ring
+       that look at the other island (not by their real coordinates), kept a third of that frontage apart */
     if (R.taipei && R.newtaipei) {
-      const NAMED = [
-        ["淡江大橋", [121.437, 25.183], "mono"], // white single-pylon cable-stayed bridge at the river mouth
-        ["關渡大橋", [121.463, 25.126], "arch"], // red steel arch bridge upstream
-      ];
+      const NAMED = [["淡江大橋", "mono"], ["關渡大橋", "arch"]]; // white single-pylon cable-stay at sea, red steel arch inland of it
+      const cenOf = (pts) => pts.reduce((m, q) => [m[0] + q[0] / pts.length, m[1] + q[1] / pts.length], [0, 0]);
+      const cA = cenOf(R.taipei.pts), cB = cenOf(R.newtaipei.pts), dirAB = Math.atan2(cB[1] - cA[1], cB[0] - cA[0]);
+      const facing = (pts, cen, dir) => pts.filter((q) => { let d = Math.atan2(q[1] - cen[1], q[0] - cen[0]) - dir; d = Math.atan2(Math.sin(d), Math.cos(d)); return Math.abs(d) < Math.PI / 3; });
+      const fA = facing(R.taipei.pts, cA, dirAB), fB = facing(R.newtaipei.pts, cB, dirAB + Math.PI);
+      const tAng = (q) => { let d = Math.atan2(q[1] - cA[1], q[0] - cA[0]) - dirAB; return Math.atan2(Math.sin(d), Math.cos(d)); };
+      const byAng = [...fA].sort((q1, q2) => tAng(q1) - tAng(q2));
+      let arc = 0; for (let i = 1; i < byAng.length; i++) arc += Math.hypot(byAng[i][0] - byAng[i - 1][0], byAng[i][1] - byAng[i - 1][1]);
+      const ptAt = (f) => { let h = arc * f; for (let i = 1; i < byAng.length; i++) { const L2 = Math.hypot(byAng[i][0] - byAng[i - 1][0], byAng[i][1] - byAng[i - 1][1]); if (h <= L2) return byAng[i - 1]; h -= L2; } return byAng[byAng.length - 1] || cA; };
+      const targets = [ptAt(0.28), ptAt(0.72)], sep = Math.max(5, arc / 3);
+      WORLD.namedBridgeSpacing = sep;
+      const segX = (a, b, c2, d2) => { const cr = (q1, q2, q3) => (q2[0] - q1[0]) * (q3[1] - q1[1]) - (q2[1] - q1[1]) * (q3[0] - q1[0]); return cr(a, b, c2) * cr(a, b, d2) < 0 && cr(c2, d2, a) * cr(c2, d2, b) < 0; };
+      const crosses = (a, b) => WORLD.bridges.some((B2) => segX(a, b, B2.a, B2.b)) || WORLD.ferryRoutes.some((f2) => segX(a, b, [f2.ax, f2.az], [f2.bx, f2.bz]));
       const placed = [];
-      for (const [name, ll, kind] of NAMED) {
-        const gA = WORLD.geo("taipei", ll[0], ll[1]), gB = WORLD.geo("newtaipei", ll[0], ll[1]);
-        const near = (pts, g) => [...pts].sort((p, q) => Math.hypot(p[0] - g[0], p[1] - g[1]) - Math.hypot(q[0] - g[0], q[1] - g[1])).slice(0, 70);
-        const cand = [];
-        for (const a of near(R.taipei.pts, gA)) for (const b of near(R.newtaipei.pts, gB)) cand.push([Math.hypot(a[0] - b[0], a[1] - b[1]) + 0.6 * (Math.hypot(a[0] - gA[0], a[1] - gA[1]) + Math.hypot(b[0] - gB[0], b[1] - gB[1])), a, b]);
-        cand.sort((p, q) => p[0] - q[0]);
-        const hit = cand.find(([, a, b]) => overWater(a, b) && placed.every(([pa, pb]) => Math.min(Math.hypot(a[0] - pa[0], a[1] - pa[1]), Math.hypot(b[0] - pb[0], b[1] - pb[1])) > 5));
-        if (!hit) continue;
+      NAMED.forEach(([name, kind], ni) => {
+        const tgt = targets[ni], cand = [];
+        for (const a of fA) for (const b of fB) cand.push([Math.hypot(a[0] - b[0], a[1] - b[1]) + 0.9 * Math.hypot(a[0] - tgt[0], a[1] - tgt[1]), a, b]);
+        cand.sort((q1, q2) => q1[0] - q2[0]);
+        const ok = (need) => cand.find(([, a, b]) => overWater(a, b) && !crosses(a, b) && placed.every(([pa, pb]) => Math.min(Math.hypot(a[0] - pa[0], a[1] - pa[1]), Math.hypot(b[0] - pb[0], b[1] - pb[1])) > need));
+        const hit = ok(sep); // keep the requested minimum spacing; never silently narrow the crossings
+        if (!hit) return;
         const [, a, b] = hit; placed.push([a, b]);
         build(a, b, "taipei", "newtaipei", kind, name);
-      }
+      });
     }
   }
 }

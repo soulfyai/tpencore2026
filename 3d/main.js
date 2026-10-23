@@ -6,6 +6,7 @@ const islandLabels = new Map();
 for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
+  el.dataset.city = isl.city;
   el.style.setProperty("--c", `var(--c-${isl.city})`);
   el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
@@ -15,9 +16,11 @@ for (const isl of islands.filter((i) => i.live)) {
   WORLD.bodies.get(isl.id).g.add(o);
   islandLabels.set(isl.id, { o, el });
 }
+const citySigns = [];
 for (const c of A.cities) {
   const el = document.createElement("div");
   const live = LIVE_CITIES.has(c.city);
+  citySigns.push(el);
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
   const ci = WORLD.cities.get(c.city), top = ci.coast.reduce((m, q) => (q[1] < m[1] ? q : m));
@@ -140,7 +143,7 @@ function overview() {
   const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
   const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
   const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
-  const span = Math.max(sx / Math.max(aspect, 0.6), sz) * 1.02;
+  const span = Math.max(sx / Math.max(aspect, 0.25), sz) * 1.02;
   const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
   return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)), dist };
 }
@@ -246,7 +249,27 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
 new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
 let last = performance.now(), clock = 0;
-function loop(now) {
+function fitCitySigns() {
+  citySigns.forEach(el => { el.style.translate = ""; });
+  if (stage.clientWidth > 620 || !stage.classList.contains("pano")) return;
+  const frame = stage.getBoundingClientRect(), gap = 8;
+  const signs = citySigns.map(el => {
+    const r = el.getBoundingClientRect();
+    return { el, left: r.left - frame.left, top: r.top - frame.top, width: r.width, height: r.height };
+  }).sort((a, b) => a.top - b.top);
+  for (let i = 0; i < signs.length; i++) {
+    const s = signs[i];
+    s.x = Math.max(gap, Math.min(frame.width - s.width - gap, s.left));
+    s.y = Math.max(110, s.top);
+    for (let j = 0; j < i; j++) {
+      const p = signs[j];
+      if (s.x < p.x + p.width + gap && s.x + s.width + gap > p.x && s.y < p.y + p.height + gap) s.y = p.y + p.height + gap;
+    }
+  }
+  const overflow = Math.max(0, ...signs.map(s => s.y + s.height - (frame.height - 140)));
+  signs.forEach(s => { s.el.style.translate = `${s.x - s.left}px ${s.y - overflow - s.top}px`; });
+}
+function renderFrame(now, forceRender = false) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   let busy = false;
   if (fly) {
@@ -269,13 +292,21 @@ function loop(now) {
   stage.classList.toggle("pano", camDist > labelTH);
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
-  if (busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); dirty = false; }
+  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); dirty = false; }
+}
+function loop(now) {
+  renderFrame(now);
   requestAnimationFrame(loop);
 }
 resize();
 { const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
-window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV };
+window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV, snapshot() {
+  // Complete camera transitions and all dependent scene updates before a deterministic capture.
+  if (fly) { camera.position.copy(fly.p1); controls.target.copy(fly.q1); fly = null; }
+  ENV.apply(); last = performance.now(); renderFrame(last, true);
+  return { ...ENV.state, lampsOn: ENV.lampsOn };
+} };
 
 /* ---------- live weather: page db (refreshed hourly by a scheduled task), else the snapshot built into the page ---------- */
 {

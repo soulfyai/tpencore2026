@@ -105,18 +105,27 @@ const SHIPS = {};
       p("cyl", 0, 0.75, 0.05, 0.02, 1.2, 0.02, "#d0d4d8");
       p("prism", 0, 0.7, -0.15, 0.01, 0.95, 0.5, "#ffffff", Math.PI / 2, 0, 0); p("prism", 0, 0.55, 0.3, 0.01, 0.6, 0.3, "#e0453c", Math.PI / 2, 0, 0);
     },
-    plane(p) { // low-poly airliner (not in the sea MIX): white fuselage, swept wings, twin engines, red fin
-      p("cyl", 0, 0, 0, 0.17, 2.5, 0.17, "#f8f6f1", 0, Math.PI / 2);
-      p("sphere", 0, 0, 1.28, 0.17, 0.16, 0.28, "#eef1f5");
-      p("sphere", 0, 0.02, -1.26, 0.15, 0.14, 0.3, "#f8f6f1");
-      p("box", 0, 0.1, 1.02, 0.24, 0.1, 0.24, "#2b3138", 0, 0, 0, true); // cockpit glass, lit at night
+    plane(p) { // widebody airliner, A350/787 proportions (original neutral livery: white + one aqua accent, no real airline)
+      const W = "#fbfbf9", LG = "#e9eef4", AC = "#3fc1d1", DK = "#1d232b";
+      p("cyl", 0, 0, 0.05, 0.3, 2.0, 0.3, W, 0, Math.PI / 2);                        // slender pressurised tube
+      p("sphere", 0, -0.005, 1.12, 0.3, 0.28, 0.62, LG);                             // rounded, tapering nose
+      p("cone", 0, 0.035, -1.42, 0.28, 0.95, 0.24, W, 0, -Math.PI / 2 + 0.1);        // upswept tail cone
+      p("rbox", 0, -0.11, 0.08, 0.26, 0.13, 0.9, "#e6ebf0");                         // belly / wing-root fairing
+      p("box", 0, 0.082, 1.18, 0.2, 0.055, 0.15, DK, 0, -0.35, 0, true);             // wrap-around cockpit glazing
       for (const s of [-1, 1]) {
-        p("box", s * 0.75, -0.04, 0.1, 1.5, 0.045, 0.5, "#e9eef4", s * 0.5);        // swept main wing
-        p("box", s * 0.4, 0.14, -1.25, 0.72, 0.035, 0.3, "#e9eef4", s * 0.45);      // tailplane
-        p("cyl", s * 0.52, -0.15, 0.42, 0.1, 0.34, 0.1, "#9aa0a6", 0, Math.PI / 2); // engine
-        p("box", s * 0.165, 0.04, 0.15, 0.01, 0.05, 1.5, "#bfe3f5", 0, 0, 0, true); // window strip
+        p("box", s * 0.68, -0.03, 0.02, 1.35, 0.04, 0.46, LG, s * 0.5, 0, s * 0.07); // inner wing: swept, with dihedral
+        p("box", s * 1.3, 0.05, -0.34, 0.78, 0.028, 0.27, LG, s * 0.62, 0, s * 0.1); // tapered outer wing
+        p("box", s * 1.63, 0.15, -0.62, 0.025, 0.17, 0.11, AC, s * 0.62, 0, s * 0.5); // raked winglet, accent colour
+        p("box", s * 0.38, 0.16, -1.52, 0.6, 0.026, 0.22, LG, s * 0.45, 0, s * 0.06); // swept tailplane
+        p("box", s * 0.5, -0.07, 0.3, 0.04, 0.12, 0.24, "#c9ced3", s * 0.1);         // engine pylon
+        p("cyl", s * 0.5, -0.17, 0.42, 0.19, 0.42, 0.19, "#eef1f5", 0, Math.PI / 2); // nacelle slung under the wing
+        p("cyl", s * 0.5, -0.17, 0.63, 0.205, 0.045, 0.205, "#c9ced3", 0, Math.PI / 2); // intake lip
+        p("cyl", s * 0.5, -0.17, 0.645, 0.165, 0.016, 0.165, DK, 0, Math.PI / 2);    // open intake (dark fan face)
+        p("cyl", s * 0.5, -0.165, 0.18, 0.1, 0.1, 0.1, "#9aa0a6", 0, Math.PI / 2);   // exhaust cone
+        p("box", s * 0.148, 0.045, 0.08, 0.012, 0.034, 1.7, "#cfeefc", 0, 0, 0, true); // cabin window band, lit at night
       }
-      p("box", 0, 0.4, -1.28, 0.045, 0.66, 0.4, "#e0453c", 0, -0.45);               // swept fin
+      p("box", 0, 0.42, -1.3, 0.035, 0.7, 0.32, AC, 0, -0.5);                        // swept fin: single identity colour
+      p("box", 0, 0.3, -1.19, 0.04, 0.4, 0.1, W, 0, -0.5);                           // white leading flash on the fin
     },
   };
   SHIPS.make = (type, r) => merge((p) => TYPES[type](p, r));

@@ -27,8 +27,8 @@ const pick = (r, arr) => arr[Math.floor(r() * arr.length) % arr.length];
 
 /* renderer */
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.75 : 1.4));
-renderer.shadowMap.enabled = true;
+renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY === "high" ? 1.5 : 1.25));
+renderer.shadowMap.enabled = QUALITY === "high";
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -118,6 +118,7 @@ const GEO = {
 const MAT = {
   solid: new THREE.MeshStandardMaterial({ roughness: 0.82, metalness: 0.02 }),
   glow: new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0, emissive: 0xffd08a, emissiveIntensity: 0 }),
+  glowCool: new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, emissive: 0xaee8ff, emissiveIntensity: 0 }), // futuristic LED strips: cool white-blue after dark
 };
 /* ---------- procedural facade materials: window grids that keep their size on any box (UVs from instance scale) ---------- */
 const FACADE = {};
@@ -191,10 +192,10 @@ function part(ctx, g, x, y, z, sx, sy, sz, color, ry = 0, rx = 0, rz = 0, glow =
 const batches = new Map();     // key -> InstancedMesh
 function buildBatches() {
   const groups = new Map();
-  for (const p of parts) { const k = (p.glow ? "g:" : "s:") + p.g; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
+  for (const p of parts) { const k = (p.glow === "cool" ? "c:" : p.glow ? "g:" : "s:") + p.g; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
   for (const [k, list] of groups) {
     const [kind, gname] = k.split(":");
-    const im = new THREE.InstancedMesh(GEO[gname] || GEO.box, kind === "g" ? MAT.glow : FACADE[gname] || MAT.solid, list.length);
+    const im = new THREE.InstancedMesh(GEO[gname] || GEO.box, kind === "g" ? MAT.glow : kind === "c" ? MAT.glowCool : FACADE[gname] || MAT.solid, list.length);
     im.castShadow = true; im.receiveShadow = true;
     im.userData = { type: "parts", owners: list.map((p) => p.owner), isl: list.map((p) => p.isl) };
     list.forEach((p, n) => { p.mesh = im; p.index = n; im.setColorAt(n, p.c); });
