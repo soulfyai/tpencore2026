@@ -183,6 +183,7 @@ const ENV = {};
     // street lights: on from 17:00 (fading up over 20 min) until 06:00 Taipei time, fully off in the daytime
     const lampsOn = minute >= 1020 ? THREE.MathUtils.clamp((minute - 1020) / 20, 0, 1) : minute < 360 ? THREE.MathUtils.clamp((360 - minute) / 20, 0, 1) : 0;
     MAT.glow.emissiveIntensity = lampsOn * (1.1 + k.night * 0.7);
+    MAT.glowCool.emissiveIntensity = lampsOn * (1.5 + k.night * 0.9); // LED bands burn a little brighter than the warm lamps
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
     // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)
