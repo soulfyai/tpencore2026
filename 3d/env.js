@@ -25,16 +25,34 @@ const ENV = {};
     for (let i = 0; i < N; i++) {
       const th = Rs() * Math.PI * 2, y = Rs() * 1.08 - 0.08, r = Math.sqrt(Math.max(0, 1 - y * y)); // mostly above the horizon, a few at it
       pos.set([Math.cos(th) * r, y, Math.sin(th) * r], i * 3);
-      const b = 0.45 + Rs() * 0.55, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
+      const b = 0.55 + Rs() * 0.45, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
       colr.set([b * (warm ? 1 : cool ? 0.85 : 1), b * (warm ? 0.9 : cool ? 0.92 : 1), b * (warm ? 0.75 : 1)], i * 3);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(colr, 3));
-    const m = new THREE.PointsMaterial({ size: 1.7, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
+    const m = new THREE.PointsMaterial({ size: 2.1, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
     const pts = new THREE.Points(g, m);
     pts.renderOrder = -9; pts.position.copy(MID); pts.scale.setScalar(226); pts.visible = false; scene.add(pts);
     return pts;
   })();
+  /* moon: a toy cream disc with a soft halo, fixed on the star shell (elevation ~36 deg, over the default view's northern sky) */
+  const moonMat = new THREE.MeshBasicMaterial({ color: 0xf7eed6, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  const craterMat = new THREE.MeshBasicMaterial({ color: 0xe4d6b4, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  const haloMat = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+    const grd = g.createRadialGradient(64, 64, 10, 64, 64, 64); grd.addColorStop(0, "rgba(255,243,214,.6)"); grd.addColorStop(1, "rgba(255,243,214,0)");
+    g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+    return new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, opacity: 0, fog: false, depthWrite: false }); })();
+  const moon = (() => {
+    const g = new THREE.Group();
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(2.3, 28), moonMat); disc.renderOrder = -8; g.add(disc);
+    for (const [cx, cy, cr] of [[-0.7, 0.5, 0.5], [0.62, -0.18, 0.34], [0.05, -0.9, 0.26]]) { const c = new THREE.Mesh(new THREE.CircleGeometry(cr, 18), craterMat); c.position.set(cx, cy, 0.02); c.renderOrder = -8; disc.add(c); }
+    const halo = new THREE.Sprite(haloMat); halo.scale.setScalar(9.5); halo.position.z = -0.4; halo.renderOrder = -8; g.add(halo);
+    g.userData.dir = new THREE.Vector3(-0.28, 0.59, -0.76).normalize();
+    g.visible = false; scene.add(g);
+    return g;
+  })();
+  const placeMoon = (k = 1) => { moon.position.copy(MID).addScaledVector(moon.userData.dir, 219 * k); moon.scale.setScalar(k); moon.lookAt(MID); };
+  placeMoon(1);
   scene.fog = new THREE.Fog(0xeef3f8, 70, 210);
 
   /* ---------- open sea ---------- */
@@ -187,9 +205,12 @@ const ENV = {};
     MAT.glowDim.emissiveIntensity = lampsOn * 0.45;
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
-    // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)
-    const starA = Math.max(0, k.night - cloud * 0.35 - wet * 0.6) * 0.95;
+    // stars: a stylised city, not a weather simulation — night stars always show, weather only takes a little off the top
+    const starA = k.night * (0.95 - cloud * 0.15 - wet * 0.15);
     stars.material.opacity = starA; stars.visible = starA > 0.02;
+    const moonA = k.night * (0.95 - cloud * 0.12 - wet * 0.12);
+    moon.visible = moonA > 0.02;
+    moonMat.opacity = moonA; craterMat.opacity = moonA * 0.5; haloMat.opacity = moonA * 0.8;
     ENV.state = { minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
     renderer.toneMappingExposure = 1 - k.night * 0.15;
     ENV.onChange?.(ENV.state);
@@ -221,7 +242,7 @@ const ENV = {};
   ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };
   ENV.fit = (d) => { // the Taipei-centred panorama pulls back past the original dome: grow sky/sea and the far plane with it
     const k = Math.max(1, (d + 70) / 230);
-    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k);
+    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k); placeMoon(k);
     camera.far = Math.max(420, (d + 70) * 2.4); camera.updateProjectionMatrix();
   };
   ENV.isDarkUI = isDarkUI;
