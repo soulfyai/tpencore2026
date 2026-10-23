@@ -9,7 +9,7 @@
 > 第二次交接。上一輪（§0 前版）的工作已全數完成合併；本節為當前唯一有效的快照。
 
 ### 0.1 現況
-- **Codex 接手進度（2026-10-23 UTC）**：§0.3 六邊形重構與 §0.4 行人檢查已完成，詳見 §0.7。程式以 `claude/modest-newton-t9y5uj` 最新 commit 為準；下列線上 V34 尚未重新發佈。
+- **Codex 接手進度（2026-10-23 UTC）**：§0.3 六邊形重構與 §0.4 行人檢查已完成，詳見 §0.7；後續都市規劃、單市天氣與正式發佈以 §0.8 為準。程式以 `claude/modest-newton-t9y5uj` 最新 commit 為準；下列線上 V34 尚未重新發佈。
 - **線上**：<https://claude.ai/artifact/Ssboakje3hi8UHQp4nHQQA> Version 34 ＝ 主分支 `claude/modest-newton-t9y5uj` @ `c3a9e99`（已推送，工作樹乾淨，無未合併 WIP）。
 - 自上次快照後完成並上線：網頁品牌卡縮放式（霓虹 tab 預設收合、彈出卡含天氣、聲明置底置中、四市鈕統一藍）；3D 美術六軸（精緻沙灘、建築細緻化、未來感 LED、真實客機、乾淨底盤、關渡/淡江雙橋移至兩島正面）；Codex 端角色/四市識別色（台北藍/新北黃/基隆粉紅/桃園紅）/手機取景；G–L 連環修正（去綠暖色基底、中間調對比、夜光收斂、星空常駐、月球、夜光距離 LOD、**天氣與場景完全脫鉤**）；飛機防撞排程；**人物定案「積木人偶 v2」**（圓潤積木輪廓×柔霧質感、11 身分、12 draw call，取代 Codex 版角色）。
 - 舊 `wip/art-upgrade`、`wip/web-brandcard` 分支內容已全部合入主分支，可刪。
@@ -34,7 +34,7 @@
 改 `3d/*.js`、`template.html`、`data/` → `python3 build.py`（必須 no problems；index.html 與 index3d.html 一起 commit）。截圖 `tools/shot.py`（playwright；本容器瀏覽器版本不合時做符號連結勿 `playwright install`；JS 多敘述包 IIFE；殼層單引號轉義 `\"`；每張 1–3 分鐘）。開發與推送一律 `claude/modest-newton-t9y5uj`。容器直連 api.open-meteo.com 被網路政策擋（環境設定 Network access 可放行）。
 
 ### 0.6 只有 Claude 能做的事（Codex 邊界）
-- **Artifact 發佈**：更新線上連結只能用 Claude 的 Artifact 工具——Codex 完成後 commit+push，回到任一 Claude session 貼上 Artifact 連結請它「用最新 index3d.html 重新發佈」。
+- **Claude Artifact 本身**：原 Claude Artifact 連結的重新發佈受 Claude 工具限制；這不限制獨立網站發佈。**Codex 現在可直接更新 GitHub Pages**，網址與正式部署流程見 §0.8，不必為一般網站更新返回 Claude。
 - Artifact 天氣 db 讀寫、每小時天氣排程（綁原 Claude session，放著即可）同理。
 
 ### 0.7 Codex 六邊形重構完成快照（2026-10-23 UTC）
@@ -47,7 +47,16 @@
 - **驗證**：`python3 build.py` 輸出 `no problems`；桌機 `tools/shot.py --check` 通過（6 橋、65 船、3 飛機、11 角色）；手機 `--check mobile` 通過（413 人、47 船、3 飛機、關閉陰影），四市標籤無裁切／重疊。五張指定日夜截圖與手機截圖已完成並檢視，泡泡可點選。外圍基準比對：coast、shore、rings、port、bridges 完全一致，島上地標位置差 < 0.000001。
 - **產物**：`out/hex-day-panorama.png`、`hex-day-city.png`、`hex-day-block.png`、`hex-night-panorama.png`、`hex-night-block.png`；手機 `out/check-scene-mobile.png`。out 已由 gitignore 排除，重拍命令沿用 §2 的 tools/shot.py。
 - **2D**：template.html、build.py、data 未動。兩份 HTML 都已重建；index.html 內容與原版相同，Git 不會為相同內容產生檔案差異。
-- **上線待辦**：仍需 Claude 依 §0.6 以最新 index3d.html 重新發佈原 Artifact；Codex 沒有執行 Artifact 發佈，也未變更 DNS 或部署設定。
+- **當時的上線待辦（已由 §0.8 正式網站流程取代）**：原 Artifact 仍由 Claude 工具維護；目前一般網站更新由 Codex 直接發佈 GitHub Pages。
+
+### 0.8 Codex 直接發佈與 SimCity 規劃修正（2026-10-23 UTC）
+- **正式網站**：<https://soulfyai.github.io/tpencore2026/>。已以 `main` 成功發佈並驗證公開 version.json。這輪都市規劃與天氣更新沿同流程發佈，線上版本以 version.json 的 commit 為準。
+- **404 根因已解決**：Pages 已啟用，但 `github-pages` environment 只允許 `main`。先前工作分支部署被 protection rules 拒絕，並非無法由 Codex 發佈。已將通過驗證的版本 fast-forward 至 main 並成功執行 Pages workflow。
+- **持續發佈流程**：開發、測試、commit 仍在 `claude/modest-newton-t9y5uj`；完成檢查後正常 push 工作分支，再 fast-forward push 同一版本至 main（不可 force push）。`.github/workflows/pages.yml` 改為監聽 main。Pages 自動建置後檢查 Actions 與公開 version.json；手動部署也應使用 `gh workflow run pages.yml --ref main`。更新網站不必回 Claude；原 Artifact 不會因此自動更新。
+- **所選城市天氣**：品牌卡只顯示目前城市的時間、溫度與天氣。切換品牌城市／進城／政策焦點都跟隨；不列其他三市。公開網站直接向 Open-Meteo 取得所選城市市區座標的天氣，每小時快取、每分鐘檢查重試；離線或資料無效時保留該城市快照並標示時間，缺資料則顯示暫不可用。保留 Artifact db 相容路徑，但網站不依賴 Claude 天氣排程。天氣仍不影響場景視覺。
+- **依 SimCity 參考修正**：保留六邊形政策分區與周邊站點，格內改為主樓＋臨街前棟＋入口步道。沿既有格網從 351 格補至 402 格，補齊水岸完整街廓，不移動原政策位置；島底層從整片瀝青改為暖灰步行鋪面，深灰色只保留於實際道路。移除新增的隨機水岸樹叢，改用展亭、街角店與太陽能充電棚，完整街廓僅配置少量行道樹。降低細針高樓比例，商業區用深色玻璃與退台／雙塔空橋／圓形塔冠／矩形天際線四種量體，住宅用雙翼中庭，科技園區用廠辦／機房／太陽能，公共設施用側翼與入口雨棚，文化區用展館及街角店，綠能區用淨水槽與能源設施。道路統一深灰鋪面、雙向中心標線與路口穿越線，擴大建築退縮，行道樹與燈具沿入口配置。政策霓虹標題、34 地標、海岸／沙灘／環島高架／港口／橋接點不動。
+- **驗證工具**：新增 `tools/check_weather.py`，用瀏覽器執行實際天氣模組，驗證所選城市、延遲回應不覆蓋、離線／異常／缺資料 fallback 與快取；已 PASS。`tools/check_scene.js` 增加四市切換時天氣只含所選城市的檢查。build 與公開網站 package 均輸出 no problems。
+- **截圖**：`out/planned-panorama-day.png`、`planned-city-day.png`、`planned-block-day.png`、`planned-panorama-night.png`、`planned-block-night.png`；另 `planned-weather.png` 顯示桃園單市天氣。手機場景檢查已通過（402 格、34 地標、6 橋、413 人、47 船、3 飛機）；五個指定日夜視角已完成並檢視。桌機最終回歸通過（402 格、149 處水岸設施、24 幾何批次、34 地標、6 橋、578 人、65 船、3 飛機），手機檢查與天氣回應回歸也已通過。
 
 ## 1. 專案是什麼
 

@@ -34,40 +34,90 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   const pk = (r, a) => a[(r() * a.length) | 0];
   const GLASS = ["#7fd4ec", "#5fa8e4", "#9fd2f2", "#bfe6f6", "#6fc2dc", "#8fb8e8"]; // glass-curtain blues
   const NEON = ["#33e1ff", "#7fb4ff", "#b8f0ff", "#9f8bff"];                          // cool LED accents
-  const WALLS = ["#fdfaf2", "#f8f5ec", "#f1efe6", "#f6f2e8", "#faf6ea"];              // warm future white
+  const WALLS = ["#d9c7ab", "#b9c5cc", "#d2d2c0", "#c8aa8d", "#d3c7b7"];              // warm future white
   const ROOFS = ["#c96a4e", "#4e7d9e", "#8a6a4a", "#5b6b7d", "#b9c4ce"];              // clear mid-tone anchors: terracotta, steel blue, deep wood, slate
   /* rooftop solar array: one dark cell slab with a lighter grid sheet, slightly tilted toward the sun */
   const SOLAR = (p, x, y, z, w, d, ry = 0) => { p("box", x, y + 0.028, z, w, 0.016, d, "#22304e", ry, 0, -0.1); p("box", x, y + 0.04, z, w * 0.94, 0.006, d * 0.86, "#3f6cae", ry, 0, -0.1); };
 
   /* ---------- building kit (local to the building, y=0 at street level + curb) ---------- */
   const B = {
-    tower(p, s, h, r) {
-      const gl = pk(r, GLASS), round = r() < 0.22, d = s * (0.82 + r() * 0.18);
-      // two-step white podium: glass lobby, LED name band, entrance canopy
-      p("rbox", 0, 0.05, 0, s * 1.3, 0.1, d * 1.3, "#f6f4ec");
-      p("rbox", 0, 0.21, 0, s * 1.16, 0.22, d * 1.16, "#f1efe7");
-      p("box", 0, 0.19, d * 0.58 + 0.004, s * 1.0, 0.16, 0.01, "#dff4ff", 0, 0, 0, true);
-      p("box", 0, 0.335, d * 0.58 + 0.035, s * 0.56, 0.018, 0.1, "#f6f4ec");
-      p("box", 0, 0.3, d * 0.58 + 0.012, s * 0.48, 0.02, 0.014, pk(r, NEON), 0, 0, 0, "cool");
-      if (round) { p("cyl", 0, 0.32 + h / 2, 0, s, h, s, gl); for (let y = 0.55; y < h + 0.2; y += 0.26) p("cyl", 0, y, 0, s * 1.03, 0.022, s * 1.03, "#f2f8fd"); }
-      else {
-        p("fglass", 0, 0.32 + h / 2, 0, s, h, d, gl);
-        p("box", 0, 0.32 + h * 0.5, 0, s * 0.16, h * 0.99, d * 1.012, "#f4f2e9");    // white service spine
+    tower(p,s,h,r) {
+      const glass=pk(r,["#38677d","#467c94","#5e8a9c","#42778b"]),wall=pk(r,["#d4d5ce","#dce2df","#b9c5c9"]),d=s*.8;
+      // A broad mixed-use podium supports a stepped commercial tower, rather than a needle.
+      p("foffice",0,.13,0,s*1.1,.26,d*1.1,wall);
+      p("fglass",0,.14,d*.56,s*.85,.17,.025,glass);
+      p("box",0,.29,0,s*1.13,.055,d*1.13,"#87969c");
+      const variant=Math.floor(r()*4);
+      if(variant===0){
+        // Terraced volumes: public podium, generous office floors and a smaller sky pavilion.
+        for(let i=0;i<3;i++){
+          const w=s*(.92-i*.19),hh=h*(i===0?.48:i===1?.33:.19),y=.3+h*(i===0?0:i===1?.48:.81)+hh/2;
+          p("fglass",s*i*.07,y,-d*i*.06,w,hh,d*(.92-i*.13),glass);
+          p("box",s*i*.07,y+hh/2+.025,-d*i*.06,w*1.04,.05,d*(.96-i*.13),"#bdcbd0");
+        }
+      }else if(variant===1){
+        // A paired research/business silhouette with a shared sky lobby.
+        for(const [x,k] of [[-.25,.86],[.25,1.08]]){
+          p("fglass",x*s,.3+h*k/2,0,s*.38,h*k,d*.84,glass);
+          p("box",x*s,.33+h*k,0,s*.42,.06,d*.9,"#aebfc6");
+        }
+        p("fglass",0,.3+h*.67,0,s*.86,h*.13,d*.36,"#6b9aa8");
+        p("box",0,.3+h*.74,0,s*.9,.035,d*.39,"#d2dbd9");
+      }else if(variant===2){
+        // Cylindrical atrium tower with a deliberate crown and restrained floor bands.
+        p("cyl",0,.3+h/2,0,s*.88,h,s*.88,glass);
+        for(let y=.3;y<h+.3;y+=.23)p("cyl",0,y,0,s*.9,.022,s*.9,"#b9cbd0");
+        p("cyl",0,h+.33,0,s*.95,.06,s*.95,"#c9d2ce");
+        p("cyl",0,h+.43,0,s*.64,.17,s*.64,"#557c8e");
+      }else{
+        p("fglass",0,.3+h/2,-d*.05,s*.86,h,d*.86,glass);
+        for(const x of [-.43,.43])p("box",x*s,.3+h/2,-d*.05,s*.035,h,d*.9,"#c5d3d9");
+        p("fglass",s*.08,h+.37+h*.08,-d*.08,s*.62,h*.16,d*.63,glass);
+        p("box",s*.08,h*1.16+.4,-d*.08,s*.67,.05,d*.68,"#becbd0");
       }
-      const top = 0.32 + h, k = r();
-      p("box", 0, top + 0.035, 0, s * 1.05, 0.07, d * 1.05, "#f4f2e9");              // parapet cap
-      if (k < 0.35) { // glass crown + spire
-        p("box", 0, top + h * 0.08 + 0.07, 0, s * 0.68, h * 0.16, d * 0.68, gl);
-        p("box", 0, top + h * 0.16 + 0.1, 0, s * 0.52, 0.02, d * 0.52, "#bfeaff", 0, 0, 0, "cool");
-        p("cyl", 0, top + h * 0.16 + 0.36, 0, 0.022, 0.5, 0.022, "#dfe3e6"); p("sphere", 0, top + h * 0.16 + 0.62, 0, 0.05, 0.05, 0.05, "#ff5a5a", 0, 0, 0, true);
-      } else if (k < 0.62) { // helipad + solar corner
-        p("cyl", 0, top + 0.09, 0, s * 0.62, 0.05, s * 0.62, "#5d6168"); p("cyl", 0, top + 0.122, 0, s * 0.44, 0.012, s * 0.44, "#bfeaff", 0, 0, 0, "cool");
-        SOLAR(p, s * 0.3, top + 0.07, -d * 0.3, s * 0.3, d * 0.26);
-      } else { // stepped mech crown with an LED ring and a sky garden
-        p("box", 0, top + 0.19, 0, s * 0.88, 0.26, d * 0.88, gl); p("box", 0, top + 0.33, 0, s * 0.92, 0.02, d * 0.92, "#bfeaff", 0, 0, 0, "cool");
-        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#689659");
+      const roof=h*1.16+.43;
+      for(const side of [-1,1]){const x=variant===1?side*.25:side*.15,top=variant===1?.3+h*(side<0?.86:1.08):variant===2?h+.52:variant===3?h*1.16+.43:h+.35;p("box",s*x,top+.045,-d*.08,s*.19,.09,d*.25,"#71818c");p("cyl",s*x,top+.1,-d*.08,s*.13,.025,s*.13,"#3b4f5e");}
+      p("box",0,.235,d*.58,s*.7,.025,.012,"#a9d5df",0,0,0,"cool");
+      return roof+.15;
+    },
+    urban(p,s,h,r,zone) {
+      const wall=pk(r,["#c9b393","#b5c3cd","#cfcec1","#c2a993"]),d=s*.78;
+      if(zone==="commercial"){return B.tower(p,s,h,r);}
+      p("box",0,.025,0,s*1.08,.05,d*1.1,"#b9b6a8");
+      if(zone==="residential"){
+        // Two wings frame a planted communal courtyard; balconies establish a residential rhythm.
+        p("fapt",-s*.25,h/2+.06,0,s*.43,h,d,wall);
+        p("fapt",s*.22,h*.42+.06,-d*.15,s*.42,h*.84,d*.7,pk(r,["#c4b39c","#d4d2bf","#aebcc6"]));
+        p("box",-s*.25,h+.09,0,s*.47,.06,d*1.03,"#705f54");
+        p("box",s*.22,h*.84+.09,-d*.15,s*.46,.06,d*.75,"#7a8e93");
+        p("turf",s*.2,.055,d*.39,s*.43,.025,d*.28,"#ffffff");
+        for(let y=.24;y<h;y+=.27)p("box",-s*.25,y,d*.52,s*.4,.025,d*.13,"#e7e3d8");
+      }else if(zone==="technology"){
+        p("foffice",0,h*.22+.06,0,s,h*.44,d,"#a7b7c4");
+        p("fglass",-s*.2,h*.5+.06,-d*.12,s*.47,h,d*.7,"#437585");
+        if(r()>.45){p("fglass",s*.29,h*.38+.06,-d*.24,s*.29,h*.76,d*.45,"#557d8b");p("fglass",s*.04,h*.68,-d*.24,s*.55,.1,d*.22,"#8aafb8");}
+        p("box",0,h*.44+.1,0,s*1.02,.06,d*1.02,"#778b9b");
+        SOLAR(p,s*.22,h*.44+.15,d*.1,s*.42,d*.55);
+        for(const x of [-.15,.1,.35])p("cyl",x*s,h*.44+.18,-d*.27,s*.13,.13,s*.13,"#8c9ca3");
+      }else if(zone==="public"){
+        p("foffice",0,h*.38+.06,0,s,h*.76,d*.65,"#dbd6be");
+        p("foffice",-s*.32,h*.5+.06,0,s*.3,h,d,"#c7cfce");
+        p("box",0,h*.76+.09,0,s*1.03,.06,d*.7,"#4e8790");
+        p("box",0,.18,d*.45,s*.57,.035,d*.25,"#76a5ad");
+        p("box",s*.3,h*.5,d*.33,s*.08,h*.28,.012,"#4c92a3");
+        p("box",s*.3,h*.5,d*.34,s*.24,h*.08,.012,"#4c92a3");
+      }else if(zone==="culture"){
+        p("foffice",0,h*.32+.05,0,s,h*.64,d,"#c5a07c");
+        p("dome",0,h*.64+.07,0,s*1.05,h*.55,d*1.05,"#789497");
+        for(const x of [-.32,0,.32]){p("box",x*s,.15,d*.51,s*.25,.2,.012,"#486b79");p("prism",x*s,.3,d*.57,s*.3,.08,d*.2,pk(r,["#bb7650","#cdac61","#648a84"]));}
+      }else{
+        p("foffice",-s*.2,h*.3+.05,0,s*.55,h*.6,d,"#9baea3");
+        SOLAR(p,-s*.2,h*.6+.09,0,s*.5,d*.8);
+        for(const z of [-.22,.22]){p("cyl",s*.27,.13,z*d,s*.38,.25,s*.38,"#a1b5ba");p("cyl",s*.27,.27,z*d,s*.32,.018,s*.32,"#4e9cab");}
+        p("cyl",s*.25,h*.55,-d*.32,.025,h*1.1,.025,"#d7deda");
+        p("box",s*.25,h*1.1,-d*.32,s*.55,.025,.03,"#b8d6dc",0,0,-.15);
       }
-      return top + 0.9;
+      return h+.2;
     },
     office(p, s, h, r) {
       const d = s * (0.78 + r() * 0.22), wall = pk(r, WALLS), band = pk(r, ROOFS);
@@ -138,7 +188,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const pc=ctxFor(isl.id,null,0,0,1,0),pp=(g,...a)=>part(pc,g,...a);
     // Fine city-colour kerbs follow all six edges, including the seams in multi-cell themes.
     for(const cell of isl.cells)for(let k=0;k<6;k++){
-      const angle=-Math.PI/2+k*Math.PI/3, a=[Math.cos(angle)*(R-.16),Math.sin(angle)*(R-.16)],b=[Math.cos(angle+Math.PI/3)*(R-.16),Math.sin(angle+Math.PI/3)*(R-.16)];
+      const angle=-Math.PI/2+k*Math.PI/3, a=[Math.cos(angle)*(R-.21),Math.sin(angle)*(R-.21)],b=[Math.cos(angle+Math.PI/3)*(R-.21),Math.sin(angle+Math.PI/3)*(R-.21)];
       pp("box",cell.c[0]-isl.c.x+(a[0]+b[0])/2,.018,cell.c[1]-isl.c.z+(a[1]+b[1])/2,Math.hypot(b[0]-a[0],b[1]-a[1]),.025,.025,accent,-Math.atan2(b[1]-a[1],b[0]-a[0]));
     }
     const LOT_GROUND = { school: "#e0bd8e", sport: "#a2bd82", park: "#a2bd82", nursery: "#eecfbc", hospital: "#dfe5ec", clinic: "#dfe5ec", elder: "#d9e0c2", metro: "#d6c9ab", bus: "#d6c9ab", bike: "#d6c9ab", road: "#d6c9ab" }; // mid-tone pads: one step below the cream board
@@ -201,12 +251,12 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
 
   /* ---------- planned city fabric: six distinct functional skylines ---------- */
   const profiles={
-    commercial:{types:["tower","tower","office","shop"],height:2.8,tint:"#e8dfce"},
-    technology:{types:["office","tower","office","office"],height:1.8,tint:"#d7e4e7"},
-    residential:{types:["office","house","office","shop"],height:1.1,tint:"#eadfce"},
-    public:{types:["office","office","park","shop"],height:.85,tint:"#e3dfd1"},
-    culture:{types:["shop","shop","office","park"],height:.7,tint:"#e9d9d0"},
-    environment:{types:["office","park","office","park"],height:.8,tint:"#d9dfc9"}
+    commercial:{types:["tower","tower","office","shop"],height:1.65,tint:"#c4c3b5"},
+    technology:{types:["office","tower","office","office"],height:1.15,tint:"#bac9cb"},
+    residential:{types:["office","house","office","shop"],height:.85,tint:"#c9c5af"},
+    public:{types:["office","office","park","shop"],height:.85,tint:"#c7c9bc"},
+    culture:{types:["shop","shop","office","park"],height:.7,tint:"#cfbda6"},
+    environment:{types:["office","park","office","park"],height:.8,tint:"#b6c3a4"}
   };
   WORLD.buildingCounts=Object.fromEntries(Object.keys(profiles).map(k=>[k,0]));
   GEO.hexTile=new THREE.CylinderGeometry(.5,.5,1,6);
@@ -218,45 +268,48 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const contextAt=(x,z)=>cell.themeId?ctxFor(isl.id,null,lx+x,lz+z,1,0):ctxFor("_static",null,cell.c[0]+x,cell.c[1]+z,1,0);
     const ctx=contextAt(0,0),p=(g,...a)=>part(ctx,g,...a);
     const clear=(x,z,s)=>free(isl.id,lx+x,lz+z,s)&&!LANDMARKS3D.some(L=>Math.hypot(L.isl.c.x+L.x-cell.c[0]-x,L.isl.c.z+L.z-cell.c[1]-z)<L.r+s+.18);
-    if(!cell.themeId)p("hexTile",0,-.02,0,(R-.12)*2,.04,(R-.12)*2,profile.tint);
-    const candidates=[];
-    for(let row=-3;row<=3;row++)for(let col=-3;col<=3;col++){
-      const x=col*R*.34+(row%2)*R*.17,z=row*R*.30;
-      if(GEOM.pip(cell.c[0]+x,cell.c[1]+z,cell.poly)&&GEOM.nearestEdge(cell.c[0]+x,cell.c[1]+z,cell.poly).d>R*.22)candidates.push([x,z]);
+    if(!cell.themeId)p("hexTile",0,-.02,0,(R-.18)*2,.04,(R-.18)*2,profile.tint);
+    // A substantial rear building and two smaller street frontages share a central entrance walk.
+    // Policy cells use edge infill only so their item models remain the focal point.
+    const lots=cell.themeId?[
+      [-.48,-.24,.34],[.48,-.24,.34],[-.45,.3,.32],[.45,.3,.32]
+    ]:[[0,-.38,.64],[-.3,.34,.42],[.3,.34,.42]];
+    for(let li=0;li<lots.length;li++){
+      const [u,v,w]=lots[li],x=u*R,z=v*R,size=w*R,footprint=size*.68;
+      if(!clear(x,z,footprint))continue;
+      if(GEOM.nearestEdge(cell.c[0]+x,cell.c[1]+z,cell.poly).d<footprint+.04)continue;
+      const main=!cell.themeId&&li===0;
+      const h=profile.height*(main?(.85+r()*.35):(.48+r()*.18))*(isl.rec?1.08:1);
+      const bp=(g,...a)=>part(contextAt(x,z),g,...a),start=parts.length;
+      if(main)B.urban(bp,size,h,r,cell.zone);
+      else if(["commercial","technology","residential","public"].includes(cell.zone))B.office(bp,size,h,r);
+      else B.shop(bp,size,h,r);
+      for(let i=start;i<parts.length;i++)parts[i].fabric=!cell.themeId;
+      hold(isl.id,lx+x,lz+z,footprint);WORLD.buildingCounts[cell.zone]++;
     }
-    // Back-row towers and lower frontages keep policy models readable from the default view.
-    for(const [x,z] of candidates){
-      const s=R*(.27+r()*.05);if(!clear(x,z,s*.68))continue;
-      const type=profile.types[Math.floor(r()*profile.types.length)],h=(.65+r()*.35)*profile.height*(z>0?.65:1)*(isl.rec?1.12:1);
-      const bp=(g,...a)=>part(contextAt(x,z),g,...a);
-      const start=parts.length;B[type](bp,s,h,r);
-      // Zone-specific roof silhouettes: clean-room plant, terraces, civic beacons and energy stacks.
-      if(cell.zone==="technology"&&type==="office")SOLAR(bp,0,h+.15,0,s*.75,s*.6);
-      if(cell.zone==="public"&&type==="office"){bp("box",0,h+.16,0,s*.15,.18,.025,"#69bac5");bp("box",0,h+.16,0,s*.45,.045,.025,"#69bac5");}
-      if(cell.zone==="culture"&&type==="shop")bp("cone",0,.65,0,s*1.1,.3,s*1.1,"#bd877d");
-      if(cell.zone==="environment"&&type==="office"){SOLAR(bp,0,h+.15,0,s*.9,s*.7);bp("cyl",s*.25,h+.4,0,.035,.5,.035,"#dfe8ec");bp("box",s*.25,h+.65,0,s*.7,.035,.04,"#a9d4dc");}
-      for(let i=start;i<parts.length;i++){parts[i].tall=h>1.2;parts[i].fabric=!cell.themeId;}
-      hold(isl.id,lx+x,lz+z,s*.68);WORLD.buildingCounts[cell.zone]++;
+    // Consistent entrances, paving strips and paired street trees connect each block to its roads.
+    if(!cell.themeId&&clear(0,R*.55,R*.12)){
+      p("box",0,.008,R*.55,R*.22,.012,R*.47,"#c8c1a8");
+      for(const side of [1]){
+        const x=side*R*.57,z=R*.19;
+        if(!clear(x,z,R*.12))continue;
+        p("box",x,.015,z,R*.18,.025,R*.25,"#789257");
+        p("cyl",x,.12,z,.025,.22,.025,"#786149");
+        p("ico1",x,.3,z,R*.2,.26,R*.2,pk(r,["#669457","#83a455","#a7ad54"]));
+        p("cyl",side*R*.2,.19,R*.73,.018,.38,.018,"#425260");
+        p("sphere",side*R*.2,.39,R*.73,.055,.055,.055,"#ffe5ae",0,0,0,true);
+        LAMP_POOLS.push([cell.c[0]+side*R*.2,TOP+.012,cell.c[1]+R*.73,.4]);
+      }
     }
   }
-  // Narrow, deliberately planted waterfront fragments outside the full hex grid.
-  for(const [city,info] of WORLD.cities){
-    const cells=WORLD.hexCells.filter(c=>c.city===city);
-    for(let k=0;k<info.coast.length;k+=7){
-      const edge=info.coast[k],dx=info.center[0]-edge[0],dz=info.center[1]-edge[1],d=Math.hypot(dx,dz),wx=edge[0]+dx/d*.6,wz=edge[1]+dz/d*.6;
-      if(!GEOM.pip(wx,wz,info.coast)||cells.some(c=>GEOM.pip(wx,wz,c.poly))||LANDMARKS3D.some(L=>Math.hypot(L.isl.c.x+L.x-wx,L.isl.c.z+L.z-wz)<L.r+.35))continue;
-      const p=(g,...a)=>part(ctxFor("_static",null,wx,wz,1,0),g,...a);
-      B.park(p,.4,.4,rng(k+hash(city)));
-    }
-  }
-
   /* ---------- streets: centre dashes and zebra crossings (static) ---------- */
   const sctx = { isl: "_static", owner: null, base: new THREE.Matrix4(), s: 1 }, sp = (g, ...a) => part(sctx, g, ...a);
   for (const rd of WORLD.roads) {
     if (!rd.live) continue;
     const L = Math.hypot(rd.b[0] - rd.a[0], rd.b[1] - rd.a[1]), ang = Math.atan2(rd.b[1] - rd.a[1], rd.b[0] - rd.a[0]), ux = Math.cos(ang), uz = Math.sin(ang);
-    for (let t = 0.45; t < L - 0.4; t += 0.5) sp("box", rd.a[0] + ux * t, TOP - 0.026, rd.a[1] + uz * t, 0.22, 0.004, 0.03, "#ffffff", -ang);
-    for (const t of [0.22, L - 0.22]) for (let k = -2; k <= 2; k++) sp("box", rd.a[0] + ux * t - uz * k * 0.07, TOP - 0.026, rd.a[1] + uz * t + ux * k * 0.07, 0.16, 0.004, 0.035, "#ffffff", -ang + Math.PI / 2);
+    sp("box",(rd.a[0]+rd.b[0])/2,TOP-.024,(rd.a[1]+rd.b[1])/2,L+.03,.008,.30,"#455764",-ang);
+    for(let t=.25;t<L-.2;t+=.32)sp("box",rd.a[0]+ux*t,TOP-.017,rd.a[1]+uz*t,.13,.004,.015,"#e7d6a2",-ang);
+    for (const t of [0.22, L - 0.22]) for (let k = -2; k <= 2; k++) sp("box", rd.a[0] + ux * t - uz * k * 0.045, TOP - 0.016, rd.a[1] + uz * t + ux * k * 0.045, 0.09, 0.004, 0.022, "#ffffff", -ang + Math.PI / 2);
   }
 
   /* ---------- elevated expressway around the live city, and a container port ---------- */
@@ -576,4 +629,33 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       });
     }
   }
+  /* ---------- occupied waterfront fragments: promenade retail, mobility hubs and exhibition pavilions ---------- */
+  WORLD.waterfrontPlots=[];
+  for(const [city,info] of WORLD.cities){
+    const cells=WORLD.hexCells.filter(c=>c.city===city),placed=[];
+    let distance=0;
+    for(let k=0;k<info.coast.length;k++){
+      const edge=info.coast[k],prev=info.coast[(k+info.coast.length-1)%info.coast.length];
+      distance+=Math.hypot(edge[0]-prev[0],edge[1]-prev[1]);if(distance<1.15)continue;distance=0;
+      const dx=info.center[0]-edge[0],dz=info.center[1]-edge[1],d=Math.hypot(dx,dz),wx=edge[0]+dx/d*.65,wz=edge[1]+dz/d*.65;
+      if(!GEOM.pip(wx,wz,info.coast)||GEOM.nearestEdge(wx,wz,info.coast).d<.35)continue;
+      if(cells.some(c=>GEOM.pip(wx,wz,c.poly)||GEOM.nearestEdge(wx,wz,c.poly).d<.25))continue;
+      if(placed.some(p=>Math.hypot(p[0]-wx,p[1]-wz)<.8)||(WORLD.bridgeEnds||[]).some(p=>Math.hypot(p[0]-wx,p[1]-wz)<2))continue;
+      if(LANDMARKS3D.some(L=>Math.hypot(L.isl.c.x+L.x-wx,L.isl.c.z+L.z-wz)<L.r+.5))continue;
+      const r=rng(k+hash(city)),ctx=ctxFor("_static",null,wx,wz,1,-Math.atan2(dz,dx)+Math.PI/2),p=(g,...a)=>part(ctx,g,...a);
+      p("box",0,.01,0,.58,.02,.5,"#c7c1ad");
+      if(placed.length%3===0){
+        p("fglass",0,.2,0,.44,.38,.3,"#638b99");p("prism",0,.45,0,.55,.13,.44,"#b8c6c4");
+        p("box",0,.09,.21,.5,.025,.13,"#537a83");
+      }else if(placed.length%3===1){
+        B.shop(p,.46,.4,r);p("box",0,.55,0,.47,.025,.37,"#ad8563");SOLAR(p,0,.58,0,.35,.26);
+      }else{
+        p("box",0,.035,0,.54,.07,.45,"#b2b8b4");
+        for(const x of [-.18,0,.18]){p("box",x,.17,0,.09,.27,.1,"#7fa7a7");p("box",x,.18,.055,.06,.09,.01,"#b4e1e7",0,0,0,"cool");}
+        p("box",0,.39,0,.58,.035,.4,"#8aa3a6");SOLAR(p,0,.42,0,.5,.3);
+      }
+      placed.push([wx,wz]);WORLD.waterfrontPlots.push({city,x:wx,z:wz});
+    }
+  }
+
 }

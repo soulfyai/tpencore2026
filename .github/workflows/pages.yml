@@ -2,7 +2,7 @@ name: Deploy website
 
 on:
   push:
-    branches: [claude/modest-newton-t9y5uj]
+    branches: [main]
   workflow_dispatch:
 
 permissions:

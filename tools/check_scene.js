@@ -59,9 +59,9 @@
  }
  C.ENV.forced={minute:660,w:{code:1,cloud:10,wind:10,temp:25}};C.ENV.apply();MAP3D.panorama();check(C.ENV.state.minute===660&&C.ENV.lampsOn===0,'day mode reset');
  document.querySelector('.hi-brandbtn').click();
- for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch')}
+ for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch');const wx=document.querySelector('.hi-pop .wx');check(wx.dataset.city===city&&wx.querySelectorAll(':scope > span').length===2,'selected-city weather only')}
  MAP3D.panorama();document.querySelector('.hi-brandbtn').click();
  const r=document.querySelector('.notice').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
  check(l.bottom<=r.top,'landmark control behind notice');
- return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,hexRadius:W.hexRadius,hexCells:W.hexCells.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
+ return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,hexRadius:W.hexRadius,hexCells:W.hexCells.length,partBatches:C.batches.size,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
 })()

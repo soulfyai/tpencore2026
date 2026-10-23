@@ -222,6 +222,18 @@ const GEOM = {};
       isl.c.set(group[0].c[0],0,group[0].c[1]);isl.cells=group;isl.zone=zone;isl.hexRadius=hexRadius;
       for(const cell of group){available.delete(cell);cell.themeId=isl.id;cell.zone=zone;}
     }
+    // Extend the same lattice into usable coastal pockets without moving any policy block.
+    const seed=cells[0],ox=seed.c[0]-SQ3*hexRadius*(seed.q+seed.r/2),oz=seed.c[1]-1.5*hexRadius*seed.r;
+    const existing=new Set(cells.map(cell=>`${cell.q},${cell.r}`));
+    for(let r=Math.floor((Math.min(...zs)-oz)/(1.5*hexRadius));r<=Math.ceil((Math.max(...zs)-oz)/(1.5*hexRadius));r++){
+      for(let q=Math.floor((Math.min(...xs)-ox)/(SQ3*hexRadius)-r/2);q<=Math.ceil((Math.max(...xs)-ox)/(SQ3*hexRadius)-r/2);q++){
+        if(existing.has(`${q},${r}`))continue;
+        const x=ox+SQ3*hexRadius*(q+r/2),z=oz+1.5*hexRadius*r,poly=corners(x,z,hexRadius);
+        const samples=poly.flatMap((a,i)=>[a,[(a[0]+poly[(i+1)%6][0])/2,(a[1]+poly[(i+1)%6][1])/2]]);
+        if(!samples.every(p=>GEOM.pip(p[0],p[1],coast)&&GEOM.nearestEdge(p[0],p[1],coast).d>.16))continue;
+        cells.push({id:`${c.city}:${q}:${r}`,city:c.city,q,r,c:[x,z],poly,themeId:null});
+      }
+    }
     for(const cell of cells.filter(cell=>!cell.themeId)){const nearest=mine.reduce((a,b)=>Math.hypot(cell.c[0]-a.c.x,cell.c[1]-a.c.z)<Math.hypot(cell.c[0]-b.c.x,cell.c[1]-b.c.z)?a:b);cell.zone=nearest.zone;}
     WORLD.hexCells.push(...cells);
     const center = GEOM.centroid(coast);
@@ -318,7 +330,7 @@ const GEOM = {};
         const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(wall, 3)); wg.computeVertexNormals(); scene.add(new THREE.Mesh(wg, MESH.mat("#f1dfae", { side: THREE.DoubleSide })));
       }
     }
-    const roadsBase = new THREE.Mesh(MESH.slab(GEOM.offset(coast, -0.15), TOP - 0.05, TOP - 0.03), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.asphalt, roughness: 0.9 }) : MESH.mat("#8d8f92")); roadsBase.receiveShadow = true; scene.add(roadsBase);
+    const roadsBase = new THREE.Mesh(MESH.slab(GEOM.offset(coast, -0.15), TOP - 0.05, TOP - 0.03), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color:0xc4c2b7, roughness: 0.9 }) : MESH.mat("#aaa99f")); roadsBase.receiveShadow = true; scene.add(roadsBase);
     // Every full hex gets the same inset; gaps form a continuous, shared street network.
     for (const cell of cells) {
       const ids=cell.poly.map(([x,z])=>node(x,z));
@@ -331,7 +343,7 @@ const GEOM = {};
     for (const isl of mine) {
       const P=boundary(isl.cells),loc=P.map(([x,z])=>[x-isl.c.x,z-isl.c.z]);
       isl.poly=loc;isl.polyWorld=P;
-      const shapes=isl.cells.map(cell=>MESH.shape(corners(cell.c[0]-isl.c.x,cell.c[1]-isl.c.z,hexRadius-0.12)));
+      const shapes=isl.cells.map(cell=>MESH.shape(corners(cell.c[0]-isl.c.x,cell.c[1]-isl.c.z,hexRadius-0.18)));
       const geometry=new THREE.ExtrudeGeometry(shapes,{depth:0.04,bevelEnabled:false,curveSegments:1});geometry.rotateX(-Math.PI/2);geometry.translate(0,TOP-0.04,0);
       const g=new THREE.Group();g.position.set(isl.c.x,0,isl.c.z);
       const plate=new THREE.Mesh(geometry,live?new THREE.MeshStandardMaterial({map:MESH.TEX.pavers,color:0xeedcbc,roughness:0.95}):MESH.mat("#c9c6bf"));

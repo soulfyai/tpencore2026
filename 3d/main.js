@@ -320,34 +320,54 @@ window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, cam
   return { ...ENV.state, lampsOn: ENV.lampsOn };
 } };
 
-/* ---------- live weather: page db (refreshed hourly by a scheduled task), else the snapshot built into the page ---------- */
+/* ---------- selected-city weather: public API on any host, with dated snapshots as fallback ---------- */
+const WEATHER_UI = {};
 {
   const wx = document.createElement("div"); wx.className = "wx"; wx.setAttribute("aria-live", "polite"); stage.appendChild(wx);
-  const NAMES = { taipei: "台北", newtaipei: "新北", keelung: "基隆", taoyuan: "桃園" };
-  const KIND = (c) => c <= 1 ? "晴" : c === 2 ? "多雲" : c === 3 ? "陰" : c === 45 || c === 48 ? "霧" : c <= 57 ? "毛毛雨" : c <= 67 || (c >= 80 && c <= 82) ? "雨" : c >= 95 ? "雷雨" : "多雲";
-  const fmtT = (iso) => { try { return new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(iso)); } catch { return iso; } };
-  let doc = A.D.meta?.weather || null, live = false;
-  const render = () => {
-    if (!doc?.cities) { wx.hidden = true; ENV.apply(); return; }
-    const tp = doc.cities.taipei || Object.values(doc.cities)[0];
-    ENV.setWeather({ temp: tp.temp, code: tp.code, cloud: tp.cloud, precip: tp.precip, wind: tp.wind, time: doc.updatedAt });
-    const now = new Intl.DateTimeFormat("zh-TW", { timeZone: "Asia/Taipei", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
-    wx.innerHTML = "";
-    const head = document.createElement("span"); head.innerHTML = "<b></b>"; head.firstChild.textContent = `台北 ${now}`; wx.appendChild(head);
-    for (const [id, c] of Object.entries(doc.cities)) { const s = document.createElement("span"); s.textContent = `${NAMES[id] || id} ${Math.round(c.temp)}°C ${KIND(c.code)}`; wx.appendChild(s); }
-    const note = document.createElement("small"); note.textContent = `天空依台北時間與天氣呈現・${live ? "每小時更新" : "頁面內建資料"}，${fmtT(doc.updatedAt)}・Open-Meteo`; wx.appendChild(note);
-    dirty = true;
+  const SITES = {taipei:["台北",25.033,121.5654],newtaipei:["新北",25.012,121.465],keelung:["基隆",25.128,121.741],taoyuan:["桃園",24.993,121.301]};
+  const KIND = c => c<=1?"晴":c===2?"多雲":c===3?"陰":c===45||c===48?"霧":c<=57?"毛毛雨":c<=67||(c>=80&&c<=82)?"雨":c>=95?"雷雨":"多雲";
+  const fmtT = iso => {try{return new Intl.DateTimeFormat("zh-TW",{timeZone:"Asia/Taipei",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso));}catch{return "時間不詳";}};
+  let doc=A.D.meta?.weather||null,live=false,selected="taipei";
+  const cache=new Map(),pending=new Set();
+  const render=()=>{
+    const fresh=cache.get(selected),c=fresh?.data||doc?.cities?.[selected];
+    wx.hidden=false;wx.dataset.city=selected;wx.replaceChildren();
+    const head=document.createElement("span");head.innerHTML="<b></b>";
+    const now=new Intl.DateTimeFormat("zh-TW",{timeZone:"Asia/Taipei",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
+    head.firstChild.textContent=`${SITES[selected][0]} ${now}`;wx.appendChild(head);
+    const summary=document.createElement("span");
+    summary.textContent=c&&Number.isFinite(c.temp)&&Number.isFinite(c.code)?`${Math.round(c.temp)}°C ${KIND(c.code)}`:"天氣資料暫不可用";wx.appendChild(summary);
+    const note=document.createElement("small");
+    note.textContent=c?`${fresh||live?"資料時間":"內建快照"} ${fmtT(fresh?.time||doc.updatedAt)}・Open-Meteo`:"稍後將自動重試";wx.appendChild(note);
+    // Weather is information only; the scene remains clear and follows Taipei time for day/night.
+    if(c)ENV.setWeather({...c,time:fresh?.time||doc.updatedAt});
+    dirty=true;
   };
-  ENV.onChange = () => { dirty = true; };
-  render(); setInterval(render, 60000);
-  (async () => {
-    try {
-      const db = await window.claude?.use?.("db"); if (!db) return;
-      db.doc("weather/now").onSnapshot((snap) => {
-        const d = snap?.data ? (typeof snap.data === "function" ? snap.data() : snap.data) : snap;
-        if (d?.cities && Object.values(d.cities).every((c) => Number.isFinite(c.temp) && Number.isFinite(c.code))) { doc = d; live = true; render(); }
-      }, (e) => console.warn("weather db", e?.code));
-    } catch (e) { console.warn("weather db unavailable", e); }
+  const refresh=async()=>{
+    const id=selected,old=cache.get(id);
+    if(pending.has(id)||old&&Date.now()-old.fetched<3600000)return;
+    pending.add(id);
+    try{
+      const [,lat,lon]=SITES[id],params=new URLSearchParams({latitude:lat,longitude:lon,current:"temperature_2m,weather_code,cloud_cover,precipitation,wind_speed_10m",timezone:"Asia/Taipei"});
+      const response=await fetch(`https://api.open-meteo.com/v1/forecast?${params}`,{signal:AbortSignal.timeout(10000)});
+      if(!response.ok)throw new Error("Weather unavailable");
+      const data=await response.json(),c=data.current;
+      if(!c||!Number.isFinite(c.temperature_2m)||!Number.isFinite(c.weather_code)||!c.time)throw new Error("Invalid weather data");
+      cache.set(id,{data:{temp:c.temperature_2m,code:c.weather_code,cloud:c.cloud_cover,precip:c.precipitation,wind:c.wind_speed_10m},time:/[zZ]|[+-]\d\d:\d\d$/.test(c.time)?c.time:c.time+"+08:00",fetched:Date.now()});
+    }catch{/* Keep the dated snapshot when offline; never substitute another city's weather. */}
+    finally{pending.delete(id);if(selected===id)render();}
+  };
+  WEATHER_UI.setCity=id=>{if(!SITES[id])return;selected=id;render();refresh();};
+  ENV.onChange=()=>{dirty=true;};
+  render();setInterval(()=>{render();refresh();},60000);
+  (async()=>{
+    try{
+      const db=await window.claude?.use?.("db");if(!db)return;
+      db.doc("weather/now").onSnapshot(snap=>{
+        const d=snap?.data?(typeof snap.data==="function"?snap.data():snap.data):snap;
+        if(d?.cities&&Object.values(d.cities).every(c=>Number.isFinite(c.temp)&&Number.isFinite(c.code))){doc=d;live=true;render();}
+      },()=>{});
+    }catch{/* Public hosting uses Open-Meteo directly. */}
   })();
 }
 /* ---------- label visibility: 3D-layer rules + a landmark-tag toggle, bottom-left (kept out of the shared stylesheets) ---------- */

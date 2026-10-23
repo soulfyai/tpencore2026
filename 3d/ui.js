@@ -39,6 +39,7 @@ const UI = {};
   document.addEventListener("pointerdown", (e) => { if (!pop.hidden && !brand.contains(e.target)) setPop(false); }); // tap outside collapses
   UI.togglePop = setPop;
   function paintBrand() {
+    WEATHER_UI.setCity(LIVE);
     cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
     count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));

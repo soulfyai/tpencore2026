@@ -1,3 +1,5 @@
+> 歷史交接紀錄：當前網站、部署狀態與開發流程請以 [HANDOFF.md §0.8](HANDOFF.md) 為準。GitHub Pages 已成功啟用，由 Codex 直接發佈。
+
 # Codex → Claude Code 交接（2026-10-24，Asia/Taipei）
 
 ## 先讀這裡
