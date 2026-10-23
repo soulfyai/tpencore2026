@@ -14,17 +14,32 @@ const UI = {};
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const statusOf2 = (it, t) => (t.kind === "record" || it.phase === "已實施" ? "done" : /施工|興建|擴線|驗收|機電|擴區|推動中|延續推動|試辦|已宣布/.test(it.phase || "") ? "build" : "plan");
 
-  /* ---------- brand block ---------- */
+  /* ---------- brand block: the neon sign is a persistent tab, details pop out below it ---------- */
   const brand = document.querySelector("header.top .brand");
-  const h1 = brand.querySelector("h1"); if (h1) h1.innerHTML = `台北安可<span class="hi-sub">北北基桃政策市</span>`; // neon sign, styled in page.css
-  const lede = brand.querySelector("p"); if (lede) lede.textContent = "開始探索屬於你我的城市";
+  const h1 = brand.querySelector("h1");
+  const brandBtn = el("button", "hi-brandbtn", `<span class="hi-t">台北安可<i class="hi-caret" aria-hidden="true">▾</i></span><span class="hi-sub">一起打造你我的北北基桃</span>`);
+  brandBtn.type = "button"; brandBtn.setAttribute("aria-expanded", "false"); brandBtn.setAttribute("aria-controls", "hi-pop");
+  if (h1) { h1.innerHTML = ""; h1.appendChild(brandBtn); }
+  brand.querySelector("p")?.remove(); // no lede under the sign
+  // the independence notice always sits bottom-center of the viewport; move it out of the
+  // header's stacking context (z 30) so nothing — drawer (35) included — can cover it
+  const notice = document.querySelector("header.top .notice"); if (notice) document.body.appendChild(notice);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
-  brand.append(cand, count, chips);
+  // the top-left switcher is uniformly party blue (solid = selected, outline = not); city colors stay everywhere else
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", "var(--c-taipei)"); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
+  pop.append(cand, count, chips);
+  // re-home the live weather element (built and updated by main.js) into the popover; keeping
+  // the same node means ENV/weather updates keep flowing into it unchanged
+  const wxEl = document.querySelector(".stage .wx"); if (wxEl) pop.appendChild(wxEl);
+  brand.append(pop);
+  const setPop = (on) => { pop.hidden = !on; brandBtn.setAttribute("aria-expanded", String(on)); brand.classList.toggle("open", on); };
+  brandBtn.onclick = () => setPop(pop.hidden);
+  document.addEventListener("pointerdown", (e) => { if (!pop.hidden && !brand.contains(e.target)) setPop(false); }); // tap outside collapses
+  UI.togglePop = setPop;
   function paintBrand() {
-    count.style.setProperty("--c", `var(--c-${LIVE})`); // the big number follows the current city's color
-    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
+    cand.innerHTML = `<i style="background:var(--c-taipei)"></i>${esc(city.cityName)}・${esc(city.candidate)}`; // card keeps to the one blue
     count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
   }
@@ -142,8 +157,12 @@ const UI = {};
   const toast = el("div", "hi-toast"); toast.setAttribute("role", "status"); document.querySelector(".mapwrap").appendChild(toast);
   let tt = 0; UI.toast = (msg) => { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 2600); };
 
-  // Escape closes the drawer once the 2D page's handler has cleared any selection
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer(); });
+  // Escape: first collapse the brand popover, then (once the 2D page's handler has cleared any selection) close the drawer
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!pop.hidden) { setPop(false); return; }
+    if (html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer();
+  });
 
   for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano"));
   paintBrand(); A.setCity(LIVE);
