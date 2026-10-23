@@ -6,6 +6,5 @@ build_superblock.py
 map3d_smooth.js
 __pycache__/
 node_modules/
-node_modules/
 out/
-__pycache__/
+.claude/worktrees/
