@@ -129,6 +129,10 @@ details.grp .rows{padding-left:18px}
   svg.map{flex:none;aspect-ratio:var(--ar,1/1);height:auto;max-width:100%}
   .pbody{overflow:visible}
   .legend{position:static;margin:0 12px 10px}
+  /* touch targets ≥40px on phones */
+  .chip{min-height:40px}
+  .tabs button{min-height:44px}
+  .back{min-height:40px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ===== policy-island page shell (3D page only) ===== */
@@ -140,18 +144,26 @@ html.hi body{padding:0}
 .hi .mapwrap{position:absolute;inset:0;border:0;border-radius:0;background:#a9d3de}
 .hi .maptools,.hi .key,.hi .mapwrap .legend{display:none}
 .hi .stage{position:absolute;inset:0;flex:none;aspect-ratio:auto;max-width:none}
+/* contain scene labels (incl. .clabel z-index 2147483000) in one layer below the shell UI,
+   so neon signs never cover the notice, mode buttons, timeline or drawer */
+.hi .labels{z-index:5}
 
 /* brand, top-left */
 .hi header.top{position:absolute;left:20px;top:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(380px,calc(100% - 40px));pointer-events:none}
 .hi header.top>*{pointer-events:auto}
 .hi .brand{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:14px 18px 14px;box-shadow:0 6px 24px rgba(20,33,61,.12)}
-.hi .brand h1{font-size:26px;letter-spacing:.04em}
-.hi .brand p{font-size:13px;margin-top:4px}
-.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:10px;font:800 15px var(--f-display);color:var(--ink)}
-.hi-cand i{width:12px;height:12px;border-radius:3px;display:inline-block}
-.hi-cand span{width:100%;font:500 11.5px var(--f-body);color:var(--muted)}
+/* brand neon sign: same language as the city neon signs (.hi .clabel) */
+.hi .brand h1{display:inline-flex;flex-direction:column;align-items:center;gap:2px;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;
+  background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;padding:8px 16px 7px;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.55),0 0 14px var(--c-taipei),inset 0 0 14px color-mix(in srgb,var(--c-taipei) 55%,transparent);
+  text-shadow:0 0 4px #fff,0 0 10px var(--c-taipei),0 0 24px var(--c-taipei);animation:neon 3.2s ease-in-out infinite}
+.hi .brand h1 .hi-sub{font:800 12.5px var(--f-body);letter-spacing:.3em;text-indent:.3em;color:#ffe9a8;text-shadow:0 0 4px #fff3c4,0 0 10px #ffb84a,0 0 18px #ff8a3c}
+@media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}}
+.hi .brand p{font-size:13px;margin-top:6px}
+.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:10px;font:800 18px var(--f-display);color:var(--ink)}
+.hi-cand i{width:13px;height:13px;border-radius:3px;display:inline-block}
 .hi-count{display:flex;align-items:center;gap:10px;margin-top:8px}
-.hi-count b{font:800 44px/1 var(--f-display);color:var(--c-taipei);letter-spacing:-.02em}
+.hi-count b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
 .hi-count span{font-size:12.5px;line-height:1.35;color:var(--muted)}
 .hi .notice{font-size:11.5px;background:color-mix(in srgb,var(--surface) 92%,transparent)}
 
@@ -164,9 +176,9 @@ html.drawer-open .hi-modes{right:calc(min(420px,94vw) + 28px)}
 
 /* shared bits */
 .hi-eyebrow{font:700 11px var(--f-mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
-.hi-primary{font:700 14px var(--f-body);min-height:42px;padding:0 16px;border:0;border-radius:12px;background:var(--c-taipei);color:#fff;cursor:pointer}
+.hi-primary{font:700 14px var(--f-body);min-height:42px;padding:0 16px;border:0;border-radius:12px;background:var(--c-taipei);color:var(--surface);cursor:pointer}
 .hi-ghost{font:600 13.5px var(--f-body);min-height:42px;padding:0 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);cursor:pointer}
-.hi-x{position:absolute;right:10px;top:10px;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px;cursor:pointer}
+.hi-x{position:absolute;right:8px;top:8px;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px;cursor:pointer}
 .hi-x:hover{background:var(--sunk)}
 
 /* intro card */
@@ -210,8 +222,8 @@ html.drawer-open .hi-modes{right:calc(min(420px,94vw) + 28px)}
 /* detail drawer: the existing panel slides in from the right */
 .hi aside.panel{position:absolute;right:12px;top:12px;bottom:12px;width:min(420px,94vw);z-index:35;border-radius:18px;box-shadow:0 12px 40px rgba(20,33,61,.24);transform:translateX(calc(100% + 24px));transition:transform .32s ease;display:flex;flex-direction:column}
 html.drawer-open aside.panel{transform:none}
-.hi aside.panel .tabs{padding-right:44px}
-.hi-close{position:absolute;right:8px;top:6px;width:36px;height:36px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;z-index:2}
+.hi aside.panel .tabs{padding-right:48px}
+.hi-close{position:absolute;right:6px;top:4px;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;z-index:2}
 .hi-close:hover{background:var(--sunk)}
 @media (prefers-reduced-motion:reduce){.hi aside.panel{transition:none}}
 
@@ -226,7 +238,7 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 /* island name pills, policy-island style */
 .hi .tlabel{font:800 13px/1.2 var(--f-body);color:#1b2234;background:#fff;border:0;border-radius:999px;box-shadow:0 3px 10px rgba(20,33,61,.18);padding:6px 12px 6px 10px;gap:7px;transform:none}
 .hi .tlabel b{font:800 12px var(--f-mono);color:var(--c)}
-.hi .tlabel.sel{background:var(--c);color:#fff}.hi .tlabel.sel b{color:#fff;opacity:.85}
+.hi .tlabel.sel{background:var(--c);color:var(--surface)}.hi .tlabel.sel b{color:var(--surface);opacity:.85}
 .hi .tlabel.hot{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent),0 3px 10px rgba(20,33,61,.18)}
 .hi .stage.far .tlabel:not(.sel):not(.hot){font-size:12px;padding:4px 9px 4px 8px;gap:5px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) b{font-size:11px}
@@ -248,19 +260,20 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 @media (max-width:860px){
   .hi header.top{left:10px;top:10px;max-width:calc(100% - 20px)}
   .hi .brand{padding:10px 12px;border-radius:14px}
-  .hi .brand h1{font-size:19px}
-  .hi .brand p,.hi-cand span{display:none}
-  .hi-cand{margin-top:4px;font-size:13px}
+  .hi .brand h1{font-size:21px;padding:6px 12px 5px;border-width:2px}
+  .hi .brand h1 .hi-sub{font-size:10.5px;letter-spacing:.24em;text-indent:.24em}
+  .hi .brand p{display:none}
+  .hi-cand{margin-top:6px;font-size:15px}
   .hi-count{margin-top:4px}.hi-count b{font-size:28px}.hi-count span{font-size:11px}
   .hi .notice{font-size:10.5px;padding:3px 9px}
   .hi-modes{top:auto;bottom:12px;right:10px}
-  .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:38px}
+  .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:40px}
   html.drawer-open .hi-modes{right:10px}
   .hi-intro{left:10px;right:10px;top:auto;bottom:66px;width:auto;padding:14px 16px}
   .hi-intro h2{font-size:18px}.hi-intro p,.hi-intro ul{font-size:13px}
   .hi-tour{left:10px;right:10px;width:auto;bottom:62px;padding:12px 14px}
   .hi-tour h3{font-size:16px}.hi-tour p{font-size:12.5px}
-  .hi-tourbtn{left:10px;bottom:12px;min-height:38px;padding:0 14px;font-size:13px}
+  .hi-tourbtn{left:10px;bottom:12px;min-height:40px;padding:0 14px;font-size:13px}
   .hi-timeline{left:8px;right:8px;top:8px;bottom:62px;padding:14px 12px 0}
   .hi-tl-cols{grid-template-columns:1fr;overflow:auto;display:block}
   .hi-tl-col{margin-bottom:12px}.hi-tl-col ol{overflow:visible}
@@ -283,17 +296,17 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
 .callout li span{flex:1}
 .callout li i{width:9px;height:9px;border-radius:50%;flex:none}
 .st-done{background:#2e9e5b}.st-build{background:#e07b1f}.st-plan{background:#1f4fb8}
-.lotno{pointer-events:none;width:18px;height:18px;border-radius:50%;background:#fff;color:var(--c-taipei);font:800 11px/18px var(--f-mono);text-align:center;box-shadow:0 1px 4px rgba(20,33,61,.3)}
-.lotno.sel{background:var(--c-taipei);color:#fff}
+.lotno{pointer-events:none;width:18px;height:18px;border-radius:50%;background:#fff;color:#1F4FB8;font:800 11px/18px var(--f-mono);text-align:center;box-shadow:0 1px 4px rgba(20,33,61,.3)}
+.lotno.sel{background:#1F4FB8;color:#fff}
 @media (max-width:860px){.callout{min-width:0;max-width:240px;padding:7px 8px 6px}.callout li button{font-size:12px;min-height:30px;padding:4px}.co-head{font-size:13px}.callout ol{max-height:170px}}
 
 
 @media (max-width:860px){html.drawer-open .callout{display:none}}
-.hi .hi-cities{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.hi .hi-cities button{font:700 13px var(--f-body);padding:5px 12px;border-radius:999px;border:2px solid var(--c);background:transparent;color:inherit;cursor:pointer;min-height:32px}
-.hi .hi-cities button[aria-selected="true"]{background:var(--c);color:#fff;box-shadow:0 0 12px color-mix(in srgb,var(--c) 60%,transparent)}
-.hi .hi-cities button:focus-visible{outline:2px solid #fff;outline-offset:2px}
-@media (max-width:860px){.hi .hi-cities{margin-top:6px;gap:4px}.hi .hi-cities button{font-size:12px;padding:3px 9px;min-height:28px}}
+.hi .hi-cities{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.hi .hi-cities button{font:700 15px var(--f-body);padding:6px 16px;border-radius:999px;border:2px solid var(--c);background:transparent;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
+.hi .hi-cities button[aria-selected="true"]{background:var(--c);color:var(--surface);box-shadow:0 0 12px color-mix(in srgb,var(--c) 60%,transparent)}
+.hi .hi-cities button:focus-visible{outline:2px solid var(--route);outline-offset:2px}
+@media (max-width:860px){.hi .hi-cities{margin-top:6px;gap:5px}.hi .hi-cities button{font-size:14px;padding:5px 13px;min-height:44px}}
 
 .stage{position:relative;flex:1;min-height:0;overflow:hidden;background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom))}
 .stage canvas{display:block;touch-action:none}
@@ -382,12 +395,12 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
     </section>
     <aside class="panel" aria-label="政見內容">
       <div class="tabs" role="tablist">
-        <button role="tab" data-tab="cands" aria-selected="true">候選人</button>
-        <button role="tab" data-tab="list" aria-selected="false">政策清單</button>
-        <button role="tab" data-tab="flows" aria-selected="false">跨市協作</button>
-        <button role="tab" data-tab="about" aria-selected="false">資料說明</button>
+        <button role="tab" data-tab="cands" aria-selected="true" aria-controls="pbody">候選人</button>
+        <button role="tab" data-tab="list" aria-selected="false" aria-controls="pbody">政策清單</button>
+        <button role="tab" data-tab="flows" aria-selected="false" aria-controls="pbody">跨市協作</button>
+        <button role="tab" data-tab="about" aria-selected="false" aria-controls="pbody">資料說明</button>
       </div>
-      <div class="pbody" id="pbody" tabindex="-1"></div>
+      <div class="pbody" id="pbody" role="tabpanel" tabindex="-1"></div>
     </aside>
   </div>
 </div>
@@ -437,6 +450,8 @@ function wrapName(n){n=String(n);if(n.length<=5)return[n];
   const m=Math.ceil(n.length/2);return[n.slice(0,m),n.slice(m,m+6)]}
 
 const svg=$("#map");
+// role="img" would hide the interactive hexes from assistive tech; group keeps the aria-label and exposes them
+if(svg)svg.setAttribute("role","group");
 function drawMap(){
   const pts=[...hexOf.values()].map(h=>px(h.q,h.r));
   const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
@@ -3207,6 +3222,8 @@ if (st0.selItem) focusItem(st0.selItem); else if (st0.selTheme) focusTheme(st0.s
 const UI = {};
 {
   const html = document.documentElement; html.classList.add("hi");
+  // role="img" (set by build.py on #stage) would hide the island-label buttons from assistive tech
+  const stageEl = document.getElementById("stage"); if (stageEl) stageEl.setAttribute("role", "group");
   // the city being explored; everything below (brand, tour, list, timeline) follows it
   const CITIES = ["taipei", "newtaipei", "keelung", "taoyuan"].filter((c) => LIVE_CITIES.has(c) && A.cityById.get(c));
   let LIVE = CITIES[0], city, liveThemes, rows, nPlan, nRec;
@@ -3219,14 +3236,16 @@ const UI = {};
 
   /* ---------- brand block ---------- */
   const brand = document.querySelector("header.top .brand");
-  const lede = brand.querySelector("p"); if (lede) lede.textContent = "一座島一個政策主題・點一座島，開始探索";
+  const h1 = brand.querySelector("h1"); if (h1) h1.innerHTML = `台北安可<span class="hi-sub">北北基桃政策市</span>`; // neon sign, styled in page.css
+  const lede = brand.querySelector("p"); if (lede) lede.textContent = "開始探索屬於你我的城市";
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
   brand.append(cand, count, chips);
   function paintBrand() {
-    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}<span>北北基桃四市・拖曳地圖或點城市切換</span>`;
-    count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 座政策島</span>`;
+    count.style.setProperty("--c", `var(--c-${LIVE})`); // the big number follows the current city's color
+    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
+    count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
   }
   function setCur(c) { if (!c || !CITIES.includes(c)) return; const changed = c !== LIVE; load(c); paintBrand(); if (changed) { A.setCity(c); if (!timeline.hidden) renderTimeline(); } }
@@ -3252,11 +3271,12 @@ const UI = {};
   const aside = document.querySelector("aside.panel");
   const close = el("button", "hi-close", "✕"); close.type = "button"; close.setAttribute("aria-label", "關閉"); close.onclick = () => closeDrawer();
   aside.prepend(close);
-  function openDrawer() { html.classList.add("drawer-open"); }
+  aside.inert = true; // the drawer starts off-screen; keep its contents out of the tab order until it opens
+  function openDrawer() { html.classList.add("drawer-open"); aside.inert = false; }
   const clearSel = () => { if (A.state.selTheme || A.state.selItem || A.state.selFlow) document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); };
   function closeDrawer(keepMode) {
     if (!html.classList.contains("drawer-open")) return;
-    html.classList.remove("drawer-open");
+    html.classList.remove("drawer-open"); aside.inert = true;
     if (A.state.selItem && A.state.selTheme) A.openTheme(A.state.selTheme); // back to the island's list bubble
     if (!keepMode && mode === "list") { mode = "pano"; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano")); }
   }
@@ -3272,11 +3292,12 @@ const UI = {};
   const intro = el("section", "hi-intro", `
     <button type="button" class="hi-x" aria-label="關閉說明">✕</button>
     <div class="hi-eyebrow">使用說明</div>
-    <h2>一座島，一個政策主題。</h2>
-    <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 座政策區，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
+    <h2>一個政策區塊，一個政策主題。</h2>
+    <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
     <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>清單</b>：用文字一項一項瀏覽</li><li><b>時間</b>：依已完成、推動中、規劃中排好</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
+  intro.setAttribute("aria-label", "使用說明");
   document.querySelector(".mapwrap").appendChild(intro);
   const showIntro = (on) => { intro.hidden = !on; try { localStorage.setItem("hi-intro-seen", "1"); } catch {} };
   intro.querySelector(".hi-x").onclick = () => showIntro(false);
@@ -3287,7 +3308,7 @@ const UI = {};
 
   /* ---------- guided tour ---------- */
   let touring = false, step = 0;
-  const tour = el("section", "hi-tour");
+  const tour = el("section", "hi-tour"); tour.setAttribute("aria-label", "城市導覽");
   tour.innerHTML = `<div class="hi-tour-head"><span class="hi-eyebrow">城市導覽</span><span class="hi-step"></span></div>
     <h3></h3><p></p>
     <div class="hi-tour-btns"><button type="button" data-a="prev" aria-label="上一站">←</button><button type="button" data-a="more" class="hi-ghost">看細節</button><button type="button" data-a="next" class="hi-primary">下一站 →</button><button type="button" data-a="end" class="hi-ghost">結束</button></div>`;
@@ -3300,7 +3321,7 @@ const UI = {};
     tour.querySelector(".hi-step").textContent = `${String(step).padStart(2, "0")} / ${STEPS.length - 1}`;
     if (s.intro) {
       tour.querySelector("h3").textContent = `${city.cityName}・${city.candidate}`;
-      tour.querySelector("p").textContent = `從全景開始。接下來 ${liveThemes.length} 站，每站一座政策島，帶你看島上的重點。`;
+      tour.querySelector("p").textContent = `從全景開始。接下來 ${liveThemes.length} 站，每站一個政策區塊，帶你看區塊裡的重點。`;
       MAP3D.enterCity(LIVE); closeDrawer(true); clearSel();
     } else {
       const its = s.t.items || [], done = its.filter((i) => statusOf2(i, s.t) === "done").length;
@@ -3324,7 +3345,7 @@ const UI = {};
   });
 
   /* ---------- timeline ---------- */
-  const timeline = el("section", "hi-timeline"); timeline.hidden = true; document.querySelector(".mapwrap").appendChild(timeline);
+  const timeline = el("section", "hi-timeline"); timeline.setAttribute("aria-label", "時間檢視"); timeline.hidden = true; document.querySelector(".mapwrap").appendChild(timeline);
   const COLS = [["done", "已完成", "任內已實施或已上路"], ["build", "推動中", "施工、試辦或已啟動"], ["plan", "規劃中", "競選政見，尚待推動"]];
   const yearOf = (p) => { const m = String(p || "").match(/20\d\d/); return m ? +m[0] : 9999; };
   function renderTimeline() {
@@ -3340,6 +3361,9 @@ const UI = {};
   /* ---------- toast ---------- */
   const toast = el("div", "hi-toast"); toast.setAttribute("role", "status"); document.querySelector(".mapwrap").appendChild(toast);
   let tt = 0; UI.toast = (msg) => { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 2600); };
+
+  // Escape closes the drawer once the 2D page's handler has cleared any selection
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && html.classList.contains("drawer-open") && !A.state.selTheme && !A.state.selFlow) closeDrawer(); });
 
   for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano"));
   paintBrand(); A.setCity(LIVE);

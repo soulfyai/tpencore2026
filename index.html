@@ -129,6 +129,10 @@ details.grp .rows{padding-left:18px}
   svg.map{flex:none;aspect-ratio:var(--ar,1/1);height:auto;max-width:100%}
   .pbody{overflow:visible}
   .legend{position:static;margin:0 12px 10px}
+  /* touch targets ≥40px on phones */
+  .chip{min-height:40px}
+  .tabs button{min-height:44px}
+  .back{min-height:40px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -158,12 +162,12 @@ details.grp .rows{padding-left:18px}
     </section>
     <aside class="panel" aria-label="政見內容">
       <div class="tabs" role="tablist">
-        <button role="tab" data-tab="cands" aria-selected="true">候選人</button>
-        <button role="tab" data-tab="list" aria-selected="false">政策清單</button>
-        <button role="tab" data-tab="flows" aria-selected="false">跨市協作</button>
-        <button role="tab" data-tab="about" aria-selected="false">資料說明</button>
+        <button role="tab" data-tab="cands" aria-selected="true" aria-controls="pbody">候選人</button>
+        <button role="tab" data-tab="list" aria-selected="false" aria-controls="pbody">政策清單</button>
+        <button role="tab" data-tab="flows" aria-selected="false" aria-controls="pbody">跨市協作</button>
+        <button role="tab" data-tab="about" aria-selected="false" aria-controls="pbody">資料說明</button>
       </div>
-      <div class="pbody" id="pbody" tabindex="-1"></div>
+      <div class="pbody" id="pbody" role="tabpanel" tabindex="-1"></div>
     </aside>
   </div>
 </div>
@@ -213,6 +217,8 @@ function wrapName(n){n=String(n);if(n.length<=5)return[n];
   const m=Math.ceil(n.length/2);return[n.slice(0,m),n.slice(m,m+6)]}
 
 const svg=$("#map");
+// role="img" would hide the interactive hexes from assistive tech; group keeps the aria-label and exposes them
+if(svg)svg.setAttribute("role","group");
 function drawMap(){
   const pts=[...hexOf.values()].map(h=>px(h.q,h.r));
   const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
