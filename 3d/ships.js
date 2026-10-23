@@ -87,11 +87,13 @@ const SHIPS = {};
       p("rbox", 0, 0.74, -0.2, 0.48, 0.22, 1.3, "#ffffff"); p("box", 0, 0.76, -0.2, 0.485, 0.08, 1.2, "#bfe3f5", 0, 0, 0, true);
       p("rbox", 0, 0.98, -0.5, 0.18, 0.3, 0.26, "#28c8c8");
     },
-    fishing(p) {
+    fishing(p) { // small working boat: wheelhouse, mast with fish-luring lamps, net boom and outrigger poles
       hull(p, 1.3, 0.34, 0.2, "#f8f6f1", "#d8d2c6", "#2f6fd6");
       p("rbox", 0, 0.34, -0.2, 0.24, 0.2, 0.3, "#ffffff"); p("cyl", 0, 0.6, 0.15, 0.015, 0.6, 0.015, "#8a6a4a");
       p("box", 0, 0.52, 0.32, 0.005, 0.005, 0.5, "#3b4148", 0, 0.7); p("sphere", 0, 0.92, 0.15, 0.05, 0.05, 0.05, "#fff3c4", 0, 0, 0, true);
       for (let k = 0; k < 4; k++) p("sphere", 0, 0.62, 0.42 - k * 0.1, 0.035, 0.035, 0.035, "#fff3c4", 0, 0, 0, true);
+      for (const s of [-1, 1]) p("cyl", s * 0.14, 0.5, 0.05, 0.012, 0.74, 0.012, "#8a6a4a", 0, 0, s * 1.0); // outrigger net poles
+      p("box", 0, 0.26, 0.45, 0.2, 0.08, 0.16, "#2bb3a6"); p("sphere", 0.1, 0.25, -0.5, 0.045, 0.045, 0.045, "#ff9a3c"); // catch box + buoy
     },
     tug(p) {
       hull(p, 1.1, 0.42, 0.24, "#c8102e", "#3b4148", "#14213d");
@@ -102,6 +104,19 @@ const SHIPS = {};
       hull(p, 1.2, 0.3, 0.16, "#ffffff", "#c9a27a");
       p("cyl", 0, 0.75, 0.05, 0.02, 1.2, 0.02, "#d0d4d8");
       p("prism", 0, 0.7, -0.15, 0.01, 0.95, 0.5, "#ffffff", Math.PI / 2, 0, 0); p("prism", 0, 0.55, 0.3, 0.01, 0.6, 0.3, "#e0453c", Math.PI / 2, 0, 0);
+    },
+    plane(p) { // low-poly airliner (not in the sea MIX): white fuselage, swept wings, twin engines, red fin
+      p("cyl", 0, 0, 0, 0.17, 2.5, 0.17, "#f8f6f1", 0, Math.PI / 2);
+      p("sphere", 0, 0, 1.28, 0.17, 0.16, 0.28, "#eef1f5");
+      p("sphere", 0, 0.02, -1.26, 0.15, 0.14, 0.3, "#f8f6f1");
+      p("box", 0, 0.1, 1.02, 0.24, 0.1, 0.24, "#2b3138", 0, 0, 0, true); // cockpit glass, lit at night
+      for (const s of [-1, 1]) {
+        p("box", s * 0.75, -0.04, 0.1, 1.5, 0.045, 0.5, "#e9eef4", s * 0.5);        // swept main wing
+        p("box", s * 0.4, 0.14, -1.25, 0.72, 0.035, 0.3, "#e9eef4", s * 0.45);      // tailplane
+        p("cyl", s * 0.52, -0.15, 0.42, 0.1, 0.34, 0.1, "#9aa0a6", 0, Math.PI / 2); // engine
+        p("box", s * 0.165, 0.04, 0.15, 0.01, 0.05, 1.5, "#bfe3f5", 0, 0, 0, true); // window strip
+      }
+      p("box", 0, 0.4, -1.28, 0.045, 0.66, 0.4, "#e0453c", 0, -0.45);               // swept fin
     },
   };
   SHIPS.make = (type, r) => merge((p) => TYPES[type](p, r));

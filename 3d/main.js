@@ -7,7 +7,7 @@ for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
   el.style.setProperty("--c", `var(--c-${isl.city})`);
-  el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name}</span>`;
+  el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
   el.onclick = () => A.openTheme(isl.id);
   const o = new CSS2DObject(el);
@@ -50,7 +50,9 @@ window.LANDMARKS3D = LANDMARKS3D;
 for (const L of LANDMARKS3D) {
   const el = document.createElement("div"); el.className = "lmlabel" + (L.nature ? " nature" : ""); el.style.setProperty("--c", L.nature ? "#3f8f3a" : `var(--c-${L.city})`);
   el.innerHTML = `<span class="lm-pin"></span>${L.name}`;
-  const o = new CSS2DObject(el); o.position.set(L.x, L.top + 0.15, L.z); WORLD.bodies.get(L.isl.id).g.add(o);
+  const o = new CSS2DObject(el);
+  if (L.fixed) { o.position.set(L.isl.c.x + L.x, L.top + 0.15, L.isl.c.z + L.z); scene.add(o); } // bridges: anchored to the sea, not to an island that can lift
+  else { o.position.set(L.x, L.top + 0.15, L.z); WORLD.bodies.get(L.isl.id).g.add(o); }
 }
 
 /* beacon over the selected item */
@@ -134,10 +136,13 @@ function placeBeam() {
 /* ---------- camera ---------- */
 let fly = null;
 function overview() {
-  const size = bounds.getSize(new THREE.Vector3()), aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
-  const span = Math.max(size.x / Math.max(aspect, 0.6), size.z) * 1.02;
+  // panorama: Taipei island centred, the other three in frame around it; this is also the farthest zoom allowed
+  const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
+  const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
+  const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
+  const span = Math.max(sx / Math.max(aspect, 0.6), sz) * 1.02;
   const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
-  return { target: MID.clone().setY(0.3), pos: MID.clone().setY(0.3).add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)) };
+  return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)), dist };
 }
 function flyTo(target, pos) {
   if (reduced.matches) { camera.position.copy(pos); controls.target.copy(target); controls.update(); dirty = true; return; }
@@ -227,7 +232,14 @@ controls.addEventListener("change", () => {
 });
 
 /* ---------- resize / theme / loop ---------- */
-function resize() { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); labelR.setSize(w, h); dirty = true; }
+let labelTH = 99; // camera distance beyond which landmark/policy tags hide (the city neon signs always stay)
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+  camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); labelR.setSize(w, h);
+  const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); // the panorama IS the farthest zoom
+  labelTH = Math.min(o.dist * 0.94, Math.max(...A.cities.filter((c) => LIVE_CITIES.has(c.city)).map((c) => cityFrame(c.city).dist)) * 1.12);
+  dirty = true;
+}
 new ResizeObserver(resize).observe(stage);
 const retheme = () => { ENV.retheme(); for (const v of flowViews) v.mat.uniforms.uColor.value.set(css("--route") || "#c4462b"); dirty = true; };
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
@@ -252,13 +264,16 @@ function loop(now) {
   if (moving) { clock += dt; ENV.update(dt, clock); for (const v of flowViews) if (v.tube.visible) v.mat.uniforms.uTime.value = clock; if (focusId) beamMat.opacity = 0.32 + 0.16 * Math.sin(clock * 3); busy = true; }
   PEOPLE.update(dt, clock, moving);
   ENV.cullClouds(camera);
-  stage.classList.toggle("far", camera.position.distanceTo(controls.target) > 40);
+  const camDist = camera.position.distanceTo(controls.target);
+  stage.classList.toggle("far", camDist > 40);
+  stage.classList.toggle("pano", camDist > labelTH);
+  if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
   if (busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); dirty = false; }
   requestAnimationFrame(loop);
 }
 resize();
-{ const o = overview(); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); }
+{ const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
 window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV };
 
@@ -291,6 +306,26 @@ window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, cam
       }, (e) => console.warn("weather db", e?.code));
     } catch (e) { console.warn("weather db unavailable", e); }
   })();
+}
+/* ---------- label visibility: 3D-layer rules + a landmark-tag toggle, bottom-left (kept out of the shared stylesheets) ---------- */
+{
+  const st = document.createElement("style");
+  st.textContent = `
+.stage.pano .tlabel{display:none!important}
+.stage .lmlabel{display:none}
+.stage.lm-on:not(.pano) .lmlabel{display:flex}
+.lmbtn{position:absolute;left:20px;bottom:76px;z-index:31;display:flex;align-items:center;gap:7px;min-height:40px;min-width:40px;padding:0 14px;border:1.5px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--surface) 92%,transparent);color:var(--ink);font:700 13px var(--f-body);cursor:pointer;box-shadow:0 4px 14px rgba(20,33,61,.18);backdrop-filter:blur(6px)}
+.lmbtn i{width:12px;height:12px;border-radius:50%;background:#cfd4da;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.lmbtn.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.lmbtn.on i{background:#ffd23f}
+@media (max-width:860px){.lmbtn{left:10px;bottom:62px;font-size:12.5px;padding:0 12px}}
+`;
+  document.head.appendChild(st);
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "lmbtn"; btn.setAttribute("aria-pressed", "false"); btn.title = "顯示或隱藏地標標籤";
+  btn.innerHTML = "<i></i>地標標籤";
+  btn.onclick = () => { const on = stage.classList.toggle("lm-on"); btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", String(on)); dirty = true; };
+  stage.appendChild(btn);
 }
 paint();
 stage.classList.add("ready");

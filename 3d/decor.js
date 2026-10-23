@@ -135,16 +135,16 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       pp("box", (px + hx) / 2, H, (pz + hz) / 2, 0.16, 0.025, 0.025, "#3b4148", -a);
       pp("box", hx, H + 0.02, hz, 0.2, 0.08, 0.16, "#2b3036", -a, 0, -0.5);          // hood
       pp("box", hx + Math.cos(a) * 0.02, H - 0.02, hz + Math.sin(a) * 0.02, 0.16, 0.02, 0.12, "#fff6d8", -a, 0, -0.5, true); // lamp face
-      LAMP_BEAMS.push([isl.c.x + hx, TOP + H - 0.03, isl.c.z + hz, isl.c.x + px * 0.25, TOP + 0.07, isl.c.z + pz * 0.25, Math.max(cw, cd) * 0.42]);
+      LAMP_BEAMS.push([isl.c.x + hx, TOP + H - 0.03, isl.c.z + hz, isl.c.x + px * 0.25, TOP + 0.07, isl.c.z + pz * 0.25, Math.max(cw, cd) * 0.46]);
     }
-    LAMP_POOLS.push([isl.c.x, TOP + 0.075, isl.c.z, Math.max(cw, cd) * 0.42]);
+    LAMP_POOLS.push([isl.c.x, TOP + 0.075, isl.c.z, Math.max(cw, cd) * 0.5]); // campus flood pool: wider than a street lamp so people.js can light it separately
     hold(isl.id, 0, 0, Math.hypot(cw, cd) / 2 + 0.1);
     const body = WORLD.bodies.get(isl.id); body.anchor.set(0, TOP, cd / 2 + 0.28);
   }
 
   /* ---------- city landmarks for the live city ---------- */
   const LM = { taipei: [["t101", "台北 101", (i) => i.c.x, 2.3], ["dome", "台北大巨蛋", (i) => i.c.x * 0.8 - Math.abs(i.c.z) * 0.5, 1.9], ["station", "台北車站", (i) => -i.c.x - Math.abs(i.c.z) * 0.6, 1.8], ["shinkong", "新光摩天大樓", (i) => -i.c.x - Math.abs(i.c.z - 1.5) * 0.6 + 0.01, 2.0], ["grand", "圓山大飯店", (i) => -i.c.z, 1.8], ["npm", "國立故宮博物院", (i) => -i.c.z + i.c.x * 0.2, 1.6], ["miramar", "美麗華摩天輪", (i) => -i.c.z * 0.7 + i.c.x * 0.7, 1.6], ["cks", "中正紀念堂", (i) => i.c.z * 0.5 - Math.abs(i.c.x + 2), 1.6], ["sysm", "國父紀念館", (i) => i.c.x - Math.abs(i.c.z) * 0.8, 1.5], ["longshan", "艋舺龍山寺", (i) => -i.c.x + i.c.z * 0.5, 1.5], ["redhouse", "西門紅樓", (i) => -i.c.x - Math.abs(i.c.z) * 0.3, 1.5], ["yangming", "陽明山", (i) => -i.c.z * 1.2 - i.c.x * 0.2, 1.5, 1], ["elephant", "象山", (i) => i.c.x * 1.2 + i.c.z * 0.4, 1.4, 1], ["maokong", "貓空", (i) => i.c.x * 0.7 + i.c.z, 1.3, 1], ["daan", "大安森林公園", (i) => -Math.hypot(i.c.x - 2, i.c.z - 1), 1.3, 1], ["beitou", "北投溫泉", (i) => -i.c.z - i.c.x * 0.6, 1.3, 1]],
-    newtaipei: [["ntcity", "新北市政府", null, 1.8], ["danjiang", "淡江大橋", null, 1.2], ["fort", "淡水紅毛城", null, 1.6], ["jiufen", "九份老街", null, 1.5], ["shifen", "十分瀑布・天燈", null, 1.4, 1], ["queen", "野柳女王頭", null, 1.6, 1]],
+    newtaipei: [["ntcity", "新北市政府", null, 1.8], ["fort", "淡水紅毛城", null, 1.6], ["jiufen", "九份老街", null, 1.5], ["shifen", "十分瀑布・天燈", null, 1.4, 1], ["queen", "野柳女王頭", null, 1.6, 1]], // 淡江大橋 is now the real cross-strait bridge below, not an on-island model
     keelung: [["port", "基隆港", null, 1.5], ["guanyin", "中正公園大觀音", null, 1.8], ["miaokou", "廟口夜市", null, 1.5], ["houses", "正濱漁港彩色屋", null, 1.5], ["heping", "和平島", null, 1.4, 1]],
     taoyuan: [["airport", "桃園國際機場", null, 1.3], ["xpark", "Xpark 水族館", null, 1.6], ["daxi", "大溪老街", null, 1.6], ["rainbow", "永安漁港彩虹橋", null, 1.6], ["dam", "石門水庫", null, 1.3, 1], ["lala", "拉拉山", null, 1.4, 1]] };
   for (const [city, list] of Object.entries(LM)) {
@@ -155,16 +155,17 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     // real positions (lon, lat): each landmark goes to the nearest spot on land where its whole footprint fits
     const GEO_LL = { t101: [121.5645, 25.034], dome: [121.5606, 25.0437], station: [121.517, 25.0478], shinkong: [121.515, 25.0461], grand: [121.5262, 25.0784], npm: [121.5485, 25.1024], miramar: [121.5575, 25.0835], cks: [121.5219, 25.035], sysm: [121.5603, 25.04], longshan: [121.4999, 25.0372], redhouse: [121.5068, 25.042], yangming: [121.545, 25.155], elephant: [121.5767, 25.0275], maokong: [121.588, 24.968], daan: [121.5355, 25.03], beitou: [121.508, 25.137],
       ntcity: [121.4648, 25.0123], danjiang: [121.429, 25.168], fort: [121.433, 25.1753], jiufen: [121.8445, 25.1092], shifen: [121.787, 25.0475], queen: [121.69, 25.2063],
-      port: [121.74, 25.133], guanyin: [121.7445, 25.1290], miaokou: [121.7435, 25.1285], houses: [121.774, 25.15], heping: [121.765, 25.16],
+      port: [121.74, 25.133], guanyin: [121.7445, 25.1290], miaokou: [121.7435, 25.1285], houses: [121.774, 25.15], heping: [121.769, 25.163],
       airport: [121.233, 25.0797], xpark: [121.215, 25.0137], daxi: [121.287, 24.883], rainbow: [121.013, 24.989], dam: [121.24, 24.815], lala: [121.44, 24.718] };
     for (const [id, name, score, sc0, nature] of list) {
       let isl = null, best = null, sc = sc0;
       const [tx, tz] = GEO_LL[id] ? WORLD.geo(city, ...GEO_LL[id]) : [0, 0];
       // spiral out from the real spot: the footprint must sit on land and clear every policy campus and other landmark (it may span a street)
       const cells = []; for (let x = -14; x <= 14; x += 0.25) for (let z = -14; z <= 14; z += 0.25) cells.push([tx + x, tz + z, Math.hypot(x, z)]); cells.sort((p, q) => p[2] - q[2]);
+      const LPAD = { heping: 1.1 }; // extra label clearance: 和平島 sits right by 大觀音 on the Keelung shore, so its tag needs more room
       const okAt = (wx, wz, R) => GEOM.pip(wx, wz, coast) && GEOM.nearestEdge(wx, wz, coast).d >= R + 0.35 &&
         mine.every((m) => Math.hypot(wx - m.c.x, wz - m.c.z) - m.plazaR >= R * 0.92) &&
-        !LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - wx, L.isl.c.z + L.z - wz) < R + L.r + 0.7); // generous gaps so labels never stack
+        !LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - wx, L.isl.c.z + L.z - wz) < R + L.r + (LPAD[id] || 0.7)); // generous gaps so labels never stack
       for (const f of [1, 0.93, 0.86, 0.8]) { // keep sizes consistent: move a landmark further before shrinking it much
         const s2 = sc0 * f, R = (FP[id] || 0.8) * s2, lim = f === 1 ? 3 : f > 0.9 ? 5 : f > 0.85 ? 8 : 99;
         const hit = cells.find(([wx, wz, dd]) => dd <= lim && okAt(wx, wz, R));
@@ -391,25 +392,25 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       for (const f of [1.6]) { const [mx, mz] = P(f, 0); sp("box", mx, yD, mz, 0.16, 0.04, 4.2, "#e9e2d2", -an); }
       for (let s2 = -1.9; s2 <= 1.9; s2 += 0.55) {
         for (const side of [-1, 1]) { const [fx, fz] = P(1.6 + side * 0.4, s2); sp("box", fx, yD, fz, 0.7, 0.035, 0.07, "#e9e2d2", -an); }
-        for (const side of [-1, 1]) { if (R3() < 0.25) continue; const [bx, bz] = P(1.6 + side * 0.42, s2 + 0.27); if (typeof SHIPS !== "undefined") { const g = SHIPS.make(R3() < 0.75 ? "yacht" : "fishing", rng(hash(c.city) + s2 * 13 + side)); g.scale.setScalar(0.32); g.position.set(bx, WATER_Y - 0.03, bz); g.rotation.y = Math.atan2(nx, nz) + (side < 0 ? Math.PI : 0); scene.add(g); } }
+        for (const side of [-1, 1]) { if (R3() < 0.25) continue; const [bx, bz] = P(1.6 + side * 0.42, s2 + 0.27); if (typeof SHIPS !== "undefined") { const g = SHIPS.make(R3() < 0.75 ? "yacht" : "fishing", rng(hash(c.city) + s2 * 13 + side)); g.scale.setScalar(0.45); g.position.set(bx, WATER_Y - 0.03, bz); g.rotation.y = Math.atan2(nx, nz) + (side < 0 ? Math.PI : 0); scene.add(g); } }
       }
       const [hx, hz] = P(-0.4, 0); sp("rbox", hx, TOP + 0.15, hz, 0.7, 0.3, 0.45, "#f8f6f1", -an); sp("box", hx, TOP + 0.32, hz, 0.78, 0.04, 0.53, "#2f6fd6", -an);
       const [tx, tz] = P(-0.4, 0.6); sp("cyl", tx, TOP + 0.35, tz, 0.02, 0.7, 0.02, "#f8f6f1"); sp("box", tx + ux * 0.1, TOP + 0.62, tz + uz * 0.1, 0.18, 0.12, 0.01, "#2f6fd6", -Math.atan2(uz, ux));
     }
   }
 
-  /* ---------- bridges between the islands (cable-stayed, joining the ring expressways) and ferry routes ---------- */
+  /* ---------- bridges between the islands (joining the ring expressways) and ferry routes ---------- */
   WORLD.bridges = []; WORLD.ferryRoutes = []; WORLD.bridgeEnds = [];
   {
     const R = WORLD.rings || {}, cities = Object.keys(R), hub = R.taipei ? "taipei" : cities[0];
-    const pairs = cities.filter((c) => c !== hub).map((c) => [hub, c]);
-    // also link each outer island to its nearest neighbour if that is much closer than Taipei
-    for (const c of cities) if (c !== hub) { let best = null, bd = Infinity; for (const o of cities) if (o !== c && o !== hub) { const d = Math.hypot(R[c].center[0] - R[o].center[0], R[c].center[1] - R[o].center[1]); if (d < bd) { bd = d; best = o; } } const dh = Math.hypot(R[c].center[0] - R[hub].center[0], R[c].center[1] - R[hub].center[1]); if (best && bd < dh * 0.85 && !pairs.some(([a, b]) => (a === best && b === c) || (a === c && b === best))) pairs.push([c, best]); }
-    for (const [ca, cb] of pairs) {
-      const A = R[ca], B = R[cb]; let best = null, bd = Infinity;
-      for (let i = 0; i < A.pts.length; i += 2) for (let j = 0; j < B.pts.length; j += 2) { const a = A.pts[i], b = B.pts[j], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (d < bd) { bd = d; best = [a, b]; } }
-      const [a, b] = best, Y = A.deck, L = bd, ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L, ang = Math.atan2(uz, ux), nx = -uz, nz = ux;
-      WORLD.bridgeEnds.push(a, b);
+    // ring network: Taipei and New Taipei each link to Keelung and Taoyuan; Taipei–New Taipei gets the two named bridges below
+    const pairs = [];
+    for (const c of cities) if (c !== hub && c !== "newtaipei") { pairs.push([hub, c]); if (R.newtaipei) pairs.push(["newtaipei", c]); }
+    const coasts = cities.map((c) => cityInfo(c).coast);
+    const overWater = (a, b) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.ceil(L / 0.8); for (let k = 1; k < n; k++) { const x = a[0] + (b[0] - a[0]) * k / n, z = a[1] + (b[1] - a[1]) * k / n; if (coasts.some((P) => GEOM.pip(x, z, P))) return false; } return true; };
+    /* shared roadway: deck segments, kerbs, dashes, lamps and piers; returns the traffic path and the frame vectors */
+    const deck = (a, b, Y) => {
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L, ang = Math.atan2(uz, ux), nx = -uz, nz = ux;
       const n = Math.max(2, Math.round(L / 0.6)), pts = [];
       for (let k = 0; k < n; k++) {
         const f0 = k / n, f1 = (k + 1) / n, mx = a[0] + (b[0] - a[0]) * (f0 + f1) / 2, mz = a[1] + (b[1] - a[1]) * (f0 + f1) / 2, seg = L / n;
@@ -421,7 +422,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         pts.push(new THREE.Vector3(a[0] + (b[0] - a[0]) * f0, Y + 0.07, a[1] + (b[1] - a[1]) * f0));
       }
       pts.push(new THREE.Vector3(b[0], Y + 0.07, b[1]));
-      // two white A-frame pylons with fanned stay cables
+      return { pts, L, ux, uz, nx, nz, ang };
+    };
+    /* generic link: two white A-frame pylons with fanned stay cables */
+    const stays = (a, b, d, Y) => {
+      const { L, ux, uz, nx, nz, ang } = d;
       for (const f of [1 / 3, 2 / 3]) {
         const px = a[0] + (b[0] - a[0]) * f, pz = a[1] + (b[1] - a[1]) * f, PH = 2.4;
         for (const o of [-0.36, 0.36]) sp("box", px + nx * o * 0.6, Y + PH / 2, pz + nz * o * 0.6, 0.12, PH + 0.2, 0.12, "#f4f6f8", -ang, 0, 0);
@@ -429,14 +434,89 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         const ph = Y - WATER_Y; sp("box", px, WATER_Y + ph / 2, pz, 0.5, ph, 0.7, "#cfc9bd", -ang);
         for (const side of [-1, 1]) for (let c = 1; c <= 5; c++) { const dd = c * (L / 3 / 2) / 5.5 * side, ex = px + ux * dd, ez = pz + uz * dd, len = Math.hypot(dd, PH - 0.15); for (const o of [-0.22, 0.22]) sp("box", (px + ex) / 2 + nx * o, Y + (PH - 0.1) / 2 + 0.05, (pz + ez) / 2 + nz * o, len, 0.012, 0.012, "#e8edf2", -ang, 0, Math.atan2(-(PH - 0.15), dd)); }
       }
-      WORLD.highways.push({ city: ca, pts });
-      WORLD.bridges.push({ a, b, ca, cb });
-      // ferries cross alongside the bridge, harbour to harbour, a little way off to either side
-      const ca0 = cityInfo(ca).coast, cb0 = cityInfo(cb).coast;
+      return Y + 2.55;
+    };
+    /* 關渡大橋: red steel through-arch over the deck with vertical hangers (original low-poly take) */
+    const arch = (a, b, d, Y) => {
+      const { L, nx, nz, ang } = d, f0 = 0.2, f1 = 0.8, AH = Math.min(2.0, L * 0.14), NS = 14;
+      const yAt = (t) => Y + 0.08 + Math.sin(Math.PI * t) * AH;
+      for (const o of [-0.3, 0.3]) {
+        let pf = f0, py = yAt(0);
+        for (let k = 1; k <= NS; k++) {
+          const t = k / NS, f = f0 + (f1 - f0) * t, y = yAt(t);
+          const x0 = a[0] + (b[0] - a[0]) * pf + nx * o, z0 = a[1] + (b[1] - a[1]) * pf + nz * o;
+          const x1 = a[0] + (b[0] - a[0]) * f + nx * o, z1 = a[1] + (b[1] - a[1]) * f + nz * o;
+          const run = L * (f - pf), rise = y - py, len = Math.hypot(run, rise);
+          sp("box", (x0 + x1) / 2, (py + y) / 2, (z0 + z1) / 2, len + 0.02, 0.08, 0.08, "#e0453c", -ang, 0, Math.atan2(rise, run));
+          pf = f; py = y;
+        }
+      }
+      for (let k = 1; k < NS; k++) {
+        const t = k / NS, f = f0 + (f1 - f0) * t, y = yAt(t), x = a[0] + (b[0] - a[0]) * f, z = a[1] + (b[1] - a[1]) * f;
+        if (k % 2 === 0) sp("box", x, y, z, 0.06, 0.06, 0.66, "#e0453c", -ang); // wind braces between the two ribs
+        if (y - Y > 0.4) for (const o of [-0.3, 0.3]) sp("box", x + nx * o, (y + Y) / 2 + 0.03, z + nz * o, 0.025, y - Y - 0.16, 0.025, "#f0a39a"); // hangers
+      }
+      return Y + 0.08 + AH;
+    };
+    /* 淡江大橋: one white pylon, inclined legs meeting over the deck, cables fanning both ways */
+    const mono = (a, b, d, Y) => {
+      const { L, ux, uz, nx, nz, ang } = d, f = 0.42, PH = 3.3;
+      const px = a[0] + (b[0] - a[0]) * f, pz = a[1] + (b[1] - a[1]) * f, ph = Y - WATER_Y;
+      sp("box", px, WATER_Y + ph / 2, pz, 0.55, ph, 0.9, "#cfc9bd", -ang);
+      for (const s of [-1, 1]) {
+        const legH = PH * 0.62, run = -s * 0.36, len = Math.hypot(run, legH);
+        sp("box", px + nx * s * 0.28, Y + legH / 2, pz + nz * s * 0.28, len, 0.16, 0.14, "#f4f6f8", -(ang + Math.PI / 2), 0, Math.atan2(legH, run));
+      }
+      sp("box", px, Y + PH * 0.62 + (PH * 0.38) / 2, pz, 0.14, PH * 0.38 + 0.1, 0.14, "#f4f6f8");
+      sp("box", px, Y + 0.95, pz, 0.12, 0.1, 1.0, "#f4f6f8", -ang);
+      sp("sphere", px, Y + PH + 0.1, pz, 0.06, 0.06, 0.06, "#ff5a5a", 0, 0, 0, true);
+      for (const side of [-1, 1]) for (let c = 1; c <= 7; c++) {
+        const reach = Math.min(L * 0.36, 5.2), dd = (c / 7) * reach * side, ex = px + ux * dd, ez = pz + uz * dd;
+        const topY = Y + PH - 0.15 - c * 0.06, len = Math.hypot(dd, topY - Y - 0.1);
+        for (const o of [-0.2, 0.2]) sp("box", (px + ex) / 2 + nx * o, (topY + Y + 0.1) / 2, (pz + ez) / 2 + nz * o, len, 0.012, 0.012, "#e8edf2", -ang, 0, Math.atan2(-(topY - Y - 0.1), dd));
+      }
+      return Y + PH + 0.15;
+    };
+    const build = (a, b, ca, cb, kind, name) => {
+      const Y = R[ca].deck, d = deck(a, b, Y);
+      const top = kind === "arch" ? arch(a, b, d, Y) : kind === "mono" ? mono(a, b, d, Y) : stays(a, b, d, Y);
+      WORLD.bridgeEnds.push(a, b);
+      WORLD.highways.push({ city: ca, pts: d.pts });
+      WORLD.bridges.push({ a, b, ca, cb, name });
+      if (name) { // a named bridge carries a landmark tag over its main span (anchored to the sea, not to an island lift)
+        const mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
+        const isl = islands.reduce((p, m) => (Math.hypot(m.c.x - mx, m.c.z - mz) < Math.hypot(p.c.x - mx, p.c.z - mz) ? m : p));
+        LANDMARKS3D.push({ id: name, name, isl, x: mx - isl.c.x, z: mz - isl.c.z, top: top + 0.1, city: cb, sc: 1, r: 1, nature: false, fixed: true });
+      }
+      return d;
+    };
+    for (const [ca, cb] of pairs) {
+      const A2 = R[ca], B2 = R[cb]; let best = null, bd = Infinity;
+      for (let i = 0; i < A2.pts.length; i += 2) for (let j = 0; j < B2.pts.length; j += 2) { const a = A2.pts[i], b = B2.pts[j], dd = Math.hypot(a[0] - b[0], a[1] - b[1]); if (dd < bd) { bd = dd; best = [a, b]; } }
+      const [a, b] = best, d = build(a, b, ca, cb, "stays");
+      // ferries shuttle alongside the bridge, kept between the two ring roads so bigger boats never pass under a deck
       for (const off of [-3.2, 3.4]) {
-        const sx = a[0] + nx * off, sz = a[1] + nz * off, ex = b[0] + nx * off, ez = b[1] + nz * off;
-        // start/end just outside each island's coaster belt
-        WORLD.ferryRoutes.push({ ax: sx - ux * 2.6, az: sz - uz * 2.6, bx: ex + ux * 2.6, bz: ez + uz * 2.6 });
+        const sx = a[0] + d.nx * off, sz = a[1] + d.nz * off, ex = b[0] + d.nx * off, ez = b[1] + d.nz * off;
+        WORLD.ferryRoutes.push({ ax: sx + d.ux * 1.2, az: sz + d.uz * 1.2, bx: ex - d.ux * 1.2, bz: ez - d.uz * 1.2 });
+      }
+    }
+    /* Taipei–New Taipei: the two real crossings, each anchored by its true coordinates on both shores */
+    if (R.taipei && R.newtaipei) {
+      const NAMED = [
+        ["淡江大橋", [121.437, 25.183], "mono"], // white single-pylon cable-stayed bridge at the river mouth
+        ["關渡大橋", [121.463, 25.126], "arch"], // red steel arch bridge upstream
+      ];
+      const placed = [];
+      for (const [name, ll, kind] of NAMED) {
+        const gA = WORLD.geo("taipei", ll[0], ll[1]), gB = WORLD.geo("newtaipei", ll[0], ll[1]);
+        const near = (pts, g) => [...pts].sort((p, q) => Math.hypot(p[0] - g[0], p[1] - g[1]) - Math.hypot(q[0] - g[0], q[1] - g[1])).slice(0, 70);
+        const cand = [];
+        for (const a of near(R.taipei.pts, gA)) for (const b of near(R.newtaipei.pts, gB)) cand.push([Math.hypot(a[0] - b[0], a[1] - b[1]) + 0.6 * (Math.hypot(a[0] - gA[0], a[1] - gA[1]) + Math.hypot(b[0] - gB[0], b[1] - gB[1])), a, b]);
+        cand.sort((p, q) => p[0] - q[0]);
+        const hit = cand.find(([, a, b]) => overWater(a, b) && placed.every(([pa, pb]) => Math.min(Math.hypot(a[0] - pa[0], a[1] - pa[1]), Math.hypot(b[0] - pb[0], b[1] - pb[1])) > 5));
+        if (!hit) continue;
+        const [, a, b] = hit; placed.push([a, b]);
+        build(a, b, "taipei", "newtaipei", kind, name);
       }
     }
   }

@@ -658,7 +658,7 @@ controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
 controls.minPolarAngle = THREE.MathUtils.degToRad(22);
 controls.maxPolarAngle = THREE.MathUtils.degToRad(70);
 controls.minDistance = 3;
-controls.maxDistance = 95;
+controls.maxDistance = 95; // placeholder — main.js locks this to the Taipei-centred panorama distance on init/resize
 
 /* ---------- layout: 2D axial atlas -> world ---------- */
 const K = SP / A.S;
@@ -1094,6 +1094,23 @@ const ENV = {};
   });
   const sky = new THREE.Mesh(new THREE.SphereGeometry(230, 32, 18), skyMat);
   sky.renderOrder = -10; sky.position.copy(MID); scene.add(sky);
+  /* starfield: world-fixed points just inside the sky dome, so a low camera never meets black void.
+     Drawn right after the sky gradient and before everything else, so sea and islands always cover it. */
+  const stars = (() => {
+    const N = 1100, pos = new Float32Array(N * 3), colr = new Float32Array(N * 3), Rs = rng(777);
+    for (let i = 0; i < N; i++) {
+      const th = Rs() * Math.PI * 2, y = Rs() * 1.08 - 0.08, r = Math.sqrt(Math.max(0, 1 - y * y)); // mostly above the horizon, a few at it
+      pos.set([Math.cos(th) * r, y, Math.sin(th) * r], i * 3);
+      const b = 0.45 + Rs() * 0.55, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
+      colr.set([b * (warm ? 1 : cool ? 0.85 : 1), b * (warm ? 0.9 : cool ? 0.92 : 1), b * (warm ? 0.75 : 1)], i * 3);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(colr, 3));
+    const m = new THREE.PointsMaterial({ size: 1.7, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
+    const pts = new THREE.Points(g, m);
+    pts.renderOrder = -9; pts.position.copy(MID); pts.scale.setScalar(226); pts.visible = false; scene.add(pts);
+    return pts;
+  })();
   scene.fog = new THREE.Fog(0xeef3f8, 70, 210);
 
   /* ---------- open sea ---------- */
@@ -1227,6 +1244,7 @@ const ENV = {};
     sun.castShadow = sun.intensity > 0.6;
     scene.fog.color.copy(skyMat.uniforms.uHorizon.value);
     scene.fog.near = kind === "fog" ? 12 : wet > 0.5 ? 40 : 70; scene.fog.far = kind === "fog" ? 70 : wet > 0.5 ? 150 : 210;
+    ENV.fog0 = { near: scene.fog.near, far: scene.fog.far }; // base values: main.js scales them up when the camera pulls far back
     waterMat.uniforms.uColor.value.copy(col("#7fc0d4")).lerp(col("#8a9aa6"), gray * 0.7);
     waterMat.uniforms.uDeep.value.copy(col("#2f7aa3")).lerp(col("#4d5c68"), gray * 0.6);
     waterMat.uniforms.uChop.value = THREE.MathUtils.clamp((W.wind || 10) / 40, 0.1, 1.2);
@@ -1243,6 +1261,9 @@ const ENV = {};
     MAT.glow.emissiveIntensity = lampsOn * (1.1 + k.night * 0.7);
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
+    // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)
+    const starA = Math.max(0, k.night - cloud * 0.35 - wet * 0.6) * 0.95;
+    stars.material.opacity = starA; stars.visible = starA > 0.02;
     ENV.state = { minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
     renderer.toneMappingExposure = 1 - k.night * 0.15;
     ENV.onChange?.(ENV.state);
@@ -1272,6 +1293,11 @@ const ENV = {};
     }
   };
   ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };
+  ENV.fit = (d) => { // the Taipei-centred panorama pulls back past the original dome: grow sky/sea and the far plane with it
+    const k = Math.max(1, (d + 70) / 230);
+    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k);
+    camera.far = Math.max(420, (d + 70) * 2.4); camera.updateProjectionMatrix();
+  };
   ENV.isDarkUI = isDarkUI;
   setInterval(apply, 60000); // follow the clock
 }
@@ -2144,11 +2170,13 @@ const SHIPS = {};
       p("rbox", 0, 0.74, -0.2, 0.48, 0.22, 1.3, "#ffffff"); p("box", 0, 0.76, -0.2, 0.485, 0.08, 1.2, "#bfe3f5", 0, 0, 0, true);
       p("rbox", 0, 0.98, -0.5, 0.18, 0.3, 0.26, "#28c8c8");
     },
-    fishing(p) {
+    fishing(p) { // small working boat: wheelhouse, mast with fish-luring lamps, net boom and outrigger poles
       hull(p, 1.3, 0.34, 0.2, "#f8f6f1", "#d8d2c6", "#2f6fd6");
       p("rbox", 0, 0.34, -0.2, 0.24, 0.2, 0.3, "#ffffff"); p("cyl", 0, 0.6, 0.15, 0.015, 0.6, 0.015, "#8a6a4a");
       p("box", 0, 0.52, 0.32, 0.005, 0.005, 0.5, "#3b4148", 0, 0.7); p("sphere", 0, 0.92, 0.15, 0.05, 0.05, 0.05, "#fff3c4", 0, 0, 0, true);
       for (let k = 0; k < 4; k++) p("sphere", 0, 0.62, 0.42 - k * 0.1, 0.035, 0.035, 0.035, "#fff3c4", 0, 0, 0, true);
+      for (const s of [-1, 1]) p("cyl", s * 0.14, 0.5, 0.05, 0.012, 0.74, 0.012, "#8a6a4a", 0, 0, s * 1.0); // outrigger net poles
+      p("box", 0, 0.26, 0.45, 0.2, 0.08, 0.16, "#2bb3a6"); p("sphere", 0.1, 0.25, -0.5, 0.045, 0.045, 0.045, "#ff9a3c"); // catch box + buoy
     },
     tug(p) {
       hull(p, 1.1, 0.42, 0.24, "#c8102e", "#3b4148", "#14213d");
@@ -2159,6 +2187,19 @@ const SHIPS = {};
       hull(p, 1.2, 0.3, 0.16, "#ffffff", "#c9a27a");
       p("cyl", 0, 0.75, 0.05, 0.02, 1.2, 0.02, "#d0d4d8");
       p("prism", 0, 0.7, -0.15, 0.01, 0.95, 0.5, "#ffffff", Math.PI / 2, 0, 0); p("prism", 0, 0.55, 0.3, 0.01, 0.6, 0.3, "#e0453c", Math.PI / 2, 0, 0);
+    },
+    plane(p) { // low-poly airliner (not in the sea MIX): white fuselage, swept wings, twin engines, red fin
+      p("cyl", 0, 0, 0, 0.17, 2.5, 0.17, "#f8f6f1", 0, Math.PI / 2);
+      p("sphere", 0, 0, 1.28, 0.17, 0.16, 0.28, "#eef1f5");
+      p("sphere", 0, 0.02, -1.26, 0.15, 0.14, 0.3, "#f8f6f1");
+      p("box", 0, 0.1, 1.02, 0.24, 0.1, 0.24, "#2b3138", 0, 0, 0, true); // cockpit glass, lit at night
+      for (const s of [-1, 1]) {
+        p("box", s * 0.75, -0.04, 0.1, 1.5, 0.045, 0.5, "#e9eef4", s * 0.5);        // swept main wing
+        p("box", s * 0.4, 0.14, -1.25, 0.72, 0.035, 0.3, "#e9eef4", s * 0.45);      // tailplane
+        p("cyl", s * 0.52, -0.15, 0.42, 0.1, 0.34, 0.1, "#9aa0a6", 0, Math.PI / 2); // engine
+        p("box", s * 0.165, 0.04, 0.15, 0.01, 0.05, 1.5, "#bfe3f5", 0, 0, 0, true); // window strip
+      }
+      p("box", 0, 0.4, -1.28, 0.045, 0.66, 0.4, "#e0453c", 0, -0.45);               // swept fin
     },
   };
   SHIPS.make = (type, r) => merge((p) => TYPES[type](p, r));
@@ -2331,16 +2372,16 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       pp("box", (px + hx) / 2, H, (pz + hz) / 2, 0.16, 0.025, 0.025, "#3b4148", -a);
       pp("box", hx, H + 0.02, hz, 0.2, 0.08, 0.16, "#2b3036", -a, 0, -0.5);          // hood
       pp("box", hx + Math.cos(a) * 0.02, H - 0.02, hz + Math.sin(a) * 0.02, 0.16, 0.02, 0.12, "#fff6d8", -a, 0, -0.5, true); // lamp face
-      LAMP_BEAMS.push([isl.c.x + hx, TOP + H - 0.03, isl.c.z + hz, isl.c.x + px * 0.25, TOP + 0.07, isl.c.z + pz * 0.25, Math.max(cw, cd) * 0.42]);
+      LAMP_BEAMS.push([isl.c.x + hx, TOP + H - 0.03, isl.c.z + hz, isl.c.x + px * 0.25, TOP + 0.07, isl.c.z + pz * 0.25, Math.max(cw, cd) * 0.46]);
     }
-    LAMP_POOLS.push([isl.c.x, TOP + 0.075, isl.c.z, Math.max(cw, cd) * 0.42]);
+    LAMP_POOLS.push([isl.c.x, TOP + 0.075, isl.c.z, Math.max(cw, cd) * 0.5]); // campus flood pool: wider than a street lamp so people.js can light it separately
     hold(isl.id, 0, 0, Math.hypot(cw, cd) / 2 + 0.1);
     const body = WORLD.bodies.get(isl.id); body.anchor.set(0, TOP, cd / 2 + 0.28);
   }
 
   /* ---------- city landmarks for the live city ---------- */
   const LM = { taipei: [["t101", "台北 101", (i) => i.c.x, 2.3], ["dome", "台北大巨蛋", (i) => i.c.x * 0.8 - Math.abs(i.c.z) * 0.5, 1.9], ["station", "台北車站", (i) => -i.c.x - Math.abs(i.c.z) * 0.6, 1.8], ["shinkong", "新光摩天大樓", (i) => -i.c.x - Math.abs(i.c.z - 1.5) * 0.6 + 0.01, 2.0], ["grand", "圓山大飯店", (i) => -i.c.z, 1.8], ["npm", "國立故宮博物院", (i) => -i.c.z + i.c.x * 0.2, 1.6], ["miramar", "美麗華摩天輪", (i) => -i.c.z * 0.7 + i.c.x * 0.7, 1.6], ["cks", "中正紀念堂", (i) => i.c.z * 0.5 - Math.abs(i.c.x + 2), 1.6], ["sysm", "國父紀念館", (i) => i.c.x - Math.abs(i.c.z) * 0.8, 1.5], ["longshan", "艋舺龍山寺", (i) => -i.c.x + i.c.z * 0.5, 1.5], ["redhouse", "西門紅樓", (i) => -i.c.x - Math.abs(i.c.z) * 0.3, 1.5], ["yangming", "陽明山", (i) => -i.c.z * 1.2 - i.c.x * 0.2, 1.5, 1], ["elephant", "象山", (i) => i.c.x * 1.2 + i.c.z * 0.4, 1.4, 1], ["maokong", "貓空", (i) => i.c.x * 0.7 + i.c.z, 1.3, 1], ["daan", "大安森林公園", (i) => -Math.hypot(i.c.x - 2, i.c.z - 1), 1.3, 1], ["beitou", "北投溫泉", (i) => -i.c.z - i.c.x * 0.6, 1.3, 1]],
-    newtaipei: [["ntcity", "新北市政府", null, 1.8], ["danjiang", "淡江大橋", null, 1.2], ["fort", "淡水紅毛城", null, 1.6], ["jiufen", "九份老街", null, 1.5], ["shifen", "十分瀑布・天燈", null, 1.4, 1], ["queen", "野柳女王頭", null, 1.6, 1]],
+    newtaipei: [["ntcity", "新北市政府", null, 1.8], ["fort", "淡水紅毛城", null, 1.6], ["jiufen", "九份老街", null, 1.5], ["shifen", "十分瀑布・天燈", null, 1.4, 1], ["queen", "野柳女王頭", null, 1.6, 1]], // 淡江大橋 is now the real cross-strait bridge below, not an on-island model
     keelung: [["port", "基隆港", null, 1.5], ["guanyin", "中正公園大觀音", null, 1.8], ["miaokou", "廟口夜市", null, 1.5], ["houses", "正濱漁港彩色屋", null, 1.5], ["heping", "和平島", null, 1.4, 1]],
     taoyuan: [["airport", "桃園國際機場", null, 1.3], ["xpark", "Xpark 水族館", null, 1.6], ["daxi", "大溪老街", null, 1.6], ["rainbow", "永安漁港彩虹橋", null, 1.6], ["dam", "石門水庫", null, 1.3, 1], ["lala", "拉拉山", null, 1.4, 1]] };
   for (const [city, list] of Object.entries(LM)) {
@@ -2351,16 +2392,17 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     // real positions (lon, lat): each landmark goes to the nearest spot on land where its whole footprint fits
     const GEO_LL = { t101: [121.5645, 25.034], dome: [121.5606, 25.0437], station: [121.517, 25.0478], shinkong: [121.515, 25.0461], grand: [121.5262, 25.0784], npm: [121.5485, 25.1024], miramar: [121.5575, 25.0835], cks: [121.5219, 25.035], sysm: [121.5603, 25.04], longshan: [121.4999, 25.0372], redhouse: [121.5068, 25.042], yangming: [121.545, 25.155], elephant: [121.5767, 25.0275], maokong: [121.588, 24.968], daan: [121.5355, 25.03], beitou: [121.508, 25.137],
       ntcity: [121.4648, 25.0123], danjiang: [121.429, 25.168], fort: [121.433, 25.1753], jiufen: [121.8445, 25.1092], shifen: [121.787, 25.0475], queen: [121.69, 25.2063],
-      port: [121.74, 25.133], guanyin: [121.7445, 25.1290], miaokou: [121.7435, 25.1285], houses: [121.774, 25.15], heping: [121.765, 25.16],
+      port: [121.74, 25.133], guanyin: [121.7445, 25.1290], miaokou: [121.7435, 25.1285], houses: [121.774, 25.15], heping: [121.769, 25.163],
       airport: [121.233, 25.0797], xpark: [121.215, 25.0137], daxi: [121.287, 24.883], rainbow: [121.013, 24.989], dam: [121.24, 24.815], lala: [121.44, 24.718] };
     for (const [id, name, score, sc0, nature] of list) {
       let isl = null, best = null, sc = sc0;
       const [tx, tz] = GEO_LL[id] ? WORLD.geo(city, ...GEO_LL[id]) : [0, 0];
       // spiral out from the real spot: the footprint must sit on land and clear every policy campus and other landmark (it may span a street)
       const cells = []; for (let x = -14; x <= 14; x += 0.25) for (let z = -14; z <= 14; z += 0.25) cells.push([tx + x, tz + z, Math.hypot(x, z)]); cells.sort((p, q) => p[2] - q[2]);
+      const LPAD = { heping: 1.1 }; // extra label clearance: 和平島 sits right by 大觀音 on the Keelung shore, so its tag needs more room
       const okAt = (wx, wz, R) => GEOM.pip(wx, wz, coast) && GEOM.nearestEdge(wx, wz, coast).d >= R + 0.35 &&
         mine.every((m) => Math.hypot(wx - m.c.x, wz - m.c.z) - m.plazaR >= R * 0.92) &&
-        !LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - wx, L.isl.c.z + L.z - wz) < R + L.r + 0.7); // generous gaps so labels never stack
+        !LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - wx, L.isl.c.z + L.z - wz) < R + L.r + (LPAD[id] || 0.7)); // generous gaps so labels never stack
       for (const f of [1, 0.93, 0.86, 0.8]) { // keep sizes consistent: move a landmark further before shrinking it much
         const s2 = sc0 * f, R = (FP[id] || 0.8) * s2, lim = f === 1 ? 3 : f > 0.9 ? 5 : f > 0.85 ? 8 : 99;
         const hit = cells.find(([wx, wz, dd]) => dd <= lim && okAt(wx, wz, R));
@@ -2587,25 +2629,25 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       for (const f of [1.6]) { const [mx, mz] = P(f, 0); sp("box", mx, yD, mz, 0.16, 0.04, 4.2, "#e9e2d2", -an); }
       for (let s2 = -1.9; s2 <= 1.9; s2 += 0.55) {
         for (const side of [-1, 1]) { const [fx, fz] = P(1.6 + side * 0.4, s2); sp("box", fx, yD, fz, 0.7, 0.035, 0.07, "#e9e2d2", -an); }
-        for (const side of [-1, 1]) { if (R3() < 0.25) continue; const [bx, bz] = P(1.6 + side * 0.42, s2 + 0.27); if (typeof SHIPS !== "undefined") { const g = SHIPS.make(R3() < 0.75 ? "yacht" : "fishing", rng(hash(c.city) + s2 * 13 + side)); g.scale.setScalar(0.32); g.position.set(bx, WATER_Y - 0.03, bz); g.rotation.y = Math.atan2(nx, nz) + (side < 0 ? Math.PI : 0); scene.add(g); } }
+        for (const side of [-1, 1]) { if (R3() < 0.25) continue; const [bx, bz] = P(1.6 + side * 0.42, s2 + 0.27); if (typeof SHIPS !== "undefined") { const g = SHIPS.make(R3() < 0.75 ? "yacht" : "fishing", rng(hash(c.city) + s2 * 13 + side)); g.scale.setScalar(0.45); g.position.set(bx, WATER_Y - 0.03, bz); g.rotation.y = Math.atan2(nx, nz) + (side < 0 ? Math.PI : 0); scene.add(g); } }
       }
       const [hx, hz] = P(-0.4, 0); sp("rbox", hx, TOP + 0.15, hz, 0.7, 0.3, 0.45, "#f8f6f1", -an); sp("box", hx, TOP + 0.32, hz, 0.78, 0.04, 0.53, "#2f6fd6", -an);
       const [tx, tz] = P(-0.4, 0.6); sp("cyl", tx, TOP + 0.35, tz, 0.02, 0.7, 0.02, "#f8f6f1"); sp("box", tx + ux * 0.1, TOP + 0.62, tz + uz * 0.1, 0.18, 0.12, 0.01, "#2f6fd6", -Math.atan2(uz, ux));
     }
   }
 
-  /* ---------- bridges between the islands (cable-stayed, joining the ring expressways) and ferry routes ---------- */
+  /* ---------- bridges between the islands (joining the ring expressways) and ferry routes ---------- */
   WORLD.bridges = []; WORLD.ferryRoutes = []; WORLD.bridgeEnds = [];
   {
     const R = WORLD.rings || {}, cities = Object.keys(R), hub = R.taipei ? "taipei" : cities[0];
-    const pairs = cities.filter((c) => c !== hub).map((c) => [hub, c]);
-    // also link each outer island to its nearest neighbour if that is much closer than Taipei
-    for (const c of cities) if (c !== hub) { let best = null, bd = Infinity; for (const o of cities) if (o !== c && o !== hub) { const d = Math.hypot(R[c].center[0] - R[o].center[0], R[c].center[1] - R[o].center[1]); if (d < bd) { bd = d; best = o; } } const dh = Math.hypot(R[c].center[0] - R[hub].center[0], R[c].center[1] - R[hub].center[1]); if (best && bd < dh * 0.85 && !pairs.some(([a, b]) => (a === best && b === c) || (a === c && b === best))) pairs.push([c, best]); }
-    for (const [ca, cb] of pairs) {
-      const A = R[ca], B = R[cb]; let best = null, bd = Infinity;
-      for (let i = 0; i < A.pts.length; i += 2) for (let j = 0; j < B.pts.length; j += 2) { const a = A.pts[i], b = B.pts[j], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (d < bd) { bd = d; best = [a, b]; } }
-      const [a, b] = best, Y = A.deck, L = bd, ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L, ang = Math.atan2(uz, ux), nx = -uz, nz = ux;
-      WORLD.bridgeEnds.push(a, b);
+    // ring network: Taipei and New Taipei each link to Keelung and Taoyuan; Taipei–New Taipei gets the two named bridges below
+    const pairs = [];
+    for (const c of cities) if (c !== hub && c !== "newtaipei") { pairs.push([hub, c]); if (R.newtaipei) pairs.push(["newtaipei", c]); }
+    const coasts = cities.map((c) => cityInfo(c).coast);
+    const overWater = (a, b) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.ceil(L / 0.8); for (let k = 1; k < n; k++) { const x = a[0] + (b[0] - a[0]) * k / n, z = a[1] + (b[1] - a[1]) * k / n; if (coasts.some((P) => GEOM.pip(x, z, P))) return false; } return true; };
+    /* shared roadway: deck segments, kerbs, dashes, lamps and piers; returns the traffic path and the frame vectors */
+    const deck = (a, b, Y) => {
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uz = (b[1] - a[1]) / L, ang = Math.atan2(uz, ux), nx = -uz, nz = ux;
       const n = Math.max(2, Math.round(L / 0.6)), pts = [];
       for (let k = 0; k < n; k++) {
         const f0 = k / n, f1 = (k + 1) / n, mx = a[0] + (b[0] - a[0]) * (f0 + f1) / 2, mz = a[1] + (b[1] - a[1]) * (f0 + f1) / 2, seg = L / n;
@@ -2617,7 +2659,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         pts.push(new THREE.Vector3(a[0] + (b[0] - a[0]) * f0, Y + 0.07, a[1] + (b[1] - a[1]) * f0));
       }
       pts.push(new THREE.Vector3(b[0], Y + 0.07, b[1]));
-      // two white A-frame pylons with fanned stay cables
+      return { pts, L, ux, uz, nx, nz, ang };
+    };
+    /* generic link: two white A-frame pylons with fanned stay cables */
+    const stays = (a, b, d, Y) => {
+      const { L, ux, uz, nx, nz, ang } = d;
       for (const f of [1 / 3, 2 / 3]) {
         const px = a[0] + (b[0] - a[0]) * f, pz = a[1] + (b[1] - a[1]) * f, PH = 2.4;
         for (const o of [-0.36, 0.36]) sp("box", px + nx * o * 0.6, Y + PH / 2, pz + nz * o * 0.6, 0.12, PH + 0.2, 0.12, "#f4f6f8", -ang, 0, 0);
@@ -2625,14 +2671,89 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         const ph = Y - WATER_Y; sp("box", px, WATER_Y + ph / 2, pz, 0.5, ph, 0.7, "#cfc9bd", -ang);
         for (const side of [-1, 1]) for (let c = 1; c <= 5; c++) { const dd = c * (L / 3 / 2) / 5.5 * side, ex = px + ux * dd, ez = pz + uz * dd, len = Math.hypot(dd, PH - 0.15); for (const o of [-0.22, 0.22]) sp("box", (px + ex) / 2 + nx * o, Y + (PH - 0.1) / 2 + 0.05, (pz + ez) / 2 + nz * o, len, 0.012, 0.012, "#e8edf2", -ang, 0, Math.atan2(-(PH - 0.15), dd)); }
       }
-      WORLD.highways.push({ city: ca, pts });
-      WORLD.bridges.push({ a, b, ca, cb });
-      // ferries cross alongside the bridge, harbour to harbour, a little way off to either side
-      const ca0 = cityInfo(ca).coast, cb0 = cityInfo(cb).coast;
+      return Y + 2.55;
+    };
+    /* 關渡大橋: red steel through-arch over the deck with vertical hangers (original low-poly take) */
+    const arch = (a, b, d, Y) => {
+      const { L, nx, nz, ang } = d, f0 = 0.2, f1 = 0.8, AH = Math.min(2.0, L * 0.14), NS = 14;
+      const yAt = (t) => Y + 0.08 + Math.sin(Math.PI * t) * AH;
+      for (const o of [-0.3, 0.3]) {
+        let pf = f0, py = yAt(0);
+        for (let k = 1; k <= NS; k++) {
+          const t = k / NS, f = f0 + (f1 - f0) * t, y = yAt(t);
+          const x0 = a[0] + (b[0] - a[0]) * pf + nx * o, z0 = a[1] + (b[1] - a[1]) * pf + nz * o;
+          const x1 = a[0] + (b[0] - a[0]) * f + nx * o, z1 = a[1] + (b[1] - a[1]) * f + nz * o;
+          const run = L * (f - pf), rise = y - py, len = Math.hypot(run, rise);
+          sp("box", (x0 + x1) / 2, (py + y) / 2, (z0 + z1) / 2, len + 0.02, 0.08, 0.08, "#e0453c", -ang, 0, Math.atan2(rise, run));
+          pf = f; py = y;
+        }
+      }
+      for (let k = 1; k < NS; k++) {
+        const t = k / NS, f = f0 + (f1 - f0) * t, y = yAt(t), x = a[0] + (b[0] - a[0]) * f, z = a[1] + (b[1] - a[1]) * f;
+        if (k % 2 === 0) sp("box", x, y, z, 0.06, 0.06, 0.66, "#e0453c", -ang); // wind braces between the two ribs
+        if (y - Y > 0.4) for (const o of [-0.3, 0.3]) sp("box", x + nx * o, (y + Y) / 2 + 0.03, z + nz * o, 0.025, y - Y - 0.16, 0.025, "#f0a39a"); // hangers
+      }
+      return Y + 0.08 + AH;
+    };
+    /* 淡江大橋: one white pylon, inclined legs meeting over the deck, cables fanning both ways */
+    const mono = (a, b, d, Y) => {
+      const { L, ux, uz, nx, nz, ang } = d, f = 0.42, PH = 3.3;
+      const px = a[0] + (b[0] - a[0]) * f, pz = a[1] + (b[1] - a[1]) * f, ph = Y - WATER_Y;
+      sp("box", px, WATER_Y + ph / 2, pz, 0.55, ph, 0.9, "#cfc9bd", -ang);
+      for (const s of [-1, 1]) {
+        const legH = PH * 0.62, run = -s * 0.36, len = Math.hypot(run, legH);
+        sp("box", px + nx * s * 0.28, Y + legH / 2, pz + nz * s * 0.28, len, 0.16, 0.14, "#f4f6f8", -(ang + Math.PI / 2), 0, Math.atan2(legH, run));
+      }
+      sp("box", px, Y + PH * 0.62 + (PH * 0.38) / 2, pz, 0.14, PH * 0.38 + 0.1, 0.14, "#f4f6f8");
+      sp("box", px, Y + 0.95, pz, 0.12, 0.1, 1.0, "#f4f6f8", -ang);
+      sp("sphere", px, Y + PH + 0.1, pz, 0.06, 0.06, 0.06, "#ff5a5a", 0, 0, 0, true);
+      for (const side of [-1, 1]) for (let c = 1; c <= 7; c++) {
+        const reach = Math.min(L * 0.36, 5.2), dd = (c / 7) * reach * side, ex = px + ux * dd, ez = pz + uz * dd;
+        const topY = Y + PH - 0.15 - c * 0.06, len = Math.hypot(dd, topY - Y - 0.1);
+        for (const o of [-0.2, 0.2]) sp("box", (px + ex) / 2 + nx * o, (topY + Y + 0.1) / 2, (pz + ez) / 2 + nz * o, len, 0.012, 0.012, "#e8edf2", -ang, 0, Math.atan2(-(topY - Y - 0.1), dd));
+      }
+      return Y + PH + 0.15;
+    };
+    const build = (a, b, ca, cb, kind, name) => {
+      const Y = R[ca].deck, d = deck(a, b, Y);
+      const top = kind === "arch" ? arch(a, b, d, Y) : kind === "mono" ? mono(a, b, d, Y) : stays(a, b, d, Y);
+      WORLD.bridgeEnds.push(a, b);
+      WORLD.highways.push({ city: ca, pts: d.pts });
+      WORLD.bridges.push({ a, b, ca, cb, name });
+      if (name) { // a named bridge carries a landmark tag over its main span (anchored to the sea, not to an island lift)
+        const mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
+        const isl = islands.reduce((p, m) => (Math.hypot(m.c.x - mx, m.c.z - mz) < Math.hypot(p.c.x - mx, p.c.z - mz) ? m : p));
+        LANDMARKS3D.push({ id: name, name, isl, x: mx - isl.c.x, z: mz - isl.c.z, top: top + 0.1, city: cb, sc: 1, r: 1, nature: false, fixed: true });
+      }
+      return d;
+    };
+    for (const [ca, cb] of pairs) {
+      const A2 = R[ca], B2 = R[cb]; let best = null, bd = Infinity;
+      for (let i = 0; i < A2.pts.length; i += 2) for (let j = 0; j < B2.pts.length; j += 2) { const a = A2.pts[i], b = B2.pts[j], dd = Math.hypot(a[0] - b[0], a[1] - b[1]); if (dd < bd) { bd = dd; best = [a, b]; } }
+      const [a, b] = best, d = build(a, b, ca, cb, "stays");
+      // ferries shuttle alongside the bridge, kept between the two ring roads so bigger boats never pass under a deck
       for (const off of [-3.2, 3.4]) {
-        const sx = a[0] + nx * off, sz = a[1] + nz * off, ex = b[0] + nx * off, ez = b[1] + nz * off;
-        // start/end just outside each island's coaster belt
-        WORLD.ferryRoutes.push({ ax: sx - ux * 2.6, az: sz - uz * 2.6, bx: ex + ux * 2.6, bz: ez + uz * 2.6 });
+        const sx = a[0] + d.nx * off, sz = a[1] + d.nz * off, ex = b[0] + d.nx * off, ez = b[1] + d.nz * off;
+        WORLD.ferryRoutes.push({ ax: sx + d.ux * 1.2, az: sz + d.uz * 1.2, bx: ex - d.ux * 1.2, bz: ez - d.uz * 1.2 });
+      }
+    }
+    /* Taipei–New Taipei: the two real crossings, each anchored by its true coordinates on both shores */
+    if (R.taipei && R.newtaipei) {
+      const NAMED = [
+        ["淡江大橋", [121.437, 25.183], "mono"], // white single-pylon cable-stayed bridge at the river mouth
+        ["關渡大橋", [121.463, 25.126], "arch"], // red steel arch bridge upstream
+      ];
+      const placed = [];
+      for (const [name, ll, kind] of NAMED) {
+        const gA = WORLD.geo("taipei", ll[0], ll[1]), gB = WORLD.geo("newtaipei", ll[0], ll[1]);
+        const near = (pts, g) => [...pts].sort((p, q) => Math.hypot(p[0] - g[0], p[1] - g[1]) - Math.hypot(q[0] - g[0], q[1] - g[1])).slice(0, 70);
+        const cand = [];
+        for (const a of near(R.taipei.pts, gA)) for (const b of near(R.newtaipei.pts, gB)) cand.push([Math.hypot(a[0] - b[0], a[1] - b[1]) + 0.6 * (Math.hypot(a[0] - gA[0], a[1] - gA[1]) + Math.hypot(b[0] - gB[0], b[1] - gB[1])), a, b]);
+        cand.sort((p, q) => p[0] - q[0]);
+        const hit = cand.find(([, a, b]) => overWater(a, b) && placed.every(([pa, pb]) => Math.min(Math.hypot(a[0] - pa[0], a[1] - pa[1]), Math.hypot(b[0] - pb[0], b[1] - pb[1])) > 5));
+        if (!hit) continue;
+        const [, a, b] = hit; placed.push([a, b]);
+        build(a, b, "taipei", "newtaipei", kind, name);
       }
     }
   }
@@ -2680,11 +2801,16 @@ const PEOPLE = { list: [], routes: [] };
   /* pools of warm light under the street lamps: invisible by day, they fade in when the lamps switch on at 17:00 */
   {
     const tex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const g = c.getContext("2d"), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,226,150,1)"); gr.addColorStop(0.5, "rgba(255,210,120,.45)"); gr.addColorStop(1, "rgba(255,200,110,0)"); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
-    const pm = new THREE.MeshBasicMaterial({ map: tex, color: new THREE.Color(1.8, 1.55, 1.1), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0, toneMapped: false, fog: false });
-    const im = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), pm, Math.max(1, LAMP_POOLS.length)), M = new THREE.Matrix4();
-    LAMP_POOLS.forEach(([x, y, z, r], i) => im.setMatrixAt(i, M.makeScale(r * 3, 1, r * 3).setPosition(x, y + 0.01, z)));
-    im.count = LAMP_POOLS.length; im.frustumCulled = false; im.renderOrder = 2; scene.add(im);
-    PEOPLE.lampPools = pm;
+    const M = new THREE.Matrix4();
+    const mkPools = (list, colr) => {
+      const pm = new THREE.MeshBasicMaterial({ map: tex, color: colr, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0, toneMapped: false, fog: false });
+      const im = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), pm, Math.max(1, list.length));
+      list.forEach(([x, y, z, r], i) => im.setMatrixAt(i, M.makeScale(r * 3, 1, r * 3).setPosition(x, y + 0.01, z)));
+      im.count = list.length; im.frustumCulled = false; im.renderOrder = 2; scene.add(im); return pm;
+    };
+    // street lamps and the policy-campus floodlights (the wide pools) are lit separately, so the campuses stand out at night
+    PEOPLE.lampPools = mkPools(LAMP_POOLS.filter((p2) => p2[3] <= 0.6), new THREE.Color(1.8, 1.55, 1.1));
+    PEOPLE.campusPools = mkPools(LAMP_POOLS.filter((p2) => p2[3] > 0.6), new THREE.Color(2.4, 2.15, 1.5));
     // soft light cones from each floodlight down onto its campus
     const bm = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.0, 0.9, 0.65), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false, fog: false });
     const cone = new THREE.ConeGeometry(1, 1, 20, 1, true).translate(0, -0.5, 0); // apex at origin, opening downward along -y
@@ -2732,26 +2858,85 @@ const PEOPLE = { list: [], routes: [] };
     carB.instanceMatrix.needsUpdate = carG.instanceMatrix.needsUpdate = true;
   };
 
-  /* ships: a container ship docked at the port, others sailing lanes between the islands */
+  /* ships: a container ship docked at the port, others sailing lanes between the islands.
+     Toy-town scale (not true to life, by request): big ships read clearly even from the panorama. */
   PEOPLE.ships = [];
+  const SHIP_SCL = { frigate: 1.5, destroyer: 1.5, coastguard: 1.3, container: 1.9, bulk: 1.8, tanker: 1.8, ferry: 1.6, fishing: 1.15, tug: 1.25, yacht: 1.15 };
   if (typeof SHIPS !== "undefined") {
     const seaOK = (x, z) => [...WORLD.cities.values()].every((ci) => !GEOM.pip(x, z, ci.seaGuard || (ci.seaGuard = GEOM.offsetRound(GEOM.hull(ci.coast), ci.live ? 4.6 : 2.4, 3))));
-    if (WORLD.port) { const g = SHIPS.make("container", rng(5)); g.position.set(WORLD.port.x, WATER_Y - 0.06, WORLD.port.z); g.rotation.y = Math.PI / 2; g.scale.setScalar(0.9); scene.add(g); }
-    const MIXS = ["frigate", "container", "fishing", "ferry", "coastguard", "tanker", "yacht", "fishing", "bulk", "tug", "destroyer", "yacht", "container", "fishing", "yacht", "tanker", "coastguard", "fishing", "bulk", "yacht"];
+    const bridgeClear = (x, z, m) => (WORLD.bridges || []).every((B) => GEOM.segDist(x, z, B.a, B.b) > m);
+    const TALL = new Set(["frigate", "destroyer", "container", "bulk", "tanker", "ferry"]); // too tall at this scale to pass under a bridge deck
+    if (WORLD.port) { const g = SHIPS.make("container", rng(5)); g.position.set(WORLD.port.x, WATER_Y - 0.06, WORLD.port.z); g.rotation.y = Math.PI / 2; g.scale.setScalar(1.3); scene.add(g); }
+    const MIXS = ["frigate", "container", "fishing", "ferry", "coastguard", "tanker", "yacht", "fishing", "bulk", "tug", "destroyer", "yacht", "container", "fishing", "yacht", "tanker", "coastguard", "fishing", "bulk", "yacht", "container", "tug", "frigate", "bulk", "yacht", "container", "coastguard", "tanker", "fishing", "destroyer"];
+    const WANT = QUALITY === "high" ? MIXS.length : 20;
     const bx = bounds.clone().expandByScalar(18), Rs = rng(19);
-    for (let tries = 0; tries < 400 && PEOPLE.ships.length < MIXS.length; tries++) {
+    for (let tries = 0; tries < 900 && PEOPLE.ships.length < WANT; tries++) {
+      const type = MIXS[PEOPLE.ships.length % MIXS.length], m = TALL.has(type) ? 3.6 : 1.4;
       const x = bx.min.x + Rs() * (bx.max.x - bx.min.x), z = bx.min.z + Rs() * (bx.max.z - bx.min.z), h = Rs() * Math.PI * 2, len = 8 + Rs() * 14, ex = x + Math.cos(h) * len, ez = z + Math.sin(h) * len;
-      let ok = true; for (let s = 0; s <= 1.001 && ok; s += 0.1) ok = seaOK(x + (ex - x) * s, z + (ez - z) * s); if (!ok) continue;
-      const type = MIXS[PEOPLE.ships.length], g = SHIPS.make(type, rng(tries)); g.scale.setScalar(type === "fishing" || type === "yacht" || type === "tug" ? 0.8 : 0.85); scene.add(g);
+      let ok = true; for (let s = 0; s <= 1.001 && ok; s += 0.1) { const qx = x + (ex - x) * s, qz = z + (ez - z) * s; ok = seaOK(qx, qz) && bridgeClear(qx, qz, m); } if (!ok) continue;
+      const g = SHIPS.make(type, rng(tries)); g.scale.setScalar(SHIP_SCL[type] || 1); scene.add(g);
       PEOPLE.ships.push({ g, ax: x, az: z, bx: ex, bz: ez, t: Rs(), dir: 1, yaw: Math.atan2(ex - x, ez - z), speed: 0.35 / len, bob: Rs() * 6 });
+    }
+    // fishing fleets working each island's near waters — Keelung, the fishing harbour, gets the biggest one
+    for (const c of A.cities) {
+      if (!LIVE_CITIES.has(c.city)) continue;
+      const info = WORLD.cities.get(c.city), [fcx, fcz] = GEOM.centroid(info.coast), Rf = rng(hash(c.city) + 23);
+      const want = c.city === "keelung" ? (QUALITY === "high" ? 7 : 5) : (QUALITY === "high" ? 4 : 2);
+      for (let k = 0, tries = 0; k < want && tries < 260; tries++) {
+        const aa = Rf() * Math.PI * 2; let rr = 2;
+        while (rr < 70 && (GEOM.pip(fcx + Math.cos(aa) * rr, fcz + Math.sin(aa) * rr, info.coast) || GEOM.nearestEdge(fcx + Math.cos(aa) * rr, fcz + Math.sin(aa) * rr, info.coast).d < 5.0)) rr += 0.4;
+        const x = fcx + Math.cos(aa) * (rr + Rf() * 1.6), z = fcz + Math.sin(aa) * (rr + Rf() * 1.6);
+        const h = Rf() * Math.PI * 2, len = 2.5 + Rf() * 3, ex = x + Math.cos(h) * len, ez = z + Math.sin(h) * len;
+        let ok = true; for (let s = 0; s <= 1.001 && ok; s += 0.2) { const qx = x + (ex - x) * s, qz = z + (ez - z) * s; ok = seaOK(qx, qz) && bridgeClear(qx, qz, 1.4); } if (!ok) continue;
+        const g = SHIPS.make("fishing", rng(900 + hash(c.city) + tries)); g.scale.setScalar(1.1 + Rf() * 0.2); scene.add(g);
+        PEOPLE.ships.push({ g, ax: x, az: z, bx: ex, bz: ez, t: Rf(), dir: 1, yaw: Math.atan2(ex - x, ez - z), speed: 0.3 / len, bob: Rf() * 6 });
+        k++;
+      }
     }
   }
   // scheduled ferries between the islands: they shuttle harbour to harbour and wait a moment at each end
   if (typeof SHIPS !== "undefined") (WORLD.ferryRoutes || []).forEach((r, i) => {
     const len = Math.hypot(r.bx - r.ax, r.bz - r.az); if (len < 2) return;
-    for (const ph of [0, 0.5]) { const g = SHIPS.make(ph ? "ferry" : (i % 3 === 2 ? "container" : "ferry"), rng(300 + i * 7 + ph * 3)); g.scale.setScalar(0.7); scene.add(g);
+    // a route that passes under another bridge keeps a small, low ferry so nothing clips the deck
+    let under = false; for (let s = 0; s <= 1.001 && !under; s += 0.05) under = (WORLD.bridges || []).some((B) => GEOM.segDist(r.ax + (r.bx - r.ax) * s, r.az + (r.bz - r.az) * s, B.a, B.b) < 1.4);
+    for (const ph of [0, 0.5]) { const type = under ? "ferry" : ph ? "ferry" : (i % 3 === 2 ? "container" : "ferry"), g = SHIPS.make(type, rng(300 + i * 7 + ph * 3)); g.scale.setScalar(under ? 0.8 : Math.min(SHIP_SCL[type], len * (type === "container" ? 0.11 : 0.22))); scene.add(g);
       PEOPLE.ships.push({ g, ax: r.ax, az: r.az, bx: r.bx, bz: r.bz, t: ph, dir: ph ? -1 : 1, yaw: Math.atan2(r.bx - r.ax, r.bz - r.az), speed: 0.6 / len, bob: i + ph * 3, dwell: 2.5, wait: 0 }); }
   });
+  /* airliners: one circles the archipelago, two shuttle 桃園機場 ↔ 松山機場 with a climb-and-descend profile */
+  PEOPLE.planes = [];
+  if (typeof SHIPS !== "undefined" && WORLD.geo) {
+    const blinkR = new THREE.MeshBasicMaterial({ color: 0xff5a5a, toneMapped: false, fog: false });
+    const blinkW = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false, fog: false });
+    const mk = () => {
+      const g = SHIPS.make("plane", rng(71)); g.scale.setScalar(1.7); scene.add(g);
+      const l1 = new THREE.Mesh(GEO.sphere, blinkR), l2 = new THREE.Mesh(GEO.sphere, blinkW);
+      l1.scale.setScalar(0.09); l2.scale.setScalar(0.07); l1.position.set(0, 0.78, -1.28); l2.position.set(0, -0.22, 0.5);
+      l1.visible = l2.visible = false; g.add(l1, l2); return { g, l1, l2 };
+    };
+    const TA = WORLD.geo("taoyuan", 121.233, 25.0797), SS = WORLD.geo("taipei", 121.5525, 25.0694); // 桃園國際機場 / 松山機場
+    const RAD = Math.max(bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) * 0.42;
+    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 12, w: 0.055, a: rng(3)() * 6 });
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.2, dir: 1, speed: 0.045, hi: 10.5 });  // cruise stays above 台北 101
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.72, dir: -1, speed: 0.045, hi: 10.5 });
+  }
+  PEOPLE.updatePlanes = (dt, time, moving) => {
+    const night = (ENV.lampsOn || 0) > 0.05, on1 = time % 1 < 0.16, on2 = (time + 0.5) % 1 < 0.16;
+    for (const pl of PEOPLE.planes) {
+      pl.l1.visible = night && on1; pl.l2.visible = night && on2; // blinking navigation lights after dark
+      if (pl.kind === "orbit") {
+        if (moving) pl.a += pl.w * dt;
+        pl.g.position.set(MID.x + Math.cos(pl.a) * pl.r, TOP + pl.h, MID.z + Math.sin(pl.a) * pl.r * 0.82);
+        pl.g.rotation.set(0, Math.atan2(-Math.sin(pl.a), Math.cos(pl.a) * 0.82), 0.12);
+      } else {
+        if (moving) { pl.t += pl.dir * pl.speed * dt; if (pl.t > 1) { pl.t = 1; pl.dir = -1; } if (pl.t < 0) { pl.t = 0; pl.dir = 1; } }
+        const x = pl.ax + (pl.bx - pl.ax) * pl.t, z = pl.az + (pl.bz - pl.az) * pl.t;
+        const y = TOP + 2.6 + Math.sin(Math.PI * pl.t) * pl.hi, slope = Math.PI * Math.cos(Math.PI * pl.t) * pl.hi;
+        const hLen = Math.hypot(pl.bx - pl.ax, pl.bz - pl.az);
+        pl.g.position.set(x, y, z);
+        pl.g.rotation.set(-Math.atan2(slope * pl.dir, hLen) * 0.6, Math.atan2((pl.bx - pl.ax) * pl.dir, (pl.bz - pl.az) * pl.dir), 0);
+      }
+    }
+  };
   PEOPLE.updateShips = (dt, time, moving) => {
     for (const s of PEOPLE.ships) {
       if (moving) { if (s.wait > 0) s.wait -= dt; else { s.t += s.dir * s.speed * dt; if (s.t > 1) { s.t = 1; s.dir = -1; s.wait = s.dwell || 0; } if (s.t < 0) { s.t = 0; s.dir = 1; s.wait = s.dwell || 0; } } }
@@ -2817,7 +3002,7 @@ const PEOPLE = { list: [], routes: [] };
       if (o.badge) { o.badge.visible = visible && PEOPLE.badges; o.badge.position.set(pos.x + side.x, pos.y + 0.38, pos.z + side.z); }
     });
     for (const m of [legs, arms, bodies, heads, hairs]) m.instanceMatrix.needsUpdate = true;
-    if (PEOPLE.lampPools) { PEOPLE.lampPools.opacity = (ENV.lampsOn || 0) * 0.85; PEOPLE.lampPools.visible = (ENV.lampsOn || 0) > 0.01; PEOPLE.lampBeams.opacity = (ENV.lampsOn || 0) * 0.07; PEOPLE.lampBeams.visible = PEOPLE.lampPools.visible; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
+    if (PEOPLE.lampPools) { const on = ENV.lampsOn || 0; PEOPLE.lampPools.opacity = on * 0.55; PEOPLE.lampPools.visible = on > 0.01; PEOPLE.campusPools.opacity = on; PEOPLE.campusPools.visible = on > 0.01; PEOPLE.lampBeams.opacity = on * 0.16; PEOPLE.lampBeams.visible = on > 0.01; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); PEOPLE.updatePlanes(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
   };
   PEOPLE.badges = false;
 }
@@ -2912,7 +3097,7 @@ for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
   el.style.setProperty("--c", `var(--c-${isl.city})`);
-  el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name}</span>`;
+  el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
   el.onclick = () => A.openTheme(isl.id);
   const o = new CSS2DObject(el);
@@ -2955,7 +3140,9 @@ window.LANDMARKS3D = LANDMARKS3D;
 for (const L of LANDMARKS3D) {
   const el = document.createElement("div"); el.className = "lmlabel" + (L.nature ? " nature" : ""); el.style.setProperty("--c", L.nature ? "#3f8f3a" : `var(--c-${L.city})`);
   el.innerHTML = `<span class="lm-pin"></span>${L.name}`;
-  const o = new CSS2DObject(el); o.position.set(L.x, L.top + 0.15, L.z); WORLD.bodies.get(L.isl.id).g.add(o);
+  const o = new CSS2DObject(el);
+  if (L.fixed) { o.position.set(L.isl.c.x + L.x, L.top + 0.15, L.isl.c.z + L.z); scene.add(o); } // bridges: anchored to the sea, not to an island that can lift
+  else { o.position.set(L.x, L.top + 0.15, L.z); WORLD.bodies.get(L.isl.id).g.add(o); }
 }
 
 /* beacon over the selected item */
@@ -3039,10 +3226,13 @@ function placeBeam() {
 /* ---------- camera ---------- */
 let fly = null;
 function overview() {
-  const size = bounds.getSize(new THREE.Vector3()), aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
-  const span = Math.max(size.x / Math.max(aspect, 0.6), size.z) * 1.02;
+  // panorama: Taipei island centred, the other three in frame around it; this is also the farthest zoom allowed
+  const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
+  const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
+  const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
+  const span = Math.max(sx / Math.max(aspect, 0.6), sz) * 1.02;
   const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
-  return { target: MID.clone().setY(0.3), pos: MID.clone().setY(0.3).add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)) };
+  return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)), dist };
 }
 function flyTo(target, pos) {
   if (reduced.matches) { camera.position.copy(pos); controls.target.copy(target); controls.update(); dirty = true; return; }
@@ -3132,7 +3322,14 @@ controls.addEventListener("change", () => {
 });
 
 /* ---------- resize / theme / loop ---------- */
-function resize() { const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return; camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); labelR.setSize(w, h); dirty = true; }
+let labelTH = 99; // camera distance beyond which landmark/policy tags hide (the city neon signs always stay)
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+  camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); labelR.setSize(w, h);
+  const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); // the panorama IS the farthest zoom
+  labelTH = Math.min(o.dist * 0.94, Math.max(...A.cities.filter((c) => LIVE_CITIES.has(c.city)).map((c) => cityFrame(c.city).dist)) * 1.12);
+  dirty = true;
+}
 new ResizeObserver(resize).observe(stage);
 const retheme = () => { ENV.retheme(); for (const v of flowViews) v.mat.uniforms.uColor.value.set(css("--route") || "#c4462b"); dirty = true; };
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
@@ -3157,13 +3354,16 @@ function loop(now) {
   if (moving) { clock += dt; ENV.update(dt, clock); for (const v of flowViews) if (v.tube.visible) v.mat.uniforms.uTime.value = clock; if (focusId) beamMat.opacity = 0.32 + 0.16 * Math.sin(clock * 3); busy = true; }
   PEOPLE.update(dt, clock, moving);
   ENV.cullClouds(camera);
-  stage.classList.toggle("far", camera.position.distanceTo(controls.target) > 40);
+  const camDist = camera.position.distanceTo(controls.target);
+  stage.classList.toggle("far", camDist > 40);
+  stage.classList.toggle("pano", camDist > labelTH);
+  if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
   if (busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); dirty = false; }
   requestAnimationFrame(loop);
 }
 resize();
-{ const o = overview(); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); }
+{ const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
 window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV };
 
@@ -3196,6 +3396,26 @@ window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, cam
       }, (e) => console.warn("weather db", e?.code));
     } catch (e) { console.warn("weather db unavailable", e); }
   })();
+}
+/* ---------- label visibility: 3D-layer rules + a landmark-tag toggle, bottom-left (kept out of the shared stylesheets) ---------- */
+{
+  const st = document.createElement("style");
+  st.textContent = `
+.stage.pano .tlabel{display:none!important}
+.stage .lmlabel{display:none}
+.stage.lm-on:not(.pano) .lmlabel{display:flex}
+.lmbtn{position:absolute;left:20px;bottom:76px;z-index:31;display:flex;align-items:center;gap:7px;min-height:40px;min-width:40px;padding:0 14px;border:1.5px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--surface) 92%,transparent);color:var(--ink);font:700 13px var(--f-body);cursor:pointer;box-shadow:0 4px 14px rgba(20,33,61,.18);backdrop-filter:blur(6px)}
+.lmbtn i{width:12px;height:12px;border-radius:50%;background:#cfd4da;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.lmbtn.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.lmbtn.on i{background:#ffd23f}
+@media (max-width:860px){.lmbtn{left:10px;bottom:62px;font-size:12.5px;padding:0 12px}}
+`;
+  document.head.appendChild(st);
+  const btn = document.createElement("button");
+  btn.type = "button"; btn.className = "lmbtn"; btn.setAttribute("aria-pressed", "false"); btn.title = "顯示或隱藏地標標籤";
+  btn.innerHTML = "<i></i>地標標籤";
+  btn.onclick = () => { const on = stage.classList.toggle("lm-on"); btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", String(on)); dirty = true; };
+  stage.appendChild(btn);
 }
 paint();
 stage.classList.add("ready");

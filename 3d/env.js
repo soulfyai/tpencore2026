@@ -18,6 +18,23 @@ const ENV = {};
   });
   const sky = new THREE.Mesh(new THREE.SphereGeometry(230, 32, 18), skyMat);
   sky.renderOrder = -10; sky.position.copy(MID); scene.add(sky);
+  /* starfield: world-fixed points just inside the sky dome, so a low camera never meets black void.
+     Drawn right after the sky gradient and before everything else, so sea and islands always cover it. */
+  const stars = (() => {
+    const N = 1100, pos = new Float32Array(N * 3), colr = new Float32Array(N * 3), Rs = rng(777);
+    for (let i = 0; i < N; i++) {
+      const th = Rs() * Math.PI * 2, y = Rs() * 1.08 - 0.08, r = Math.sqrt(Math.max(0, 1 - y * y)); // mostly above the horizon, a few at it
+      pos.set([Math.cos(th) * r, y, Math.sin(th) * r], i * 3);
+      const b = 0.45 + Rs() * 0.55, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
+      colr.set([b * (warm ? 1 : cool ? 0.85 : 1), b * (warm ? 0.9 : cool ? 0.92 : 1), b * (warm ? 0.75 : 1)], i * 3);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(colr, 3));
+    const m = new THREE.PointsMaterial({ size: 1.7, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
+    const pts = new THREE.Points(g, m);
+    pts.renderOrder = -9; pts.position.copy(MID); pts.scale.setScalar(226); pts.visible = false; scene.add(pts);
+    return pts;
+  })();
   scene.fog = new THREE.Fog(0xeef3f8, 70, 210);
 
   /* ---------- open sea ---------- */
@@ -151,6 +168,7 @@ const ENV = {};
     sun.castShadow = sun.intensity > 0.6;
     scene.fog.color.copy(skyMat.uniforms.uHorizon.value);
     scene.fog.near = kind === "fog" ? 12 : wet > 0.5 ? 40 : 70; scene.fog.far = kind === "fog" ? 70 : wet > 0.5 ? 150 : 210;
+    ENV.fog0 = { near: scene.fog.near, far: scene.fog.far }; // base values: main.js scales them up when the camera pulls far back
     waterMat.uniforms.uColor.value.copy(col("#7fc0d4")).lerp(col("#8a9aa6"), gray * 0.7);
     waterMat.uniforms.uDeep.value.copy(col("#2f7aa3")).lerp(col("#4d5c68"), gray * 0.6);
     waterMat.uniforms.uChop.value = THREE.MathUtils.clamp((W.wind || 10) / 40, 0.1, 1.2);
@@ -167,6 +185,9 @@ const ENV = {};
     MAT.glow.emissiveIntensity = lampsOn * (1.1 + k.night * 0.7);
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
+    // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)
+    const starA = Math.max(0, k.night - cloud * 0.35 - wet * 0.6) * 0.95;
+    stars.material.opacity = starA; stars.visible = starA > 0.02;
     ENV.state = { minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
     renderer.toneMappingExposure = 1 - k.night * 0.15;
     ENV.onChange?.(ENV.state);
@@ -196,6 +217,11 @@ const ENV = {};
     }
   };
   ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };
+  ENV.fit = (d) => { // the Taipei-centred panorama pulls back past the original dome: grow sky/sea and the far plane with it
+    const k = Math.max(1, (d + 70) / 230);
+    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k);
+    camera.far = Math.max(420, (d + 70) * 2.4); camera.updateProjectionMatrix();
+  };
   ENV.isDarkUI = isDarkUI;
   setInterval(apply, 60000); // follow the clock
 }

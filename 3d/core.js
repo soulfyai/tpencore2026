@@ -51,7 +51,7 @@ controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
 controls.minPolarAngle = THREE.MathUtils.degToRad(22);
 controls.maxPolarAngle = THREE.MathUtils.degToRad(70);
 controls.minDistance = 3;
-controls.maxDistance = 95;
+controls.maxDistance = 95; // placeholder — main.js locks this to the Taipei-centred panorama distance on init/resize
 
 /* ---------- layout: 2D axial atlas -> world ---------- */
 const K = SP / A.S;
