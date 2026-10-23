@@ -8,7 +8,7 @@
 :root{
   --paper:#EEF2F8; --surface:#FBFCFE; --sunk:#E1E8F2; --ink:#14213D; --muted:#55627A; --line:#C8D2E2;
   --route:#B5122B;
-  --c-taipei:#1F4FB8; --c-newtaipei:#11A09D; --c-keelung:#23336E; --c-taoyuan:#E0523A;
+  --c-taipei:#1F4FB8; --c-newtaipei:#E5B82E; --c-keelung:#E66B9E; --c-taoyuan:#E0523A;
   --f-display:"Chiron Sung HK","Noto Serif TC","Songti TC",serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -17,12 +17,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
@@ -61,6 +61,7 @@ svg.map{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation}
 .hex text{fill:var(--ink);font-family:var(--f-body);font-size:11.5px;font-weight:700;text-anchor:middle;pointer-events:none}
 .hex text.code{font-family:var(--f-mono);font-weight:500;font-size:8.5px;fill:var(--muted)}
 .hex.sel text.code{fill:var(--surface);opacity:.8}
+.hex.sel:is([data-city="newtaipei"],[data-city="keelung"]) text{fill:#14213D}
 .border{stroke:var(--c);stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
 .citylabel{font-family:var(--f-display);font-weight:800;font-size:17px;fill:var(--c);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .citylabel tspan.cand{font-family:var(--f-body);font-weight:500;font-size:11px;fill:var(--ink)}
@@ -249,6 +250,7 @@ html.drawer-open aside.panel{transform:none}
 .hi .tlabel{font:800 13px/1.2 var(--f-body);color:#1b2234;background:#fff;border:0;border-radius:999px;box-shadow:0 3px 10px rgba(20,33,61,.18);padding:6px 12px 6px 10px;gap:7px;transform:none}
 .hi .tlabel b{font:800 12px var(--f-mono);color:var(--c)}
 .hi .tlabel.sel{background:var(--c);color:var(--surface)}.hi .tlabel.sel b{color:var(--surface);opacity:.85}
+.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]),.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]) b{color:#14213D}
 .hi .tlabel.hot{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent),0 3px 10px rgba(20,33,61,.18)}
 .hi .stage.far .tlabel:not(.sel):not(.hot){font-size:12px;padding:4px 9px 4px 8px;gap:5px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) b{font-size:11px}
@@ -319,6 +321,7 @@ html.drawer-open aside.panel{transform:none}
 .hi .hi-cities{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
 .hi .hi-cities button{font:700 15px var(--f-body);padding:6px 16px;border-radius:999px;border:2px solid var(--c);background:transparent;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
 .hi .hi-cities button[aria-selected="true"]{background:var(--c);color:var(--surface);box-shadow:0 0 12px color-mix(in srgb,var(--c) 60%,transparent)}
+.hi .hi-cities button:is([data-city="newtaipei"],[data-city="keelung"])[aria-selected="true"]{color:#14213D}
 .hi .hi-cities button:focus-visible{outline:2px solid var(--route);outline-offset:2px}
 @media (max-width:860px){.hi .hi-cities{margin-top:6px;gap:5px}.hi .hi-cities button{font-size:14px;padding:5px 13px;min-height:44px}}
 
@@ -3124,6 +3127,7 @@ const islandLabels = new Map();
 for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
+  el.dataset.city = isl.city;
   el.style.setProperty("--c", `var(--c-${isl.city})`);
   el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
@@ -3479,8 +3483,8 @@ const UI = {};
   const notice = document.querySelector("header.top .notice"); if (notice) document.body.appendChild(notice);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
-  // the top-left switcher is uniformly party blue (solid = selected, outline = not); city colors stay everywhere else
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", "var(--c-taipei)"); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  // City switcher colors match the map and city signs.
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
   const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
   pop.append(cand, count, chips);
   // re-home the live weather element (built and updated by main.js) into the popover; keeping
@@ -3492,7 +3496,7 @@ const UI = {};
   document.addEventListener("pointerdown", (e) => { if (!pop.hidden && !brand.contains(e.target)) setPop(false); }); // tap outside collapses
   UI.togglePop = setPop;
   function paintBrand() {
-    cand.innerHTML = `<i style="background:var(--c-taipei)"></i>${esc(city.cityName)}・${esc(city.candidate)}`; // card keeps to the one blue
+    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
     count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
   }

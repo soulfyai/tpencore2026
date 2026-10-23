@@ -106,6 +106,7 @@ html.drawer-open aside.panel{transform:none}
 .hi .tlabel{font:800 13px/1.2 var(--f-body);color:#1b2234;background:#fff;border:0;border-radius:999px;box-shadow:0 3px 10px rgba(20,33,61,.18);padding:6px 12px 6px 10px;gap:7px;transform:none}
 .hi .tlabel b{font:800 12px var(--f-mono);color:var(--c)}
 .hi .tlabel.sel{background:var(--c);color:var(--surface)}.hi .tlabel.sel b{color:var(--surface);opacity:.85}
+.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]),.hi .tlabel.sel:is([data-city="newtaipei"],[data-city="keelung"]) b{color:#14213D}
 .hi .tlabel.hot{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent),0 3px 10px rgba(20,33,61,.18)}
 .hi .stage.far .tlabel:not(.sel):not(.hot){font-size:12px;padding:4px 9px 4px 8px;gap:5px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) b{font-size:11px}
@@ -176,5 +177,6 @@ html.drawer-open aside.panel{transform:none}
 .hi .hi-cities{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
 .hi .hi-cities button{font:700 15px var(--f-body);padding:6px 16px;border-radius:999px;border:2px solid var(--c);background:transparent;color:inherit;cursor:pointer;min-height:44px;min-width:44px}
 .hi .hi-cities button[aria-selected="true"]{background:var(--c);color:var(--surface);box-shadow:0 0 12px color-mix(in srgb,var(--c) 60%,transparent)}
+.hi .hi-cities button:is([data-city="newtaipei"],[data-city="keelung"])[aria-selected="true"]{color:#14213D}
 .hi .hi-cities button:focus-visible{outline:2px solid var(--route);outline-offset:2px}
 @media (max-width:860px){.hi .hi-cities{margin-top:6px;gap:5px}.hi .hi-cities button{font-size:14px;padding:5px 13px;min-height:44px}}

@@ -26,8 +26,8 @@ const UI = {};
   const notice = document.querySelector("header.top .notice"); if (notice) document.body.appendChild(notice);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
-  // the top-left switcher is uniformly party blue (solid = selected, outline = not); city colors stay everywhere else
-  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", "var(--c-taipei)"); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
+  // City switcher colors match the map and city signs.
+  for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); }; chips.appendChild(b); }
   const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
   pop.append(cand, count, chips);
   // re-home the live weather element (built and updated by main.js) into the popover; keeping
@@ -39,7 +39,7 @@ const UI = {};
   document.addEventListener("pointerdown", (e) => { if (!pop.hidden && !brand.contains(e.target)) setPop(false); }); // tap outside collapses
   UI.togglePop = setPop;
   function paintBrand() {
-    cand.innerHTML = `<i style="background:var(--c-taipei)"></i>${esc(city.cityName)}・${esc(city.candidate)}`; // card keeps to the one blue
+    cand.innerHTML = `<i style="background:var(--c-${LIVE})"></i>${esc(city.cityName)}・${esc(city.candidate)}`;
     count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;
     chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.city === LIVE)));
   }

@@ -8,7 +8,7 @@
 :root{
   --paper:#EEF2F8; --surface:#FBFCFE; --sunk:#E1E8F2; --ink:#14213D; --muted:#55627A; --line:#C8D2E2;
   --route:#B5122B;
-  --c-taipei:#1F4FB8; --c-newtaipei:#11A09D; --c-keelung:#23336E; --c-taoyuan:#E0523A;
+  --c-taipei:#1F4FB8; --c-newtaipei:#E5B82E; --c-keelung:#E66B9E; --c-taoyuan:#E0523A;
   --f-display:"Chiron Sung HK","Noto Serif TC","Songti TC",serif;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -17,12 +17,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0E1424; --surface:#151D31; --sunk:#0A0F1C; --ink:#E6ECF7; --muted:#9AA8C2; --line:#2A3654;
   --route:#F05A6E;
-  --c-taipei:#6F9BF2; --c-newtaipei:#3FD1C9; --c-keelung:#A9B8F0; --c-taoyuan:#F58A6E;
+  --c-taipei:#6F9BF2; --c-newtaipei:#F4D35E; --c-keelung:#F49AC2; --c-taoyuan:#F58A6E;
   --hex-mix:26%; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
@@ -61,6 +61,7 @@ svg.map{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation}
 .hex text{fill:var(--ink);font-family:var(--f-body);font-size:11.5px;font-weight:700;text-anchor:middle;pointer-events:none}
 .hex text.code{font-family:var(--f-mono);font-weight:500;font-size:8.5px;fill:var(--muted)}
 .hex.sel text.code{fill:var(--surface);opacity:.8}
+.hex.sel:is([data-city="newtaipei"],[data-city="keelung"]) text{fill:#14213D}
 .border{stroke:var(--c);stroke-width:2.6;stroke-linecap:round;fill:none;pointer-events:none}
 .citylabel{font-family:var(--f-display);font-weight:800;font-size:17px;fill:var(--c);paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;pointer-events:none}
 .citylabel tspan.cand{font-family:var(--f-body);font-weight:500;font-size:11px;fill:var(--ink)}

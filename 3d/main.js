@@ -6,6 +6,7 @@ const islandLabels = new Map();
 for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
+  el.dataset.city = isl.city;
   el.style.setProperty("--c", `var(--c-${isl.city})`);
   el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
