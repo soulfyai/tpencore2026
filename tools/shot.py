@@ -7,6 +7,7 @@ Usage (from repo root):
   CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py '{"out/pano":"MAP3D.panorama()","out/tpe":"MAP3D.enterCity(\'taipei\')"}' [mobile]
 
 Use --check [mobile] instead of the JSON argument to verify scene geometry and animation.
+Use --check-sea [mobile] to verify the sea animation clock and reduced-motion pause.
 
 Each key is an output path (".png" is appended), each value is JS evaluated in the page before the shot.
 Weather/time are forced to 11:00 clear; set CITY3D.ENV.forced = {minute: 1140, ...} inside a shot for night.
@@ -37,9 +38,12 @@ def serve():
 
 mobile = "mobile" in sys.argv
 checking = "--check" in sys.argv
+sea_check = "--check-sea" in sys.argv
 if checking:
     with open(os.path.join(ROOT, "tools/check_scene.js"), encoding="utf-8") as f:
         shots = {"out/check-scene-mobile" if mobile else "out/check-scene-desktop": f.read()}
+elif sea_check:
+    shots = {"out/check-sea-mobile" if mobile else "out/check-sea-desktop": "MAP3D.panorama()"}
 else:
     shots = json.loads(sys.argv[1])
 with serve() as url, sync_playwright() as p:
@@ -48,17 +52,29 @@ with serve() as url, sync_playwright() as p:
     b = p.chromium.launch(**options)
     pg = b.new_page(viewport={"width": 400, "height": 860} if mobile else {"width": 1400, "height": 860}, reduced_motion="reduce")
     # Pause the animation scheduler, but snapshot() runs the complete production frame pipeline.
-    pg.add_init_script("""window.requestAnimationFrame = () => 0;
+    pg.add_init_script("""window.requestAnimationFrame = cb => { window.__sceneFrame = cb; return 0; };
 const getContext = HTMLCanvasElement.prototype.getContext;
 HTMLCanvasElement.prototype.getContext = function(type, options) {
   return getContext.call(this, type, type.startsWith('webgl') ? {...options, preserveDrawingBuffer:true} : options);
 };""")
     out = []
     pg.on("pageerror", lambda e: out.append("ERR " + str(e)))
+    pg.on("console", lambda m: out.append("ERR " + m.text) if m.type == "error" and "THREE.WebGLProgram" in m.text else None)
     pg.route("**/three@0.160.0/**", route); pg.route("**/fonts.g*/**", lambda r: r.abort())
     pg.goto(url, wait_until="commit")
     pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')", timeout=300000, polling=100)
     pg.evaluate("(()=>{const E=CITY3D.ENV;E.forced={minute:660,w:{code:1,cloud:20,wind:10,temp:27}};E.apply();const i=document.querySelector('.hi-intro');if(i)i.hidden=true;})()")
+    if sea_check:
+        pg.emulate_media(reduced_motion="no-preference")
+        before = pg.evaluate("CITY3D.scene.getObjectByName('open-sea').material.uniforms.uTime.value")
+        pg.evaluate("window.__sceneFrame(performance.now()+100)")
+        after = pg.evaluate("CITY3D.scene.getObjectByName('open-sea').material.uniforms.uTime.value")
+        assert after > before, "Production frame loop did not animate the sea"
+        assert pg.evaluate("CITY3D.scene.getObjectByName('coastal-surf').material.uniforms.uTime.value") == after, "Surf clock out of sync"
+        pg.emulate_media(reduced_motion="reduce")
+        pg.evaluate("window.__sceneFrame(performance.now()+200)")
+        assert pg.evaluate("CITY3D.scene.getObjectByName('open-sea').material.uniforms.uTime.value") == after, "Reduced-motion sea did not pause"
+        out.append("Sea: production animation, coastal sync and reduced-motion pause passed")
     for name, js in shots.items():
         r = pg.evaluate(js)
         if r is not None: out.append(f"{name}: {str(r)[:600]}")

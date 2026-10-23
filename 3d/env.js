@@ -1,4 +1,4 @@
-/* ===== environment: an island nation on open sea, sky driven by Taipei time and live weather ===== */
+/* ===== environment: open sea and a clear sky; Taipei time drives day/night, weather is information only ===== */
 const ENV = {};
 {
   const isDarkUI = () => document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme !== "light" && matchMedia("(prefers-color-scheme: dark)").matches);
@@ -58,22 +58,82 @@ const ENV = {};
   /* ---------- open sea ---------- */
   const waterMat = new THREE.ShaderMaterial({
     fog: true,
-    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uColor: { value: col("#7fc0d4") }, uDeep: { value: col("#2f7aa3") }, uMid: { value: new THREE.Vector2(MID.x, MID.z) }, uChop: { value: 0.4 }, uGlint: { value: 1 }, uNight: { value: 0 }, uRain: { value: 0 } }]),
+    extensions: { derivatives: true },
+    uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, { uTime: { value: 0 }, uColor: { value: col("#7fc0d4") }, uDeep: { value: col("#2f7aa3") }, uMid: { value: new THREE.Vector2(MID.x, MID.z) }, uGlint: { value: 1 }, uNight: { value: 0 } }]),
     vertexShader: "varying vec3 vW;\n#include <fog_pars_vertex>\nvoid main(){vec4 w=modelMatrix*vec4(position,1.0);vW=w.xyz;vec4 mvPosition=viewMatrix*w;gl_Position=projectionMatrix*mvPosition;\n#include <fog_vertex>\n}",
-    fragmentShader: `varying vec3 vW;uniform float uTime,uChop,uGlint,uNight,uRain;uniform vec3 uColor,uDeep;uniform vec2 uMid;
+    fragmentShader: `varying vec3 vW;uniform float uTime,uGlint,uNight;uniform vec3 uColor,uDeep;uniform vec2 uMid;
       float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float noise2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+        return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1)),f.x),f.y);}
       #include <fog_pars_fragment>
       void main(){float d=length(vW.xz-uMid);vec3 c=mix(uColor,uDeep,smoothstep(16.0,70.0,d));
-      float b=sin(vW.x*0.8+uTime*0.5*(0.5+uChop))*sin(vW.z*0.65-uTime*0.35*(0.5+uChop));c+=vec3(0.035+0.03*uChop)*b;
-      float w=sin(vW.x*2.6+vW.z*0.9+uTime*(1.2+uChop))*sin(vW.z*2.2-uTime*(0.9+uChop));c+=vec3(0.05)*smoothstep(0.82-0.12*uChop,1.0,w)*(1.0-smoothstep(25.0,80.0,d));
-      float g=step(0.985,sin(vW.x*3.1+uTime)*sin(vW.z*2.7-uTime*0.8));c+=vec3(0.3)*g*uGlint*(1.0-smoothstep(18.0,50.0,d));
-      vec2 cell=floor(vW.xz*3.0);float rp=fract(uTime*1.7+h2(cell));c+=vec3(0.18)*uRain*step(0.9,h2(cell+floor(uTime*1.7)))*smoothstep(0.0,0.2,rp)*(1.0-rp)*(1.0-smoothstep(10.0,30.0,d));
+      vec2 p=vW.xz;float t=uTime;
+      float drift=noise2(p*0.13+vec2(-t*0.025,t*0.018));
+      float swell=sin(dot(p,vec2(0.34,0.21))-t*0.48+drift*2.8);
+      float crossSea=sin(dot(p,vec2(-0.17,0.41))-t*0.33+drift*1.9);
+      c+=vec3(0.018,0.032,0.034)*(swell*0.65+crossSea*0.35);
+      // Curved, broken crests; never multiply perpendicular waves into a checkerboard.
+      float phase=dot(p,vec2(1.18,0.61))-t*1.05+drift*5.0+0.5*sin(dot(p,vec2(-0.23,0.37))-t*0.21);
+      float ridge=0.5+0.5*sin(phase),aa=max(fwidth(ridge),0.015);
+      float crest=smoothstep(0.91-aa,0.98+aa,ridge);
+      float detail=1.0-smoothstep(24.0,110.0,distance(cameraPosition,vW));
+      float broken=smoothstep(0.35,0.8,noise2(p*0.52+vec2(t*0.07,-t*0.04)));
+      c+=vec3(0.07,0.10,0.105)*crest*broken*detail*(0.35+0.65*uGlint);
       c*=1.0-0.55*uNight;gl_FragColor=vec4(c,1.0);
       #include <fog_fragment>
       }`,
   });
   const water = new THREE.Mesh(new THREE.CircleGeometry(240, 72).rotateX(-Math.PI / 2), waterMat);
+  water.name = "open-sea";
   water.position.set(MID.x, WATER_Y, MID.z); scene.add(water);
+
+  /* One GPU-animated ribbon follows the existing coast. UV.x is distance offshore,
+     UV.y is distance along the shore; no coastline, beach, harbour or boat moves. */
+  const surfPos = [], surfUV = [], surfNormals = [];
+  for (const [city, segments] of WORLD.shore) {
+    const width = LIVE_CITIES.has(city) ? 2.0 : 1.1;
+    let along = 0;
+    for (const s of segments) {
+      const edge = s.type === "harbour" ? 0.12 : (s.type === "rocks" ? width * 0.6 : width) + 0.32;
+      const len = Math.hypot(s.b[0]-s.a[0], s.b[1]-s.a[1]);
+      const vertices = [[s.a,s.na,0,along],[s.b,s.nb,0,along+len],[s.b,s.nb,1.65,along+len],[s.a,s.na,1.65,along]];
+      for (const k of [0,1,2,0,2,3]) {
+        const [p,n,off,u] = vertices[k];
+        surfPos.push(p[0]+n[0]*(edge+off), WATER_Y+0.025, p[1]+n[1]*(edge+off));
+        surfNormals.push(n[0],n[1]); surfUV.push(off,u);
+      }
+      along += len;
+    }
+  }
+  const surfGeo = new THREE.BufferGeometry();
+  surfGeo.setAttribute("position", new THREE.Float32BufferAttribute(surfPos,3));
+  surfGeo.setAttribute("uv", new THREE.Float32BufferAttribute(surfUV,2));
+  surfGeo.setAttribute("outward", new THREE.Float32BufferAttribute(surfNormals,2));
+  const surfMat = new THREE.ShaderMaterial({
+    transparent:true, depthWrite:false, side:THREE.DoubleSide, fog:true,
+    extensions:{derivatives:true},
+    uniforms:THREE.UniformsUtils.merge([THREE.UniformsLib.fog,{uTime:{value:0},uNight:{value:0}}]),
+    vertexShader:`attribute vec2 outward;varying vec2 vSurf;uniform float uTime;
+      #include <fog_pars_vertex>
+      void main(){vSurf=uv;vec3 p=position;
+        p.xz+=outward*(0.10*sin(uTime*0.28)+0.035*sin(uv.y*0.6-uTime*0.42));
+        vec4 mvPosition=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mvPosition;
+        #include <fog_vertex>
+      }`,
+    fragmentShader:`varying vec2 vSurf;uniform float uTime,uNight;
+      #include <fog_pars_fragment>
+      void main(){float x=vSurf.x,s=vSurf.y,t=uTime;
+        float phase=x*7.0+t*1.18+0.36*sin(s*0.85-t*0.27)+0.16*sin(s*2.1+t*0.32);
+        float w=0.5+0.5*sin(phase),aa=max(fwidth(w),0.025);
+        float crest=smoothstep(0.82-aa,0.98+aa,w);
+        float edge=smoothstep(0.0,0.16,x)*(1.0-smoothstep(0.75,1.65,x));
+        float lace=0.6+0.4*sin(s*2.8+sin(s*0.7)-t*0.65);
+        float a=crest*edge*lace*0.52;
+        gl_FragColor=vec4(mix(vec3(0.86,0.98,0.97),vec3(0.33,0.52,0.61),uNight),a);
+        #include <fog_fragment>
+      }`
+  });
+  const surf = new THREE.Mesh(surfGeo,surfMat); surf.name="coastal-surf"; surf.renderOrder=2; scene.add(surf);
 
   /* ---------- islets, lighthouses and boats out at sea (decorative) ---------- */
   const deco = new THREE.Group(); scene.add(deco);
@@ -190,10 +250,9 @@ const ENV = {};
     ENV.fog0 = { near: scene.fog.near, far: scene.fog.far }; // base values: main.js scales them up when the camera pulls far back
     waterMat.uniforms.uColor.value.copy(col("#7fc0d4")).lerp(col("#8a9aa6"), gray * 0.7);
     waterMat.uniforms.uDeep.value.copy(col("#2f7aa3")).lerp(col("#4d5c68"), gray * 0.6);
-    waterMat.uniforms.uChop.value = 0.3; // fixed gentle sea; live wind no longer stirs it
     waterMat.uniforms.uGlint.value = (1 - gray) * (1 - k.night);
     waterMat.uniforms.uNight.value = k.night * 0.8;
-    waterMat.uniforms.uRain.value = wet;
+    surfMat.uniforms.uNight.value = k.night;
     const showN = Math.round(4 + cloud * 22);
     clouds.children.forEach((g) => { g.visible = g.userData.rank * 26 < showN; });
     cloudMat.color.copy(col("#ffffff")).lerp(col(k.night > 0.5 ? "#3a4256" : "#9aa3ad"), Math.max(wet, cloud * 0.5));
@@ -221,6 +280,7 @@ const ENV = {};
   ENV.retheme = () => apply();
   ENV.update = (dt, t) => {
     waterMat.uniforms.uTime.value = t;
+    surfMat.uniforms.uTime.value = t;
     const wind = 12; // fixed breeze: cloud drift is decorative, decoupled from live weather
     for (const g of clouds.children) { const dx = g.position.x - MID.x, dz = g.position.z - MID.z + 8, d = Math.hypot(dx, dz), w = dt * g.userData.v * (0.6 + wind / 25) / Math.max(d, 1); g.position.x = MID.x + dx * Math.cos(w) - dz * Math.sin(w); g.position.z = MID.z - 8 + dx * Math.sin(w) + dz * Math.cos(w); }
     for (const b of boats) { b.a += b.v * dt; b.g.position.set(MID.x + Math.cos(b.a) * b.r, WATER_Y + Math.sin(t * 1.3 + b.r) * 0.04, MID.z + Math.sin(b.a) * b.r * 0.8 - 6); b.g.rotation.y = -b.a + (b.v > 0 ? 0 : Math.PI); }
