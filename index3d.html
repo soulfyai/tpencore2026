@@ -190,6 +190,8 @@ html.hi body{padding:0}
 .hi-home{display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 12px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);color:var(--ink);font:700 13.5px var(--f-body);box-shadow:0 6px 20px rgba(20,33,61,.12);cursor:pointer;white-space:nowrap}
 .hi-home:hover{background:var(--sunk)}
 .hi-home:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
+.hi-tools-panel{display:contents}
+.hi-tools-panel[hidden],.hi-tools-toggle,.hi-help-label{display:none}
 .hi-maptools button:focus-visible,.hi-modes button:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
 .hi-maptools .lmbtn.on{background:var(--ink);color:var(--surface)}
 .hi-mode-short{display:none}
@@ -296,24 +298,28 @@ html.drawer-open aside.panel{transform:none}
   /* keep the full weather info readable inside the popover on phones */
   .hi .hi-pop .wx{display:flex;padding:8px 0 0;margin-top:10px}
   .hi .hi-pop .wx span,.hi .hi-pop .wx small{display:inline-block}
-  /* notice sits above the bottom control row (tour button left, mode bar right) */
-  .hi .notice{bottom:58px;font-size:10.5px;padding:3px 9px}
-  .hi .lmbtn{bottom:100px} /* keep the landmark toggle above the pinned notice */
-  .hi-toolbar,.hi-maptools{display:contents;position:static}
-  .hi-home{position:absolute;top:12px;right:10px;z-index:31;min-height:44px;padding:0 10px;font-size:12.5px}
-  .hi-modes{position:absolute;top:auto;bottom:12px;right:10px}
-  .hi-mode-label{display:none}.hi-mode-short{display:inline}
-  .hi .hi-maptools .lmbtn{position:absolute;left:10px;bottom:100px;padding:0 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px}
-  .hi .hi-maptools .lmbtn.on{background:var(--ink)}
-  .hi .hi-maptools .hi-tourbtn{position:absolute;left:10px;bottom:12px;padding:0 14px;border-radius:999px;background:var(--ink);color:var(--surface);font-size:13px}
-  .hi-modes button{min-width:44px;padding:0 9px;font-size:12.5px;min-height:40px}
+  .hi .notice{bottom:max(12px,env(safe-area-inset-bottom));font-size:10.5px;padding:3px 9px}
+  .hi-toolbar{top:12px;right:10px;z-index:45;display:flex;flex-direction:column;align-items:stretch;gap:6px;max-width:none}
+  html.drawer-open .hi-toolbar{top:12px;right:10px;max-width:none}
+  .hi-home,.hi-tools-toggle{position:static;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 10px;font-size:12.5px}
+  .hi-tools-toggle{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:700 12.5px var(--f-body);cursor:pointer;box-shadow:0 6px 20px rgba(20,33,61,.12)}
+  .hi-tools-toggle[aria-expanded=true]{background:var(--ink);color:var(--surface)}
+  .hi-tools-toggle:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
+  .hi-tools-panel{position:absolute;top:100%;right:0;margin-top:8px;width:min(252px,calc(100vw - 20px));max-height:calc(100dvh - 180px);overflow:auto;padding:8px;box-sizing:border-box;display:grid;gap:8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 12px 32px rgba(20,33,61,.24)}
+  .hi-maptools,.hi-modes{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0;background:none;box-shadow:none;backdrop-filter:none}
+  .hi-modes{border-top:1px solid var(--line);padding-top:8px}
+  .hi-mode-label{display:inline}.hi-mode-short{display:none}
+  .hi .hi-maptools .lmbtn,.hi .hi-maptools .hi-tourbtn{position:static;justify-content:center;min-height:44px;padding:0 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-size:12.5px}
+  .hi .hi-maptools .lmbtn.on{background:var(--ink);color:var(--surface)}
+  .hi-modes button{min-width:44px;padding:0 8px;font-size:12.5px;min-height:44px}
+  .hi-help-label{display:inline;margin-left:5px}
   html.drawer-open .hi-modes{right:10px}
-  .hi-intro{left:10px;right:10px;top:auto;bottom:92px;width:auto;padding:14px 16px}
+  .hi-intro{left:10px;right:10px;top:auto;bottom:52px;width:auto;padding:14px 16px}
   .hi-intro h2{font-size:18px}.hi-intro p,.hi-intro ul{font-size:13px}
-  .hi-tour{left:10px;right:10px;width:auto;bottom:92px;padding:12px 14px}
+  .hi-tour{left:10px;right:10px;width:auto;bottom:52px;padding:12px 14px}
   .hi-tour h3{font-size:16px}.hi-tour p{font-size:12.5px}
   .hi-tourbtn{left:10px;bottom:12px;min-height:40px;padding:0 14px;font-size:13px}
-  .hi-timeline{left:8px;right:8px;top:8px;bottom:86px;padding:14px 12px 0}
+  .hi-timeline{left:8px;right:8px;top:116px;bottom:52px;padding:14px 12px 0}
   .hi-tl-cols{grid-template-columns:1fr;overflow:auto;display:block}
   .hi-tl-col{margin-bottom:12px}.hi-tl-col ol{overflow:visible}
   .hi aside.panel{left:0;right:0;top:auto;bottom:0;width:auto;height:72dvh;border-radius:18px 18px 0 0;transform:translateY(105%)}
@@ -4284,10 +4290,26 @@ const UI = {};
   const btn = {};
   for (const [id, name] of MODES) { const b = el("button", null, `<span class="hi-mode-label">${name}</span><span class="hi-mode-short">${id==="list"?"清單":id==="time"?"進度":name}</span>`); b.type = "button"; b.setAttribute("aria-label",name); b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
   const help = el("button", "hi-help", "?"); help.type = "button"; help.setAttribute("aria-label", "使用說明"); help.onclick = () => showIntro(true); modes.appendChild(help);
+  help.innerHTML = `<span aria-hidden="true">?</span><span class="hi-help-label">使用說明</span>`;
   const home = el("button", "hi-home", `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Home</span>`);
   home.type = "button"; home.setAttribute("aria-label", "Home：回到初始全景"); home.title = "回到初始全景";
-  home.onclick = () => { endTour(); setPop(false); showIntro(false); setMode("pano"); };
-  toolbar.append(mapTools,modes,home);document.querySelector(".mapwrap").appendChild(toolbar);
+  home.onclick = () => { setTools(false); endTour(); setPop(false); showIntro(false); setMode("pano"); };
+  const toolsPanel = el("div", "hi-tools-panel"); toolsPanel.id = "hi-tools-panel"; toolsPanel.append(mapTools,modes);
+  const toolsToggle = el("button", "hi-tools-toggle", `<span aria-hidden="true">☰</span> 工具`);
+  toolsToggle.type = "button"; toolsToggle.setAttribute("aria-label", "地圖工具"); toolsToggle.setAttribute("aria-controls", toolsPanel.id);
+  const phoneTools = matchMedia("(max-width:860px)");
+  function setTools(on) {
+    const restoreFocus = !on && toolsPanel.contains(document.activeElement);
+    toolsPanel.hidden = phoneTools.matches && !on;
+    toolsToggle.setAttribute("aria-expanded", String(phoneTools.matches && on));
+    if (restoreFocus && phoneTools.matches) toolsToggle.focus();
+  }
+  setTools(false); phoneTools.addEventListener("change", () => setTools(false));
+  toolsToggle.onclick = () => { setPop(false); setTools(toolsPanel.hidden); };
+  toolsPanel.addEventListener("click", (e) => { if (phoneTools.matches && e.target.closest("button")) setTools(false); });
+  document.addEventListener("pointerdown", (e) => { if (!toolbar.contains(e.target)) setTools(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && phoneTools.matches && !toolsPanel.hidden) { setTools(false); toolsToggle.focus(); } });
+  toolbar.append(toolsPanel,home,toolsToggle);document.querySelector(".mapwrap").appendChild(toolbar);
   let mode = "pano";
   function setMode(m) {
     mode = m; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === m));

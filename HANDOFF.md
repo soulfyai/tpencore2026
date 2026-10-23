@@ -99,6 +99,11 @@
 - tools/check_scene.js 同步四邊等長、軸線對齊、直角道路、四向連通與相鄰背景布局不重複檢查；保留建築、地標、人物／船機、泡泡、工具列、城市標題點選與天氣同步檢查。build 與 package no problems；2D 版維持既有資料呈現。
 - 桌機與手機完整場景檢查通過（578／413 人、65／47 船、3 飛機、6 橋），四市標題點擊與鍵盤進城正常。另以城市近景驗證全部街道及四邊對齊座標軸；已檢視桌機城市日／夜景、雙格政策近景與手機單格政策近景。截圖 out/square-city-day.png、square-city-night.png、square-policy-close.png、square-mobile-policy.png。依 §0.8 發佈 Pages。
 
+### 0.16 手機工具集中右上角（2026-10-24 台北時間）
+- 手機原本左下角地標／導覽與右下角全景／清單／進度／說明，整合至右上角「工具」展開面板，Home 保持直接可按。使用原有按鈕節點與事件，桌機仍採原工具列排列；視窗跨過 860px 時會同步恢復顯示並收合手機選單。
+- 工具面板二欄排列，所有操作至少 44px；使用完整「政策清單／政策進度／使用說明」標籤。選擇功能、按 Home、點外側或 Esc 會收合，提供 aria-expanded／aria-controls 與焦點回復；隱藏面板不進鍵盤焦點順序。手機聲明移至底部安全區，導覽／說明與進度面板留出空間，進度面板上緣避開右上角按鈕。
+- 實際瀏覽器點擊六個功能、Home 返回、選單自動收合、Space／Esc、點外側、320px 窄螢幕、640×360 橫向與桌機／手機切換均通過；桌機原工具列位置已檢查。已檢視 out/mobile-tools-closed.png、mobile-tools-open.png、mobile-tools-timeline.png 與 desktop-tools-retained.png。build 與 package no problems，依 §0.8 發佈 Pages。
+
 ## 1. 專案是什麼
 
 獨立、非官方的選舉政見網站，把國民黨北北基桃四位市長參選人的政見與任內政績，畫成 **SimCity BuildIt 風格的 3D 城市島嶼**。版面、內容架構參考 <https://puma.taipei/heart-island>。
