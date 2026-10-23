@@ -57,7 +57,10 @@ const UI = {};
   const btn = {};
   for (const [id, name] of MODES) { const b = el("button", null, `<span class="hi-mode-label">${name}</span><span class="hi-mode-short">${id==="list"?"清單":id==="time"?"進度":name}</span>`); b.type = "button"; b.setAttribute("aria-label",name); b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
   const help = el("button", "hi-help", "?"); help.type = "button"; help.setAttribute("aria-label", "使用說明"); help.onclick = () => showIntro(true); modes.appendChild(help);
-  toolbar.append(mapTools,modes);document.querySelector(".mapwrap").appendChild(toolbar);
+  const home = el("button", "hi-home", `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Home</span>`);
+  home.type = "button"; home.setAttribute("aria-label", "Home：回到初始全景"); home.title = "回到初始全景";
+  home.onclick = () => { endTour(); setPop(false); showIntro(false); setMode("pano"); };
+  toolbar.append(mapTools,modes,home);document.querySelector(".mapwrap").appendChild(toolbar);
   let mode = "pano";
   function setMode(m) {
     mode = m; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === m));
