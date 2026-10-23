@@ -57,11 +57,20 @@
    check(buttons.length===isl.t.items.length&&buttons.every(b=>C.ITEMS3D.has(b.dataset.item)),'theme bubble item links');
    buttons[0].click();check(APP.state.selItem===buttons[0].dataset.item,'bubble item selection');
  }
+ const plans=W.blockPlans.filter(p=>p.buildings.length),byCell=new Map(plans.map(p=>[p.cell,p]));
+ check(new Set(plans.map(p=>p.plan)).size>=6,'distinct block organisations');
+ check(new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size>=10,'distinct architecture types');
+ for(const city of ['taipei','newtaipei','keelung','taoyuan'])check(new Set(plans.filter(p=>p.city===city).map(p=>p.plan)).size>=5,'city block variety '+city);
+ for(const cell of W.hexCells){
+   const a=byCell.get(cell.id);if(!a)continue;
+   for(const [q,r] of [[1,0],[0,1],[-1,1]]){const b=byCell.get(`${cell.city}:${cell.q+q}:${cell.r+r}`);if(b)check(a.plan!==b.plan,'repeated adjacent block layout');}
+ }
+ check(W.streetTypes.pedestrian>0&&W.streetTypes.road>W.streetTypes.pedestrian,'street hierarchy');
  C.ENV.forced={minute:660,w:{code:1,cloud:10,wind:10,temp:25}};C.ENV.apply();MAP3D.panorama();check(C.ENV.state.minute===660&&C.ENV.lampsOn===0,'day mode reset');
  document.querySelector('.hi-brandbtn').click();
  for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch');const wx=document.querySelector('.hi-pop .wx');check(wx.dataset.city===city&&wx.querySelectorAll(':scope > span').length===2,'selected-city weather only')}
  MAP3D.panorama();document.querySelector('.hi-brandbtn').click();
  const r=document.querySelector('.notice').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
  check(l.bottom<=r.top,'landmark control behind notice');
- return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,hexRadius:W.hexRadius,hexCells:W.hexCells.length,partBatches:C.batches.size,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
+ return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,hexRadius:W.hexRadius,hexCells:W.hexCells.length,partBatches:C.batches.size,blockTypes:new Set(plans.map(p=>p.plan)).size,architectureTypes:new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size,streets:W.streetTypes,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
 })()
