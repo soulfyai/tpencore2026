@@ -7,3 +7,4 @@ map3d_smooth.js
 __pycache__/
 node_modules/
 out/
+.claude/worktrees/
