@@ -3073,9 +3073,13 @@ const PEOPLE = { list: [], routes: [] };
     };
     const TA = WORLD.geo("taoyuan", 121.233, 25.0797), SS = WORLD.geo("taipei", 121.5525, 25.0694); // 桃園國際機場 / 松山機場
     const RAD = Math.max(bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) * 0.42;
-    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 12, w: 0.055, a: rng(3)() * 6 });
-    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.2, dir: 1, speed: 0.045, hi: 10.5 });  // cruise stays above 台北 101
-    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.72, dir: -1, speed: 0.045, hi: 10.5 });
+    /* deconflicted scheduling: the two shuttles fly parallel offset corridors at different cruise
+       altitudes with opposite phases (always near opposite ends), and the orbiter circles well above
+       both peaks — no two aircraft ever come within a fuselage length of each other */
+    const dxs = SS[0] - TA[0], dzs = SS[1] - TA[1], Lsh = Math.hypot(dxs, dzs) || 1, nxs = -dzs / Lsh, nzs = dxs / Lsh;
+    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 22, w: 0.055, a: rng(3)() * 6 });
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] + nxs * 2, az: TA[1] + nzs * 2, bx: SS[0] + nxs * 2, bz: SS[1] + nzs * 2, t: 0.2, dir: 1, speed: 0.045, hi: 8.5 });  // cruise stays above 台北 101
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] - nxs * 2, az: TA[1] - nzs * 2, bx: SS[0] - nxs * 2, bz: SS[1] - nzs * 2, t: 0.72, dir: -1, speed: 0.045, hi: 13.5 });
   }
   PEOPLE.updatePlanes = (dt, time, moving) => {
     const night = (ENV.lampsOn || 0) > 0.05, on1 = time % 1 < 0.16, on2 = (time + 0.5) % 1 < 0.16;
