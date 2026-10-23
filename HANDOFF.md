@@ -1,5 +1,7 @@
 # Handoff：北北基桃政策城市（tpencore2026）
 
+> **最新交接（2026-10-24，Codex → Claude Code）：先讀 [CLAUDE_CODE_HANDOFF.md](CLAUDE_CODE_HANDOFF.md)。使用者已要求暫停部署並打包；該檔記錄最新程式、Pages／HiNet 狀態、驗證與還原指令。**
+
 > 交接日期：2026-10-23　來源：claude.ai 雲端 session（Cowork）→ Claude Code
 > 使用者：KunWei（James Lin），回覆一律用**繁體中文**，語氣直接、技術對等。
 
