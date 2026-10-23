@@ -1,5 +1,5 @@
-{"source":"Open-Meteo","updatedAt":"2026-10-23T01:45+08:00","cities":{
-"taipei":{"temp":23.2,"code":55,"cloud":100,"precip":0.3,"wind":27.4,"isDay":0},
-"newtaipei":{"temp":23.3,"code":55,"cloud":100,"precip":0.3,"wind":21.9,"isDay":0},
-"keelung":{"temp":24.2,"code":80,"cloud":100,"precip":0.4,"wind":39.8,"isDay":0},
-"taoyuan":{"temp":22.9,"code":55,"cloud":100,"precip":0.3,"wind":32.4,"isDay":0}}}
+{"source":"Open-Meteo","updatedAt":"2026-10-23T22:45+08:00","cities":{
+"taipei":{"temp":25.3,"code":63,"cloud":100,"precip":1.3,"wind":32.4,"isDay":0},
+"newtaipei":{"temp":25.0,"code":95,"cloud":100,"precip":1.5,"wind":34.4,"isDay":0},
+"keelung":{"temp":26.2,"code":63,"cloud":100,"precip":1.1,"wind":48.4,"isDay":0},
+"taoyuan":{"temp":25.0,"code":96,"cloud":100,"precip":1.0,"wind":45.2,"isDay":0}}}
