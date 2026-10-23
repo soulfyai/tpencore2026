@@ -3,25 +3,26 @@ const PEOPLE = { list: [], routes: [] };
 {
   const R1 = rng(41);
   /* --- chibi character kit (heart-island style): big round heads, soft low-saturation wardrobe, roles told by silhouette + props --- */
-  const SKIN = ["#f6d7b8", "#eec49e", "#dcae82", "#c69468"];
-  const HAIRC = ["#33291f", "#201f23", "#4a3a2e", "#6b5444", "#8a6a4a", "#58514b"];
+  const SKIN = ["#f6d7b8", "#eac39a", "#c99772", "#8d5f3f"];
+  const HAIRC = ["#3a2a1e", "#241f1d", "#4e3426", "#5d4030", "#2e2a33"];
   const GREYH = ["#c6c9cd", "#e2e4e6", "#979da3"];
-  const CASUAL = ["#8ea6c0", "#a3b78f", "#c48d7e", "#d9c38c", "#9c8fb5", "#7f9e99", "#d8d2c6", "#b5c4b1", "#6f7f93", "#d3a788", "#c2b4a3", "#a8bfc9"];
-  const PANTSC = ["#3b4148", "#5a6b7d", "#7a6f63", "#44525f", "#8b8378", "#4a4e57"];
-  const SUITC = ["#46525e", "#3a4652", "#5b5e66", "#6b6257"];
+  const CASUAL = ["#e8713c", "#52a3a3", "#f2c75c", "#e3989f", "#f4f1e8", "#6f8fc0", "#8fb07a", "#c8795a", "#9f8fc4", "#5f7ea0"];
+  const PANTSC = ["#3c4a62", "#55617a", "#6b5a4e", "#44525f", "#8a94a8"];
+  const SUITC = ["#46525e", "#3a4652", "#5f6670", "#6b6257"];
   const prop = (o, g, c, p, s, r) => o.props.push({ g, c, p, s, r });
-  /* hairstyles: short / bob / bun / ponytail / curly — hat-wearing roles pass plain=true to stay under the brim */
+  /* hair caps (reference style): one smooth piece over the head with a clear fringe line — the cap is a dome
+     tilted forward so the hem rides high over the brow and low over the nape. Hat-wearing roles pass plain=true. */
   const hairOf = (o, R, colr, plain) => {
-    const c = colr || pick(R, HAIRC), st = plain ? R() * 0.64 : R();
-    o.topC = c; o.topT = [[0, 0.19, -0.004], [0.138, 0.075, 0.138]]; // short crop by default
-    if (st >= 0.42 && st < 0.64) o.topT = [[0, 0.172, -0.01], [0.15, 0.115, 0.148]]; // bob
-    else if (st >= 0.64 && st < 0.8) prop(o, "sph", c, [0, 0.265, -0.025], [0.052, 0.046, 0.052]); // bun
-    else if (st >= 0.8 && st < 0.92) prop(o, "sph", c, [0, 0.16, -0.08], [0.046, 0.1, 0.05]); // ponytail
-    else if (st >= 0.92) o.topT = [[0, 0.185, 0], [0.158, 0.1, 0.158]]; // curly puff
+    const c = colr || pick(R, HAIRC), st = plain ? R() * 0.62 : R();
+    o.topC = c; o.topT = [[0, 0.212, -0.008], [0.126, 0.095, 0.129], [0.22, 0, 0]]; // short crop cap
+    if (st >= 0.4 && st < 0.62) o.topT = [[0, 0.196, -0.012], [0.136, 0.13, 0.136], [0.1, 0, 0]]; // bob, down over the ears
+    else if (st >= 0.62 && st < 0.76) prop(o, "sph", c, [0, 0.292, -0.025], [0.055, 0.05, 0.055]); // bun on the crop
+    else if (st >= 0.76 && st < 0.88) prop(o, "sph", c, [0, 0.185, -0.085], [0.05, 0.105, 0.055]); // low ponytail
+    else if (st >= 0.88) o.topT = [[0.008, 0.21, -0.006], [0.13, 0.1, 0.132], [0.2, 0, 0.16]]; // side-parted sweep
   };
   const DRESS = {
     office(o, R) { /* 上班族：西裝色＋公事包（少數改拿咖啡） */
-      o.shirt = pick(R, SUITC); o.pants = pick(R, ["#3b4148", "#44525f", "#4a4e57"]); hairOf(o, R);
+      o.shirt = pick(R, SUITC); o.pants = pick(R, ["#3c4a62", "#44525f", "#4a4e57"]); hairOf(o, R);
       if (R() < 0.7) prop(o, "rbox", "#4a4038", [0.104, -0.002, 0.015], [0.026, 0.068, 0.098]);
       else prop(o, "cyl", "#f4efe6", [0.1, 0.05, 0.05], [0.032, 0.042, 0.032]);
     },
@@ -31,14 +32,14 @@ const PEOPLE = { list: [], routes: [] };
       if (R() < 0.5) prop(o, "cyl", "#f4efe6", [-0.1, 0.05, 0.05], [0.03, 0.042, 0.03]);
     },
     student(o, R) { /* 學童：小黃帽＋書包，個子小、步伐快 */
-      o.sc = 0.56; o.speed *= 1.25; o.shirt = pick(R, ["#d8d2c6", "#8ea6c0", "#b5c4b1", "#a8bfc9"]); o.pants = pick(R, ["#44525f", "#5a6b7d"]); hairOf(o, R, null, true);
+      o.sc = 0.56; o.speed *= 1.25; o.shirt = pick(R, ["#f4f1e8", "#6f8fc0", "#8fb07a", "#f2c75c"]); o.pants = pick(R, ["#44525f", "#55617a"]); hairOf(o, R, null, true);
       prop(o, "dome", "#f2c84b", [0, 0.198, 0.004], [0.152, 0.082, 0.152]);
       prop(o, "cyl", "#f2c84b", [0, 0.21, 0.088], [0.12, 0.012, 0.1]);
       prop(o, "rbox", pick(R, ["#c4756b", "#6b86a8", "#c9a86b", "#8f6f8f"]), [0, 0.085, -0.078], [0.098, 0.112, 0.052]);
     },
     elder(o, R) { /* 長者：灰髮＋拐杖，微駝、走得慢 */
       o.sc = 0.74; o.speed = 0.05 + R() * 0.05; o.stoop = true;
-      o.shirt = pick(R, ["#8b8378", "#7a6f63", "#9c8fb5", "#7f9e99", "#c2b4a3"]); o.pants = pick(R, ["#7a6f63", "#5a6b7d", "#8b8378"]); hairOf(o, R, pick(R, GREYH), true);
+      o.shirt = pick(R, ["#8a94a8", "#6b5a4e", "#9f8fc4", "#52a3a3", "#c8b9a4"]); o.pants = pick(R, ["#6b5a4e", "#55617a", "#8a94a8"]); hairOf(o, R, pick(R, GREYH), true);
       prop(o, "cyl", "#7a5c42", [0.1, -0.015, 0.03], [0.012, 0.135, 0.012]);
     },
     parent(o, R) { /* 家長：推嬰兒車（車身＋頂篷＋滾輪＋把手） */
@@ -50,13 +51,13 @@ const PEOPLE = { list: [], routes: [] };
       prop(o, "cyl", "#6a6f75", [0, 0.05, 0.085], [0.012, 0.13, 0.012], [0.5, 0, 0]);
     },
     worker(o, R) { /* 工地人員：工程帽（黃/白）＋工作服 */
-      o.shirt = pick(R, ["#e0995c", "#d9c38c", "#8b8378"]); o.pants = pick(R, ["#4a4e57", "#44525f"]); hairOf(o, R, null, true);
+      o.shirt = pick(R, ["#e8713c", "#f2c75c", "#8a94a8"]); o.pants = pick(R, ["#4a4e57", "#44525f"]); hairOf(o, R, null, true);
       const hc = R() < 0.7 ? "#f0b03c" : "#e8e4da";
       prop(o, "dome", hc, [0, 0.196, 0], [0.165, 0.1, 0.165]);
       prop(o, "cyl", hc, [0, 0.198, 0], [0.195, 0.013, 0.195]);
     },
     hiker(o, R) { /* 登山客：大背包＋圓盤帽＋登山杖 */
-      o.shirt = pick(R, ["#a3b78f", "#c48d7e", "#7f9e99", "#d3a788"]); o.pants = pick(R, ["#7a6f63", "#44525f"]); hairOf(o, R, null, true);
+      o.shirt = pick(R, ["#8fb07a", "#c8795a", "#52a3a3", "#f2c75c"]); o.pants = pick(R, ["#6b5a4e", "#44525f"]); hairOf(o, R, null, true);
       prop(o, "rbox", pick(R, ["#7d8f6a", "#a8744f", "#8f6f8f"]), [0, 0.095, -0.088], [0.105, 0.155, 0.07]);
       prop(o, "dome", "#8a9471", [0, 0.2, 0], [0.148, 0.07, 0.148]);
       prop(o, "cyl", "#8a9471", [0, 0.202, 0], [0.2, 0.012, 0.2]);
@@ -68,19 +69,19 @@ const PEOPLE = { list: [], routes: [] };
       prop(o, "cone", pick(R, ["#c98a8a", "#8aa6c9", "#a6c98f", "#d9c38c"]), [0.1, 0.35, 0.02], [0.37, 0.1, 0.37]);
     },
     balloonkid(o, R) { /* 拿氣球的小孩 */
-      o.sc = 0.54; o.speed *= 1.3; o.shirt = pick(R, ["#d3a788", "#a8bfc9", "#b5c4b1", "#d9c38c"]); o.pants = pick(R, ["#5a6b7d", "#8ea6c0"]); hairOf(o, R);
+      o.sc = 0.54; o.speed *= 1.3; o.shirt = pick(R, ["#f2c75c", "#6f8fc0", "#8fb07a", "#e3989f"]); o.pants = pick(R, ["#55617a", "#6f8fc0"]); hairOf(o, R);
       prop(o, "cyl", "#d8d8d8", [0.115, 0.26, 0.015], [0.005, 0.27, 0.005]);
       prop(o, "sph", pick(R, ["#e88c7d", "#8fb8d8", "#f0c64a", "#9fc48f"]), [0.118, 0.44, 0.015], [0.095, 0.115, 0.095]);
     },
     tourist(o, R) { /* 旅客：遮陽帽＋拖行李箱 */
-      o.shirt = pick(R, ["#d3a788", "#7f9e99", "#c48d7e", "#a8bfc9", "#d9c38c"]); o.pants = pick(R, ["#d8d2c6", "#5a6b7d", "#8b8378"]); hairOf(o, R, null, true);
+      o.shirt = pick(R, ["#e8713c", "#52a3a3", "#e3989f", "#f2c75c", "#f4f1e8"]); o.pants = pick(R, ["#f4f1e8", "#55617a", "#8a94a8"]); hairOf(o, R, null, true);
       prop(o, "dome", "#e8dcc0", [0, 0.202, 0], [0.148, 0.068, 0.148]);
       prop(o, "cyl", "#e8dcc0", [0, 0.205, 0], [0.235, 0.011, 0.235]);
       prop(o, "rbox", pick(R, ["#7d99b5", "#b57d7d", "#c9b27d"]), [-0.105, -0.02, -0.055], [0.055, 0.118, 0.085]);
       prop(o, "cyl", "#3f444b", [-0.105, 0.065, -0.055], [0.009, 0.08, 0.009]);
     },
     farmer(o, R) { /* 小農：斗笠＋提籃 */
-      o.shirt = pick(R, ["#a3b78f", "#c2b4a3", "#8b8378"]); o.pants = pick(R, ["#7a6f63", "#44525f"]); hairOf(o, R, null, true);
+      o.shirt = pick(R, ["#8fb07a", "#c8b9a4", "#8a94a8"]); o.pants = pick(R, ["#6b5a4e", "#44525f"]); hairOf(o, R, null, true);
       prop(o, "cone", "#d9c08a", [0, 0.23, 0], [0.27, 0.095, 0.27]);
       prop(o, "rbox", "#c9a86b", [0.104, 0.012, 0.025], [0.066, 0.05, 0.066]);
     },
@@ -125,7 +126,8 @@ const PEOPLE = { list: [], routes: [] };
     o.skin = col(pick(R1, SKIN)); o.sc = 0.8; o.props = [];
     if (o.kind === "flow") { hairOf(o, R1); o.pants = "#3b4148"; } // flow walkers keep the city-colour shirt they were given (route identification only)
     else (DRESS[o.role] || DRESS.commuter)(o, R1);
-    o.shirt = col(o.shirt); o.pants = col(o.pants); o.topC = col(o.topC); o.ph = R1() * 6;
+    if (!o.sleeve && R1() < 0.4 && ["commuter", "parent", "tourist", "student", "balloonkid", "umbrella"].includes(o.role)) o.sleeve = "#f4f1e8"; // reference-style two-tone shirt: cream sleeves
+    o.shirt = col(o.shirt); o.pants = col(o.pants); o.topC = col(o.topC); o.sleeve = col(o.sleeve || o.shirt); o.ph = R1() * 6;
     PEOPLE.list.push(o);
   };
   const perRoute = QUALITY === "high" ? 3 : 2;
@@ -258,9 +260,13 @@ const PEOPLE = { list: [], routes: [] };
     };
     const TA = WORLD.geo("taoyuan", 121.233, 25.0797), SS = WORLD.geo("taipei", 121.5525, 25.0694); // 桃園國際機場 / 松山機場
     const RAD = Math.max(bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) * 0.42;
-    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 12, w: 0.055, a: rng(3)() * 6 });
-    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.2, dir: 1, speed: 0.045, hi: 10.5 });  // cruise stays above 台北 101
-    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.72, dir: -1, speed: 0.045, hi: 10.5 });
+    /* deconflicted scheduling: the two shuttles fly parallel offset corridors at different cruise
+       altitudes with opposite phases (always near opposite ends), and the orbiter circles well above
+       both peaks — no two aircraft ever come within a fuselage length of each other */
+    const dxs = SS[0] - TA[0], dzs = SS[1] - TA[1], Lsh = Math.hypot(dxs, dzs) || 1, nxs = -dzs / Lsh, nzs = dxs / Lsh;
+    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 22, w: 0.055, a: rng(3)() * 6 });
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] + nxs * 2, az: TA[1] + nzs * 2, bx: SS[0] + nxs * 2, bz: SS[1] + nzs * 2, t: 0.2, dir: 1, speed: 0.045, hi: 8.5 });  // cruise stays above 台北 101
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] - nxs * 2, az: TA[1] - nzs * 2, bx: SS[0] - nxs * 2, bz: SS[1] - nzs * 2, t: 0.72, dir: -1, speed: 0.045, hi: 13.5 });
   }
   PEOPLE.updatePlanes = (dt, time, moving) => {
     const night = (ENV.lampsOn || 0) > 0.05, on1 = time % 1 < 0.16, on2 = (time + 0.5) % 1 < 0.16;
@@ -291,38 +297,44 @@ const PEOPLE = { list: [], routes: [] };
   /* instanced body parts — chibi proportions (head ≈ 1 : body+legs ≈ 1.7); role props share five instanced pools */
   const N = PEOPLE.list.length;
   const mk = (g, n, mat) => { const m = new THREE.InstancedMesh(g, mat, n); m.castShadow = true; m.frustumCulled = false; scene.add(m); return m; };
-  const pm = new THREE.MeshStandardMaterial({ roughness: 0.8 });
-  /* one shared comic face (dot eyes + smile + blush) drawn dark-on-white so the per-instance skin tint colours the rest of the head */
+  const pm = new THREE.MeshStandardMaterial({ roughness: 0.92 }); // soft matte, clay-like
+  /* minimal reference face: two small dot eyes set a little low, drawn dark-on-white so the per-instance skin tint colours the head */
   const faceTex = (() => {
     const c = document.createElement("canvas"); c.width = 256; c.height = 128; const g = c.getContext("2d");
     g.fillStyle = "#ffffff"; g.fillRect(0, 0, 256, 128);
-    const ex = 64; // face centre sits at u = 0.25 — the +z side the walker faces
-    g.fillStyle = "#2b2420";
-    for (const s of [-1, 1]) { g.beginPath(); g.ellipse(ex + s * 13, 56, 4.5, 6.5, 0, 0, 7); g.fill(); }
-    g.strokeStyle = "#2b2420"; g.lineWidth = 3.5; g.lineCap = "round"; g.beginPath(); g.arc(ex, 61, 7, 0.4, Math.PI - 0.4); g.stroke();
-    g.fillStyle = "#ffd3c4"; for (const s of [-1, 1]) { g.beginPath(); g.arc(ex + s * 25, 66, 6, 0, 7); g.fill(); }
+    const ex = 64; // face centre sits at u = 0.25 — rotated to +z, the way the walker faces
+    g.fillStyle = "#26211f";
+    for (const s of [-1, 1]) { g.beginPath(); g.ellipse(ex + s * 13, 86, 4.6, 5.4, 0, 0, 7); g.fill(); }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   })();
-  const legG = new THREE.BoxGeometry(0.042, 0.085, 0.05).translate(0, -0.042, 0);
-  const armG = new THREE.BoxGeometry(0.034, 0.095, 0.04).translate(0, -0.048, 0);
-  const bodyG = new RoundedBoxGeometry(0.135, 0.135, 0.1, 2, 0.045);
-  const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm);
-  const heads = mk(GEO.sphere, N, new THREE.MeshStandardMaterial({ roughness: 0.8, map: faceTex })), tops = mk(GEO.dome, N, pm);
+  /* BRICK-FIG silhouette with a clay finish: rounded-edge blocks, smooth capsule head, matte material.
+     Original homage shape — no brand marks, no text, natural skin tones. */
+  const legG = new RoundedBoxGeometry(0.054, 0.1, 0.06, 1, 0.016).translate(0, -0.05, 0);
+  const armG = new THREE.CylinderGeometry(0.0175, 0.0155, 0.095, 8).translate(0, -0.0475, 0);
+  const bodyG = new RoundedBoxGeometry(1, 1, 1, 2, 0.14);
+  const headG = new THREE.CapsuleGeometry(0.5, 0.62, 3, 10);
+  const hairG = new THREE.SphereGeometry(0.5, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2);
+  const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), hips = mk(GEO.rbox, N, pm), hands = mk(GEO.ico, N * 2, pm);
+  const heads = mk(headG, N, new THREE.MeshStandardMaterial({ roughness: 0.95, map: faceTex })), tops = mk(hairG, N, pm);
   const PROPG = { rbox: GEO.rbox, cyl: GEO.cyl, dome: GEO.dome, sph: GEO.sphere, cone: GEO.cone };
   const want = {}; for (const o of PEOPLE.list) for (const pr of o.props) want[pr.g] = (want[pr.g] || 0) + 1;
   const propIM = {}, nextI = {}; for (const k in want) { propIM[k] = mk(PROPG[k], want[k], pm); nextI[k] = 0; }
   const E2 = new THREE.Euler(), Q2 = new THREE.Quaternion(), mat4 = () => new THREE.Matrix4();
   PEOPLE.list.forEach((o, i) => {
-    legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.shirt); arms.setColorAt(i * 2 + 1, o.shirt);
-    bodies.setColorAt(i, o.shirt); heads.setColorAt(i, o.skin); tops.setColorAt(i, o.topC);
+    legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.sleeve); arms.setColorAt(i * 2 + 1, o.sleeve);
+    bodies.setColorAt(i, o.shirt); hips.setColorAt(i, o.pants); heads.setColorAt(i, o.skin);
+    hands.setColorAt(i * 2, o.skin); hands.setColorAt(i * 2 + 1, o.skin); tops.setColorAt(i, o.topC);
     const st = o.stoop; // elders lean a little forward
-    o.bodyLoc = mat4().compose(new THREE.Vector3(0, 0.065, st ? 0.014 : 0), Q2.setFromEuler(E2.set(st ? 0.18 : 0, 0, 0)), new THREE.Vector3(1, 1, 1));
-    o.headLoc = mat4().compose(new THREE.Vector3(0, st ? 0.174 : 0.182, st ? 0.022 : 0.004), Q2.identity(), new THREE.Vector3(0.128, 0.122, 0.128));
-    o.topLoc = mat4().compose(new THREE.Vector3(o.topT[0][0], o.topT[0][1] + (st ? -0.008 : 0), o.topT[0][2] + (st ? 0.018 : 0)), Q2.identity(), new THREE.Vector3(o.topT[1][0], o.topT[1][1], o.topT[1][2]));
+    o.bodyLoc = mat4().compose(new THREE.Vector3(0, 0.1, st ? 0.014 : 0), Q2.setFromEuler(E2.set(st ? 0.18 : 0, 0, 0)), new THREE.Vector3(0.148, 0.125, 0.092));
+    o.hipLoc = mat4().compose(new THREE.Vector3(0, 0.024, 0), Q2.identity(), new THREE.Vector3(0.12, 0.05, 0.066));
+    o.headLoc = mat4().compose(new THREE.Vector3(0, st ? 0.2 : 0.208, st ? 0.02 : 0.002), Q2.setFromEuler(E2.set(0, -Math.PI / 2, 0)), new THREE.Vector3(0.105, 0.062, 0.105));
+    const ht = o.topT[2] || [0, 0, 0];
+    o.topLoc = mat4().compose(new THREE.Vector3(o.topT[0][0], o.topT[0][1] + 0.022 + (st ? -0.008 : 0), o.topT[0][2] + (st ? 0.018 : 0)), Q2.setFromEuler(E2.set(ht[0], ht[1], ht[2])), new THREE.Vector3(o.topT[1][0], o.topT[1][1], o.topT[1][2]));
     o.parts = o.props.map((pr) => {
       const k = nextI[pr.g]++; propIM[pr.g].setColorAt(k, col(pr.c));
       const r = pr.r || [0, 0, 0];
-      return { im: propIM[pr.g], i: k, m: mat4().compose(new THREE.Vector3(pr.p[0], pr.p[1], pr.p[2]), Q2.setFromEuler(E2.set(r[0], r[1], r[2])), new THREE.Vector3(pr.s[0], pr.s[1], pr.s[2])) };
+      const py = pr.p[1] + (pr.p[1] > 0.15 ? 0.03 : 0); // hats and hair pieces ride the taller head
+      return { im: propIM[pr.g], i: k, m: mat4().compose(new THREE.Vector3(pr.p[0], py, pr.p[2]), Q2.setFromEuler(E2.set(r[0], r[1], r[2])), new THREE.Vector3(pr.s[0], pr.s[1], pr.s[2])) };
     });
   });
   PEOPLE.stats = { people: N, props: want };
@@ -338,6 +350,7 @@ const PEOPLE = { list: [], routes: [] };
   for (const o of PEOPLE.list) if (o.kind === "flow") { o.badge = new THREE.Sprite(badgeFor(o.carry)); o.badge.scale.set(0.34, 0.17, 1); o.badge.renderOrder = 5; scene.add(o.badge); }
 
   const P = new THREE.Vector3(), Dv = new THREE.Vector3(), base = new THREE.Matrix4(), loc = new THREE.Matrix4(), out = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1);
+  const out2 = new THREE.Matrix4(), HT = new THREE.Matrix4().compose(new THREE.Vector3(0, -0.105, 0), new THREE.Quaternion(), new THREE.Vector3(0.036, 0.034, 0.036)); // mitt hand rides the swinging arm
   const sample = (rt, s) => {
     let k = 1; while (k < rt.cum.length - 1 && rt.cum[k] < s) k++;
     const a = rt.pts[k - 1], b = rt.pts[k], t = (s - rt.cum[k - 1]) / Math.max(1e-6, rt.cum[k] - rt.cum[k - 1]);
@@ -362,16 +375,18 @@ const PEOPLE = { list: [], routes: [] };
       const ph = time * (o.sc < 0.7 ? 11 : 9) + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.014 : 0;
       base.compose(new THREE.Vector3(pos.x + side.x, pos.y + lift + (0.084 + bob) * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
       for (const [k, sgn] of [[0, 1], [1, -1]]) {
-        loc.compose(new THREE.Vector3(sgn * 0.028, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
-        loc.compose(new THREE.Vector3(sgn * 0.083, 0.122, 0), q.setFromEuler(e.set(-sgn * sw * 0.7, 0, sgn * 0.1)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        loc.compose(new THREE.Vector3(sgn * 0.031, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        loc.compose(new THREE.Vector3(sgn * 0.09, 0.15, 0), q.setFromEuler(e.set(-sgn * sw * 0.7, 0, sgn * 0.12)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        hands.setMatrixAt(i * 2 + k, out2.multiplyMatrices(out, HT));
       }
       bodies.setMatrixAt(i, out.multiplyMatrices(base, o.bodyLoc));
+      hips.setMatrixAt(i, out.multiplyMatrices(base, o.hipLoc));
       heads.setMatrixAt(i, out.multiplyMatrices(base, o.headLoc));
       tops.setMatrixAt(i, out.multiplyMatrices(base, o.topLoc));
       for (const pt of o.parts) pt.im.setMatrixAt(pt.i, out.multiplyMatrices(base, pt.m));
       if (o.badge) { o.badge.visible = visible && PEOPLE.badges; o.badge.position.set(pos.x + side.x, pos.y + 0.38, pos.z + side.z); }
     });
-    for (const m of [legs, arms, bodies, heads, tops]) m.instanceMatrix.needsUpdate = true;
+    for (const m of [legs, arms, bodies, hips, hands, heads, tops]) m.instanceMatrix.needsUpdate = true;
     for (const k in propIM) propIM[k].instanceMatrix.needsUpdate = true;
     if (PEOPLE.lampPools) { const on = ENV.lampsOn || 0; PEOPLE.lampPools.opacity = on * 0.55; PEOPLE.lampPools.visible = on > 0.01; PEOPLE.campusPools.opacity = on; PEOPLE.campusPools.visible = on > 0.01; PEOPLE.lampBeams.opacity = on * 0.16; PEOPLE.lampBeams.visible = on > 0.01; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); PEOPLE.updatePlanes(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
   };
