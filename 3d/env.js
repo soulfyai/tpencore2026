@@ -60,7 +60,7 @@ const ENV = {};
   /* ---------- islets, lighthouses and boats out at sea (decorative) ---------- */
   const deco = new THREE.Group(); scene.add(deco);
   const R1 = rng(1313), dm = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, flatShading: true, ...extra });
-  const rockM = dm("#a59d8e"), grassM = dm("#92ab7c"), trunkM = dm("#8a6a4a"), leafM = dm("#74955f"), whiteM = dm("#f7f6f2"), redM = dm("#c8102e"), blueM = dm("#1f4fb8"), sandM = dm("#e8dcb8");
+  const rockM = dm("#a59d8e"), grassM = dm("#92ab7c"), trunkM = dm("#8a6a4a"), leafM = dm("#648753"), whiteM = dm("#f7f6f2"), redM = dm("#c8102e"), blueM = dm("#1f4fb8"), sandM = dm("#e8dcb8");
   const lampM = new THREE.MeshStandardMaterial({ color: "#fff6d8", emissive: "#ffe9a8", emissiveIntensity: 0 });
   const rx = Math.max(size.x, size.z) / 2;
   const islets = [];
@@ -163,8 +163,8 @@ const ENV = {};
     const dir = new THREE.Vector3(Math.cos(az) * Math.cos(elev), Math.sin(elev), 0.45 + Math.sin(az) * 0.3).normalize();
     skyMat.uniforms.uSun.value.copy(dir);
     sun.position.copy(MID).add(dir.clone().multiplyScalar(45)); sun.color.copy(k.sun).lerp(col("#ffffff"), 0.35);
-    sun.intensity = k.si * (1 - gray * 0.62);
-    hemi.intensity = k.hi * (1 - gray * 0.25); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
+    sun.intensity = k.si * (1 - gray * 0.5);
+    hemi.intensity = k.hi * (1 - gray * 0.34); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
     sun.castShadow = sun.intensity > 0.6;
     scene.fog.color.copy(skyMat.uniforms.uHorizon.value);
     scene.fog.near = kind === "fog" ? 12 : wet > 0.5 ? 40 : 70; scene.fog.far = kind === "fog" ? 70 : wet > 0.5 ? 150 : 210;
@@ -184,6 +184,7 @@ const ENV = {};
     const lampsOn = minute >= 1020 ? THREE.MathUtils.clamp((minute - 1020) / 20, 0, 1) : minute < 360 ? THREE.MathUtils.clamp((360 - minute) / 20, 0, 1) : 0;
     MAT.glow.emissiveIntensity = lampsOn * (1.1 + k.night * 0.7);
     MAT.glowCool.emissiveIntensity = lampsOn * (0.5 + k.night * 0.3); // cool LED stays an accent: the warm street lamps carry the night
+    MAT.glowDim.emissiveIntensity = lampsOn * 0.45;
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
     // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)

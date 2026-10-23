@@ -36,7 +36,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   const GLASS = ["#7fd4ec", "#5fa8e4", "#9fd2f2", "#bfe6f6", "#6fc2dc", "#8fb8e8"]; // glass-curtain blues
   const NEON = ["#33e1ff", "#7fb4ff", "#b8f0ff", "#9f8bff"];                          // cool LED accents
   const WALLS = ["#fdfaf2", "#f8f5ec", "#f1efe6", "#f6f2e8", "#faf6ea"];              // warm future white
-  const ROOFS = ["#dfe8f0", "#cfd8e2", "#9fc8e0", "#8fb4c8", "#b9c4ce"];              // pale steel/glass tones
+  const ROOFS = ["#c96a4e", "#4e7d9e", "#8a6a4a", "#5b6b7d", "#b9c4ce"];              // clear mid-tone anchors: terracotta, steel blue, deep wood, slate
   /* rooftop solar array: one dark cell slab with a lighter grid sheet, slightly tilted toward the sun */
   const SOLAR = (p, x, y, z, w, d, ry = 0) => { p("box", x, y + 0.028, z, w, 0.016, d, "#22304e", ry, 0, -0.1); p("box", x, y + 0.04, z, w * 0.94, 0.006, d * 0.86, "#3f6cae", ry, 0, -0.1); };
 
@@ -66,7 +66,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         SOLAR(p, s * 0.3, top + 0.07, -d * 0.3, s * 0.3, d * 0.26);
       } else { // stepped mech crown with an LED ring and a sky garden
         p("box", 0, top + 0.19, 0, s * 0.88, 0.26, d * 0.88, gl); p("box", 0, top + 0.33, 0, s * 0.92, 0.02, d * 0.92, "#bfeaff", 0, 0, 0, "cool");
-        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#7da26e");
+        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#689659");
       }
       return top + 0.9;
     },
@@ -78,7 +78,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       p("box", 0, 0.07 + h + 0.06, 0, s * 0.96, 0.012, d * 0.96, band);             // roof trim band
       const roof = 0.07 + h + 0.075, kk = r();
       if (kk < 0.4) SOLAR(p, 0, roof, 0, s * 0.68, d * 0.58);                        // rooftop solar farm
-      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#88ab74"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#a3bf8a"); } // sky garden
+      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#739c5f"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#8bab6f"); } // sky garden
       else { p("box", -s * 0.2, roof + 0.05, -d * 0.15, s * 0.3, 0.1, d * 0.3, "#dfe5ec"); p("cyl", s * 0.24, roof + 0.06, d * 0.18, 0.1, 0.12, 0.1, "#c9ced3"); } // mech penthouse
       p("box", 0, 0.17, d / 2 + 0.045, s * 0.5, 0.016, 0.1, "#f6f4ec", 0, -0.25);    // entrance canopy
       p("box", 0, 0.1, d / 2 + 0.008, s * 0.32, 0.15, 0.012, "#cfeefc", 0, 0, 0, true); // glass lobby door
@@ -110,7 +110,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     park(p, s, h, r) {
       p("cyl", 0, 0.01, 0, s * 1.1, 0.02, s * 1.1, "#a9bf8d");
       if (r() < 0.5) { p("cyl", 0, 0.03, 0, s * 0.5, 0.04, s * 0.5, "#e8ecef"); p("cyl", 0, 0.05, 0, s * 0.42, 0.03, s * 0.42, "#6fd3f0", 0, 0, 0, true); p("cyl", 0, 0.16, 0, 0.05, 0.22, 0.05, "#bff2ff", 0, 0, 0, "cool"); }
-      for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#7da26e", "#92b47e", "#6f9460"])); }
+      for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#689659", "#7aa567", "#5e8750"])); }
       return 0.5;
     },
   };
@@ -142,11 +142,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const pc = ctxFor(isl.id, null, 0, 0, 1, 0, zone, null), pp = (g, ...a) => part(pc, g, ...a);
     pp("rbox", 0, 0.02, 0, cw + 0.1, 0.04, cd + 0.1, accent);          // thin city-colour frame, nothing louder
     pp("rbox", 0, 0.036, 0, cw + 0.02, 0.05, cd + 0.02, "#f6eedb");     // one clean cream board per theme
-    const LOT_GROUND = { school: "#eccfa8", sport: "#b7c89b", park: "#b7c89b", nursery: "#f6e2d6", hospital: "#f1efe7", clinic: "#f1efe7", elder: "#e9eedb", metro: "#e4dccb", bus: "#e4dccb", bike: "#e4dccb", road: "#e4dccb" }; // low-saturation board-game tints
+    const LOT_GROUND = { school: "#e0bd8e", sport: "#a2bd82", park: "#a2bd82", nursery: "#eecfbc", hospital: "#dfe5ec", clinic: "#dfe5ec", elder: "#d9e0c2", metro: "#d6c9ab", bus: "#d6c9ab", bike: "#d6c9ab", road: "#d6c9ab" }; // mid-tone pads: one step below the cream board
     let campusTop = TOP;
     for (const sl of slots) {
       const r = (hash(sl.it.id) % 1000) / 1000, kind = MODELS.kindFor(sl.it, isl.t);
-      pp("box", sl.x, 0.066, sl.z, sl.s - 0.12, 0.01, sl.s - 0.12, LOT_GROUND[kind] || "#efe4c8"); // slim lot pad, generous margins between lots
+      pp("box", sl.x, 0.066, sl.z, sl.s - 0.12, 0.01, sl.s - 0.12, LOT_GROUND[kind] || "#e2d3b1"); // slim lot pad, generous margins between lots
       const ctx = ctxFor(isl.id, sl.it.id, sl.x, sl.z, sl.s * 0.95, 0, zone, null);
       ctx.base.premultiply(new THREE.Matrix4().makeTranslation(0, 0.07, 0));
       const start = parts.length, p = (g, ...a) => part(ctx, g, ...a);
@@ -230,8 +230,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         if (r() < (downtown ? 0.22 : 0.4)) { // leave room for greenery: a small grove instead of another building
           if (!free(isl.id, x, z, 0.22)) continue; hold(isl.id, x, z, 0.22);
           const gp = (g, ...a) => part(ctxFor(isl.id, null, x, z, 1, 0, zone, null), g, ...a), nT = 1 + ((r() * 3) | 0);
-          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#7da26e", "#92b47e", "#6f9460", "#a3bf8a"])); }
-          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#88ab74");
+          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#689659", "#7aa567", "#5e8750", "#8bab6f"])); }
+          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#739c5f");
           continue;
         }
         let type = downtown ? (v < 0.5 ? "tower" : v < 0.84 ? "office" : v < 0.93 ? "shop" : "park") : (v < 0.16 ? "tower" : v < 0.52 ? "office" : v < 0.76 ? "house" : v < 0.88 ? "shop" : "park");
@@ -256,7 +256,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
           let x = a[0] + ux * t - uz * 0.14, z = a[1] + uz * t + ux * 0.14; if (!GEOM.pip(x, z, P)) { x = a[0] + ux * t + uz * 0.14; z = a[1] + uz * t - ux * 0.14; }
           if (!GEOM.pip(x, z, P) || (Math.abs(x) < isl.campus.w / 2 + 0.15 && Math.abs(z) < isl.campus.d / 2 + 0.15)) continue;
           if (LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - isl.c.x - x, L.isl.c.z + L.z - isl.c.z - z) < L.r + 0.2)) continue;
-          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#7da26e", "#92b47e", "#6f9460"])); }
+          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#689659", "#7aa567", "#5e8750"])); }
           else { tp("cyl", x, 0.17, z, 0.018, 0.34, 0.018, "#3b4148"); tp("sphere", x, 0.35, z, 0.045, 0.045, 0.045, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([isl.c.x + x, TOP + 0.012, isl.c.z + z, 0.42]); }
         }
       }
@@ -319,7 +319,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         if (k % 5 === 0) for (const o of [-0.25, 0.25]) sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.136, mz + Math.cos(ang) * o, 0.05, 0.016, 0.016, "#bfeaff", -ang, 0, 0, "cool"); // sparse cool markers, not a light bar
         if (k % 2 === 0) sp("box", mx, TOP + RH + 0.052, mz, L * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 3 === 0) { const ph = TOP + RH - base; sp("cyl", mx, base + ph / 2 - 0.05, mz, 0.13, ph, 0.13, "#cfc9bd"); sp("box", mx, TOP + RH - 0.08, mz, 0.12, 0.08, 0.52, "#cfc9bd", -ang); sp("cyl", mx, base + 0.02, mz, 0.22, 0.05, 0.22, "#ffffff"); }
-        if (k % 2 === 0) for (const o of [k % 4 === 0 ? -0.26 : 0.26]) { LAMP_POOLS.push([mx - Math.sin(ang) * o * 0.4, TOP + RH + 0.055, mz + Math.cos(ang) * o * 0.4, 0.42]); sp("cyl", mx - Math.sin(ang) * o, TOP + RH + 0.3, mz + Math.cos(ang) * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx - Math.sin(ang) * o, TOP + RH + 0.5, mz + Math.cos(ang) * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); }
+        if (k % 6 === 0) for (const o of [k % 12 === 0 ? -0.26 : 0.26]) { LAMP_POOLS.push([mx - Math.sin(ang) * o * 0.4, TOP + RH + 0.055, mz + Math.cos(ang) * o * 0.4, 0.42]); sp("cyl", mx - Math.sin(ang) * o, TOP + RH + 0.3, mz + Math.cos(ang) * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx - Math.sin(ang) * o, TOP + RH + 0.5, mz + Math.cos(ang) * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); } // sparse: no glowing band over the ring
       }
       WORLD.rings = WORLD.rings || {}; WORLD.rings[c.city] = { pts: rp, center: [cx, cz], deck: TOP + RH };
       WORLD.highways.push({ city: c.city, closed: true, pts: rp.map(([x, z]) => new THREE.Vector3(x, TOP + RH + 0.06, z)) });
@@ -341,7 +341,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const yAt = (o) => TOP - 0.06 + (WATER_Y + 0.02 - TOP + 0.06) * Math.min(1, o / W);
     const UMB = ["#f8f6f1", "#6fd0dc"];                       // resort canvas: white + aqua only
     const TOWEL = ["#bfeef4", "#f8f6f1", "#ffd9c0"];           // lounger towels, low-saturation
-    const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#6f9460" : "#7fa368", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
+    const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#5e8750" : "#6c9655", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
     const umbrella = (x, y, z, cc) => { sp("cyl", x, y + 0.22, z, 0.018, 0.44, 0.018, "#f8f6f1"); sp("cone", x, y + 0.46, z, 0.48, 0.13, 0.48, cc); sp("sphere", x, y + 0.535, z, 0.028, 0.028, 0.028, "#f8f6f1"); };
     const lounger = (x, y, z, a2, cc) => { const ca = Math.cos(a2), sa = Math.sin(a2);
       sp("box", x, y + 0.035, z, 0.3, 0.028, 0.13, "#f8f6f1", -a2);
@@ -478,7 +478,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         if (k % 4 === 0) for (const o of [-0.28, 0.28]) sp("box", mx + nx * o, Y + 0.146, mz + nz * o, 0.05, 0.016, 0.016, "#bfeaff", -ang, 0, 0, "cool");
         if (k % 2 === 0) sp("box", mx, Y + 0.058, mz, seg * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 4 === 0 && k > 0) { const ph = Y - WATER_Y; sp("cyl", mx, WATER_Y + ph / 2 - 0.05, mz, 0.16, ph, 0.16, "#cfc9bd"); sp("cyl", mx, WATER_Y + 0.02, mz, 0.26, 0.05, 0.26, "#ffffff"); }
-        if (k % 2 === 1) { const o = k % 4 === 1 ? -0.3 : 0.3; sp("cyl", mx + nx * o, Y + 0.3, mz + nz * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx + nx * o, Y + 0.5, mz + nz * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([mx + nx * o * 0.4, Y + 0.06, mz + nz * o * 0.4, 0.42]); }
+        if (k % 4 === 1) { const o = k % 8 === 1 ? -0.3 : 0.3; sp("cyl", mx + nx * o, Y + 0.3, mz + nz * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx + nx * o, Y + 0.5, mz + nz * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([mx + nx * o * 0.4, Y + 0.06, mz + nz * o * 0.4, 0.42]); }
         pts.push(new THREE.Vector3(a[0] + (b[0] - a[0]) * f0, Y + 0.07, a[1] + (b[1] - a[1]) * f0));
       }
       pts.push(new THREE.Vector3(b[0], Y + 0.07, b[1]));

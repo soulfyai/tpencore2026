@@ -79,7 +79,7 @@ MODELS.heroes = {};
   };
   H["nt-transport-1"] = (p, h) => { // 汐東線加速南延: elevated line curving south over hills
     p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#a9c98c", Math.PI / 6);
-    p("ico1", -0.3, 0, -0.32, 0.5, 0.36, 0.4, "#92ab7c"); p("ico1", 0.28, 0, -0.38, 0.42, 0.28, 0.32, "#9fb58a");
+    p("ico1", -0.3, 0, -0.32, 0.5, 0.36, 0.4, "#92ab7c"); p("ico1", 0.28, 0, -0.38, 0.42, 0.28, 0.32, "#87a56f");
     const pts = []; for (let k = 0; k <= 8; k++) { const t = k / 8; pts.push([-0.46 + t * 0.92, 0.32 - Math.sin(t * Math.PI) * 0.42]); }
     for (let k = 0; k < 8; k++) { const [x0, z0] = pts[k], [x1, z1] = pts[k + 1], dx = x1 - x0, dz = z1 - z0, L = Math.hypot(dx, dz), ry = -Math.atan2(dz, dx);
       p("box", (x0 + x1) / 2, 0.3, (z0 + z1) / 2, L * 1.04, 0.035, 0.13, "#d8d2c6", ry); if (k % 2 === 0) h.box(x0, 0, z0, 0.05, 0.29, 0.05, ST);
@@ -129,7 +129,7 @@ MODELS.heroes = {};
   };
   H["kl-transport-1"] = (p, h) => { // 捷運二階走麥金路: line threading between hills to Keelung
     p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#b2cc96", Math.PI / 6);
-    p("ico1", -0.32, 0, -0.34, 0.5, 0.42, 0.4, "#92ab7c"); p("ico1", 0.34, 0, 0.36, 0.44, 0.36, 0.36, "#9fb58a");
+    p("ico1", -0.32, 0, -0.34, 0.5, 0.42, 0.4, "#92ab7c"); p("ico1", 0.34, 0, 0.36, 0.44, 0.36, 0.36, "#87a56f");
     p("box", 0, 0.016, 0, 1.0, 0.03, 0.22, ROAD, -0.5); for (let x = -0.4; x <= 0.4; x += 0.2) h.box(x, 0, x * -0.55 + 0.0, 0.05, 0.26, 0.05, ST);
     p("box", 0, 0.28, 0, 1.06, 0.035, 0.12, "#d8d2c6", -0.5); train(p, -0.06, 0.3, 0.03, 0.6, W, B, 3, -0.5);
     h.house(0.26, -0.22, 0.26, 0.16, 0.14, W, B, { roof: "flat" }); h.sign(0.26, 0.12, -0.135, 0.16, B);

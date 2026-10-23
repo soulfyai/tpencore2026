@@ -232,7 +232,7 @@ const GEOM = {};
       const loc = ins.map(([x, z]) => [x - isl.c.x, z - isl.c.z]);
       isl.poly = loc; isl.polyWorld = P;
       const g = new THREE.Group(); g.position.set(isl.c.x, 0, isl.c.z);
-      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color: 0xfff3dd, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true; // cream paving: green is the garnish, not the base
+      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color: 0xeedcbc, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true; // cream paving: green is the garnish, not the base
       plate.userData = { type: "island", id: isl.id };
       const outline = new THREE.Mesh(MESH.ribbon(loc, 0.12, TOP + 0.012, true), new THREE.MeshBasicMaterial({ color: live ? col(cityHex(isl.city)) : col("#9a9a9a"), side: THREE.DoubleSide }));
       outline.visible = false;

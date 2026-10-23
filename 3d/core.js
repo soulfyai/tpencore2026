@@ -119,6 +119,7 @@ const MAT = {
   solid: new THREE.MeshStandardMaterial({ roughness: 0.82, metalness: 0.02 }),
   glow: new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0, emissive: 0xffd08a, emissiveIntensity: 0 }),
   glowCool: new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, emissive: 0xaee8ff, emissiveIntensity: 0 }), // futuristic LED strips: cool white-blue after dark
+  glowDim: new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0, color: 0xcfd6dd, emissive: 0xffe9bc, emissiveIntensity: 0 }), // faint cabin windows (aircraft): never a light bar
 };
 /* ---------- procedural facade materials: window grids that keep their size on any box (UVs from instance scale) ---------- */
 const FACADE = {};
