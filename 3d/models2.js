@@ -1,7 +1,7 @@
 /* ===== model variants: the same kind looks different from item to item on one island ===== */
 {
   const C = MODELS.C, K = MODELS.kinds;
-  const SH = ["#d9573f", "#3e7c8c", "#f0c64a", "#6f9e57", "#8a6fb5", "#e48b5c", "#4f6fa8"];
+  const SH = ["#d9573f", "#3e7c8c", "#f0c64a", "#6b9158", "#8a6fb5", "#e48b5c", "#4f6fa8"];
   const sh = (r, k = 0) => SH[(((r * 97) | 0) + k) % 7];
   const V = {
     metro: [K.metro,
@@ -17,9 +17,9 @@
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); for (const x of [-0.3, 0.3]) h.box(x, 0, -0.1, 0.06, 0.3, 0.06, C.stone); p("box", 0, 0.32, -0.1, 1, 0.04, 0.14, "#b9b2a6"); for (const z of [-0.3, 0.25]) h.box(0, 0, z, 0.06, 0.5, 0.06, C.stone); p("box", 0, 0.52, 0, 0.14, 0.04, 0.84, "#b9b2a6");
         p("rbox", -0.25, 0.4, -0.1, 0.38, 0.11, 0.11, a); p("rbox", 0, 0.6, 0.15, 0.11, 0.11, 0.38, C.white); h.tree(0.38, 0.32, 0.6); h.person(-0.3, 0.3, sh(r)); }],
     bus: [K.bus,
-      (p, h, a, r) => { h.slab(1, 0.84, C.stone); p("box", 0, 0.3, -0.02, 0.96, 0.03, 0.62, a); for (const x of [-0.45, 0.45]) for (const z of [-0.3, 0.26]) h.box(x, 0, z, 0.03, 0.3, 0.03, C.steel); for (const [x, c] of [[-0.25, a], [0.05, C.white], [0.32, "#6f9e57"]]) h.bus(x, -0.02, c, Math.PI / 2); h.person(-0.42, 0.35, sh(r)); },
+      (p, h, a, r) => { h.slab(1, 0.84, C.stone); p("box", 0, 0.3, -0.02, 0.96, 0.03, 0.62, a); for (const x of [-0.45, 0.45]) for (const z of [-0.3, 0.26]) h.box(x, 0, z, 0.03, 0.3, 0.03, C.steel); for (const [x, c] of [[-0.25, a], [0.05, C.white], [0.32, "#6b9158"]]) h.bus(x, -0.02, c, Math.PI / 2); h.person(-0.42, 0.35, sh(r)); },
       (p, h, a, r) => { h.slab(1, 0.84, C.grass); p("box", 0, 0.015, 0.05, 1, 0.025, 0.2, "#7d7f84"); p("rbox", -0.1, 0.08, 0.05, 0.24, 0.12, 0.12, C.white); p("box", -0.1, 0.1, 0.05, 0.2, 0.04, 0.122, C.glass, 0, 0, 0, true); p("box", -0.1, 0.06, 0.05, 0.245, 0.02, 0.125, a);
-        for (const dx of [-0.07, 0.07]) p("cyl", -0.1 + dx, 0.025, 0.05, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); p("cone", -0.3, 0.2, -0.28, 0.5, 0.4, 0.3, "#8fb376"); p("cone", 0.15, 0.25, -0.3, 0.6, 0.5, 0.3, "#7ea566"); h.tree(0.35, -0.22, 0.6, "cone"); h.house(0.3, 0.3, 0.2, 0.14, 0.14, C.cream, a, { win: false }); h.person(0.12, 0.22, sh(r)); },
+        for (const dx of [-0.07, 0.07]) p("cyl", -0.1 + dx, 0.025, 0.05, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); p("cone", -0.3, 0.2, -0.28, 0.5, 0.4, 0.3, "#9fae87"); p("cone", 0.15, 0.25, -0.3, 0.6, 0.5, 0.3, "#90a37a"); h.tree(0.35, -0.22, 0.6, "cone"); h.house(0.3, 0.3, 0.2, 0.14, 0.14, C.cream, a, { win: false }); h.person(0.12, 0.22, sh(r)); },
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.road(1, 0.24, 0.2); p("box", 0, 0.24, -0.2, 0.5, 0.02, 0.16, a); h.box(0, 0, -0.27, 0.48, 0.24, 0.015, C.glass); p("box", 0.12, 0.13, -0.26, 0.18, 0.14, 0.012, C.white, 0, 0, 0, true); for (let k = 0; k < 3; k++) h.person(-0.15 + k * 0.1, -0.15, sh(r, k)); h.bench(-0.1, -0.22); h.bus(-0.1, 0.2, a, Math.PI); }],
     nursery: [K.nursery,
       (p, h, a, r) => { h.slab(1, 0.84, "#efe3c8"); p("box", -0.18, 0.02, 0.12, 0.4, 0.03, 0.34, "#e8d39a"); p("dome", 0.25, 0, 0.1, 0.32, 0.26, 0.32, C.white); for (let k = 0; k < 6; k++) p("torus", 0.25, 0.04 + k * 0.025, 0.1, 0.33 - k * 0.04, 0.33 - k * 0.04, 0.4, [a, C.yellow, C.red][k % 3], 0, Math.PI / 2);
@@ -68,8 +68,8 @@
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.tower(0, -0.1, 0.7, 0.4, 0.62, C.white, C.stone, 4); p("cyl", 0.1, 0.65, -0.1, 0.3, 0.02, 0.3, C.dark); p("box", 0.1, 0.665, -0.1, 0.12, 0.004, 0.03, C.white); p("box", 0.1, 0.665, -0.1, 0.03, 0.004, 0.12, C.white);
         h.crossMark(-0.2, 0.5, 0.106, C.red); p("rbox", -0.25, 0.07, 0.28, 0.22, 0.12, 0.12, C.white); p("box", -0.25, 0.07, 0.28, 0.222, 0.025, 0.122, C.red); h.person(0.25, 0.28, C.sky); }],
     canteen: [K.canteen,
-      (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.house(-0.15, -0.18, 0.6, 0.3, 0.24, C.white, a, { roof: "flat" }); p("rbox", 0.22, 0.09, 0.2, 0.36, 0.15, 0.16, C.white); p("box", 0.12, 0.11, 0.2, 0.14, 0.13, 0.162, "#6f9e57");
-        for (let k = 0; k < 4; k++) p("box", 0.3 + (k % 2) * 0.08, 0.2, 0.15 + Math.floor(k / 2) * 0.08, 0.07, 0.05, 0.06, ["#e86a6a", "#8db96a", "#f0c64a", "#e48b5c"][k]); for (const dx of [-0.1, 0.1]) p("cyl", 0.22 + dx, 0.025, 0.2, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); h.person(-0.05, 0.25, "#c8a46a"); }],
+      (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.house(-0.15, -0.18, 0.6, 0.3, 0.24, C.white, a, { roof: "flat" }); p("rbox", 0.22, 0.09, 0.2, 0.36, 0.15, 0.16, C.white); p("box", 0.12, 0.11, 0.2, 0.14, 0.13, 0.162, "#6b9158");
+        for (let k = 0; k < 4; k++) p("box", 0.3 + (k % 2) * 0.08, 0.2, 0.15 + Math.floor(k / 2) * 0.08, 0.07, 0.05, 0.06, ["#e86a6a", "#87a56f", "#f0c64a", "#e48b5c"][k]); for (const dx of [-0.1, 0.1]) p("cyl", 0.22 + dx, 0.025, 0.2, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); h.person(-0.05, 0.25, "#c8a46a"); }],
     road: [K.road,
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); p("box", 0, 0.014, 0.05, 1, 0.026, 0.32, C.road); p("box", 0, 0.03, 0.05, 1, 0.004, 0.3, "#b2564a"); h.zebra(0, 0.05, 0.3, 1); p("box", -0.3, 0.035, 0.05, 0.08, 0.02, 0.3, C.yellow);
         for (let k = 0; k < 4; k++) h.person(-0.06 + k * 0.04, 0.05 + (k % 2) * 0.06 - 0.03, C.yellow, Math.PI / 2, 0.55); p("box", 0.3, 0.22, -0.2, 0.12, 0.12, 0.012, C.white); h.box(0.3, 0, -0.2, 0.012, 0.16, 0.012, C.dark); h.house(-0.2, -0.28, 0.4, 0.16, 0.2, C.cream, a); h.tree(0.4, 0.32, 0.6); },
