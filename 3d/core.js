@@ -119,6 +119,7 @@ const MAT = {
   solid: new THREE.MeshStandardMaterial({ roughness: 0.82, metalness: 0.02 }),
   glow: new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0, emissive: 0xffd08a, emissiveIntensity: 0 }),
   glowCool: new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, emissive: 0xaee8ff, emissiveIntensity: 0 }), // futuristic LED strips: cool white-blue after dark
+  glowDim: new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0, color: 0xcfd6dd, emissive: 0xffe9bc, emissiveIntensity: 0 }), // faint cabin windows (aircraft): never a light bar
 };
 /* ---------- procedural facade materials: window grids that keep their size on any box (UVs from instance scale) ---------- */
 const FACADE = {};
@@ -156,8 +157,8 @@ const FACADE = {};
     FACADE[name] = m;
   }
   /* turf: lawn texture mapped in world XZ so it tiles evenly on bases of any size; instance colour tints it */
-  const turfTex = cv((g, R) => { g.fillStyle = "#7cc35a"; g.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 2200; i++) { const x = R() * 256, y = R() * 256; g.fillStyle = R() < 0.5 ? "rgba(60,130,40,.35)" : "rgba(190,235,140,.35)"; g.fillRect(x, y, 2, 4); }
+  const turfTex = cv((g, R) => { g.fillStyle = "#a9bd87"; g.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 2200; i++) { const x = R() * 256, y = R() * 256; g.fillStyle = R() < 0.5 ? "rgba(100,125,75,.3)" : "rgba(214,226,180,.35)"; g.fillRect(x, y, 2, 4); }
     g.fillStyle = "rgba(255,255,255,.06)"; for (let y = 0; y < 256; y += 64) g.fillRect(0, y, 256, 32); });
   const tm = new THREE.MeshStandardMaterial({ map: turfTex, roughness: 0.95 });
   tm.onBeforeCompile = (sh) => {

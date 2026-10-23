@@ -6,20 +6,22 @@ const SHIPS = {};
   const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3(), S = new THREE.Vector3(), NM = new THREE.Matrix3();
   /* collect parts into one vertex-coloured geometry */
   const merge = (build) => {
-    const pos = [], nor = [], colr = [], glowPos = [], glowNor = [];
+    const pos = [], nor = [], colr = [], glowPos = [], glowNor = [], dimPos = [], dimNor = [];
     const p = (g, x, y, z, sx, sy, sz, c, ry = 0, rx = 0, rz = 0, glow = false) => {
       const src = ni(g), P = src.attributes.position, N = src.attributes.normal;
       M4.compose(V.set(x, y, z), Q.setFromEuler(E.set(rx, ry, rz)), S.set(sx, sy, sz)); NM.getNormalMatrix(M4);
       const cc = col(c), v = new THREE.Vector3(), n = new THREE.Vector3();
+      const tp = glow === "dim" ? [dimPos, dimNor] : glow ? [glowPos, glowNor] : [pos, nor];
       for (let i = 0; i < P.count; i++) {
         v.fromBufferAttribute(P, i).applyMatrix4(M4); n.fromBufferAttribute(N, i).applyMatrix3(NM).normalize();
-        (glow ? glowPos : pos).push(v.x, v.y, v.z); (glow ? glowNor : nor).push(n.x, n.y, n.z); if (!glow) colr.push(cc.r, cc.g, cc.b);
+        tp[0].push(v.x, v.y, v.z); tp[1].push(n.x, n.y, n.z); if (!glow) colr.push(cc.r, cc.g, cc.b);
       }
     };
     build(p);
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(colr, 3));
     const grp = new THREE.Group(), mesh = new THREE.Mesh(g, SHIPS.mat); mesh.castShadow = true; grp.add(mesh);
-    if (glowPos.length) { const gg = new THREE.BufferGeometry(); gg.setAttribute("position", new THREE.Float32BufferAttribute(glowPos, 3)); gg.setAttribute("normal", new THREE.Float32BufferAttribute(glowNor, 3)); grp.add(new THREE.Mesh(gg, MAT.glow)); }
+    const addGlow = (gp, gn, mat) => { if (!gp.length) return; const gg = new THREE.BufferGeometry(); gg.setAttribute("position", new THREE.Float32BufferAttribute(gp, 3)); gg.setAttribute("normal", new THREE.Float32BufferAttribute(gn, 3)); grp.add(new THREE.Mesh(gg, mat)); };
+    addGlow(glowPos, glowNor, MAT.glow); addGlow(dimPos, dimNor, MAT.glowDim);
     return grp;
   };
   SHIPS.mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7 });
@@ -111,7 +113,7 @@ const SHIPS = {};
       p("sphere", 0, -0.005, 1.12, 0.3, 0.28, 0.62, LG);                             // rounded, tapering nose
       p("cone", 0, 0.035, -1.42, 0.28, 0.95, 0.24, W, 0, -Math.PI / 2 + 0.1);        // upswept tail cone
       p("rbox", 0, -0.11, 0.08, 0.26, 0.13, 0.9, "#e6ebf0");                         // belly / wing-root fairing
-      p("box", 0, 0.082, 1.18, 0.2, 0.055, 0.15, DK, 0, -0.35, 0, true);             // wrap-around cockpit glazing
+      p("box", 0, 0.082, 1.18, 0.2, 0.055, 0.15, DK, 0, -0.35, 0, "dim");            // wrap-around cockpit glazing
       for (const s of [-1, 1]) {
         p("box", s * 0.68, -0.03, 0.02, 1.35, 0.04, 0.46, LG, s * 0.5, 0, s * 0.07); // inner wing: swept, with dihedral
         p("box", s * 1.3, 0.05, -0.34, 0.78, 0.028, 0.27, LG, s * 0.62, 0, s * 0.1); // tapered outer wing
@@ -122,7 +124,7 @@ const SHIPS = {};
         p("cyl", s * 0.5, -0.17, 0.63, 0.205, 0.045, 0.205, "#c9ced3", 0, Math.PI / 2); // intake lip
         p("cyl", s * 0.5, -0.17, 0.645, 0.165, 0.016, 0.165, DK, 0, Math.PI / 2);    // open intake (dark fan face)
         p("cyl", s * 0.5, -0.165, 0.18, 0.1, 0.1, 0.1, "#9aa0a6", 0, Math.PI / 2);   // exhaust cone
-        p("box", s * 0.148, 0.045, 0.08, 0.012, 0.034, 1.7, "#cfeefc", 0, 0, 0, true); // cabin window band, lit at night
+        p("box", s * 0.148, 0.045, 0.08, 0.012, 0.024, 1.7, "#cfeefc", 0, 0, 0, "dim"); // faint cabin window band
       }
       p("box", 0, 0.42, -1.3, 0.035, 0.7, 0.32, AC, 0, -0.5);                        // swept fin: single identity colour
       p("box", 0, 0.3, -1.19, 0.04, 0.4, 0.1, W, 0, -0.5);                           // white leading flash on the fin

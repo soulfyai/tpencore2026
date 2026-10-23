@@ -25,16 +25,34 @@ const ENV = {};
     for (let i = 0; i < N; i++) {
       const th = Rs() * Math.PI * 2, y = Rs() * 1.08 - 0.08, r = Math.sqrt(Math.max(0, 1 - y * y)); // mostly above the horizon, a few at it
       pos.set([Math.cos(th) * r, y, Math.sin(th) * r], i * 3);
-      const b = 0.45 + Rs() * 0.55, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
+      const b = 0.55 + Rs() * 0.45, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
       colr.set([b * (warm ? 1 : cool ? 0.85 : 1), b * (warm ? 0.9 : cool ? 0.92 : 1), b * (warm ? 0.75 : 1)], i * 3);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(colr, 3));
-    const m = new THREE.PointsMaterial({ size: 1.7, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
+    const m = new THREE.PointsMaterial({ size: 2.1, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
     const pts = new THREE.Points(g, m);
     pts.renderOrder = -9; pts.position.copy(MID); pts.scale.setScalar(226); pts.visible = false; scene.add(pts);
     return pts;
   })();
+  /* moon: a toy cream disc with a soft halo, fixed on the star shell (elevation ~36 deg, over the default view's northern sky) */
+  const moonMat = new THREE.MeshBasicMaterial({ color: 0xf7eed6, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  const craterMat = new THREE.MeshBasicMaterial({ color: 0xe4d6b4, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  const haloMat = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+    const grd = g.createRadialGradient(64, 64, 10, 64, 64, 64); grd.addColorStop(0, "rgba(255,243,214,.6)"); grd.addColorStop(1, "rgba(255,243,214,0)");
+    g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+    return new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, opacity: 0, fog: false, depthWrite: false }); })();
+  const moon = (() => {
+    const g = new THREE.Group();
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(2.3, 28), moonMat); disc.renderOrder = -8; g.add(disc);
+    for (const [cx, cy, cr] of [[-0.7, 0.5, 0.5], [0.62, -0.18, 0.34], [0.05, -0.9, 0.26]]) { const c = new THREE.Mesh(new THREE.CircleGeometry(cr, 18), craterMat); c.position.set(cx, cy, 0.02); c.renderOrder = -8; disc.add(c); }
+    const halo = new THREE.Sprite(haloMat); halo.scale.setScalar(9.5); halo.position.z = -0.4; halo.renderOrder = -8; g.add(halo);
+    g.userData.dir = new THREE.Vector3(-0.28, 0.59, -0.76).normalize();
+    g.visible = false; scene.add(g);
+    return g;
+  })();
+  const placeMoon = (k = 1) => { moon.position.copy(MID).addScaledVector(moon.userData.dir, 219 * k); moon.scale.setScalar(k); moon.lookAt(MID); };
+  placeMoon(1);
   scene.fog = new THREE.Fog(0xeef3f8, 70, 210);
 
   /* ---------- open sea ---------- */
@@ -60,7 +78,7 @@ const ENV = {};
   /* ---------- islets, lighthouses and boats out at sea (decorative) ---------- */
   const deco = new THREE.Group(); scene.add(deco);
   const R1 = rng(1313), dm = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, flatShading: true, ...extra });
-  const rockM = dm("#a59d8e"), grassM = dm("#7fae62"), trunkM = dm("#8a6a4a"), leafM = dm("#5f9a52"), whiteM = dm("#f7f6f2"), redM = dm("#c8102e"), blueM = dm("#1f4fb8"), sandM = dm("#e8dcb8");
+  const rockM = dm("#a59d8e"), grassM = dm("#92ab7c"), trunkM = dm("#8a6a4a"), leafM = dm("#648753"), whiteM = dm("#f7f6f2"), redM = dm("#c8102e"), blueM = dm("#1f4fb8"), sandM = dm("#e8dcb8");
   const lampM = new THREE.MeshStandardMaterial({ color: "#fff6d8", emissive: "#ffe9a8", emissiveIntensity: 0 });
   const rx = Math.max(size.x, size.z) / 2;
   const islets = [];
@@ -149,9 +167,10 @@ const ENV = {};
     const W = ENV.forced?.w || ENV.weather || { cloud: 20, code: 1, precip: 0, wind: 10, temp: 25 };
     const minute = ENV.forced?.minute ?? taipeiMinutes();
     const k = lerpKey(minute), kind = WMO(W.code);
-    const cloud = THREE.MathUtils.clamp(W.cloud / 100, 0, 1), wet = kind === "drizzle" ? 0.45 : kind === "rain" ? 0.85 : kind === "storm" ? 1 : 0;
+    // 使用者決定：即時天氣只是「資訊」，不改變城市樣貌——場景永遠是晴朗好天氣，
+    // 只有台北時間驅動日夜；真實天氣只寫進 ENV.state 給 UI 文字用。
+    const cloud = 0.2, wet = 0, gray = 0; // fixed fine-weather visuals (a few decorative clouds, no rain, no grey wash)
     const grey = col(k.night > 0.5 ? "#2a3142" : "#aeb7c2");
-    const gray = Math.max(cloud * 0.55, wet * 0.75, kind === "fog" ? 0.7 : 0);
     skyMat.uniforms.uTop.value.copy(k.top).lerp(grey, gray);
     skyMat.uniforms.uHorizon.value.copy(k.hor).lerp(grey.clone().lerp(col("#ffffff"), 0.2), gray * 0.85);
     skyMat.uniforms.uSunCol.value.copy(k.sun);
@@ -163,15 +182,15 @@ const ENV = {};
     const dir = new THREE.Vector3(Math.cos(az) * Math.cos(elev), Math.sin(elev), 0.45 + Math.sin(az) * 0.3).normalize();
     skyMat.uniforms.uSun.value.copy(dir);
     sun.position.copy(MID).add(dir.clone().multiplyScalar(45)); sun.color.copy(k.sun).lerp(col("#ffffff"), 0.35);
-    sun.intensity = k.si * (1 - gray * 0.62);
-    hemi.intensity = k.hi * (1 - gray * 0.25); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
+    sun.intensity = k.si * (1 - gray * 0.5);
+    hemi.intensity = k.hi * (1 - gray * 0.34); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
     sun.castShadow = sun.intensity > 0.6;
     scene.fog.color.copy(skyMat.uniforms.uHorizon.value);
-    scene.fog.near = kind === "fog" ? 12 : wet > 0.5 ? 40 : 70; scene.fog.far = kind === "fog" ? 70 : wet > 0.5 ? 150 : 210;
+    scene.fog.near = 70; scene.fog.far = 210; // fixed clear-day fog; weather never thickens it
     ENV.fog0 = { near: scene.fog.near, far: scene.fog.far }; // base values: main.js scales them up when the camera pulls far back
     waterMat.uniforms.uColor.value.copy(col("#7fc0d4")).lerp(col("#8a9aa6"), gray * 0.7);
     waterMat.uniforms.uDeep.value.copy(col("#2f7aa3")).lerp(col("#4d5c68"), gray * 0.6);
-    waterMat.uniforms.uChop.value = THREE.MathUtils.clamp((W.wind || 10) / 40, 0.1, 1.2);
+    waterMat.uniforms.uChop.value = 0.3; // fixed gentle sea; live wind no longer stirs it
     waterMat.uniforms.uGlint.value = (1 - gray) * (1 - k.night);
     waterMat.uniforms.uNight.value = k.night * 0.8;
     waterMat.uniforms.uRain.value = wet;
@@ -183,12 +202,16 @@ const ENV = {};
     // street lights: on from 17:00 (fading up over 20 min) until 06:00 Taipei time, fully off in the daytime
     const lampsOn = minute >= 1020 ? THREE.MathUtils.clamp((minute - 1020) / 20, 0, 1) : minute < 360 ? THREE.MathUtils.clamp((360 - minute) / 20, 0, 1) : 0;
     MAT.glow.emissiveIntensity = lampsOn * (1.1 + k.night * 0.7);
-    MAT.glowCool.emissiveIntensity = lampsOn * (1.5 + k.night * 0.9); // LED bands burn a little brighter than the warm lamps
+    MAT.glowCool.emissiveIntensity = lampsOn * (0.5 + k.night * 0.3); // cool LED stays an accent: the warm street lamps carry the night
+    MAT.glowDim.emissiveIntensity = lampsOn * 0.45;
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
-    // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)
-    const starA = Math.max(0, k.night - cloud * 0.35 - wet * 0.6) * 0.95;
+    // stars: a stylised city, not a weather simulation — night stars always show, weather only takes a little off the top
+    const starA = k.night * (0.95 - cloud * 0.15 - wet * 0.15);
     stars.material.opacity = starA; stars.visible = starA > 0.02;
+    const moonA = k.night * (0.95 - cloud * 0.12 - wet * 0.12);
+    moon.visible = moonA > 0.02;
+    moonMat.opacity = moonA; craterMat.opacity = moonA * 0.5; haloMat.opacity = moonA * 0.8;
     ENV.state = { minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
     renderer.toneMappingExposure = 1 - k.night * 0.15;
     ENV.onChange?.(ENV.state);
@@ -198,7 +221,7 @@ const ENV = {};
   ENV.retheme = () => apply();
   ENV.update = (dt, t) => {
     waterMat.uniforms.uTime.value = t;
-    const wind = (ENV.forced?.w || ENV.weather)?.wind || 10;
+    const wind = 12; // fixed breeze: cloud drift is decorative, decoupled from live weather
     for (const g of clouds.children) { const dx = g.position.x - MID.x, dz = g.position.z - MID.z + 8, d = Math.hypot(dx, dz), w = dt * g.userData.v * (0.6 + wind / 25) / Math.max(d, 1); g.position.x = MID.x + dx * Math.cos(w) - dz * Math.sin(w); g.position.z = MID.z - 8 + dx * Math.sin(w) + dz * Math.cos(w); }
     for (const b of boats) { b.a += b.v * dt; b.g.position.set(MID.x + Math.cos(b.a) * b.r, WATER_Y + Math.sin(t * 1.3 + b.r) * 0.04, MID.z + Math.sin(b.a) * b.r * 0.8 - 6); b.g.rotation.y = -b.a + (b.v > 0 ? 0 : Math.PI); }
     if (rain.visible) {
@@ -211,16 +234,11 @@ const ENV = {};
       rainG.attributes.position.needsUpdate = true;
       rainG.setDrawRange(0, Math.round(DROPS * ENV.rainRate) * 2);
     }
-    if (ENV.state?.storm) { // lightning
-      nextFlash -= dt;
-      if (nextFlash < 0) { flash = 1; nextFlash = 4 + Math.random() * 7; }
-      if (flash > 0) { flash = Math.max(0, flash - dt * 4); hemi.intensity += flash * 2.5; skyMat.uniforms.uTop.value.lerp(col("#dfe6ff"), flash * 0.5); }
-    }
   };
   ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };
   ENV.fit = (d) => { // the Taipei-centred panorama pulls back past the original dome: grow sky/sea and the far plane with it
     const k = Math.max(1, (d + 70) / 230);
-    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k);
+    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k); placeMoon(k);
     camera.far = Math.max(420, (d + 70) * 2.4); camera.updateProjectionMatrix();
   };
   ENV.isDarkUI = isDarkUI;

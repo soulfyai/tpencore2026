@@ -764,6 +764,7 @@ const MAT = {
   solid: new THREE.MeshStandardMaterial({ roughness: 0.82, metalness: 0.02 }),
   glow: new THREE.MeshStandardMaterial({ roughness: 0.4, metalness: 0, emissive: 0xffd08a, emissiveIntensity: 0 }),
   glowCool: new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0, emissive: 0xaee8ff, emissiveIntensity: 0 }), // futuristic LED strips: cool white-blue after dark
+  glowDim: new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0, color: 0xcfd6dd, emissive: 0xffe9bc, emissiveIntensity: 0 }), // faint cabin windows (aircraft): never a light bar
 };
 /* ---------- procedural facade materials: window grids that keep their size on any box (UVs from instance scale) ---------- */
 const FACADE = {};
@@ -801,8 +802,8 @@ const FACADE = {};
     FACADE[name] = m;
   }
   /* turf: lawn texture mapped in world XZ so it tiles evenly on bases of any size; instance colour tints it */
-  const turfTex = cv((g, R) => { g.fillStyle = "#7cc35a"; g.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 2200; i++) { const x = R() * 256, y = R() * 256; g.fillStyle = R() < 0.5 ? "rgba(60,130,40,.35)" : "rgba(190,235,140,.35)"; g.fillRect(x, y, 2, 4); }
+  const turfTex = cv((g, R) => { g.fillStyle = "#a9bd87"; g.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 2200; i++) { const x = R() * 256, y = R() * 256; g.fillStyle = R() < 0.5 ? "rgba(100,125,75,.3)" : "rgba(214,226,180,.35)"; g.fillRect(x, y, 2, 4); }
     g.fillStyle = "rgba(255,255,255,.06)"; for (let y = 0; y < 256; y += 64) g.fillRect(0, y, 256, 32); });
   const tm = new THREE.MeshStandardMaterial({ map: turfTex, roughness: 0.95 });
   tm.onBeforeCompile = (sh) => {
@@ -908,7 +909,7 @@ const GEOM = {};
   MESH.TEX = {
     asphalt: MESH.tex((g, R) => { g.fillStyle = "#73787f"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 2600; i++) { g.fillStyle = R() < 0.5 ? "rgba(0,0,0,.08)" : "rgba(255,255,255,.07)"; g.fillRect(R() * 256, R() * 256, 2, 2); } for (let i = 0; i < 6; i++) { g.strokeStyle = "rgba(0,0,0,.08)"; g.lineWidth = 1; g.beginPath(); g.moveTo(R() * 256, R() * 256); g.lineTo(R() * 256, R() * 256); g.stroke(); } }, 0.8),
     pavers: MESH.tex((g, R) => { g.fillStyle = "#e9e4da"; g.fillRect(0, 0, 256, 256); for (let y = 0; y < 256; y += 32) for (let x = (y / 32) % 2 ? 16 : 0; x < 256; x += 32) { g.fillStyle = `hsl(38,${12 + R() * 8}%,${84 + R() * 6}%)`; g.fillRect(x + 1, y + 1, 30, 30); } }, 1.1),
-    grass: MESH.tex((g, R) => { g.fillStyle = "#93c76a"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 3000; i++) { g.fillStyle = R() < 0.5 ? "#86bb5e" : "#a6d47c"; g.fillRect(R() * 256, R() * 256, 3, 3); } for (let i = 0; i < 60; i++) { g.fillStyle = R() < 0.5 ? "#f6e9a8" : "#ffffff"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.6),
+    grass: MESH.tex((g, R) => { g.fillStyle = "#bcc9a0"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 3000; i++) { g.fillStyle = R() < 0.5 ? "#aebe92" : "#ccd8ae"; g.fillRect(R() * 256, R() * 256, 3, 3); } for (let i = 0; i < 60; i++) { g.fillStyle = R() < 0.5 ? "#f6e9a8" : "#ffffff"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.6), // sage lawn, low saturation
     sand: MESH.tex((g, R) => { g.fillStyle = "#f9e5b4"; g.fillRect(0, 0, 256, 256); for (let i = 0; i < 1600; i++) { g.fillStyle = R() < 0.5 ? "rgba(214,181,120,.12)" : "rgba(255,255,255,.22)"; g.fillRect(R() * 256, R() * 256, 2, 2); } }, 0.7),
   };
   MESH.ribbon = (pts, w, y, closed = false) => { // strip geometry along a polyline
@@ -1090,7 +1091,7 @@ const GEOM = {};
       const loc = ins.map(([x, z]) => [x - isl.c.x, z - isl.c.z]);
       isl.poly = loc; isl.polyWorld = P;
       const g = new THREE.Group(); g.position.set(isl.c.x, 0, isl.c.z);
-      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.grass, color: 0xe8ffe0, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true;
+      const plate = new THREE.Mesh(MESH.slab(loc, TOP - 0.04, TOP), live ? new THREE.MeshStandardMaterial({ map: MESH.TEX.pavers, color: 0xeedcbc, roughness: 0.95 }) : MESH.mat("#c9c6bf")); plate.receiveShadow = true; // cream paving: green is the garnish, not the base
       plate.userData = { type: "island", id: isl.id };
       const outline = new THREE.Mesh(MESH.ribbon(loc, 0.12, TOP + 0.012, true), new THREE.MeshBasicMaterial({ color: live ? col(cityHex(isl.city)) : col("#9a9a9a"), side: THREE.DoubleSide }));
       outline.visible = false;
@@ -1141,16 +1142,34 @@ const ENV = {};
     for (let i = 0; i < N; i++) {
       const th = Rs() * Math.PI * 2, y = Rs() * 1.08 - 0.08, r = Math.sqrt(Math.max(0, 1 - y * y)); // mostly above the horizon, a few at it
       pos.set([Math.cos(th) * r, y, Math.sin(th) * r], i * 3);
-      const b = 0.45 + Rs() * 0.55, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
+      const b = 0.55 + Rs() * 0.45, warm = Rs() < 0.18, cool = !warm && Rs() < 0.25;
       colr.set([b * (warm ? 1 : cool ? 0.85 : 1), b * (warm ? 0.9 : cool ? 0.92 : 1), b * (warm ? 0.75 : 1)], i * 3);
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(colr, 3));
-    const m = new THREE.PointsMaterial({ size: 1.7, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
+    const m = new THREE.PointsMaterial({ size: 2.1, sizeAttenuation: false, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, fog: false, toneMapped: false });
     const pts = new THREE.Points(g, m);
     pts.renderOrder = -9; pts.position.copy(MID); pts.scale.setScalar(226); pts.visible = false; scene.add(pts);
     return pts;
   })();
+  /* moon: a toy cream disc with a soft halo, fixed on the star shell (elevation ~36 deg, over the default view's northern sky) */
+  const moonMat = new THREE.MeshBasicMaterial({ color: 0xf7eed6, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  const craterMat = new THREE.MeshBasicMaterial({ color: 0xe4d6b4, transparent: true, opacity: 0, fog: false, toneMapped: false, depthWrite: false });
+  const haloMat = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+    const grd = g.createRadialGradient(64, 64, 10, 64, 64, 64); grd.addColorStop(0, "rgba(255,243,214,.6)"); grd.addColorStop(1, "rgba(255,243,214,0)");
+    g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+    return new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, opacity: 0, fog: false, depthWrite: false }); })();
+  const moon = (() => {
+    const g = new THREE.Group();
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(2.3, 28), moonMat); disc.renderOrder = -8; g.add(disc);
+    for (const [cx, cy, cr] of [[-0.7, 0.5, 0.5], [0.62, -0.18, 0.34], [0.05, -0.9, 0.26]]) { const c = new THREE.Mesh(new THREE.CircleGeometry(cr, 18), craterMat); c.position.set(cx, cy, 0.02); c.renderOrder = -8; disc.add(c); }
+    const halo = new THREE.Sprite(haloMat); halo.scale.setScalar(9.5); halo.position.z = -0.4; halo.renderOrder = -8; g.add(halo);
+    g.userData.dir = new THREE.Vector3(-0.28, 0.59, -0.76).normalize();
+    g.visible = false; scene.add(g);
+    return g;
+  })();
+  const placeMoon = (k = 1) => { moon.position.copy(MID).addScaledVector(moon.userData.dir, 219 * k); moon.scale.setScalar(k); moon.lookAt(MID); };
+  placeMoon(1);
   scene.fog = new THREE.Fog(0xeef3f8, 70, 210);
 
   /* ---------- open sea ---------- */
@@ -1176,7 +1195,7 @@ const ENV = {};
   /* ---------- islets, lighthouses and boats out at sea (decorative) ---------- */
   const deco = new THREE.Group(); scene.add(deco);
   const R1 = rng(1313), dm = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, flatShading: true, ...extra });
-  const rockM = dm("#a59d8e"), grassM = dm("#7fae62"), trunkM = dm("#8a6a4a"), leafM = dm("#5f9a52"), whiteM = dm("#f7f6f2"), redM = dm("#c8102e"), blueM = dm("#1f4fb8"), sandM = dm("#e8dcb8");
+  const rockM = dm("#a59d8e"), grassM = dm("#92ab7c"), trunkM = dm("#8a6a4a"), leafM = dm("#648753"), whiteM = dm("#f7f6f2"), redM = dm("#c8102e"), blueM = dm("#1f4fb8"), sandM = dm("#e8dcb8");
   const lampM = new THREE.MeshStandardMaterial({ color: "#fff6d8", emissive: "#ffe9a8", emissiveIntensity: 0 });
   const rx = Math.max(size.x, size.z) / 2;
   const islets = [];
@@ -1265,9 +1284,10 @@ const ENV = {};
     const W = ENV.forced?.w || ENV.weather || { cloud: 20, code: 1, precip: 0, wind: 10, temp: 25 };
     const minute = ENV.forced?.minute ?? taipeiMinutes();
     const k = lerpKey(minute), kind = WMO(W.code);
-    const cloud = THREE.MathUtils.clamp(W.cloud / 100, 0, 1), wet = kind === "drizzle" ? 0.45 : kind === "rain" ? 0.85 : kind === "storm" ? 1 : 0;
+    // 使用者決定：即時天氣只是「資訊」，不改變城市樣貌——場景永遠是晴朗好天氣，
+    // 只有台北時間驅動日夜；真實天氣只寫進 ENV.state 給 UI 文字用。
+    const cloud = 0.2, wet = 0, gray = 0; // fixed fine-weather visuals (a few decorative clouds, no rain, no grey wash)
     const grey = col(k.night > 0.5 ? "#2a3142" : "#aeb7c2");
-    const gray = Math.max(cloud * 0.55, wet * 0.75, kind === "fog" ? 0.7 : 0);
     skyMat.uniforms.uTop.value.copy(k.top).lerp(grey, gray);
     skyMat.uniforms.uHorizon.value.copy(k.hor).lerp(grey.clone().lerp(col("#ffffff"), 0.2), gray * 0.85);
     skyMat.uniforms.uSunCol.value.copy(k.sun);
@@ -1279,15 +1299,15 @@ const ENV = {};
     const dir = new THREE.Vector3(Math.cos(az) * Math.cos(elev), Math.sin(elev), 0.45 + Math.sin(az) * 0.3).normalize();
     skyMat.uniforms.uSun.value.copy(dir);
     sun.position.copy(MID).add(dir.clone().multiplyScalar(45)); sun.color.copy(k.sun).lerp(col("#ffffff"), 0.35);
-    sun.intensity = k.si * (1 - gray * 0.62);
-    hemi.intensity = k.hi * (1 - gray * 0.25); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
+    sun.intensity = k.si * (1 - gray * 0.5);
+    hemi.intensity = k.hi * (1 - gray * 0.34); hemi.color.copy(k.hor).lerp(col("#ffffff"), 0.82);
     sun.castShadow = sun.intensity > 0.6;
     scene.fog.color.copy(skyMat.uniforms.uHorizon.value);
-    scene.fog.near = kind === "fog" ? 12 : wet > 0.5 ? 40 : 70; scene.fog.far = kind === "fog" ? 70 : wet > 0.5 ? 150 : 210;
+    scene.fog.near = 70; scene.fog.far = 210; // fixed clear-day fog; weather never thickens it
     ENV.fog0 = { near: scene.fog.near, far: scene.fog.far }; // base values: main.js scales them up when the camera pulls far back
     waterMat.uniforms.uColor.value.copy(col("#7fc0d4")).lerp(col("#8a9aa6"), gray * 0.7);
     waterMat.uniforms.uDeep.value.copy(col("#2f7aa3")).lerp(col("#4d5c68"), gray * 0.6);
-    waterMat.uniforms.uChop.value = THREE.MathUtils.clamp((W.wind || 10) / 40, 0.1, 1.2);
+    waterMat.uniforms.uChop.value = 0.3; // fixed gentle sea; live wind no longer stirs it
     waterMat.uniforms.uGlint.value = (1 - gray) * (1 - k.night);
     waterMat.uniforms.uNight.value = k.night * 0.8;
     waterMat.uniforms.uRain.value = wet;
@@ -1299,12 +1319,16 @@ const ENV = {};
     // street lights: on from 17:00 (fading up over 20 min) until 06:00 Taipei time, fully off in the daytime
     const lampsOn = minute >= 1020 ? THREE.MathUtils.clamp((minute - 1020) / 20, 0, 1) : minute < 360 ? THREE.MathUtils.clamp((360 - minute) / 20, 0, 1) : 0;
     MAT.glow.emissiveIntensity = lampsOn * (1.1 + k.night * 0.7);
-    MAT.glowCool.emissiveIntensity = lampsOn * (1.5 + k.night * 0.9); // LED bands burn a little brighter than the warm lamps
+    MAT.glowCool.emissiveIntensity = lampsOn * (0.5 + k.night * 0.3); // cool LED stays an accent: the warm street lamps carry the night
+    MAT.glowDim.emissiveIntensity = lampsOn * 0.45;
     lampM.emissiveIntensity = lampsOn * 2;
     ENV.lampsOn = lampsOn;
-    // stars: out by night, dimmed by cloud, gone in rain/fog (clouds and rain draw later, so they still read in front)
-    const starA = Math.max(0, k.night - cloud * 0.35 - wet * 0.6) * 0.95;
+    // stars: a stylised city, not a weather simulation — night stars always show, weather only takes a little off the top
+    const starA = k.night * (0.95 - cloud * 0.15 - wet * 0.15);
     stars.material.opacity = starA; stars.visible = starA > 0.02;
+    const moonA = k.night * (0.95 - cloud * 0.12 - wet * 0.12);
+    moon.visible = moonA > 0.02;
+    moonMat.opacity = moonA; craterMat.opacity = moonA * 0.5; haloMat.opacity = moonA * 0.8;
     ENV.state = { minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
     renderer.toneMappingExposure = 1 - k.night * 0.15;
     ENV.onChange?.(ENV.state);
@@ -1314,7 +1338,7 @@ const ENV = {};
   ENV.retheme = () => apply();
   ENV.update = (dt, t) => {
     waterMat.uniforms.uTime.value = t;
-    const wind = (ENV.forced?.w || ENV.weather)?.wind || 10;
+    const wind = 12; // fixed breeze: cloud drift is decorative, decoupled from live weather
     for (const g of clouds.children) { const dx = g.position.x - MID.x, dz = g.position.z - MID.z + 8, d = Math.hypot(dx, dz), w = dt * g.userData.v * (0.6 + wind / 25) / Math.max(d, 1); g.position.x = MID.x + dx * Math.cos(w) - dz * Math.sin(w); g.position.z = MID.z - 8 + dx * Math.sin(w) + dz * Math.cos(w); }
     for (const b of boats) { b.a += b.v * dt; b.g.position.set(MID.x + Math.cos(b.a) * b.r, WATER_Y + Math.sin(t * 1.3 + b.r) * 0.04, MID.z + Math.sin(b.a) * b.r * 0.8 - 6); b.g.rotation.y = -b.a + (b.v > 0 ? 0 : Math.PI); }
     if (rain.visible) {
@@ -1327,16 +1351,11 @@ const ENV = {};
       rainG.attributes.position.needsUpdate = true;
       rainG.setDrawRange(0, Math.round(DROPS * ENV.rainRate) * 2);
     }
-    if (ENV.state?.storm) { // lightning
-      nextFlash -= dt;
-      if (nextFlash < 0) { flash = 1; nextFlash = 4 + Math.random() * 7; }
-      if (flash > 0) { flash = Math.max(0, flash - dt * 4); hemi.intensity += flash * 2.5; skyMat.uniforms.uTop.value.lerp(col("#dfe6ff"), flash * 0.5); }
-    }
   };
   ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };
   ENV.fit = (d) => { // the Taipei-centred panorama pulls back past the original dome: grow sky/sea and the far plane with it
     const k = Math.max(1, (d + 70) / 230);
-    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k);
+    sky.scale.setScalar(k); water.scale.setScalar(k); stars.scale.setScalar(226 * k); placeMoon(k);
     camera.far = Math.max(420, (d + 70) * 2.4); camera.updateProjectionMatrix();
   };
   ENV.isDarkUI = isDarkUI;
@@ -1347,7 +1366,7 @@ const ENV = {};
 const MODELS = {};
 {
   const C = { wall: "#f3ebdf", white: "#f8f6f1", cream: "#efe1c8", stone: "#cfc8bb", dark: "#3b4148", road: "#5d6168", line: "#f5f1e6", glass: "#9fd4ec",
-    wood: "#a8794f", woodD: "#7d5a3a", leaf: "#6f9e57", leafL: "#8db96a", red: "#d9573f", yellow: "#f0c64a", skin: "#f1c9a6", hair: "#3a2e28", grass: "#9cc27c", water: "#7fc0d4", pink: "#f2b3b0", sky: "#8fc6e8", steel: "#9aa3ab" };
+    wood: "#a8794f", woodD: "#7d5a3a", leaf: "#6b9158", leafL: "#87a56f", red: "#d9573f", yellow: "#f0c64a", skin: "#f1c9a6", hair: "#3a2e28", grass: "#bcc9a0", water: "#7fc0d4", pink: "#f2b3b0", sky: "#8fc6e8", steel: "#9aa3ab" };
   const SHIRTS = ["#1f4fb8", "#c8102e", "#f8f6f1", "#28c8c8", "#14213d", "#e48b5c", "#4f6fa8"];
 
   /* --- helpers (p = part placer bound to a model context) --- */
@@ -1390,7 +1409,7 @@ const MODELS = {};
     },
     tree(x, z, s = 1, kind = "round") {
       p("cyl", x, 0.1 * s, z, 0.04 * s, 0.2 * s, 0.04 * s, C.wood);
-      if (kind === "cone") { p("cone", x, 0.32 * s, z, 0.24 * s, 0.34 * s, 0.24 * s, "#4f7d4a"); p("cone", x, 0.46 * s, z, 0.17 * s, 0.24 * s, 0.17 * s, "#5c8c52"); }
+      if (kind === "cone") { p("cone", x, 0.32 * s, z, 0.24 * s, 0.34 * s, 0.24 * s, "#627f58"); p("cone", x, 0.46 * s, z, 0.17 * s, 0.24 * s, 0.17 * s, "#70906a"); }
       else { p("ico1", x, 0.28 * s, z, 0.26 * s, 0.22 * s, 0.26 * s, C.leaf); p("ico1", x + 0.03 * s, 0.37 * s, z - 0.02 * s, 0.18 * s, 0.16 * s, 0.18 * s, C.leafL); }
     },
     bush: (x, z, s = 1, c = C.leaf) => p("ico1", x, 0.05 * s, z, 0.14 * s, 0.1 * s, 0.14 * s, c),
@@ -1468,11 +1487,11 @@ const MODELS = {};
     fire(p, h, a, r) { h.slab(1, 0.84, C.stone); h.house(-0.12, -0.15, 0.62, 0.38, 0.32, "#e8e0d2", C.red, { roof: "flat", win: false }); for (const x of [-0.3, -0.06]) p("box", x, 0.12, 0.045, 0.18, 0.22, 0.012, C.dark);
       h.box(0.3, 0, -0.2, 0.08, 0.5, 0.08, C.red); p("rbox", 0.2, 0.08, 0.25, 0.32, 0.13, 0.14, C.red); p("box", 0.2, 0.17, 0.25, 0.26, 0.02, 0.03, C.steel, 0, 0, 0.1); for (const dx of [-0.1, 0.1]) p("cyl", 0.2 + dx, 0.03, 0.25, 0.055, 0.03, 0.055, C.dark, 0, Math.PI / 2); h.person(-0.35, 0.3, C.yellow); },
     police(p, h, a) { h.slab(1, 0.84, C.stone); h.house(-0.1, -0.14, 0.6, 0.36, 0.3, C.white, "#4f6fa8", { roof: "flat" }); h.sign(-0.1, 0.25, 0.046, 0.25, "#4f6fa8"); p("rbox", 0.28, 0.06, 0.25, 0.24, 0.09, 0.12, C.white); p("box", 0.28, 0.12, 0.25, 0.06, 0.025, 0.04, "#4f6fa8"); h.flag(0.38, -0.25, a); h.person(0.05, 0.3, "#3d4f7a"); },
-    recycle(p, h, a, r) { h.slab(1, 0.84, C.stone); h.house(-0.15, -0.12, 0.6, 0.38, 0.26, "#d5dccf", "#6f9e57", { roof: "flat" }); h.cyl(0.3, 0, -0.22, 0.06, 0.58, C.stone);
-      for (let k = 0; k < 4; k++) h.rbox(-0.32 + k * 0.12, 0, 0.26, 0.09, 0.12, 0.09, ["#3e7c8c", "#f0c64a", "#6f9e57", "#d9573f"][k]); for (let k = 0; k < 3; k++) p("box", 0.22 + k * 0.08, 0.2, 0.18, 0.07, 0.003, 0.14, "#2f4e7a", 0, -0.5); h.tree(0.4, 0.35, 0.6); },
+    recycle(p, h, a, r) { h.slab(1, 0.84, C.stone); h.house(-0.15, -0.12, 0.6, 0.38, 0.26, "#d5dccf", "#6b9158", { roof: "flat" }); h.cyl(0.3, 0, -0.22, 0.06, 0.58, C.stone);
+      for (let k = 0; k < 4; k++) h.rbox(-0.32 + k * 0.12, 0, 0.26, 0.09, 0.12, 0.09, ["#3e7c8c", "#f0c64a", "#6b9158", "#d9573f"][k]); for (let k = 0; k < 3; k++) p("box", 0.22 + k * 0.08, 0.2, 0.18, 0.07, 0.003, 0.14, "#2f4e7a", 0, -0.5); h.tree(0.4, 0.35, 0.6); },
     ev(p, h, a) { h.slab(1, 0.84, C.stone); p("box", 0, 0.32, -0.05, 0.9, 0.025, 0.42, C.steel); for (const x of [-0.4, 0.4]) h.box(x, 0, -0.05, 0.03, 0.32, 0.03, C.steel);
-      h.bus(-0.18, -0.05, a); h.bus(0.24, -0.05, "#6f9e57"); for (const x of [-0.18, 0.24]) h.box(x, 0, 0.2, 0.04, 0.16, 0.04, C.white); for (let k = 0; k < 4; k++) p("box", -0.3 + k * 0.2, 0.34, -0.05, 0.16, 0.004, 0.36, "#2f4e7a", 0, 0); },
-    sport(p, h, a, r) { h.slab(1, 0.84, "#6aa66b"); p("box", 0, 0.026, 0, 0.82, 0.004, 0.6, C.white); p("box", 0, 0.028, 0, 0.78, 0.004, 0.56, "#6aa66b"); p("box", 0, 0.03, 0, 0.006, 0.004, 0.56, C.white); p("torus", 0, 0.03, 0, 0.18, 0.18, 0.04, C.white, 0, Math.PI / 2);
+      h.bus(-0.18, -0.05, a); h.bus(0.24, -0.05, "#6b9158"); for (const x of [-0.18, 0.24]) h.box(x, 0, 0.2, 0.04, 0.16, 0.04, C.white); for (let k = 0; k < 4; k++) p("box", -0.3 + k * 0.2, 0.34, -0.05, 0.16, 0.004, 0.36, "#2f4e7a", 0, 0); },
+    sport(p, h, a, r) { h.slab(1, 0.84, "#74a375"); p("box", 0, 0.026, 0, 0.82, 0.004, 0.6, C.white); p("box", 0, 0.028, 0, 0.78, 0.004, 0.56, "#74a375"); p("box", 0, 0.03, 0, 0.006, 0.004, 0.56, C.white); p("torus", 0, 0.03, 0, 0.18, 0.18, 0.04, C.white, 0, Math.PI / 2);
       for (const x of [-0.4, 0.4]) { h.box(x, 0, 0, 0.012, 0.12, 0.2, C.white); } h.person(-0.15, 0.1, a, 0.5); h.person(0.18, -0.1, C.yellow, 3); h.ball(0.02, 0.03, 0.05, 0.025, C.white); h.lamp(-0.46, 0.38); h.lamp(0.46, -0.38); },
     gym(p, h, a, r) { h.slab(1, 0.84, C.stone); h.house(-0.05, -0.1, 0.72, 0.46, 0.3, C.white, a); h.windows(-0.05, 0.05, -0.1, 0.66, 0.2, 0.46, 6, 1); h.person(0.25, 0.3, SHIRTS[(r * 7) | 0]); h.person(-0.3, 0.32, C.yellow); h.tree(0.4, 0.3, 0.6); },
     stadium(p, h, a) { h.slab(1, 0.9, C.stone); p("cyl", 0, 0.06, 0, 0.9, 0.12, 0.74, C.white); p("dome", 0, 0.12, 0, 0.86, 0.36, 0.7, "#eef0f2"); for (let k = 0; k < 10; k++) { const t = (k / 10) * Math.PI * 2; p("box", Math.cos(t) * 0.44, 0.1, Math.sin(t) * 0.36, 0.02, 0.06, 0.02, a, -t); }
@@ -1542,7 +1561,7 @@ const MODELS = {};
 /* ===== model variants: the same kind looks different from item to item on one island ===== */
 {
   const C = MODELS.C, K = MODELS.kinds;
-  const SH = ["#d9573f", "#3e7c8c", "#f0c64a", "#6f9e57", "#8a6fb5", "#e48b5c", "#4f6fa8"];
+  const SH = ["#d9573f", "#3e7c8c", "#f0c64a", "#6b9158", "#8a6fb5", "#e48b5c", "#4f6fa8"];
   const sh = (r, k = 0) => SH[(((r * 97) | 0) + k) % 7];
   const V = {
     metro: [K.metro,
@@ -1558,9 +1577,9 @@ const MODELS = {};
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); for (const x of [-0.3, 0.3]) h.box(x, 0, -0.1, 0.06, 0.3, 0.06, C.stone); p("box", 0, 0.32, -0.1, 1, 0.04, 0.14, "#b9b2a6"); for (const z of [-0.3, 0.25]) h.box(0, 0, z, 0.06, 0.5, 0.06, C.stone); p("box", 0, 0.52, 0, 0.14, 0.04, 0.84, "#b9b2a6");
         p("rbox", -0.25, 0.4, -0.1, 0.38, 0.11, 0.11, a); p("rbox", 0, 0.6, 0.15, 0.11, 0.11, 0.38, C.white); h.tree(0.38, 0.32, 0.6); h.person(-0.3, 0.3, sh(r)); }],
     bus: [K.bus,
-      (p, h, a, r) => { h.slab(1, 0.84, C.stone); p("box", 0, 0.3, -0.02, 0.96, 0.03, 0.62, a); for (const x of [-0.45, 0.45]) for (const z of [-0.3, 0.26]) h.box(x, 0, z, 0.03, 0.3, 0.03, C.steel); for (const [x, c] of [[-0.25, a], [0.05, C.white], [0.32, "#6f9e57"]]) h.bus(x, -0.02, c, Math.PI / 2); h.person(-0.42, 0.35, sh(r)); },
+      (p, h, a, r) => { h.slab(1, 0.84, C.stone); p("box", 0, 0.3, -0.02, 0.96, 0.03, 0.62, a); for (const x of [-0.45, 0.45]) for (const z of [-0.3, 0.26]) h.box(x, 0, z, 0.03, 0.3, 0.03, C.steel); for (const [x, c] of [[-0.25, a], [0.05, C.white], [0.32, "#6b9158"]]) h.bus(x, -0.02, c, Math.PI / 2); h.person(-0.42, 0.35, sh(r)); },
       (p, h, a, r) => { h.slab(1, 0.84, C.grass); p("box", 0, 0.015, 0.05, 1, 0.025, 0.2, "#7d7f84"); p("rbox", -0.1, 0.08, 0.05, 0.24, 0.12, 0.12, C.white); p("box", -0.1, 0.1, 0.05, 0.2, 0.04, 0.122, C.glass, 0, 0, 0, true); p("box", -0.1, 0.06, 0.05, 0.245, 0.02, 0.125, a);
-        for (const dx of [-0.07, 0.07]) p("cyl", -0.1 + dx, 0.025, 0.05, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); p("cone", -0.3, 0.2, -0.28, 0.5, 0.4, 0.3, "#8fb376"); p("cone", 0.15, 0.25, -0.3, 0.6, 0.5, 0.3, "#7ea566"); h.tree(0.35, -0.22, 0.6, "cone"); h.house(0.3, 0.3, 0.2, 0.14, 0.14, C.cream, a, { win: false }); h.person(0.12, 0.22, sh(r)); },
+        for (const dx of [-0.07, 0.07]) p("cyl", -0.1 + dx, 0.025, 0.05, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); p("cone", -0.3, 0.2, -0.28, 0.5, 0.4, 0.3, "#9fae87"); p("cone", 0.15, 0.25, -0.3, 0.6, 0.5, 0.3, "#90a37a"); h.tree(0.35, -0.22, 0.6, "cone"); h.house(0.3, 0.3, 0.2, 0.14, 0.14, C.cream, a, { win: false }); h.person(0.12, 0.22, sh(r)); },
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.road(1, 0.24, 0.2); p("box", 0, 0.24, -0.2, 0.5, 0.02, 0.16, a); h.box(0, 0, -0.27, 0.48, 0.24, 0.015, C.glass); p("box", 0.12, 0.13, -0.26, 0.18, 0.14, 0.012, C.white, 0, 0, 0, true); for (let k = 0; k < 3; k++) h.person(-0.15 + k * 0.1, -0.15, sh(r, k)); h.bench(-0.1, -0.22); h.bus(-0.1, 0.2, a, Math.PI); }],
     nursery: [K.nursery,
       (p, h, a, r) => { h.slab(1, 0.84, "#efe3c8"); p("box", -0.18, 0.02, 0.12, 0.4, 0.03, 0.34, "#e8d39a"); p("dome", 0.25, 0, 0.1, 0.32, 0.26, 0.32, C.white); for (let k = 0; k < 6; k++) p("torus", 0.25, 0.04 + k * 0.025, 0.1, 0.33 - k * 0.04, 0.33 - k * 0.04, 0.4, [a, C.yellow, C.red][k % 3], 0, Math.PI / 2);
@@ -1609,8 +1628,8 @@ const MODELS = {};
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.tower(0, -0.1, 0.7, 0.4, 0.62, C.white, C.stone, 4); p("cyl", 0.1, 0.65, -0.1, 0.3, 0.02, 0.3, C.dark); p("box", 0.1, 0.665, -0.1, 0.12, 0.004, 0.03, C.white); p("box", 0.1, 0.665, -0.1, 0.03, 0.004, 0.12, C.white);
         h.crossMark(-0.2, 0.5, 0.106, C.red); p("rbox", -0.25, 0.07, 0.28, 0.22, 0.12, 0.12, C.white); p("box", -0.25, 0.07, 0.28, 0.222, 0.025, 0.122, C.red); h.person(0.25, 0.28, C.sky); }],
     canteen: [K.canteen,
-      (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.house(-0.15, -0.18, 0.6, 0.3, 0.24, C.white, a, { roof: "flat" }); p("rbox", 0.22, 0.09, 0.2, 0.36, 0.15, 0.16, C.white); p("box", 0.12, 0.11, 0.2, 0.14, 0.13, 0.162, "#6f9e57");
-        for (let k = 0; k < 4; k++) p("box", 0.3 + (k % 2) * 0.08, 0.2, 0.15 + Math.floor(k / 2) * 0.08, 0.07, 0.05, 0.06, ["#e86a6a", "#8db96a", "#f0c64a", "#e48b5c"][k]); for (const dx of [-0.1, 0.1]) p("cyl", 0.22 + dx, 0.025, 0.2, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); h.person(-0.05, 0.25, "#c8a46a"); }],
+      (p, h, a, r) => { h.slab(1, 0.84, C.stone); h.house(-0.15, -0.18, 0.6, 0.3, 0.24, C.white, a, { roof: "flat" }); p("rbox", 0.22, 0.09, 0.2, 0.36, 0.15, 0.16, C.white); p("box", 0.12, 0.11, 0.2, 0.14, 0.13, 0.162, "#6b9158");
+        for (let k = 0; k < 4; k++) p("box", 0.3 + (k % 2) * 0.08, 0.2, 0.15 + Math.floor(k / 2) * 0.08, 0.07, 0.05, 0.06, ["#e86a6a", "#87a56f", "#f0c64a", "#e48b5c"][k]); for (const dx of [-0.1, 0.1]) p("cyl", 0.22 + dx, 0.025, 0.2, 0.05, 0.03, 0.05, C.dark, 0, Math.PI / 2); h.person(-0.05, 0.25, "#c8a46a"); }],
     road: [K.road,
       (p, h, a, r) => { h.slab(1, 0.84, C.stone); p("box", 0, 0.014, 0.05, 1, 0.026, 0.32, C.road); p("box", 0, 0.03, 0.05, 1, 0.004, 0.3, "#b2564a"); h.zebra(0, 0.05, 0.3, 1); p("box", -0.3, 0.035, 0.05, 0.08, 0.02, 0.3, C.yellow);
         for (let k = 0; k < 4; k++) h.person(-0.06 + k * 0.04, 0.05 + (k % 2) * 0.06 - 0.03, C.yellow, Math.PI / 2, 0.55); p("box", 0.3, 0.22, -0.2, 0.12, 0.12, 0.012, C.white); h.box(0.3, 0, -0.2, 0.012, 0.16, 0.012, C.dark); h.house(-0.2, -0.28, 0.4, 0.16, 0.2, C.cream, a); h.tree(0.4, 0.32, 0.6); },
@@ -1668,13 +1687,13 @@ MODELS.heroes = {};
     crowd(h, [[0.12, 0.42], [0.36, 0.42], [-0.3, 0.3]]); trees(h, [[-0.42, 0.38], [0.45, -0.16]]);
   };
   H["tp-rec-transport-2"] = (p, h) => { // 公館圓環改正交路口
-    p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#9fc183", Math.PI / 6);
+    p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#c0c9a2", Math.PI / 6);
     p("box", 0, 0.016, 0, 1.0, 0.03, 0.3, ROAD); p("box", 0, 0.017, 0, 0.3, 0.031, 1.0, ROAD);
     for (const [x, z, ry] of [[0, 0.22, 0], [0, -0.22, 0], [0.22, 0, 1], [-0.22, 0, 1]]) h.zebra(x, z, 0.26, ry);
     p("box", 0, 0.034, 0.36, 0.012, 0.004, 0.2, "#f0c64a"); p("box", 0, 0.034, -0.36, 0.012, 0.004, 0.2, "#f0c64a");
     for (const [x, z] of [[0.19, 0.19], [-0.19, -0.19]]) { p("cyl", x, 0.12, z, 0.014, 0.24, 0.014, C.dark); p("box", x, 0.22, z, 0.03, 0.08, 0.03, NV); p("sphere", x, 0.245, z + 0.016, 0.018, 0.018, 0.01, RD, 0, 0, 0, true); p("sphere", x, 0.2, z + 0.016, 0.018, 0.018, 0.01, "#4fd27a", 0, 0, 0, true); }
     // the old roundabout, kept as a small memory ring of greenery in a corner
-    p("cyl", 0.34, 0.03, 0.34, 0.24, 0.05, 0.24, "#7fae62"); trees(h, [[0.34, 0.34], [-0.34, 0.36], [-0.36, -0.34], [0.36, -0.36]]);
+    p("cyl", 0.34, 0.03, 0.34, 0.24, 0.05, 0.24, "#92ab7c"); trees(h, [[0.34, 0.34], [-0.34, 0.36], [-0.36, -0.34], [0.36, -0.36]]);
     h.car(-0.32, 0.07, B); h.car(0.3, -0.07, W, Math.PI); h.bus(0.07, -0.34, RD, Math.PI / 2); h.car(-0.07, 0.36, TL, -Math.PI / 2);
     crowd(h, [[0.2, 0.25], [-0.25, 0.2]]); p("box", -0.32, 0.03, -0.24, 0.2, 0.01, 0.05, TL); // bike lane
   };
@@ -1690,7 +1709,7 @@ MODELS.heroes = {};
 
   /* ---------- 李四川 ---------- */
   H["nt-transport-4"] = (p, h) => { // 蘆社大橋與跨河輕軌: cable-stayed bridge over a river
-    p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#9fc183", Math.PI / 6); p("box", 0, 0.014, 0, 1.0, 0.012, 0.46, "#6fb3cc");
+    p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#c0c9a2", Math.PI / 6); p("box", 0, 0.014, 0, 1.0, 0.012, 0.46, "#6fb3cc");
     p("box", 0, 0.16, 0, 1.0, 0.04, 0.2, "#e2ddd3"); p("box", 0, 0.185, 0.06, 1.0, 0.01, 0.06, ROAD); p("box", 0, 0.185, -0.05, 1.0, 0.01, 0.06, "#8a8f96");
     for (const x of [-0.18, 0.2]) { p("box", x, 0.3, 0.12, 0.05, 0.6, 0.05, W); p("box", x, 0.3, -0.12, 0.05, 0.6, 0.05, W); p("box", x, 0.57, 0, 0.05, 0.05, 0.28, RD); p("box", x, 0.07, 0, 0.08, 0.14, 0.3, ST); }
     for (const x of [-0.18, 0.2]) for (const s of [-1, 1]) for (let k = 1; k <= 3; k++) { const len = 0.1 * k + 0.04, ang = Math.atan2(0.38 - 0.06 * k, len); p("box", x + s * len / 2, 0.37 - 0.03 * k, 0.13, len / Math.cos(ang) * 1.1, 0.006, 0.006, W, 0, 0, s * ang); p("box", x + s * len / 2, 0.37 - 0.03 * k, -0.13, len / Math.cos(ang) * 1.1, 0.006, 0.006, W, 0, 0, s * ang); }
@@ -1701,7 +1720,7 @@ MODELS.heroes = {};
   };
   H["nt-transport-1"] = (p, h) => { // 汐東線加速南延: elevated line curving south over hills
     p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#a9c98c", Math.PI / 6);
-    p("ico1", -0.3, 0, -0.32, 0.5, 0.36, 0.4, "#7fae62"); p("ico1", 0.28, 0, -0.38, 0.42, 0.28, 0.32, "#8db96a");
+    p("ico1", -0.3, 0, -0.32, 0.5, 0.36, 0.4, "#92ab7c"); p("ico1", 0.28, 0, -0.38, 0.42, 0.28, 0.32, "#87a56f");
     const pts = []; for (let k = 0; k <= 8; k++) { const t = k / 8; pts.push([-0.46 + t * 0.92, 0.32 - Math.sin(t * Math.PI) * 0.42]); }
     for (let k = 0; k < 8; k++) { const [x0, z0] = pts[k], [x1, z1] = pts[k + 1], dx = x1 - x0, dz = z1 - z0, L = Math.hypot(dx, dz), ry = -Math.atan2(dz, dx);
       p("box", (x0 + x1) / 2, 0.3, (z0 + z1) / 2, L * 1.04, 0.035, 0.13, "#d8d2c6", ry); if (k % 2 === 0) h.box(x0, 0, z0, 0.05, 0.29, 0.05, ST);
@@ -1751,7 +1770,7 @@ MODELS.heroes = {};
   };
   H["kl-transport-1"] = (p, h) => { // 捷運二階走麥金路: line threading between hills to Keelung
     p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#b2cc96", Math.PI / 6);
-    p("ico1", -0.32, 0, -0.34, 0.5, 0.42, 0.4, "#7fae62"); p("ico1", 0.34, 0, 0.36, 0.44, 0.36, 0.36, "#8db96a");
+    p("ico1", -0.32, 0, -0.34, 0.5, 0.42, 0.4, "#92ab7c"); p("ico1", 0.34, 0, 0.36, 0.44, 0.36, 0.36, "#87a56f");
     p("box", 0, 0.016, 0, 1.0, 0.03, 0.22, ROAD, -0.5); for (let x = -0.4; x <= 0.4; x += 0.2) h.box(x, 0, x * -0.55 + 0.0, 0.05, 0.26, 0.05, ST);
     p("box", 0, 0.28, 0, 1.06, 0.035, 0.12, "#d8d2c6", -0.5); train(p, -0.06, 0.3, 0.03, 0.6, W, B, 3, -0.5);
     h.house(0.26, -0.22, 0.26, 0.16, 0.14, W, B, { roof: "flat" }); h.sign(0.26, 0.12, -0.135, 0.16, B);
@@ -1760,7 +1779,7 @@ MODELS.heroes = {};
   };
   H["kl-tourism-2"] = (p, h) => { // 西岸纜車審議: cable car over the west harbour (still under review)
     p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#a9c98c", Math.PI / 6); p("box", 0.1, 0.014, 0.2, 0.8, 0.012, 0.5, "#6fb3cc");
-    p("ico1", -0.36, 0, -0.32, 0.42, 0.5, 0.4, "#7fae62");
+    p("ico1", -0.36, 0, -0.32, 0.42, 0.5, 0.4, "#92ab7c");
     for (const [x, z, hh] of [[-0.36, -0.3, 0.62], [0.06, 0.0, 0.44], [0.42, 0.3, 0.3]]) { p("box", x, hh / 2, z, 0.05, hh, 0.05, W); p("box", x, hh, z, 0.14, 0.03, 0.04, RD, -0.7); }
     p("box", -0.15, 0.53, -0.15, 0.6, 0.006, 0.006, NV, -0.62, 0, -0.33); p("box", 0.24, 0.37, 0.15, 0.48, 0.006, 0.006, NV, -0.72, 0, -0.3);
     for (const [x, y, z, c] of [[-0.18, 0.44, -0.14, RD], [0.24, 0.28, 0.16, B]]) { p("cyl", x, y + 0.08, z, 0.006, 0.05, 0.006, C.dark); p("rbox", x, y, z, 0.09, 0.1, 0.08, c); p("box", x, y + 0.01, z, 0.092, 0.04, 0.082, GL, 0, 0, 0, true); }
@@ -1814,12 +1833,12 @@ MODELS.heroes = {};
     trees(h, [[-0.44, -0.4], [0.44, -0.42], [-0.06, 0.42]]); crowd(h, [[-0.3, 0.26], [0.22, 0.3], [0.38, 0.42]]);
   };
   H["ty-rec-works-1"] = (p, h) => { // 大仁滯洪池啟用: detention basin doubling as a park
-    p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#9fc183", Math.PI / 6);
+    p("cyl6", 0, 0.005, 0, 1.08, 0.01, 1.08, "#c0c9a2", Math.PI / 6);
     p("cyl", 0, 0.016, 0.02, 0.8, 0.012, 0.64, "#c9b48c"); p("cyl", 0, 0.024, 0.02, 0.66, 0.012, 0.5, "#5fa9c4");
     p("torus", 0, 0.03, 0.02, 0.72, 0.56, 0.04, "#d8d2c6", 0, Math.PI / 2);
     for (let k = 0; k < 6; k++) p("box", -0.25 + k * 0.1, 0.035, 0.02, 0.09, 0.012, 0.06, "#c9a27a");
     p("box", 0.42, 0.06, 0.0, 0.1, 0.12, 0.16, ST); p("box", 0.42, 0.13, 0.0, 0.12, 0.02, 0.18, B); // gate
-    for (const [x, z] of [[-0.18, 0.12], [0.16, -0.08], [0.06, 0.18]]) p("ico1", x, 0.015, z, 0.06, 0.03, 0.06, "#7fae62"); // reeds
+    for (const [x, z] of [[-0.18, 0.12], [0.16, -0.08], [0.06, 0.18]]) p("ico1", x, 0.015, z, 0.06, 0.03, 0.06, "#92ab7c"); // reeds
     trees(h, [[-0.44, -0.4], [-0.1, -0.42], [0.3, -0.4], [0.44, 0.38], [-0.44, 0.38]]); crowd(h, [[-0.3, -0.3], [0.18, 0.4], [-0.1, 0.42]]);
     h.bench(-0.3, 0.42); h.bench(0.3, 0.42);
   };
@@ -1845,14 +1864,14 @@ const LANDMARK_BUILD = {
     return 0.85;
   },
   fort(p) { // 淡水紅毛城: the red fort with crenellations, and the red-brick consulate beside it
-    p("box", 0, 0.02, 0, 1.6, 0.04, 1.2, "#7fae62");
+    p("box", 0, 0.02, 0, 1.6, 0.04, 1.2, "#92ab7c");
     p("box", -0.3, 0.32, 0, 0.72, 0.6, 0.72, "#b5432f"); for (let k = -2; k <= 2; k++) for (const s of [-1, 1]) { p("box", -0.3 + k * 0.15, 0.66, s * 0.33, 0.08, 0.08, 0.06, "#b5432f"); p("box", -0.3 + s * 0.33, 0.66, k * 0.15, 0.06, 0.08, 0.08, "#b5432f"); }
     for (const y of [0.2, 0.42]) for (const x of [-0.45, -0.15]) p("box", x, y, 0.362, 0.08, 0.12, 0.004, "#f2e6d8");
     p("box", 0.45, 0.2, 0.1, 0.55, 0.36, 0.5, "#c0563a"); for (let x = 0.25; x <= 0.66; x += 0.135) p("box", x, 0.16, 0.352, 0.08, 0.16, 0.004, "#f8f2e6"); p("cone4", 0.45, 0.44, 0.1, 0.66, 0.14, 0.6, "#5a4a42");
     return 0.75;
   },
   shifen(p) { // 十分: a curtain waterfall into a jade pool, the old rail line, and sky lanterns rising
-    p("box", 0, 0.4, -0.45, 1.6, 0.8, 0.5, "#8a8577"); p("ico1", -0.55, 0.85, -0.5, 0.7, 0.4, 0.5, "#5d9e42"); p("ico1", 0.5, 0.85, -0.5, 0.8, 0.4, 0.5, "#4f9a3f");
+    p("box", 0, 0.4, -0.45, 1.6, 0.8, 0.5, "#8a8577"); p("ico1", -0.55, 0.85, -0.5, 0.7, 0.4, 0.5, "#5d9e42"); p("ico1", 0.5, 0.85, -0.5, 0.8, 0.4, 0.5, "#5e8750");
     p("box", 0, 0.42, -0.19, 1.0, 0.72, 0.03, "#dff4fb"); p("cyl", 0, 0.04, 0.15, 1.3, 0.04, 0.6, "#5ec4c4"); for (let k = 0; k < 6; k++) p("sphere", -0.4 + k * 0.16, 0.08, -0.12, 0.14, 0.08, 0.1, "#ffffff");
     p("box", 0, 0.02, 0.65, 1.7, 0.02, 0.16, "#7a6a5a"); for (let x = -0.8; x <= 0.8; x += 0.12) p("box", x, 0.035, 0.65, 0.03, 0.01, 0.2, "#5a4a3a");
     for (const [x, y, z, c] of [[-0.3, 1.3, 0.2, "#ff5a3c"], [0.2, 1.6, 0.1, "#ffd24a"], [0.5, 1.15, 0.35, "#ff8a3c"], [-0.6, 1.75, 0.0, "#ffd24a"], [0.0, 2.0, 0.3, "#ff5a3c"]]) { p("box", x, y, z, 0.12, 0.16, 0.12, c, 0, 0, 0, true); p("sphere", x, y - 0.1, z, 0.05, 0.03, 0.05, "#fff3c4", 0, 0, 0, true); }
@@ -1879,7 +1898,7 @@ const LANDMARK_BUILD = {
     return 0.55;
   },
   lala(p) { // 拉拉山: a high forested peak, giant old cypresses and a pink peach orchard
-    p("cone", 0, 0.75, 0, 2.0, 1.5, 1.8, "#3f7f3a"); p("cone", -0.3, 0.55, 0.3, 1.2, 1.1, 1.1, "#4f9a3f");
+    p("cone", 0, 0.75, 0, 2.0, 1.5, 1.8, "#3f7f3a"); p("cone", -0.3, 0.55, 0.3, 1.2, 1.1, 1.1, "#5e8750");
     for (let k = 0; k < 14; k++) { const a = k * 2.39, r = 0.55 + (k % 3) * 0.2; p("cone", Math.cos(a) * r, 0.25 + (1 - r / 1.1) * 0.6, Math.sin(a) * r * 0.9, 0.18, 0.5, 0.18, k % 2 ? "#2f6f2a" : "#3a7a33"); }
     for (let k = 0; k < 8; k++) { const x = -0.6 + (k % 4) * 0.3, z = 0.75 + ((k / 4) | 0) * 0.2; p("cyl", x, 0.08, z, 0.03, 0.16, 0.03, "#8a6a4a"); p("ico1", x, 0.2, z, 0.18, 0.15, 0.18, "#f6a9c8"); }
     return 1.5;
@@ -1893,8 +1912,8 @@ const LANDMARK_BUILD = {
     return 0.6;
   },
   elephant(p) { // 象山: a forested hill with the Six Giant Rocks and a viewing deck facing 101
-    const G = ["#4f9a3f", "#5fa752", "#6fb85a", "#478f3a"];
-    p("ico", 0, 0.32, 0, 1.7, 0.8, 1.5, "#5a9e48"); p("ico", -0.25, 0.7, -0.1, 1.15, 0.8, 1.0, "#4f9a3f"); p("ico", 0.1, 1.05, -0.15, 0.7, 0.6, 0.62, "#5fa752");
+    const G = ["#5e8750", "#689659", "#739c5f", "#478f3a"];
+    p("ico", 0, 0.32, 0, 1.7, 0.8, 1.5, "#5a9e48"); p("ico", -0.25, 0.7, -0.1, 1.15, 0.8, 1.0, "#5e8750"); p("ico", 0.1, 1.05, -0.15, 0.7, 0.6, 0.62, "#689659");
     for (let k = 0; k < 14; k++) { const a = k * 2.4, r = 0.25 + (k % 4) * 0.16, x = Math.cos(a) * r, z = Math.sin(a) * r * 0.85, y = 1.0 - r * 0.9; p("ico1", x, y + 0.12, z, 0.24, 0.26, 0.24, G[k % 4]); }
     for (const [x, y, z, s] of [[0.32, 0.95, 0.2, 0.22], [0.42, 0.82, 0.32, 0.18], [0.2, 1.08, 0.3, 0.2], [0.5, 0.7, 0.1, 0.16], [0.05, 1.15, 0.24, 0.15], [0.3, 1.0, 0.42, 0.14]]) p("ico", x, y, z, s, s * 1.2, s, "#a59d8e", s * 7);
     p("box", 0.1, 1.28, 0.05, 0.36, 0.03, 0.26, "#a8794f"); for (const sx of [-0.15, 0.15]) p("box", 0.1 + sx, 1.33, 0.18, 0.012, 0.08, 0.012, "#7a5a3a");
@@ -1914,27 +1933,27 @@ const LANDMARK_BUILD = {
   },
   yangming(p) { // 陽明山: a grassy volcano with fumarole steam and the flower clock at its foot
     p("cone", 0, 0.7, -0.1, 2.2, 1.4, 1.9, "#5d9e42"); p("cone", 0.2, 1.05, -0.25, 1.2, 1.0, 1.1, "#7ab85a"); p("cone", 0.25, 1.62, -0.28, 0.4, 0.22, 0.36, "#9acd7a");
-    for (let k = 0; k < 16; k++) { const a = k * 2.39, r = 0.55 + (k % 3) * 0.22; p("ico1", Math.cos(a) * r, 0.25 + (1 - r / 1.2) * 0.5, -0.1 + Math.sin(a) * r * 0.85, 0.22, 0.24, 0.22, k % 2 ? "#3f8a35" : "#4f9a3f"); }
+    for (let k = 0; k < 16; k++) { const a = k * 2.39, r = 0.55 + (k % 3) * 0.22; p("ico1", Math.cos(a) * r, 0.25 + (1 - r / 1.2) * 0.5, -0.1 + Math.sin(a) * r * 0.85, 0.22, 0.24, 0.22, k % 2 ? "#3f8a35" : "#5e8750"); }
     for (const [x, y, z, s] of [[-0.35, 0.95, 0.1, 0.18], [-0.3, 1.15, 0.05, 0.24], [-0.38, 1.4, 0.0, 0.3], [0.5, 0.8, 0.2, 0.15], [0.55, 1.0, 0.18, 0.2]]) p("sphere", x, y, z, s, s, s, "#f4f6f8");
     p("ico", -0.35, 0.82, 0.12, 0.2, 0.08, 0.16, "#e8d06a"); p("ico", 0.5, 0.68, 0.22, 0.16, 0.06, 0.14, "#e8d06a");
-    const fx = 0.2, fz = 0.95; p("cyl", fx, 0.05, fz, 0.7, 0.06, 0.7, "#6fb85a"); ["#e0453c", "#f0c64a", "#ff7aa8", "#f8f6f1"].forEach((c, k) => p("cyl", fx, 0.09 + k * 0.004, fz, 0.6 - k * 0.13, 0.02, 0.6 - k * 0.13, c));
+    const fx = 0.2, fz = 0.95; p("cyl", fx, 0.05, fz, 0.7, 0.06, 0.7, "#739c5f"); ["#e0453c", "#f0c64a", "#ff7aa8", "#f8f6f1"].forEach((c, k) => p("cyl", fx, 0.09 + k * 0.004, fz, 0.6 - k * 0.13, 0.02, 0.6 - k * 0.13, c));
     p("box", fx, 0.12, fz - 0.08, 0.02, 0.01, 0.2, "#2b2b2b", 0.6); p("box", fx + 0.05, 0.12, fz, 0.02, 0.01, 0.13, "#2b2b2b", -0.9);
     return 1.75;
   },
   daan(p) { // 大安森林公園: a dense urban forest with a pond and the open-air stage
-    p("rbox", 0, 0.03, 0, 2.0, 0.06, 1.6, "#7cc35a"); p("cyl", 0.45, 0.065, 0.25, 0.75, 0.02, 0.55, "#5ec4dd"); p("cyl", 0.45, 0.06, 0.25, 0.83, 0.02, 0.63, "#d9cfb6");
+    p("rbox", 0, 0.03, 0, 2.0, 0.06, 1.6, "#a9bd87"); p("cyl", 0.45, 0.065, 0.25, 0.75, 0.02, 0.55, "#5ec4dd"); p("cyl", 0.45, 0.06, 0.25, 0.83, 0.02, 0.63, "#d9cfb6");
     p("ico", 0.55, 0.11, 0.2, 0.12, 0.06, 0.1, "#a59d8e"); p("box", 0.6, 0.13, 0.22, 0.06, 0.04, 0.03, "#f8f6f1");
     p("cyl", -0.45, 0.08, 0.35, 0.6, 0.06, 0.5, "#e8e2d4"); p("sphere", -0.45, 0.1, 0.2, 0.62, 0.42, 0.42, "#f8f6f1");
-    for (let k = 0; k < 30; k++) { const a = k * 2.39996, r = 0.35 + ((k * 37) % 60) / 100, x = Math.cos(a) * r * 1.0, z = Math.sin(a) * r * 0.75; if (Math.hypot(x - 0.45, z - 0.25) < 0.5 || Math.hypot(x + 0.45, z - 0.3) < 0.38) continue; const h = 0.22 + (k % 3) * 0.06; p("cyl", x, 0.06 + h / 2, z, 0.035, h, 0.035, "#8a6a4a"); p(k % 4 ? "ico1" : "cone", x, 0.08 + h + 0.1, z, 0.26, 0.28, 0.26, ["#4f9a3f", "#5fa752", "#3f8a35", "#6fb85a"][k % 4]); }
+    for (let k = 0; k < 30; k++) { const a = k * 2.39996, r = 0.35 + ((k * 37) % 60) / 100, x = Math.cos(a) * r * 1.0, z = Math.sin(a) * r * 0.75; if (Math.hypot(x - 0.45, z - 0.25) < 0.5 || Math.hypot(x + 0.45, z - 0.3) < 0.38) continue; const h = 0.22 + (k % 3) * 0.06; p("cyl", x, 0.06 + h / 2, z, 0.035, h, 0.035, "#8a6a4a"); p(k % 4 ? "ico1" : "cone", x, 0.08 + h + 0.1, z, 0.26, 0.28, 0.26, ["#5e8750", "#689659", "#3f8a35", "#739c5f"][k % 4]); }
     for (let x = -0.9; x <= 0.9; x += 0.3) p("box", x, 0.07, -0.7, 0.2, 0.02, 0.06, "#d6c9a8");
     return 0.6;
   },
   beitou(p) { // 北投溫泉: a steaming thermal valley pool and the wooden green library
-    p("cyl", 0, 0.04, 0, 1.8, 0.08, 1.5, "#6fb85a"); p("cyl", -0.25, 0.08, 0.15, 1.0, 0.04, 0.7, "#c9b48a"); p("cyl", -0.25, 0.1, 0.15, 0.86, 0.02, 0.58, "#7fe0d0");
+    p("cyl", 0, 0.04, 0, 1.8, 0.08, 1.5, "#739c5f"); p("cyl", -0.25, 0.08, 0.15, 1.0, 0.04, 0.7, "#c9b48a"); p("cyl", -0.25, 0.1, 0.15, 0.86, 0.02, 0.58, "#7fe0d0");
     for (const [x, z, s] of [[-0.4, 0.1, 0.22], [-0.15, 0.2, 0.28], [-0.3, 0.3, 0.18], [-0.05, 0.05, 0.2]]) for (let k = 0; k < 3; k++) p("sphere", x + k * 0.04, 0.2 + k * 0.17, z - k * 0.02, s * (1 - k * 0.2), s * (1 - k * 0.2), s * (1 - k * 0.2), "#f6f8fa");
     p("box", 0.5, 0.2, -0.25, 0.7, 0.24, 0.42, "#a8794f"); for (let x = 0.2; x <= 0.8; x += 0.1) p("box", x, 0.2, -0.035, 0.03, 0.24, 0.008, "#7a5a3a");
     p("box", 0.5, 0.35, -0.25, 0.8, 0.04, 0.52, "#5a9e48"); p("box", 0.5, 0.38, -0.25, 0.62, 0.02, 0.38, "#7ab85a");
-    for (const [x, z] of [[0.8, 0.4], [0.95, 0.15], [-0.75, -0.35], [-0.85, 0.45]]) { p("cyl", x, 0.18, z, 0.03, 0.22, 0.03, "#8a6a4a"); p("ico1", x, 0.38, z, 0.24, 0.26, 0.24, "#4f9a3f"); }
+    for (const [x, z] of [[0.8, 0.4], [0.95, 0.15], [-0.75, -0.35], [-0.85, 0.45]]) { p("cyl", x, 0.18, z, 0.03, 0.22, 0.03, "#8a6a4a"); p("ico1", x, 0.38, z, 0.24, 0.26, 0.24, "#5e8750"); }
     return 0.75;
   },
   cks(p) { // 中正紀念堂: white hall on a stepped podium, blue double roof
@@ -2025,7 +2044,7 @@ const LANDMARK_BUILD = {
     return 1.32;
   },
   grand(p) {
-    p("ico1", 0, 0.02, 0, 1.8, 0.46, 1.6, "#7fae62"); p("ico1", 0.5, 0.1, -0.4, 0.8, 0.4, 0.7, "#6d9f55");
+    p("ico1", 0, 0.02, 0, 1.8, 0.46, 1.6, "#92ab7c"); p("ico1", 0.5, 0.1, -0.4, 0.8, 0.4, 0.7, "#6d9f55");
     p("box", 0, 0.5, 0.15, 1.34, 0.46, 0.42, "#c8102e");
     for (let k = 0; k < 3; k++) p("box", 0, 0.38 + k * 0.12, 0.362, 1.2, 0.04, 0.004, "#ffe3a1", 0, 0, 0, true);
     for (let x = -0.6; x <= 0.61; x += 0.2) p("box", x, 0.5, 0.37, 0.04, 0.46, 0.02, "#a90d26");
@@ -2090,7 +2109,7 @@ const LANDMARK_BUILD = {
     return 0.6;
   },
   guanyin(p) {
-    p("ico1", 0, 0.0, 0, 0.86, 0.36, 0.86, "#7fae62"); p("box", 0, 0.22, 0, 0.3, 0.14, 0.3, "#e6e2da");
+    p("ico1", 0, 0.0, 0, 0.86, 0.36, 0.86, "#92ab7c"); p("box", 0, 0.22, 0, 0.3, 0.14, 0.3, "#e6e2da");
     p("cone", 0, 0.62, 0, 0.3, 0.72, 0.3, "#ffffff"); p("box", 0, 0.62, 0, 0.18, 0.5, 0.18, "#f6f4ef");
     p("sphere", 0, 1.03, 0, 0.13, 0.14, 0.13, "#ffffff"); p("cone", 0, 1.13, 0, 0.08, 0.08, 0.08, "#f6f4ef");
     return 1.2;
@@ -2135,20 +2154,22 @@ const SHIPS = {};
   const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3(), S = new THREE.Vector3(), NM = new THREE.Matrix3();
   /* collect parts into one vertex-coloured geometry */
   const merge = (build) => {
-    const pos = [], nor = [], colr = [], glowPos = [], glowNor = [];
+    const pos = [], nor = [], colr = [], glowPos = [], glowNor = [], dimPos = [], dimNor = [];
     const p = (g, x, y, z, sx, sy, sz, c, ry = 0, rx = 0, rz = 0, glow = false) => {
       const src = ni(g), P = src.attributes.position, N = src.attributes.normal;
       M4.compose(V.set(x, y, z), Q.setFromEuler(E.set(rx, ry, rz)), S.set(sx, sy, sz)); NM.getNormalMatrix(M4);
       const cc = col(c), v = new THREE.Vector3(), n = new THREE.Vector3();
+      const tp = glow === "dim" ? [dimPos, dimNor] : glow ? [glowPos, glowNor] : [pos, nor];
       for (let i = 0; i < P.count; i++) {
         v.fromBufferAttribute(P, i).applyMatrix4(M4); n.fromBufferAttribute(N, i).applyMatrix3(NM).normalize();
-        (glow ? glowPos : pos).push(v.x, v.y, v.z); (glow ? glowNor : nor).push(n.x, n.y, n.z); if (!glow) colr.push(cc.r, cc.g, cc.b);
+        tp[0].push(v.x, v.y, v.z); tp[1].push(n.x, n.y, n.z); if (!glow) colr.push(cc.r, cc.g, cc.b);
       }
     };
     build(p);
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(colr, 3));
     const grp = new THREE.Group(), mesh = new THREE.Mesh(g, SHIPS.mat); mesh.castShadow = true; grp.add(mesh);
-    if (glowPos.length) { const gg = new THREE.BufferGeometry(); gg.setAttribute("position", new THREE.Float32BufferAttribute(glowPos, 3)); gg.setAttribute("normal", new THREE.Float32BufferAttribute(glowNor, 3)); grp.add(new THREE.Mesh(gg, MAT.glow)); }
+    const addGlow = (gp, gn, mat) => { if (!gp.length) return; const gg = new THREE.BufferGeometry(); gg.setAttribute("position", new THREE.Float32BufferAttribute(gp, 3)); gg.setAttribute("normal", new THREE.Float32BufferAttribute(gn, 3)); grp.add(new THREE.Mesh(gg, mat)); };
+    addGlow(glowPos, glowNor, MAT.glow); addGlow(dimPos, dimNor, MAT.glowDim);
     return grp;
   };
   SHIPS.mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7 });
@@ -2240,7 +2261,7 @@ const SHIPS = {};
       p("sphere", 0, -0.005, 1.12, 0.3, 0.28, 0.62, LG);                             // rounded, tapering nose
       p("cone", 0, 0.035, -1.42, 0.28, 0.95, 0.24, W, 0, -Math.PI / 2 + 0.1);        // upswept tail cone
       p("rbox", 0, -0.11, 0.08, 0.26, 0.13, 0.9, "#e6ebf0");                         // belly / wing-root fairing
-      p("box", 0, 0.082, 1.18, 0.2, 0.055, 0.15, DK, 0, -0.35, 0, true);             // wrap-around cockpit glazing
+      p("box", 0, 0.082, 1.18, 0.2, 0.055, 0.15, DK, 0, -0.35, 0, "dim");            // wrap-around cockpit glazing
       for (const s of [-1, 1]) {
         p("box", s * 0.68, -0.03, 0.02, 1.35, 0.04, 0.46, LG, s * 0.5, 0, s * 0.07); // inner wing: swept, with dihedral
         p("box", s * 1.3, 0.05, -0.34, 0.78, 0.028, 0.27, LG, s * 0.62, 0, s * 0.1); // tapered outer wing
@@ -2251,7 +2272,7 @@ const SHIPS = {};
         p("cyl", s * 0.5, -0.17, 0.63, 0.205, 0.045, 0.205, "#c9ced3", 0, Math.PI / 2); // intake lip
         p("cyl", s * 0.5, -0.17, 0.645, 0.165, 0.016, 0.165, DK, 0, Math.PI / 2);    // open intake (dark fan face)
         p("cyl", s * 0.5, -0.165, 0.18, 0.1, 0.1, 0.1, "#9aa0a6", 0, Math.PI / 2);   // exhaust cone
-        p("box", s * 0.148, 0.045, 0.08, 0.012, 0.034, 1.7, "#cfeefc", 0, 0, 0, true); // cabin window band, lit at night
+        p("box", s * 0.148, 0.045, 0.08, 0.012, 0.024, 1.7, "#cfeefc", 0, 0, 0, "dim"); // faint cabin window band
       }
       p("box", 0, 0.42, -1.3, 0.035, 0.7, 0.32, AC, 0, -0.5);                        // swept fin: single identity colour
       p("box", 0, 0.3, -1.19, 0.04, 0.4, 0.1, W, 0, -0.5);                           // white leading flash on the fin
@@ -2327,8 +2348,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
   const pk = (r, a) => a[(r() * a.length) | 0];
   const GLASS = ["#7fd4ec", "#5fa8e4", "#9fd2f2", "#bfe6f6", "#6fc2dc", "#8fb8e8"]; // glass-curtain blues
   const NEON = ["#33e1ff", "#7fb4ff", "#b8f0ff", "#9f8bff"];                          // cool LED accents
-  const WALLS = ["#ffffff", "#f7f9fb", "#eef3f8", "#f4f6f2", "#f9f7f2"];              // future white
-  const ROOFS = ["#dfe8f0", "#cfd8e2", "#9fc8e0", "#8fb4c8", "#b9c4ce"];              // pale steel/glass tones
+  const WALLS = ["#fdfaf2", "#f8f5ec", "#f1efe6", "#f6f2e8", "#faf6ea"];              // warm future white
+  const ROOFS = ["#c96a4e", "#4e7d9e", "#8a6a4a", "#5b6b7d", "#b9c4ce"];              // clear mid-tone anchors: terracotta, steel blue, deep wood, slate
   /* rooftop solar array: one dark cell slab with a lighter grid sheet, slightly tilted toward the sun */
   const SOLAR = (p, x, y, z, w, d, ry = 0) => { p("box", x, y + 0.028, z, w, 0.016, d, "#22304e", ry, 0, -0.1); p("box", x, y + 0.04, z, w * 0.94, 0.006, d * 0.86, "#3f6cae", ry, 0, -0.1); };
 
@@ -2337,19 +2358,18 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     tower(p, s, h, r) {
       const gl = pk(r, GLASS), round = r() < 0.22, d = s * (0.82 + r() * 0.18);
       // two-step white podium: glass lobby, LED name band, entrance canopy
-      p("rbox", 0, 0.05, 0, s * 1.3, 0.1, d * 1.3, "#f4f7fa");
-      p("rbox", 0, 0.21, 0, s * 1.16, 0.22, d * 1.16, "#eef2f6");
+      p("rbox", 0, 0.05, 0, s * 1.3, 0.1, d * 1.3, "#f6f4ec");
+      p("rbox", 0, 0.21, 0, s * 1.16, 0.22, d * 1.16, "#f1efe7");
       p("box", 0, 0.19, d * 0.58 + 0.004, s * 1.0, 0.16, 0.01, "#dff4ff", 0, 0, 0, true);
-      p("box", 0, 0.335, d * 0.58 + 0.035, s * 0.56, 0.018, 0.1, "#f4f7fa");
+      p("box", 0, 0.335, d * 0.58 + 0.035, s * 0.56, 0.018, 0.1, "#f6f4ec");
       p("box", 0, 0.3, d * 0.58 + 0.012, s * 0.48, 0.02, 0.014, pk(r, NEON), 0, 0, 0, "cool");
       if (round) { p("cyl", 0, 0.32 + h / 2, 0, s, h, s, gl); for (let y = 0.55; y < h + 0.2; y += 0.26) p("cyl", 0, y, 0, s * 1.03, 0.022, s * 1.03, "#f2f8fd"); }
       else {
         p("fglass", 0, 0.32 + h / 2, 0, s, h, d, gl);
-        p("box", 0, 0.32 + h * 0.5, 0, s * 0.16, h * 0.99, d * 1.012, "#f2f6fa");    // white service spine
-        for (const sd of [-1, 1]) p("box", sd * (s / 2 + 0.005), 0.32 + h / 2, d * 0.2, 0.01, h * 0.96, 0.018, "#bfeaff", 0, 0, 0, "cool"); // corner LED strips
+        p("box", 0, 0.32 + h * 0.5, 0, s * 0.16, h * 0.99, d * 1.012, "#f4f2e9");    // white service spine
       }
       const top = 0.32 + h, k = r();
-      p("box", 0, top + 0.035, 0, s * 1.05, 0.07, d * 1.05, "#f2f6fa");              // parapet cap
+      p("box", 0, top + 0.035, 0, s * 1.05, 0.07, d * 1.05, "#f4f2e9");              // parapet cap
       if (k < 0.35) { // glass crown + spire
         p("box", 0, top + h * 0.08 + 0.07, 0, s * 0.68, h * 0.16, d * 0.68, gl);
         p("box", 0, top + h * 0.16 + 0.1, 0, s * 0.52, 0.02, d * 0.52, "#bfeaff", 0, 0, 0, "cool");
@@ -2359,21 +2379,21 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         SOLAR(p, s * 0.3, top + 0.07, -d * 0.3, s * 0.3, d * 0.26);
       } else { // stepped mech crown with an LED ring and a sky garden
         p("box", 0, top + 0.19, 0, s * 0.88, 0.26, d * 0.88, gl); p("box", 0, top + 0.33, 0, s * 0.92, 0.02, d * 0.92, "#bfeaff", 0, 0, 0, "cool");
-        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#5fa752");
+        p("turf", 0, top + 0.08, d * 0.32, s * 0.78, 0.02, d * 0.24, "#ffffff"); p("ico1", s * 0.24, top + 0.14, d * 0.32, 0.11, 0.1, 0.11, "#689659");
       }
       return top + 0.9;
     },
     office(p, s, h, r) {
       const d = s * (0.78 + r() * 0.22), wall = pk(r, WALLS), band = pk(r, ROOFS);
-      p("rbox", 0, 0.035, 0, s * 1.14, 0.07, d * 1.14, "#f4f7fa");                   // plinth
+      p("rbox", 0, 0.035, 0, s * 1.14, 0.07, d * 1.14, "#f6f4ec");                   // plinth
       p(r() < 0.55 ? "foffice" : "fapt", 0, 0.07 + h / 2, 0, s, h, d, wall);
-      p("box", 0, 0.07 + h + 0.028, 0, s * 1.05, 0.056, d * 1.05, "#f2f6fa");        // parapet
+      p("box", 0, 0.07 + h + 0.028, 0, s * 1.05, 0.056, d * 1.05, "#f4f2e9");        // parapet
       p("box", 0, 0.07 + h + 0.06, 0, s * 0.96, 0.012, d * 0.96, band);             // roof trim band
       const roof = 0.07 + h + 0.075, kk = r();
       if (kk < 0.4) SOLAR(p, 0, roof, 0, s * 0.68, d * 0.58);                        // rooftop solar farm
-      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#6fb85a"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#8fcf6a"); } // sky garden
+      else if (kk < 0.72) { p("turf", 0, roof + 0.012, 0, s * 0.72, 0.024, d * 0.6, "#ffffff"); p("ico1", s * 0.2, roof + 0.08, -d * 0.12, 0.11, 0.09, 0.11, "#739c5f"); p("ico1", -s * 0.22, roof + 0.07, d * 0.1, 0.09, 0.08, 0.09, "#8bab6f"); } // sky garden
       else { p("box", -s * 0.2, roof + 0.05, -d * 0.15, s * 0.3, 0.1, d * 0.3, "#dfe5ec"); p("cyl", s * 0.24, roof + 0.06, d * 0.18, 0.1, 0.12, 0.1, "#c9ced3"); } // mech penthouse
-      p("box", 0, 0.17, d / 2 + 0.045, s * 0.5, 0.016, 0.1, "#f4f7fa", 0, -0.25);    // entrance canopy
+      p("box", 0, 0.17, d / 2 + 0.045, s * 0.5, 0.016, 0.1, "#f6f4ec", 0, -0.25);    // entrance canopy
       p("box", 0, 0.1, d / 2 + 0.008, s * 0.32, 0.15, 0.012, "#cfeefc", 0, 0, 0, true); // glass lobby door
       if (r() < 0.55) p("box", s * 0.18, 0.07 + h * 0.82, d / 2 + 0.012, s * 0.42, 0.045, 0.012, pk(r, NEON), 0, 0, 0, "cool");
       return h + 0.3;
@@ -2391,9 +2411,9 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     },
     shop(p, s, h, r) {
       const hh = 0.34 + r() * 0.18, d = s * 0.8, aw = pk(r, ["#6fd0dc", "#5fa8e0", "#f8f6f1", "#9fd0f0"]);
-      p("rbox", 0, 0.025, 0, s * 1.08, 0.05, d * 1.08, "#f4f7fa");
+      p("rbox", 0, 0.025, 0, s * 1.08, 0.05, d * 1.08, "#f6f4ec");
       p("rbox", 0, 0.05 + hh / 2, 0, s, hh, d, pk(r, WALLS));
-      p("box", 0, 0.05 + hh + 0.02, 0, s * 1.03, 0.04, d * 1.03, "#f2f6fa");         // parapet
+      p("box", 0, 0.05 + hh + 0.02, 0, s * 1.03, 0.04, d * 1.03, "#f4f2e9");         // parapet
       p("box", 0, 0.17, d / 2 + 0.006, s * 0.86, 0.2, 0.012, "#cfeefc", 0, 0, 0, true); // storefront glass
       p("box", 0, 0.28, d / 2 + 0.05, s * 0.92, 0.016, 0.1, aw, 0, -0.3);            // awning
       p("box", 0, 0.05 + hh * 0.82, d / 2 + 0.012, s * 0.55, 0.05, 0.012, pk(r, NEON), 0, 0, 0, "cool"); // LED sign
@@ -2401,9 +2421,9 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       return hh + 0.18;
     },
     park(p, s, h, r) {
-      p("cyl", 0, 0.01, 0, s * 1.1, 0.02, s * 1.1, "#8ccf68");
+      p("cyl", 0, 0.01, 0, s * 1.1, 0.02, s * 1.1, "#a9bf8d");
       if (r() < 0.5) { p("cyl", 0, 0.03, 0, s * 0.5, 0.04, s * 0.5, "#e8ecef"); p("cyl", 0, 0.05, 0, s * 0.42, 0.03, s * 0.42, "#6fd3f0", 0, 0, 0, true); p("cyl", 0, 0.16, 0, 0.05, 0.22, 0.05, "#bff2ff", 0, 0, 0, "cool"); }
-      for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#5fa752", "#7cc062", "#4f9a3f"])); }
+      for (let k = 0; k < 4; k++) { const a = k * 1.57 + r(), rr = s * 0.42; p("cyl", Math.cos(a) * rr, 0.1, Math.sin(a) * rr, 0.05, 0.2, 0.05, "#8a6a4a"); p("ico1", Math.cos(a) * rr, 0.3, Math.sin(a) * rr, 0.28, 0.26, 0.28, pk(r, ["#689659", "#7aa567", "#5e8750"])); }
       return 0.5;
     },
   };
@@ -2435,11 +2455,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const pc = ctxFor(isl.id, null, 0, 0, 1, 0, zone, null), pp = (g, ...a) => part(pc, g, ...a);
     pp("rbox", 0, 0.02, 0, cw + 0.1, 0.04, cd + 0.1, accent);          // thin city-colour frame, nothing louder
     pp("rbox", 0, 0.036, 0, cw + 0.02, 0.05, cd + 0.02, "#f6eedb");     // one clean cream board per theme
-    const LOT_GROUND = { school: "#eccfa8", sport: "#aad68c", park: "#aad68c", nursery: "#f6e2d6", hospital: "#eef2f6", clinic: "#eef2f6", elder: "#e9eedb", metro: "#e4dccb", bus: "#e4dccb", bike: "#e4dccb", road: "#e4dccb" }; // low-saturation board-game tints
+    const LOT_GROUND = { school: "#e0bd8e", sport: "#a2bd82", park: "#a2bd82", nursery: "#eecfbc", hospital: "#dfe5ec", clinic: "#dfe5ec", elder: "#d9e0c2", metro: "#d6c9ab", bus: "#d6c9ab", bike: "#d6c9ab", road: "#d6c9ab" }; // mid-tone pads: one step below the cream board
     let campusTop = TOP;
     for (const sl of slots) {
       const r = (hash(sl.it.id) % 1000) / 1000, kind = MODELS.kindFor(sl.it, isl.t);
-      pp("box", sl.x, 0.066, sl.z, sl.s - 0.12, 0.01, sl.s - 0.12, LOT_GROUND[kind] || "#efe4c8"); // slim lot pad, generous margins between lots
+      pp("box", sl.x, 0.066, sl.z, sl.s - 0.12, 0.01, sl.s - 0.12, LOT_GROUND[kind] || "#e2d3b1"); // slim lot pad, generous margins between lots
       const ctx = ctxFor(isl.id, sl.it.id, sl.x, sl.z, sl.s * 0.95, 0, zone, null);
       ctx.base.premultiply(new THREE.Matrix4().makeTranslation(0, 0.07, 0));
       const start = parts.length, p = (g, ...a) => part(ctx, g, ...a);
@@ -2523,8 +2543,8 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         if (r() < (downtown ? 0.22 : 0.4)) { // leave room for greenery: a small grove instead of another building
           if (!free(isl.id, x, z, 0.22)) continue; hold(isl.id, x, z, 0.22);
           const gp = (g, ...a) => part(ctxFor(isl.id, null, x, z, 1, 0, zone, null), g, ...a), nT = 1 + ((r() * 3) | 0);
-          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#5fa752", "#7cc062", "#4f9a3f", "#8fcf6a"])); }
-          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#6fb85a");
+          for (let k = 0; k < nT; k++) { const ox = (r() - 0.5) * 0.3, oz = (r() - 0.5) * 0.3, th = 0.16 + r() * 0.12; gp("cyl", ox, th / 2, oz, 0.03, th, 0.03, "#8a6a4a"); gp(r() < 0.3 ? "cone" : "ico1", ox, th + 0.1, oz, 0.2 + r() * 0.08, 0.22 + r() * 0.1, 0.2 + r() * 0.08, pk(r, ["#689659", "#7aa567", "#5e8750", "#8bab6f"])); }
+          if (r() < 0.5) gp("sphere", (r() - 0.5) * 0.3, 0.05, (r() - 0.5) * 0.3, 0.1, 0.07, 0.1, "#739c5f");
           continue;
         }
         let type = downtown ? (v < 0.5 ? "tower" : v < 0.84 ? "office" : v < 0.93 ? "shop" : "park") : (v < 0.16 ? "tower" : v < 0.52 ? "office" : v < 0.76 ? "house" : v < 0.88 ? "shop" : "park");
@@ -2549,7 +2569,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
           let x = a[0] + ux * t - uz * 0.14, z = a[1] + uz * t + ux * 0.14; if (!GEOM.pip(x, z, P)) { x = a[0] + ux * t + uz * 0.14; z = a[1] + uz * t - ux * 0.14; }
           if (!GEOM.pip(x, z, P) || (Math.abs(x) < isl.campus.w / 2 + 0.15 && Math.abs(z) < isl.campus.d / 2 + 0.15)) continue;
           if (LANDMARKS3D.some((L) => Math.hypot(L.isl.c.x + L.x - isl.c.x - x, L.isl.c.z + L.z - isl.c.z - z) < L.r + 0.2)) continue;
-          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#5fa752", "#7cc062", "#4f9a3f"])); }
+          if (j % 2 === 1) { if (r() < 0.25) continue; tp("cyl", x, 0.1, z, 0.035, 0.2, 0.035, "#8a6a4a"); tp("ico1", x, 0.28, z, 0.2, 0.2, 0.2, pk(r, ["#689659", "#7aa567", "#5e8750"])); }
           else { tp("cyl", x, 0.17, z, 0.018, 0.34, 0.018, "#3b4148"); tp("sphere", x, 0.35, z, 0.045, 0.045, 0.045, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([isl.c.x + x, TOP + 0.012, isl.c.z + z, 0.42]); }
         }
       }
@@ -2608,10 +2628,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
         const a = rp[k], b = rp[(k + 1) % rp.length], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 0.05) continue;
         const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
         sp("box", mx, TOP + RH, mz, L + 0.2, 0.08, 0.52, "#8b9097", -ang); sp("box", mx, TOP + RH + 0.045, mz, L + 0.2, 0.012, 0.46, "#5d6168", -ang);
-        for (const o of [-0.25, 0.25]) { sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.09, mz + Math.cos(ang) * o, L + 0.12, 0.08, 0.03, "#eef1f5", -ang); sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.136, mz + Math.cos(ang) * o, L + 0.12, 0.014, 0.014, "#bfeaff", -ang, 0, 0, "cool"); }
+        for (const o of [-0.25, 0.25]) sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.09, mz + Math.cos(ang) * o, L + 0.12, 0.08, 0.03, "#eef1f5", -ang);
+        if (k % 5 === 0) for (const o of [-0.25, 0.25]) sp("box", mx - Math.sin(ang) * o, TOP + RH + 0.136, mz + Math.cos(ang) * o, 0.05, 0.016, 0.016, "#bfeaff", -ang, 0, 0, "cool"); // sparse cool markers, not a light bar
         if (k % 2 === 0) sp("box", mx, TOP + RH + 0.052, mz, L * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 3 === 0) { const ph = TOP + RH - base; sp("cyl", mx, base + ph / 2 - 0.05, mz, 0.13, ph, 0.13, "#cfc9bd"); sp("box", mx, TOP + RH - 0.08, mz, 0.12, 0.08, 0.52, "#cfc9bd", -ang); sp("cyl", mx, base + 0.02, mz, 0.22, 0.05, 0.22, "#ffffff"); }
-        if (k % 2 === 0) for (const o of [k % 4 === 0 ? -0.26 : 0.26]) { LAMP_POOLS.push([mx - Math.sin(ang) * o * 0.4, TOP + RH + 0.055, mz + Math.cos(ang) * o * 0.4, 0.42]); sp("cyl", mx - Math.sin(ang) * o, TOP + RH + 0.3, mz + Math.cos(ang) * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx - Math.sin(ang) * o, TOP + RH + 0.5, mz + Math.cos(ang) * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); }
+        if (k % 6 === 0) for (const o of [k % 12 === 0 ? -0.26 : 0.26]) { LAMP_POOLS.push([mx - Math.sin(ang) * o * 0.4, TOP + RH + 0.055, mz + Math.cos(ang) * o * 0.4, 0.42]); sp("cyl", mx - Math.sin(ang) * o, TOP + RH + 0.3, mz + Math.cos(ang) * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx - Math.sin(ang) * o, TOP + RH + 0.5, mz + Math.cos(ang) * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); } // sparse: no glowing band over the ring
       }
       WORLD.rings = WORLD.rings || {}; WORLD.rings[c.city] = { pts: rp, center: [cx, cz], deck: TOP + RH };
       WORLD.highways.push({ city: c.city, closed: true, pts: rp.map(([x, z]) => new THREE.Vector3(x, TOP + RH + 0.06, z)) });
@@ -2633,7 +2654,7 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
     const yAt = (o) => TOP - 0.06 + (WATER_Y + 0.02 - TOP + 0.06) * Math.min(1, o / W);
     const UMB = ["#f8f6f1", "#6fd0dc"];                       // resort canvas: white + aqua only
     const TOWEL = ["#bfeef4", "#f8f6f1", "#ffd9c0"];           // lounger towels, low-saturation
-    const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#4f9a3f" : "#62b04e", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
+    const palm = (px, py, pz, s = 1) => { for (let k = 0; k < 4; k++) sp("cyl", px + k * 0.025 * s, py + (0.12 + k * 0.22) * s, pz, 0.05 * s, 0.24 * s, 0.05 * s, "#a8794f", 0, 0, -0.12); for (let k = 0; k < 7; k++) { const a = (k / 7) * Math.PI * 2; sp("box", px + (0.1 + Math.cos(a) * 0.24) * s, py + 0.9 * s, pz + Math.sin(a) * 0.24 * s, 0.52 * s, 0.025, 0.13 * s, k % 2 ? "#5e8750" : "#6c9655", -a, 0, -0.35); } sp("sphere", px + 0.1 * s, py + 0.95 * s, pz, 0.1 * s, 0.1 * s, 0.1 * s, "#7a5a3a"); };
     const umbrella = (x, y, z, cc) => { sp("cyl", x, y + 0.22, z, 0.018, 0.44, 0.018, "#f8f6f1"); sp("cone", x, y + 0.46, z, 0.48, 0.13, 0.48, cc); sp("sphere", x, y + 0.535, z, 0.028, 0.028, 0.028, "#f8f6f1"); };
     const lounger = (x, y, z, a2, cc) => { const ca = Math.cos(a2), sa = Math.sin(a2);
       sp("box", x, y + 0.035, z, 0.3, 0.028, 0.13, "#f8f6f1", -a2);
@@ -2766,10 +2787,11 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
       for (let k = 0; k < n; k++) {
         const f0 = k / n, f1 = (k + 1) / n, mx = a[0] + (b[0] - a[0]) * (f0 + f1) / 2, mz = a[1] + (b[1] - a[1]) * (f0 + f1) / 2, seg = L / n;
         sp("box", mx, Y, mz, seg + 0.08, 0.1, 0.58, "#8b9097", -ang); sp("box", mx, Y + 0.05, mz, seg + 0.08, 0.012, 0.5, "#5d6168", -ang);
-        for (const o of [-0.28, 0.28]) { sp("box", mx + nx * o, Y + 0.1, mz + nz * o, seg + 0.08, 0.08, 0.03, "#eef1f5", -ang); sp("box", mx + nx * o, Y + 0.146, mz + nz * o, seg + 0.08, 0.014, 0.014, "#bfeaff", -ang, 0, 0, "cool"); }
+        for (const o of [-0.28, 0.28]) sp("box", mx + nx * o, Y + 0.1, mz + nz * o, seg + 0.08, 0.08, 0.03, "#eef1f5", -ang);
+        if (k % 4 === 0) for (const o of [-0.28, 0.28]) sp("box", mx + nx * o, Y + 0.146, mz + nz * o, 0.05, 0.016, 0.016, "#bfeaff", -ang, 0, 0, "cool");
         if (k % 2 === 0) sp("box", mx, Y + 0.058, mz, seg * 0.45, 0.004, 0.025, "#ffffff", -ang);
         if (k % 4 === 0 && k > 0) { const ph = Y - WATER_Y; sp("cyl", mx, WATER_Y + ph / 2 - 0.05, mz, 0.16, ph, 0.16, "#cfc9bd"); sp("cyl", mx, WATER_Y + 0.02, mz, 0.26, 0.05, 0.26, "#ffffff"); }
-        if (k % 2 === 1) { const o = k % 4 === 1 ? -0.3 : 0.3; sp("cyl", mx + nx * o, Y + 0.3, mz + nz * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx + nx * o, Y + 0.5, mz + nz * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([mx + nx * o * 0.4, Y + 0.06, mz + nz * o * 0.4, 0.42]); }
+        if (k % 4 === 1) { const o = k % 8 === 1 ? -0.3 : 0.3; sp("cyl", mx + nx * o, Y + 0.3, mz + nz * o, 0.015, 0.4, 0.015, "#3b4148"); sp("sphere", mx + nx * o, Y + 0.5, mz + nz * o, 0.04, 0.04, 0.04, "#fff3c4", 0, 0, 0, true); LAMP_POOLS.push([mx + nx * o * 0.4, Y + 0.06, mz + nz * o * 0.4, 0.42]); }
         pts.push(new THREE.Vector3(a[0] + (b[0] - a[0]) * f0, Y + 0.07, a[1] + (b[1] - a[1]) * f0));
       }
       pts.push(new THREE.Vector3(b[0], Y + 0.07, b[1]));
@@ -2886,10 +2908,107 @@ const LANDMARKS3D = [], LAMP_POOLS = [], LAMP_BEAMS = [];
 const PEOPLE = { list: [], routes: [] };
 {
   const R1 = rng(41);
-  const SKIN = ["#f1c9a6", "#e2b38c", "#c99772", "#f4d4b8"], HAIR = ["#2e2620", "#4a3a2e", "#6b5444", "#1f1f22", "#9a9a9a"];
-  const SHIRT = ["#ebe5d9", "#9aa99a", "#b8a6aa", "#81949a", "#c4ae8e", "#c2bdac"]; // muted everyday clothes, independent of city identity colors
-  const ROLES = ["commuter", "student", "elder", "parent", "worker", "hiker", "umbrella", "balloon", "runner", "shopper"];
-  PEOPLE.roles = ROLES;
+  /* --- chibi character kit (heart-island style): big round heads, soft low-saturation wardrobe, roles told by silhouette + props --- */
+  const SKIN = ["#f6d7b8", "#eac39a", "#c99772", "#8d5f3f"];
+  const HAIRC = ["#3a2a1e", "#241f1d", "#4e3426", "#5d4030", "#2e2a33"];
+  const GREYH = ["#c6c9cd", "#e2e4e6", "#979da3"];
+  const CASUAL = ["#e8713c", "#52a3a3", "#f2c75c", "#e3989f", "#f4f1e8", "#6f8fc0", "#8fb07a", "#c8795a", "#9f8fc4", "#5f7ea0"];
+  const PANTSC = ["#3c4a62", "#55617a", "#6b5a4e", "#44525f", "#8a94a8"];
+  const SUITC = ["#46525e", "#3a4652", "#5f6670", "#6b6257"];
+  const prop = (o, g, c, p, s, r) => o.props.push({ g, c, p, s, r });
+  /* hair caps (reference style): one smooth piece over the head with a clear fringe line — the cap is a dome
+     tilted forward so the hem rides high over the brow and low over the nape. Hat-wearing roles pass plain=true. */
+  const hairOf = (o, R, colr, plain) => {
+    const c = colr || pick(R, HAIRC), st = plain ? R() * 0.62 : R();
+    o.topC = c; o.topT = [[0, 0.212, -0.008], [0.126, 0.095, 0.129], [0.22, 0, 0]]; // short crop cap
+    if (st >= 0.4 && st < 0.62) o.topT = [[0, 0.196, -0.012], [0.136, 0.13, 0.136], [0.1, 0, 0]]; // bob, down over the ears
+    else if (st >= 0.62 && st < 0.76) prop(o, "sph", c, [0, 0.292, -0.025], [0.055, 0.05, 0.055]); // bun on the crop
+    else if (st >= 0.76 && st < 0.88) prop(o, "sph", c, [0, 0.185, -0.085], [0.05, 0.105, 0.055]); // low ponytail
+    else if (st >= 0.88) o.topT = [[0.008, 0.21, -0.006], [0.13, 0.1, 0.132], [0.2, 0, 0.16]]; // side-parted sweep
+  };
+  const DRESS = {
+    office(o, R) { /* 上班族：西裝色＋公事包（少數改拿咖啡） */
+      o.shirt = pick(R, SUITC); o.pants = pick(R, ["#3c4a62", "#44525f", "#4a4e57"]); hairOf(o, R);
+      if (R() < 0.7) prop(o, "rbox", "#4a4038", [0.104, -0.002, 0.015], [0.026, 0.068, 0.098]);
+      else prop(o, "cyl", "#f4efe6", [0.1, 0.05, 0.05], [0.032, 0.042, 0.032]);
+    },
+    commuter(o, R) { /* 通勤族：便服＋側背包，半數拿咖啡 */
+      o.shirt = pick(R, CASUAL); o.pants = pick(R, PANTSC); hairOf(o, R);
+      prop(o, "rbox", "#5a5248", [0.086, 0.04, -0.012], [0.05, 0.068, 0.036]);
+      if (R() < 0.5) prop(o, "cyl", "#f4efe6", [-0.1, 0.05, 0.05], [0.03, 0.042, 0.03]);
+    },
+    student(o, R) { /* 學童：小黃帽＋書包，個子小、步伐快 */
+      o.sc = 0.56; o.speed *= 1.25; o.shirt = pick(R, ["#f4f1e8", "#6f8fc0", "#8fb07a", "#f2c75c"]); o.pants = pick(R, ["#44525f", "#55617a"]); hairOf(o, R, null, true);
+      prop(o, "dome", "#f2c84b", [0, 0.198, 0.004], [0.152, 0.082, 0.152]);
+      prop(o, "cyl", "#f2c84b", [0, 0.21, 0.088], [0.12, 0.012, 0.1]);
+      prop(o, "rbox", pick(R, ["#c4756b", "#6b86a8", "#c9a86b", "#8f6f8f"]), [0, 0.085, -0.078], [0.098, 0.112, 0.052]);
+    },
+    elder(o, R) { /* 長者：灰髮＋拐杖，微駝、走得慢 */
+      o.sc = 0.74; o.speed = 0.05 + R() * 0.05; o.stoop = true;
+      o.shirt = pick(R, ["#8a94a8", "#6b5a4e", "#9f8fc4", "#52a3a3", "#c8b9a4"]); o.pants = pick(R, ["#6b5a4e", "#55617a", "#8a94a8"]); hairOf(o, R, pick(R, GREYH), true);
+      prop(o, "cyl", "#7a5c42", [0.1, -0.015, 0.03], [0.012, 0.135, 0.012]);
+    },
+    parent(o, R) { /* 家長：推嬰兒車（車身＋頂篷＋滾輪＋把手） */
+      o.speed = Math.min(o.speed, 0.12); o.shirt = pick(R, CASUAL); o.pants = pick(R, PANTSC); hairOf(o, R);
+      prop(o, "rbox", pick(R, ["#9aa8b5", "#b59aa8", "#a8b59a"]), [0, 0.035, 0.165], [0.11, 0.062, 0.15]);
+      prop(o, "dome", pick(R, ["#c9a8a8", "#a8bfc9", "#c2b4a3"]), [0, 0.068, 0.215], [0.115, 0.068, 0.1]);
+      prop(o, "cyl", "#3b4148", [0, -0.063, 0.1], [0.036, 0.128, 0.036], [0, 0, 1.5708]);
+      prop(o, "cyl", "#3b4148", [0, -0.063, 0.235], [0.036, 0.128, 0.036], [0, 0, 1.5708]);
+      prop(o, "cyl", "#6a6f75", [0, 0.05, 0.085], [0.012, 0.13, 0.012], [0.5, 0, 0]);
+    },
+    worker(o, R) { /* 工地人員：工程帽（黃/白）＋工作服 */
+      o.shirt = pick(R, ["#e8713c", "#f2c75c", "#8a94a8"]); o.pants = pick(R, ["#4a4e57", "#44525f"]); hairOf(o, R, null, true);
+      const hc = R() < 0.7 ? "#f0b03c" : "#e8e4da";
+      prop(o, "dome", hc, [0, 0.196, 0], [0.165, 0.1, 0.165]);
+      prop(o, "cyl", hc, [0, 0.198, 0], [0.195, 0.013, 0.195]);
+    },
+    hiker(o, R) { /* 登山客：大背包＋圓盤帽＋登山杖 */
+      o.shirt = pick(R, ["#8fb07a", "#c8795a", "#52a3a3", "#f2c75c"]); o.pants = pick(R, ["#6b5a4e", "#44525f"]); hairOf(o, R, null, true);
+      prop(o, "rbox", pick(R, ["#7d8f6a", "#a8744f", "#8f6f8f"]), [0, 0.095, -0.088], [0.105, 0.155, 0.07]);
+      prop(o, "dome", "#8a9471", [0, 0.2, 0], [0.148, 0.07, 0.148]);
+      prop(o, "cyl", "#8a9471", [0, 0.202, 0], [0.2, 0.012, 0.2]);
+      prop(o, "cyl", "#8a8f94", [0.1, -0.01, 0.04], [0.011, 0.165, 0.011], [0.12, 0, 0]);
+    },
+    umbrella(o, R) { /* 撐傘路人：陽傘是遠觀最醒目的柔色點 */
+      o.shirt = pick(R, CASUAL); o.pants = pick(R, PANTSC); hairOf(o, R);
+      prop(o, "cyl", "#6a6f75", [0.1, 0.17, 0.02], [0.013, 0.35, 0.013]);
+      prop(o, "cone", pick(R, ["#c98a8a", "#8aa6c9", "#a6c98f", "#d9c38c"]), [0.1, 0.35, 0.02], [0.37, 0.1, 0.37]);
+    },
+    balloonkid(o, R) { /* 拿氣球的小孩 */
+      o.sc = 0.54; o.speed *= 1.3; o.shirt = pick(R, ["#f2c75c", "#6f8fc0", "#8fb07a", "#e3989f"]); o.pants = pick(R, ["#55617a", "#6f8fc0"]); hairOf(o, R);
+      prop(o, "cyl", "#d8d8d8", [0.115, 0.26, 0.015], [0.005, 0.27, 0.005]);
+      prop(o, "sph", pick(R, ["#e88c7d", "#8fb8d8", "#f0c64a", "#9fc48f"]), [0.118, 0.44, 0.015], [0.095, 0.115, 0.095]);
+    },
+    tourist(o, R) { /* 旅客：遮陽帽＋拖行李箱 */
+      o.shirt = pick(R, ["#e8713c", "#52a3a3", "#e3989f", "#f2c75c", "#f4f1e8"]); o.pants = pick(R, ["#f4f1e8", "#55617a", "#8a94a8"]); hairOf(o, R, null, true);
+      prop(o, "dome", "#e8dcc0", [0, 0.202, 0], [0.148, 0.068, 0.148]);
+      prop(o, "cyl", "#e8dcc0", [0, 0.205, 0], [0.235, 0.011, 0.235]);
+      prop(o, "rbox", pick(R, ["#7d99b5", "#b57d7d", "#c9b27d"]), [-0.105, -0.02, -0.055], [0.055, 0.118, 0.085]);
+      prop(o, "cyl", "#3f444b", [-0.105, 0.065, -0.055], [0.009, 0.08, 0.009]);
+    },
+    farmer(o, R) { /* 小農：斗笠＋提籃 */
+      o.shirt = pick(R, ["#8fb07a", "#c8b9a4", "#8a94a8"]); o.pants = pick(R, ["#6b5a4e", "#44525f"]); hairOf(o, R, null, true);
+      prop(o, "cone", "#d9c08a", [0, 0.23, 0], [0.27, 0.095, 0.27]);
+      prop(o, "rbox", "#c9a86b", [0.104, 0.012, 0.025], [0.066, 0.05, 0.066]);
+    },
+  };
+  /* who walks where: role mixes keyed off the policy theme of the island the walker lives on */
+  const POOLS = [
+    [/教育|午餐|學|閱讀/, ["student", "student", "student", "student", "parent", "balloonkid", "commuter"]],
+    [/托育|育兒|親子|好孕|家庭|婦幼|生養/, ["parent", "parent", "balloonkid", "student", "commuter", "umbrella"]],
+    [/銀髮|長照|長者|高齡|社福|健康|醫療|衛生/, ["elder", "elder", "elder", "umbrella", "parent", "commuter"]],
+    [/工務|水利|居住|都更|住宅|建設|韌性/, ["worker", "worker", "worker", "commuter", "office", "umbrella"]],
+    [/交通|軌道|捷運/, ["commuter", "commuter", "worker", "office", "student", "umbrella"]],
+    [/產業|科技|AI|經濟|財政|市政|市府|治理/, ["office", "office", "commuter", "umbrella", "worker", "tourist"]],
+    [/青年|運動|體育/, ["commuter", "student", "office", "balloonkid", "hiker", "umbrella"]],
+    [/觀光|文化|藝文|港|海洋/, ["tourist", "tourist", "umbrella", "balloonkid", "farmer", "commuter"]],
+    [/環保|公園|綠|山/, ["hiker", "hiker", "parent", "balloonkid", "elder", "umbrella"]],
+    [/農|客家|原住民/, ["farmer", "farmer", "hiker", "elder", "commuter"]],
+    [/治安|消防|防災/, ["worker", "office", "commuter", "elder", "umbrella"]],
+  ];
+  const MIX = ["commuter", "office", "umbrella", "elder", "parent", "student", "tourist", "commuter", "balloonkid", "hiker", "worker", "farmer"];
+  const BEACH = ["tourist", "tourist", "balloonkid", "umbrella", "parent", "hiker", "commuter", "tourist"];
+  const poolFor = (name) => { for (const [re, p] of POOLS) if (re.test(name)) return p; return MIX; };
   const routeOf = (pts) => { const cum = [0]; for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + pts[k].distanceTo(pts[k - 1])); return { pts, cum, total: cum[cum.length - 1] }; };
 
   /* flow routes: nearest island pair between the hub city and each partner city, walked over bridges */
@@ -2910,23 +3029,23 @@ const PEOPLE = { list: [], routes: [] };
 
   /* people */
   const add = (o) => {
-    const topic = islandById.get(o.isl)?.t.name || "";
-    const local = /教育|育兒|青年/.test(topic) ? ["student", "parent", "balloon"] : /社福|長照|衛生/.test(topic) ? ["elder", "parent", "shopper"] : /工務|交通|產業/.test(topic) ? ["worker", "commuter", "shopper"] : ["hiker", "runner", "umbrella", "balloon", "parent"];
-    o.role = PEOPLE.list.length < ROLES.length ? ROLES[PEOPLE.list.length] : pick(R1, R1() < 0.7 ? local : ROLES);
-    o.size = o.role === "student" || o.role === "balloon" ? 0.76 : o.role === "elder" ? 0.93 : 1;
-    if (o.role === "elder") o.speed *= 0.65;
-    if (o.role === "runner") o.speed *= 1.45;
-    o.skin = col(pick(R1, SKIN)); o.hair = col(pick(R1, HAIR)); o.shirt = col(o.shirt || pick(R1, SHIRT)); o.pants = col(R1() < 0.5 ? "#3b4148" : "#5a6b7d"); o.ph = R1() * 6; PEOPLE.list.push(o); };
+    o.skin = col(pick(R1, SKIN)); o.sc = 0.8; o.props = [];
+    if (o.kind === "flow") { hairOf(o, R1); o.pants = "#3b4148"; } // flow walkers keep the city-colour shirt they were given (route identification only)
+    else (DRESS[o.role] || DRESS.commuter)(o, R1);
+    if (!o.sleeve && R1() < 0.4 && ["commuter", "parent", "tourist", "student", "balloonkid", "umbrella"].includes(o.role)) o.sleeve = "#f4f1e8"; // reference-style two-tone shirt: cream sleeves
+    o.shirt = col(o.shirt); o.pants = col(o.pants); o.topC = col(o.topC); o.sleeve = col(o.sleeve || o.shirt); o.ph = R1() * 6;
+    PEOPLE.list.push(o);
+  };
   const perRoute = QUALITY === "high" ? 3 : 2;
   PEOPLE.routes.forEach((rt, ri) => {
-    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: pick(R1, SHIRT) });
+    for (let k = 0; k < perRoute; k++) add({ kind: "flow", flow: rt.f.id, rt: rt.route, s: (k / perRoute) * rt.route.total, dir: k % 2 ? -1 : 1, speed: 0.32 + R1() * 0.1, wait: 0, side: (k % 2 ? 1 : -1) * 0.06, carry: rt.f.carry, shirt: cityHex(rt.from) });
   });
   for (const isl of islands.filter((i) => i.live)) {
-    const ids = WORLD.ringNode.get(isl.id), n = QUALITY === "high" ? 7 : 4;
+    const ids = WORLD.ringNode.get(isl.id), n = QUALITY === "high" ? 7 : 4, pool = poolFor(isl.t.name);
     for (let k = 0; k < n; k++) {
       const a = (R1() * ids.length) | 0, len = 3 + ((R1() * 3) | 0);
       const pts = []; for (let j = 0; j <= len; j++) pts.push(WORLD.graph.nodes[ids[(a + j) % ids.length]].p.clone());
-      add({ kind: "ambient", isl: isl.id, rt: routeOf(pts), s: R1() * 2, dir: 1, speed: 0.12 + R1() * 0.08, wait: R1() * 3, side: (R1() < 0.5 ? 1 : -1) * 0.21 });
+      add({ kind: "ambient", isl: isl.id, rt: routeOf(pts), s: R1() * 2, dir: 1, speed: 0.12 + R1() * 0.08, wait: R1() * 3, side: (R1() < 0.5 ? 1 : -1) * 0.21, role: pick(R1, pool) });
     }
   }
 
@@ -2951,12 +3070,12 @@ const PEOPLE = { list: [], routes: [] };
     bim.count = LAMP_BEAMS.length; bim.frustumCulled = false; bim.renderOrder = 3; scene.add(bim); PEOPLE.lampBeams = bm;
   }
 
-  /* beach promenade strollers: walk the boardwalk of each continuous beach stretch */
+  /* beach promenade strollers: walk the boardwalk of each continuous beach stretch — a seaside crowd (tourists, kids, parasols) */
   for (const [city, seg] of WORLD.shore || []) {
     if (!LIVE_CITIES.has(city)) continue;
     let run = [];
     const flush = () => {
-      if (run.length >= 4) { const rt = routeOf(run), n = Math.max(1, Math.round(rt.total / 1.4)); for (let k = 0; k < n; k++) add({ kind: "ambient", rt, s: R1() * rt.total, dir: R1() < 0.5 ? 1 : -1, speed: 0.08 + R1() * 0.08, wait: R1() * 4, side: (R1() - 0.5) * 0.24 }); }
+      if (run.length >= 4) { const rt = routeOf(run), n = Math.max(1, Math.round(rt.total / 1.4)); for (let k = 0; k < n; k++) add({ kind: "ambient", rt, s: R1() * rt.total, dir: R1() < 0.5 ? 1 : -1, speed: 0.08 + R1() * 0.08, wait: R1() * 4, side: (R1() - 0.5) * 0.24, role: pick(R1, BEACH) }); }
       run = [];
     };
     for (const sg of seg) { if (sg.type !== "beach") { flush(); continue; } const nx = (sg.na[0] + sg.nb[0]) / 2, nz = (sg.na[1] + sg.nb[1]) / 2; run.push(new THREE.Vector3(sg.a[0] + nx * 0.28, TOP - 0.03, sg.a[1] + nz * 0.28)); }
@@ -3047,9 +3166,13 @@ const PEOPLE = { list: [], routes: [] };
     };
     const TA = WORLD.geo("taoyuan", 121.233, 25.0797), SS = WORLD.geo("taipei", 121.5525, 25.0694); // 桃園國際機場 / 松山機場
     const RAD = Math.max(bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) * 0.42;
-    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 12, w: 0.055, a: rng(3)() * 6 });
-    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.2, dir: 1, speed: 0.045, hi: 10.5 });  // cruise stays above 台北 101
-    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0], az: TA[1], bx: SS[0], bz: SS[1], t: 0.72, dir: -1, speed: 0.045, hi: 10.5 });
+    /* deconflicted scheduling: the two shuttles fly parallel offset corridors at different cruise
+       altitudes with opposite phases (always near opposite ends), and the orbiter circles well above
+       both peaks — no two aircraft ever come within a fuselage length of each other */
+    const dxs = SS[0] - TA[0], dzs = SS[1] - TA[1], Lsh = Math.hypot(dxs, dzs) || 1, nxs = -dzs / Lsh, nzs = dxs / Lsh;
+    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 22, w: 0.055, a: rng(3)() * 6 });
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] + nxs * 2, az: TA[1] + nzs * 2, bx: SS[0] + nxs * 2, bz: SS[1] + nzs * 2, t: 0.2, dir: 1, speed: 0.045, hi: 8.5 });  // cruise stays above 台北 101
+    PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] - nxs * 2, az: TA[1] - nzs * 2, bx: SS[0] - nxs * 2, bz: SS[1] - nzs * 2, t: 0.72, dir: -1, speed: 0.045, hi: 13.5 });
   }
   PEOPLE.updatePlanes = (dt, time, moving) => {
     const night = (ENV.lampsOn || 0) > 0.05, on1 = time % 1 < 0.16, on2 = (time + 0.5) % 1 < 0.16;
@@ -3077,90 +3200,50 @@ const PEOPLE = { list: [], routes: [] };
     }
   };
 
-  /* instanced body parts */
+  /* instanced body parts — chibi proportions (head ≈ 1 : body+legs ≈ 1.7); role props share five instanced pools */
   const N = PEOPLE.list.length;
   const mk = (g, n, mat) => { const m = new THREE.InstancedMesh(g, mat, n); m.castShadow = true; m.frustumCulled = false; scene.add(m); return m; };
-  const pm = new THREE.MeshStandardMaterial({ roughness: 0.8 });
-  const legG = new THREE.BoxGeometry(0.045, 0.1, 0.055).translate(0, -0.05, 0);
-  const armG = new THREE.BoxGeometry(0.036, 0.115, 0.04).translate(0, -0.0575, 0);
-  const bodyG = new RoundedBoxGeometry(0.125, 0.145, 0.085, 2, 0.022);
-  const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), heads = mk(GEO.sphere, N, pm), hairs = mk(GEO.dome, N, pm);
+  const pm = new THREE.MeshStandardMaterial({ roughness: 0.92 }); // soft matte, clay-like
+  /* minimal reference face: two small dot eyes set a little low, drawn dark-on-white so the per-instance skin tint colours the head */
+  const faceTex = (() => {
+    const c = document.createElement("canvas"); c.width = 256; c.height = 128; const g = c.getContext("2d");
+    g.fillStyle = "#ffffff"; g.fillRect(0, 0, 256, 128);
+    const ex = 64; // face centre sits at u = 0.25 — rotated to +z, the way the walker faces
+    g.fillStyle = "#26211f";
+    for (const s of [-1, 1]) { g.beginPath(); g.ellipse(ex + s * 13, 86, 4.6, 5.4, 0, 0, 7); g.fill(); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
+  /* BRICK-FIG silhouette with a clay finish: rounded-edge blocks, smooth capsule head, matte material.
+     Original homage shape — no brand marks, no text, natural skin tones. */
+  const legG = new RoundedBoxGeometry(0.054, 0.1, 0.06, 1, 0.016).translate(0, -0.05, 0);
+  const armG = new THREE.CylinderGeometry(0.0175, 0.0155, 0.095, 8).translate(0, -0.0475, 0);
+  const bodyG = new RoundedBoxGeometry(1, 1, 1, 2, 0.14);
+  const headG = new THREE.CapsuleGeometry(0.5, 0.62, 3, 10);
+  const hairG = new THREE.SphereGeometry(0.5, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2);
+  const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), hips = mk(GEO.rbox, N, pm), hands = mk(GEO.ico, N * 2, pm);
+  const heads = mk(headG, N, new THREE.MeshStandardMaterial({ roughness: 0.95, map: faceTex })), tops = mk(hairG, N, pm);
+  const PROPG = { rbox: GEO.rbox, cyl: GEO.cyl, dome: GEO.dome, sph: GEO.sphere, cone: GEO.cone };
+  const want = {}; for (const o of PEOPLE.list) for (const pr of o.props) want[pr.g] = (want[pr.g] || 0) + 1;
+  const propIM = {}, nextI = {}; for (const k in want) { propIM[k] = mk(PROPG[k], want[k], pm); nextI[k] = 0; }
+  const E2 = new THREE.Euler(), Q2 = new THREE.Quaternion(), mat4 = () => new THREE.Matrix4();
   PEOPLE.list.forEach((o, i) => {
-    legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.shirt); arms.setColorAt(i * 2 + 1, o.shirt);
-    bodies.setColorAt(i, o.shirt); heads.setColorAt(i, o.skin); hairs.setColorAt(i, o.hair);
+    legs.setColorAt(i * 2, o.pants); legs.setColorAt(i * 2 + 1, o.pants); arms.setColorAt(i * 2, o.sleeve); arms.setColorAt(i * 2 + 1, o.sleeve);
+    bodies.setColorAt(i, o.shirt); hips.setColorAt(i, o.pants); heads.setColorAt(i, o.skin);
+    hands.setColorAt(i * 2, o.skin); hands.setColorAt(i * 2 + 1, o.skin); tops.setColorAt(i, o.topC);
+    const st = o.stoop; // elders lean a little forward
+    o.bodyLoc = mat4().compose(new THREE.Vector3(0, 0.1, st ? 0.014 : 0), Q2.setFromEuler(E2.set(st ? 0.18 : 0, 0, 0)), new THREE.Vector3(0.148, 0.125, 0.092));
+    o.hipLoc = mat4().compose(new THREE.Vector3(0, 0.024, 0), Q2.identity(), new THREE.Vector3(0.12, 0.05, 0.066));
+    o.headLoc = mat4().compose(new THREE.Vector3(0, st ? 0.2 : 0.208, st ? 0.02 : 0.002), Q2.setFromEuler(E2.set(0, -Math.PI / 2, 0)), new THREE.Vector3(0.105, 0.062, 0.105));
+    const ht = o.topT[2] || [0, 0, 0];
+    o.topLoc = mat4().compose(new THREE.Vector3(o.topT[0][0], o.topT[0][1] + 0.022 + (st ? -0.008 : 0), o.topT[0][2] + (st ? 0.018 : 0)), Q2.setFromEuler(E2.set(ht[0], ht[1], ht[2])), new THREE.Vector3(o.topT[1][0], o.topT[1][1], o.topT[1][2]));
+    o.parts = o.props.map((pr) => {
+      const k = nextI[pr.g]++; propIM[pr.g].setColorAt(k, col(pr.c));
+      const r = pr.r || [0, 0, 0];
+      const py = pr.p[1] + (pr.p[1] > 0.15 ? 0.03 : 0); // hats and hair pieces ride the taller head
+      return { im: propIM[pr.g], i: k, m: mat4().compose(new THREE.Vector3(pr.p[0], py, pr.p[2]), Q2.setFromEuler(E2.set(r[0], r[1], r[2])), new THREE.Vector3(pr.s[0], pr.s[1], pr.s[2])) };
+    });
   });
-  /* Accessories share geometry/material batches across every citizen. Local +z is the face. */
-  const accessoryParts = [];
-  const accessory = (owner, g, xyz, scale, color, rotation = [0, 0, 0]) => {
-    const matrix = new THREE.Matrix4().compose(new THREE.Vector3(...xyz), new THREE.Quaternion().setFromEuler(new THREE.Euler(...rotation)), new THREE.Vector3(...scale));
-    accessoryParts.push({ owner, g, matrix, color });
-  };
-  PEOPLE.list.forEach((o, i) => {
-    const a = (g, xyz, scale, color, rotation) => accessory(i, g, xyz, scale, color, rotation);
-    // Tiny eyes and shoes give each silhouette a face and a grounded, rounded stance.
-    for (const side of [-1, 1]) {
-      a("sphere", [side * 0.026, 0.27, 0.074], [0.012, 0.016, 0.008], "#333237");
-      a("rbox", [side * 0.03, -0.09, 0.016], [0.055, 0.032, 0.085], "#4c4b49");
-    }
-    if (o.role === "commuter") {
-      a("box", [0, 0.13, 0.047], [0.018, 0.1, 0.012], "#5a6067"); // tie
-      a("cyl", [0.115, 0.12, 0.075], [0.045, 0.07, 0.045], "#e2d4bd"); // coffee
-      a("cyl", [0.115, 0.158, 0.075], [0.049, 0.012, 0.049], "#f0e9db");
-      a("rbox", [-0.11, 0.015, 0], [0.055, 0.095, 0.09], "#6d625b"); // briefcase
-    } else if (o.role === "student") {
-      a("dome", [0, 0.32, 0], [0.18, 0.1, 0.18], "#d8bd67");
-      a("cyl", [0, 0.32, 0.015], [0.21, 0.014, 0.2], "#d8bd67"); // school hat brim
-      a("rbox", [0, 0.13, -0.07], [0.115, 0.13, 0.06], "#a18070");
-    } else if (o.role === "elder") {
-      a("cyl", [0.11, 0.015, 0.075], [0.018, 0.22, 0.018], "#89745f"); // cane
-      a("torus", [0.1, 0.128, 0.075], [0.035, 0.035, 0.018], "#89745f");
-      for (const side of [-1, 1]) a("torus", [side * 0.03, 0.27, 0.08], [0.045, 0.04, 0.012], "#77777b");
-      o.hair = col("#bdb7ad"); hairs.setColorAt(i, o.hair);
-    } else if (o.role === "parent") {
-      a("rbox", [0, 0.015, 0.25], [0.2, 0.105, 0.24], "#a6afa5"); // pram
-      a("dome", [0, 0.095, 0.21], [0.21, 0.15, 0.19], "#bba6a1");
-      a("box", [0, 0.1, 0.12], [0.18, 0.018, 0.025], "#62666a");
-      for (const side of [-1, 1]) for (const z of [0.17, 0.33]) a("cyl", [side * 0.105, -0.055, z], [0.06, 0.025, 0.06], "#54575a", [0, 0, Math.PI / 2]);
-    } else if (o.role === "worker") {
-      a("dome", [0, 0.32, 0], [0.18, 0.12, 0.18], "#d9c18a");
-      a("cyl", [0, 0.32, 0.01], [0.2, 0.018, 0.2], "#d9c18a");
-      a("box", [0, 0.13, 0.05], [0.105, 0.12, 0.014], "#c4aa7e"); // vest, reflective stripes
-      for (const x of [-0.035, 0.035]) a("box", [x, 0.13, 0.06], [0.012, 0.12, 0.008], "#e8e3cb");
-    } else if (o.role === "hiker") {
-      a("rbox", [0, 0.14, -0.085], [0.14, 0.18, 0.1], "#89977b");
-      a("box", [0, 0.18, -0.145], [0.12, 0.03, 0.02], "#c2b294");
-      a("cyl", [0.12, 0.04, 0.07], [0.013, 0.27, 0.013], "#777b78");
-      a("cyl", [0, 0.33, 0], [0.22, 0.025, 0.22], "#c2b294");
-    } else if (o.role === "umbrella") {
-      a("cyl", [0.11, 0.26, 0.03], [0.012, 0.37, 0.012], "#6f7276");
-      a("dome", [0.08, 0.44, 0.02], [0.4, 0.16, 0.4], "#8d9ba9");
-      a("sphere", [0.08, 0.525, 0.02], [0.022, 0.025, 0.022], "#6f7276");
-    } else if (o.role === "balloon") {
-      a("cyl", [0.11, 0.34, 0.02], [0.006, 0.42, 0.006], "#c4bba8");
-      a("sphere", [0.11, 0.61, 0.02], [0.16, 0.2, 0.16], "#c2a0ac");
-    } else if (o.role === "runner") {
-      a("box", [0, 0.285, 0.065], [0.13, 0.025, 0.025], "#c1b7a5"); // sweatband
-      a("cyl", [0.11, 0.05, 0.04], [0.035, 0.08, 0.035], "#9bb3b2");
-    } else if (o.role === "shopper") {
-      for (const side of [-1, 1]) {
-        a("rbox", [side * 0.12, 0.015, 0.01], [0.075, 0.12, 0.065], side > 0 ? "#c1af92" : "#a5afa1");
-        a("torus", [side * 0.12, 0.09, 0.01], [0.04, 0.04, 0.012], "#8c826f");
-      }
-    }
-  });
-  const accessoryBatches = new Map();
-  for (const item of accessoryParts) {
-    if (!accessoryBatches.has(item.g)) accessoryBatches.set(item.g, []);
-    accessoryBatches.get(item.g).push(item);
-  }
-  PEOPLE.accessories = [];
-  for (const [geo, items] of accessoryBatches) {
-    const mesh = mk(GEO[geo], items.length, pm);
-    items.forEach((item, i) => mesh.setColorAt(i, col(item.color)));
-    PEOPLE.accessories.push({ mesh, items });
-  }
-  const citizenMatrices = Array.from({ length: N }, () => new THREE.Matrix4());
-
+  PEOPLE.stats = { people: N, props: want };
   /* carry badges over flow walkers */
   const badgeTex = new Map();
   const badgeFor = (txt) => {
@@ -3173,19 +3256,14 @@ const PEOPLE = { list: [], routes: [] };
   for (const o of PEOPLE.list) if (o.kind === "flow") { o.badge = new THREE.Sprite(badgeFor(o.carry)); o.badge.scale.set(0.34, 0.17, 1); o.badge.renderOrder = 5; scene.add(o.badge); }
 
   const P = new THREE.Vector3(), Dv = new THREE.Vector3(), base = new THREE.Matrix4(), loc = new THREE.Matrix4(), out = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1);
+  const out2 = new THREE.Matrix4(), HT = new THREE.Matrix4().compose(new THREE.Vector3(0, -0.105, 0), new THREE.Quaternion(), new THREE.Vector3(0.036, 0.034, 0.036)); // mitt hand rides the swinging arm
   const sample = (rt, s) => {
     let k = 1; while (k < rt.cum.length - 1 && rt.cum[k] < s) k++;
     const a = rt.pts[k - 1], b = rt.pts[k], t = (s - rt.cum[k - 1]) / Math.max(1e-6, rt.cum[k] - rt.cum[k - 1]);
     P.lerpVectors(a, b, THREE.MathUtils.clamp(t, 0, 1)); Dv.subVectors(b, a).normalize(); return P;
   };
-  const citizenPos = new THREE.Vector3(), localPos = new THREE.Vector3(), localScale = new THREE.Vector3(), sideVector = new THREE.Vector3();
-  PEOPLE.meshes = [legs, arms, bodies, heads, hairs, ...PEOPLE.accessories.map(a => a.mesh)];
   PEOPLE.filter = null;   // Set of flow ids to show, or null for all
   PEOPLE.update = (dt, time, moving) => {
-    const detailed = camera.position.distanceTo(controls.target) < (QUALITY === "high" ? 24 : 18);
-    PEOPLE.detailVisible = detailed;
-    arms.visible = hairs.visible = detailed;
-    for (const batch of PEOPLE.accessories) batch.mesh.visible = detailed;
     PEOPLE.list.forEach((o, i) => {
       if (moving) {
         if (o.wait > 0) o.wait -= dt;
@@ -3194,30 +3272,28 @@ const PEOPLE = { list: [], routes: [] };
       const pos = sample(o.rt, o.s);
       const isl = o.kind === "ambient" ? islandById.get(o.isl) : null;
       const lift = isl ? isl.lift : 0;
-      const dir = Dv.multiplyScalar(o.dir);
-      const side = sideVector.set(-dir.z, 0, dir.x).multiplyScalar(o.side);
+      const dir = Dv.clone().multiplyScalar(o.dir);
+      const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(o.side);
       const visible = o.kind === "ambient" || !PEOPLE.filter || PEOPLE.filter.has(o.flow);
-      const sc = visible ? 0.95 * o.size : 0.0001;
+      const sc = visible ? o.sc : 0.0001;
       const yaw = Math.atan2(dir.x, dir.z);
-      base.compose(citizenPos.set(pos.x + side.x, pos.y + lift + 0.105 * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), localScale.set(sc, sc, sc));
-      citizenMatrices[i].copy(base);
       const walking = moving && o.wait <= 0;
-      const ph = time * 9 + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.01 : 0;
-      for (let k = 0; k < 2; k++) {
-        const sgn = k === 0 ? 1 : -1;
-        loc.compose(localPos.set(sgn * 0.03, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
-        loc.compose(localPos.set(sgn * 0.082, 0.14 + bob, 0), q.setFromEuler(e.set(-sgn * sw * 0.8, 0, sgn * 0.08)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+      const ph = time * (o.sc < 0.7 ? 11 : 9) + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.014 : 0;
+      base.compose(new THREE.Vector3(pos.x + side.x, pos.y + lift + (0.084 + bob) * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
+      for (const [k, sgn] of [[0, 1], [1, -1]]) {
+        loc.compose(new THREE.Vector3(sgn * 0.031, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        loc.compose(new THREE.Vector3(sgn * 0.09, 0.15, 0), q.setFromEuler(e.set(-sgn * sw * 0.7, 0, sgn * 0.12)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        hands.setMatrixAt(i * 2 + k, out2.multiplyMatrices(out, HT));
       }
-      loc.compose(localPos.set(0, 0.085 + bob, 0), q.identity(), one); bodies.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(localPos.set(0, 0.265 + bob, 0), q.identity(), localScale.set(0.16, 0.16, 0.16)); heads.setMatrixAt(i, out.multiplyMatrices(base, loc));
-      loc.compose(localPos.set(0, 0.29 + bob, -0.008), q.identity(), localScale.set(0.168, 0.115, 0.168)); hairs.setMatrixAt(i, out.multiplyMatrices(base, loc));
+      bodies.setMatrixAt(i, out.multiplyMatrices(base, o.bodyLoc));
+      hips.setMatrixAt(i, out.multiplyMatrices(base, o.hipLoc));
+      heads.setMatrixAt(i, out.multiplyMatrices(base, o.headLoc));
+      tops.setMatrixAt(i, out.multiplyMatrices(base, o.topLoc));
+      for (const pt of o.parts) pt.im.setMatrixAt(pt.i, out.multiplyMatrices(base, pt.m));
       if (o.badge) { o.badge.visible = visible && PEOPLE.badges; o.badge.position.set(pos.x + side.x, pos.y + 0.38, pos.z + side.z); }
     });
-    if (detailed) for (const { mesh, items } of PEOPLE.accessories) {
-      items.forEach((item, i) => mesh.setMatrixAt(i, out.multiplyMatrices(citizenMatrices[item.owner], item.matrix)));
-      mesh.instanceMatrix.needsUpdate = true;
-    }
-    for (const m of [legs, arms, bodies, heads, hairs]) m.instanceMatrix.needsUpdate = true;
+    for (const m of [legs, arms, bodies, hips, hands, heads, tops]) m.instanceMatrix.needsUpdate = true;
+    for (const k in propIM) propIM[k].instanceMatrix.needsUpdate = true;
     if (PEOPLE.lampPools) { const on = ENV.lampsOn || 0; PEOPLE.lampPools.opacity = on * 0.55; PEOPLE.lampPools.visible = on > 0.01; PEOPLE.campusPools.opacity = on; PEOPLE.campusPools.visible = on > 0.01; PEOPLE.lampBeams.opacity = on * 0.16; PEOPLE.lampBeams.visible = on > 0.01; } PEOPLE.updateCars(dt, moving); PEOPLE.updateShips(dt, time, moving); PEOPLE.updatePlanes(dt, time, moving); if (typeof COASTER !== "undefined") COASTER.update(dt, moving);
   };
   PEOPLE.badges = false;
@@ -3596,6 +3672,12 @@ function renderFrame(now, forceRender = false) {
   const camDist = camera.position.distanceTo(controls.target);
   stage.classList.toggle("far", camDist > 40);
   stage.classList.toggle("pano", camDist > labelTH);
+  { // night-light LOD: halo pools/beams fade out past the city view, so the panorama shows dark islands with crisp warm dots, never a white blob
+    const fade = THREE.MathUtils.clamp((labelTH * 2 - camDist) / labelTH, 0.06, 1);
+    if (PEOPLE.lampPools) { PEOPLE.lampPools.opacity *= fade; PEOPLE.campusPools.opacity *= fade; PEOPLE.lampBeams.opacity *= fade; }
+    const ff = 0.9 * (0.5 + 0.5 * THREE.MathUtils.clamp((labelTH * 2 - camDist) / labelTH, 0, 1)); // window glow halves at panorama range
+    for (const f of Object.values(FACADE)) f.emissiveIntensity = MAT.glow.emissiveIntensity * ff;
+  }
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
   if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); dirty = false; }

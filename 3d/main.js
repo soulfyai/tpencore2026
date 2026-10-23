@@ -290,6 +290,12 @@ function renderFrame(now, forceRender = false) {
   const camDist = camera.position.distanceTo(controls.target);
   stage.classList.toggle("far", camDist > 40);
   stage.classList.toggle("pano", camDist > labelTH);
+  { // night-light LOD: halo pools/beams fade out past the city view, so the panorama shows dark islands with crisp warm dots, never a white blob
+    const fade = THREE.MathUtils.clamp((labelTH * 2 - camDist) / labelTH, 0.06, 1);
+    if (PEOPLE.lampPools) { PEOPLE.lampPools.opacity *= fade; PEOPLE.campusPools.opacity *= fade; PEOPLE.lampBeams.opacity *= fade; }
+    const ff = 0.9 * (0.5 + 0.5 * THREE.MathUtils.clamp((labelTH * 2 - camDist) / labelTH, 0, 1)); // window glow halves at panorama range
+    for (const f of Object.values(FACADE)) f.emissiveIntensity = MAT.glow.emissiveIntensity * ff;
+  }
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
   if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); dirty = false; }

@@ -1,73 +1,40 @@
 # Handoff：北北基桃政策城市（tpencore2026）
 
-> **最新交接（2026-10-24，Codex → Claude Code）：先讀 [CLAUDE_CODE_HANDOFF.md](CLAUDE_CODE_HANDOFF.md)。使用者已要求暫停部署並打包；該檔記錄最新程式、Pages／HiNet 狀態、驗證與還原指令。**
 
 > 交接日期：2026-10-23　來源：claude.ai 雲端 session（Cowork）→ Claude Code
 > 使用者：KunWei（James Lin），回覆一律用**繁體中文**，語氣直接、技術對等。
 
-## 0. 移轉快照（2026-10-24 00:00 暫停・Claude Code → Codex）
+## 0. 移轉快照（2026-10-24 02:05 第二次暫停・Claude Code → Codex）
 
-### 0.0 Codex 接手更新（2026-10-24）
-
-網站部署接續：已新增 GitHub Actions Pages 工作流程及 `tools/package_site.py`，推送目前開發分支後自動發布；首頁為 3D，另有 2d.html 與 version.json。Pages 是否啟用與首次正式部署結果尚待線上確認；環境目前阻擋 api.github.com、soulfyai.github.io，已儲存兩個網域的設定草稿，需要儲存／發布套用後才能由此環境管理及驗證。操作見 README。
-
-以下 0.1–0.6 保留移轉時的歷史背景；最新工作以本節及 Git log 為準。
-
-遠端同步更新：原先 GitHub 回覆 403 的寫入權限已由使用者開放。重試時已整合遠端新增的網頁組合併提交，保留雙方歷史；以 claude/modest-newton-t9y5uj 最新提交為準。尚未更新線上 Artifact。
-
-- 網頁組已合併；手機置底聲明遮住地標按鈕的問題已修正。四市識別依使用者最新指定：台北藍、新北黃、基隆粉紅、桃園紅，適用地圖、場景、招牌、城市切換與候選人色點。
-- 美術 WIP 已整合：成組沙灘設施與留白、平滑岸線、白色／玻璃藍建築、屋頂／雨庇／太陽能板／空中綠化、冷色 LED、方形政策底盤與雙發客機。
-- 關渡／淡江雙橋改至台北面向新北的正面；取消縮小間距的 fallback。幾何檢查：六座橋不交叉，具名橋過水，兩岸最小間距約 15.80，門檻約 15.74。
-- 人物已完成十種 chibi 角色：上班族、學童、長者、家長／嬰兒車、工人、登山客、撐傘行人、氣球小孩、跑者、購物者。採低飽和衣服、依主題分布、共用 instanced 配件批次；車／船／飛機動畫段落保持原樣。
-- 效能：手機像素倍率上限 1.25、停用陰影；遠景隱藏人物手臂、頭髮與配件，近景恢復，省下配件矩陣更新；重用人物臨時向量。手機實機 FPS 仍待量測，不能由雲端軟體渲染推論。
-- 手機全景依實際長寬比取景，城市招牌限制在畫面內並防止重疊；保持台北居中、全景為最遠縮放。
-- 2D 切至跨市協作會自動顯示連線。新北候選人卡顯示參考政績數；目前來源 achievements 為空，因此是 0，未新增或推測政績資料。
-- 已驗證建置、桌機日／夜與手機完整場景；11:00 路燈關、19:00 路燈開。`panorama()` 不會清除 ENV.forced；先前截圖未執行完整畫格，造成霧距／場景狀態未更新。
-- `tools/shot.py` 現在自帶 UTF-8 HTTP 伺服器，支援 CHROMIUM_EXECUTABLE；以 CITY3D.snapshot() 完成完整畫格後截圖。`--check [mobile]` 執行 tools/check_scene.js，驗證角色／批次／動作／橋梁幾何與手機招牌。用法見 README。
-- Artifact 發布與 weather/now 排程仍由 Claude 處理；本輪未更新線上 Artifact。公開部署目的地、錯誤回報表單與新增資料查核不在這次 WIP 的既有決定中，仍待使用者定案。
-
-> 本節是暫停點交接。線上版、主分支、三組未完成工作與接手步驟都在這裡；讀完本節再讀其餘章節的長期背景。
+> 第二次交接。上一輪（§0 前版）的工作已全數完成合併；本節為當前唯一有效的快照。
 
 ### 0.1 現況
-- **線上**：claude.ai Artifact（私人）<https://claude.ai/artifact/Ssboakje3hi8UHQp4nHQQA>，Version 27＝主分支 `claude/modest-newton-t9y5uj` @ `44b3f85` 的 `index3d.html`。
-- **主分支 `claude/modest-newton-t9y5uj`（已推送）今日累計上線**：死檔清理（map3d.js、3d/lots.js 已刪）；「台北安可」品牌（霓虹招牌等寬、2D/3D 同名、城市・候選人 22px）；「政策島」→「政策區塊」；資料說明隱藏「尚待補齊」；一批無障礙／對比／觸控修正；3D 大改（六座跨島橋含具名關渡/淡江、65 艘船＋漁船隊、3 架飛機、星空、預設四島全景台北居中、標籤距離門檻＋政績去前綴、地標標籤開關、聚光燈、基隆標籤除重疊）；天氣快照更新機制。
-- **天氣**：頁面優先讀 Artifact db `weather/now`，退回內建快照。每小時排程「政策市天氣每小時更新（本session）」（每小時 :22）綁在原 Claude session 上自動更新 db；要停用去 claude.ai 的排程介面關。
+- **線上**：<https://claude.ai/artifact/Ssboakje3hi8UHQp4nHQQA> Version 34 ＝ 主分支 `claude/modest-newton-t9y5uj` @ `c3a9e99`（已推送，工作樹乾淨，無未合併 WIP）。
+- 自上次快照後完成並上線：網頁品牌卡縮放式（霓虹 tab 預設收合、彈出卡含天氣、聲明置底置中、四市鈕統一藍）；3D 美術六軸（精緻沙灘、建築細緻化、未來感 LED、真實客機、乾淨底盤、關渡/淡江雙橋移至兩島正面）；Codex 端角色/四市識別色（台北藍/新北黃/基隆粉紅/桃園紅）/手機取景；G–L 連環修正（去綠暖色基底、中間調對比、夜光收斂、星空常駐、月球、夜光距離 LOD、**天氣與場景完全脫鉤**）；飛機防撞排程；**人物定案「積木人偶 v2」**（圓潤積木輪廓×柔霧質感、11 身分、12 draw call，取代 Codex 版角色）。
+- 舊 `wip/art-upgrade`、`wip/web-brandcard` 分支內容已全部合入主分支，可刪。
+- 天氣：場景永遠晴朗（唯一視覺驅動＝台北時間日夜）；天氣資料只顯示在品牌卡彈出視窗，Artifact db `weather/now` 由 Claude session 的每小時排程更新中。
 
-### 0.2 進行中的 WIP（被暫停，未驗證）
-WIP 以 commit 保存。若 remote 上存在 `wip/art-upgrade`、`wip/web-brandcard` 分支即為同內容；否則只在原容器的 `.claude/worktrees/` 裡（容器回收即消失）。
+### 0.2 今日新增設計定案（不可回頭改）
+- 人物＝積木人偶 v2（people.js 現版）；天氣不得影響場景視覺；**政策區塊幾何改為六邊形**（推翻先前「方形」，使用者明示）；城市要 SimCity 式機能分區與高建築密度、未來感；品牌卡預設收合；「獨立整理」聲明永遠置底可見。
 
-1. **美術組** `06b9d78`（改 core/decor/env/models/ships/world，+380 行，**未完成**）——任務六軸：
-   A. 沙灘乾淨化：傘/設施成組 cluster＋留白、低飽和 2–3 色、岸線平滑，告別雜亂
-   B. 建築細緻化：立面分段、玻璃帷幕、屋頂結構（女兒牆/機電層）、入口雨庇；精緻低多邊形；必用 instanced（core.js part/buildBatches）
-   C. 科技未來感：LED 燈帶（夜發光）、太陽能板、空中綠化、純白＋玻璃藍基調；政黨色只做識別
-   D. 飛機真實化（3d/ships.js plane）：圓柱機身收尖、後掠翼上反角、翼下雙發動機艙、水平+垂直尾翼、窗帶；白塗裝+單色尾翼（避開真實航空公司）
-   E. 政策區塊 heart-island 化：**維持方形**（使用者明令不用六邊形）、乾淨平整底盤＋單色細框＋留白、暖色基底
-   F. 關渡/淡江雙橋改位：放棄真實經緯度，移到台北島**面對新北島的正面**，兩橋間距 ≥ 該側環道 1/3；維持過水/不交叉/淨空與紅拱/白塔造型
-   最後卡點：驗證截圖出現夜景——`MAP3D.panorama()` 疑似重置 `ENV.forced`，截圖前的強制 11:00 失效，需先查這個再跑圖。
-2. **網頁組** `565ce2a`（改 ui.js/page.css/template.html，**程式自評完成、截圖驗證未跑**）——任務五項：
-   ① 品牌卡縮放式：霓虹標題常駐 tab（預設收合），點開彈出資訊視窗（城市・候選人、統計、四市切換），aria-expanded＋鍵盤
-   ② 霓虹小標改「一起打造你我的北北基桃」；刪 lede「開始探索屬於你我的城市」；<title> 不變
-   ③ 「獨立整理…」聲明移畫面最下方置中小字——**紅線：任何狀態不可被遮擋**，2D/3D、桌機/手機都要驗
-   ④ 右下角天氣懸浮框移除，.wx 節點移植進彈出視窗（不可改 main.js 寫入邏輯）
-   ⑤ 左上角四市按鈕統一台北藍（僅限這些按鈕；場景城市色不變）
-3. **人物組：未動工**（基礎乾淨）。任務：3d/people.js 行人改 chibi 漫畫比例（頭:身≈1:1.5–2）；8–10 種身分（上班族咖啡、學童小黃帽、長者拐杖、家長嬰兒車、工地安全帽、登山客背包、撐傘、小孩氣球…）靠輪廓與色塊遠觀可辨；低飽和協調色票（不用政黨色做衣服）；場景分佈合理；沿用 instanced；參考 https://puma.taipei/heart-island 的角色系統。只准改 people.js（車/船/飛機動畫邏輯保留）。
+### 0.3 下一個大工程：六邊形城市重構（已核准規格、尚未動工）
+使用者方向：「不是單純去綠，要置入更多建築設計。城市要有未來感、現代科技感。參考 SimCity 的城市規劃——商業區/住宅區/科技工業區等劃分。政策區現在是不規則多邊形，視覺上很沒規劃。」幾何選定六邊形。規格：
+1. **六邊形街區**（world.js）：等大正六邊形鋪滿各島現有輪廓內部（海岸、沙灘、環島高架、港口、橋接點不動）。每政策主題＝1 格（內容多時 2–3 相鄰格群組）；島緣畸零地做綠帶/水岸公園。WORLD 對外介面（geo/bridges/ferryRoutes/highways/islands id+c）盡量相容，必要變動同步修 main.js 並記錄。參考 heart-island「等大六邊形拼成城市輪廓」。
+2. **機能分區**（decor.js）：主題語意→分區型態，各有專屬建築組合/密度/配色——商業核心（交通樞紐、市政效能→玻璃塔群+LED+廣場）、科技工業（產業/數位/AI→園區廠辦+太陽能+研發樓）、住宅（居住都更→中低層社區+中庭+街角店）、公共設施（教育/衛生/社福/托育→校園醫院+開放空間）、文創觀光（文化觀光/體育→場館市集步行街）、綠能環境（環保/工務水利→淨水+風機+濕地）。政績主題（kind=record）用對應型態的成熟樣貌。
+3. **密度與未來感**：每格建築飽滿成街廓；沿用 decor.js B kit 與 models 系列；全走 core.js part/buildBatches instanced，draw call 與現版同量級，QUALITY 降級保留。
+4. **不可破壞**：島輪廓與周邊、地標、people.js 介面（LAMP_POOLS 等）、標籤/泡泡互動、政黨色僅識別（六邊形邊框=城市政黨色細線）、聲明、資料來源機制、2D 版（template/build.py 不動）、星月與夜光 LOD、天氣脫鉤。
+5. 驗證：build no problems＋五張截圖（日全景/日進城/單格近景/夜全景/夜近景）＋泡泡 focusTheme 正常。
 
-### 0.3 未指派的待辦
-手機效能 LOD；淺色模式政黨色上白字對比不足（建議選中態背景 color-mix 加深 20%，待拍板）；2D 跨市協作分頁切換時自動開協作線；新北候選人卡補「N 項政績（參考）」；公開部署與錯誤回報表單。
+### 0.4 其他待辦
+- **tools/check_scene.js 行人段過時**（必修）：它斷言舊 Codex 角色介面（PEOPLE.meshes/accessories/detailVisible/恰 10 role/LOD 隱藏配件）；現版 brick2 是 7 基本 InstancedMesh＋5 道具池、11 role、配件常駐。請改寫該段以符合現版，其餘（車/船/飛機）斷言保留。頁面與 build.py 本身正常，只有這個測試工具會 fail。
+- 近景海色偏深（可調 env.js 水色 smoothstep(16,70,d) 起點外推或調亮 uDeep，一行）；淺色模式政黨色白字對比（方案：選中態背景 color-mix 加深 20%，待拍板）；2D 跨市協作分頁自動開線；新北候選人卡補「N 項政績（參考）」；手機實機效能；公開部署與回報表單。
 
-### 0.4 接手工作流程（Codex）
-- 改 `3d/*.js`、`template.html`、`data/` 後跑 `python3 build.py`：必須 `no problems`，產出 index.html/index3d.html 一起 commit。
-- 視覺驗證 `tools/shot.py`（用法見檔頭）。本容器眉角：playwright 瀏覽器版本不合時做符號連結（勿 `playwright install`）；shot.py 的 JS 參數多敘述要包 IIFE；殼層轉義單引號用 `\"`；軟體渲染每張 1–3 分鐘。
-- 網路：容器直連 `api.open-meteo.com` 被環境政策擋。放行：session 標題列雲端環境選單 → Edit → Network access → Allowed domains 加該網域。
-- 開發與推送一律在 `claude/modest-newton-t9y5uj`。
+### 0.5 工作流程（同前，重點重述）
+改 `3d/*.js`、`template.html`、`data/` → `python3 build.py`（必須 no problems；index.html 與 index3d.html 一起 commit）。截圖 `tools/shot.py`（playwright；本容器瀏覽器版本不合時做符號連結勿 `playwright install`；JS 多敘述包 IIFE；殼層單引號轉義 `\"`；每張 1–3 分鐘）。開發與推送一律 `claude/modest-newton-t9y5uj`。容器直連 api.open-meteo.com 被網路政策擋（環境設定 Network access 可放行）。
 
-### 0.5 只有 Claude 能做的事（Codex 邊界）
-- **Artifact 發佈**：更新同一條線上連結只能用 Claude 的 Artifact 工具。Codex 流程＝commit+push 後，回到任一 Claude session 貼該 URL 請它以最新 `index3d.html` 重新發佈。
-- **Artifact 天氣 db**（`weather/now`）讀寫同理（Claude 的 ArtifactData）。
-- 每小時天氣排程綁定原 Claude session；Codex 不需也無法接手，放著即可或從 claude.ai 排程介面停用。
-
-### 0.6 今日新增設計定案（加入「不要回頭改」清單）
-標題「台北安可」＋小標「一起打造你我的北北基桃」；城市識別與左上角四市按鈕採台北藍、新北黃、基隆粉紅、桃園紅（依使用者最新指定）；政策區塊維持方形；美術基準＝heart-island 的乾淨舒服＋SimCity 精緻＋科技未來感（不要開發中落後感）；預設視角四島全貌、台北居中、不可拉更遠；地標標籤預設隱藏（左下開關）；全景無任何泡泡（霓虹招牌除外）；3D 泡泡不出現「政績・」字樣；船隻放大不按真實比例；飛機用真實客機外型。
+### 0.6 只有 Claude 能做的事（Codex 邊界）
+- **Artifact 發佈**：更新線上連結只能用 Claude 的 Artifact 工具——Codex 完成後 commit+push，回到任一 Claude session 貼上 Artifact 連結請它「用最新 index3d.html 重新發佈」。
+- Artifact 天氣 db 讀寫、每小時天氣排程（綁原 Claude session，放著即可）同理。
 
 ## 1. 專案是什麼
 
