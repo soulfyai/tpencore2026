@@ -152,13 +152,14 @@ function placeBeam() {
 /* ---------- camera ---------- */
 let fly = null;
 function overview() {
-  // panorama: Taipei island centred, the other three in frame around it; this is also the farthest zoom allowed
+  // Reference default: low oblique view, Taipei centred, all four cities below the sea/sky horizon.
+  // This same frame is used on startup, by Panorama, and by the Home button.
   const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
   const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
   const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
   const span = Math.max(sx / Math.max(aspect, 0.25), sz) * 1.02;
   const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
-  return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.56, 0.83).normalize().multiplyScalar(dist)), dist };
+  return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.35, 0.94).normalize().multiplyScalar(dist)), dist };
 }
 function flyTo(target, pos) {
   if (reduced.matches) { camera.position.copy(pos); controls.target.copy(target); controls.update(); dirty = true; return; }
