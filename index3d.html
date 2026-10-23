@@ -153,15 +153,15 @@ html.hi body{padding:0}
 .hi header.top>*{pointer-events:auto}
 .hi .brand{background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(6px);border-radius:18px;padding:14px 18px 14px;box-shadow:0 6px 24px rgba(20,33,61,.12)}
 /* brand neon sign: same language as the city neon signs (.hi .clabel) */
-.hi .brand h1{display:inline-flex;flex-direction:column;align-items:center;gap:2px;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;
+.hi .brand h1{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;
   background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;padding:8px 16px 7px;
   box-shadow:0 0 0 1.5px rgba(255,255,255,.55),0 0 14px var(--c-taipei),inset 0 0 14px color-mix(in srgb,var(--c-taipei) 55%,transparent);
   text-shadow:0 0 4px #fff,0 0 10px var(--c-taipei),0 0 24px var(--c-taipei);animation:neon 3.2s ease-in-out infinite}
 .hi .brand h1 .hi-sub{font:800 12.5px var(--f-body);letter-spacing:.3em;text-indent:.3em;color:#ffe9a8;text-shadow:0 0 4px #fff3c4,0 0 10px #ffb84a,0 0 18px #ff8a3c}
 @media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}}
 .hi .brand p{font-size:13px;margin-top:6px}
-.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:10px;font:800 18px var(--f-display);color:var(--ink)}
-.hi-cand i{width:13px;height:13px;border-radius:3px;display:inline-block}
+.hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:10px;font:800 22px var(--f-display);color:var(--ink)}
+.hi-cand i{width:15px;height:15px;border-radius:3px;display:inline-block}
 .hi-count{display:flex;align-items:center;gap:10px;margin-top:8px}
 .hi-count b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
 .hi-count span{font-size:12.5px;line-height:1.35;color:var(--muted)}
@@ -263,7 +263,7 @@ html.drawer-open .hi .wx,html.drawer-open .wx{display:none}
   .hi .brand h1{font-size:21px;padding:6px 12px 5px;border-width:2px}
   .hi .brand h1 .hi-sub{font-size:10.5px;letter-spacing:.24em;text-indent:.24em}
   .hi .brand p{display:none}
-  .hi-cand{margin-top:6px;font-size:15px}
+  .hi-cand{margin-top:6px;font-size:17px}
   .hi-count{margin-top:4px}.hi-count b{font-size:28px}.hi-count span{font-size:11px}
   .hi .notice{font-size:10.5px;padding:3px 9px}
   .hi-modes{top:auto;bottom:12px;right:10px}
