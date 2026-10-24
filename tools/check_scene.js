@@ -85,23 +85,35 @@
  for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch');const wx=document.querySelector('.hi-pop .wx');check(wx.dataset.city===city&&wx.querySelectorAll(':scope > span').length===2,'selected-city weather only')}
  MAP3D.panorama();if(document.querySelector('.hi-brandbtn').getAttribute('aria-expanded')==='true')document.querySelector('.hi-brandbtn').click();
  C.snapshot();
- const stage=document.getElementById('stage').getBoundingClientRect(),signs=[...document.querySelectorAll('.clabel')];
- const project=([x,z])=>{const p=new C.camera.position.constructor(x,.65,z).project(C.camera);return [(p.x+1)*stage.width/2,(1-p.y)*stage.height/2]};
- const coasts=[...W.cities.values()].map(c=>c.hull.map(project));
- check(document.querySelectorAll('.city-leaders path').length===4&&document.querySelectorAll('.city-leaders circle').length===4,'four white city leaders');
- check(getComputedStyle(document.querySelector('.city-leaders')).pointerEvents==='none','leaders must not intercept map input');
- for(const sign of signs){
-   const r=sign.getBoundingClientRect(),box={left:r.left-stage.left,right:r.right-stage.left,top:r.top-stage.top,bottom:r.bottom-stage.top};
-   check(box.left>=0&&box.right<=stage.width&&box.top>=0&&box.bottom<=stage.height,'overview city sign clipped');
-   for(const coast of coasts){const xs=coast.map(p=>p[0]),ys=coast.map(p=>p[1]);check(!(box.left<Math.max(...xs)&&box.right>Math.min(...xs)&&box.top<Math.max(...ys)&&box.bottom>Math.min(...ys)),'overview sign covers an island');}
-   const line=document.querySelector('.city-leaders path[data-city='+sign.dataset.city+']');
-   check(line&&getComputedStyle(line).display!=='none'&&!/NaN|Infinity/.test(line.getAttribute('d')),'visible finite city leader');
-   check((line.getAttribute('d').match(/[ML]/g)||[]).join('')==='ML','single straight city leader');
-   check(Math.abs(parseFloat(getComputedStyle(sign).scale)-.75)<.001,'overview sign scaled proportionally');
+ const stage=document.getElementById('stage').getBoundingClientRect(),views=C.cityLabels,positions=C.cityLeaders.geometry.attributes.position;
+ check(views.length===4&&C.cityLeaders.isLineSegments&&positions.count===8,'four world-space city stems');
+ check(C.cityLeaders.material.depthTest&&!C.cityLeaders.material.depthWrite,'3D leader occlusion');
+ const verifyCityStems=()=>{
+   for(let i=0;i<views.length;i++){
+     const v=views[i],a=v.anchor,b=v.object.position;
+     check(Math.abs(a.x-b.x)<1e-8&&Math.abs(a.z-b.z)<1e-8&&b.y>a.y,'world vertical city title');
+     check(Math.abs(positions.getX(i*2)-positions.getX(i*2+1))<1e-5&&Math.abs(positions.getZ(i*2)-positions.getZ(i*2+1))<1e-5,'vertical 3D line endpoints');
+     check(v.el.style.translate==='','no screen-space city slots');
+     if(v.wrap.style.display==='none')continue;
+     const projected=b.clone().project(C.camera),r=v.el.getBoundingClientRect();
+     check(Math.abs(r.left+r.width/2-stage.left-(projected.x+1)*stage.width/2)<1.5&&Math.abs(r.bottom-stage.top-(1-projected.y)*stage.height/2)<1.5,'title follows 3D projection');
+   }
+ };
+ verifyCityStems();
+ for(const v of views){
+   const r=v.el.getBoundingClientRect();
+   check(r.left>=stage.left&&r.right<=stage.right&&r.top>=stage.top&&r.bottom<=stage.bottom,'default overview title clipped');
+   check(Math.abs(parseFloat(getComputedStyle(v.el).scale)-.75)<.001,'overview title scale');
+   check(pip([v.anchor.x,v.anchor.z],W.cities.get(v.city).coast),'city anchor on land');
  }
- for(let i=0;i<signs.length;i++)for(let j=i+1;j<signs.length;j++){
-   const a=signs[i].getBoundingClientRect(),b=signs[j].getBoundingClientRect();check(!(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top),'city title overlap');
+ const savedPosition=C.camera.position.clone(),savedTarget=C.controls.target.clone(),offset=savedPosition.clone().sub(savedTarget);
+ const originalScreens=views.map(v=>v.el.getBoundingClientRect().left);
+ for(const angle of [Math.PI/3,Math.PI/2,Math.PI]){
+   const rotated=offset.clone().applyAxisAngle(C.camera.up,angle);
+   MAP3D.flyTo(savedTarget,savedTarget.clone().add(rotated));C.snapshot();verifyCityStems();
  }
+ check(views.some((v,i)=>Math.abs(v.el.getBoundingClientRect().left-originalScreens[i])>20),'titles move when orbiting');
+ MAP3D.flyTo(savedTarget,savedPosition);C.snapshot();
  const r=document.querySelector('.notice').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
  check(l.bottom<=r.top,'landmark control behind notice');
  return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,blockHalfSize:W.blockHalfSize,blockCells:W.blockCells.length,partBatches:C.batches.size,blockTypes:new Set(plans.map(p=>p.plan)).size,architectureTypes:new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size,streets:W.streetTypes,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};

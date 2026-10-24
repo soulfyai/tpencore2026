@@ -178,10 +178,7 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 /* contain scene labels (incl. .clabel z-index 2147483000) in one layer below the shell UI,
    so neon signs never cover the notice, mode buttons, timeline or drawer */
 .hi .labels{z-index:5}
-.city-leaders{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;overflow:hidden}
-.city-leaders path{fill:none;stroke:#fff;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round;opacity:.8;vector-effect:non-scaling-stroke}
-.city-leaders circle{fill:#fff;opacity:.95}
-.hi .city-sign-anchor{z-index:2147483000!important;pointer-events:none}
+.hi .city-sign-anchor{display:flex;z-index:2147483000!important;pointer-events:none}
 .hi .clabel{transform-origin:50% 100%;min-height:60px;box-sizing:border-box}
 
 /* brand, top-left: the neon sign is a persistent tab, the info card pops out below it */
@@ -3876,9 +3873,16 @@ for (const isl of islands.filter((i) => i.live)) {
   islandLabels.set(isl.id, { o, el });
 }
 const citySignViews = [];
-const svgNS = "http://www.w3.org/2000/svg";
-const cityLeaders = document.createElementNS(svgNS,"svg");
-cityLeaders.classList.add("city-leaders");cityLeaders.setAttribute("aria-hidden","true");cityLeaders.setAttribute("focusable","false");stage.appendChild(cityLeaders);
+const cityLeaderPositions=new Float32Array(A.cities.length*6);
+const cityLeaderGeometry=new THREE.BufferGeometry();
+cityLeaderGeometry.setAttribute("position",new THREE.BufferAttribute(cityLeaderPositions,3).setUsage(THREE.DynamicDrawUsage));
+const cityLeaders=new THREE.LineSegments(cityLeaderGeometry,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.82,depthWrite:false,fog:true}));
+cityLeaders.name="city-leaders";cityLeaders.frustumCulled=false;scene.add(cityLeaders);
+const cityAnchorPositions=new Float32Array(A.cities.length*3);
+const cityAnchorGeometry=new THREE.BufferGeometry();cityAnchorGeometry.setAttribute("position",new THREE.BufferAttribute(cityAnchorPositions,3));
+const cityAnchorDots=new THREE.Points(cityAnchorGeometry,new THREE.PointsMaterial({color:0xffffff,size:3.2,sizeAttenuation:false,transparent:true,opacity:.95,depthWrite:false,fog:true}));
+cityAnchorDots.name="city-anchor-dots";cityAnchorDots.frustumCulled=false;scene.add(cityAnchorDots);
+const cityFarHeights={taipei:.14,newtaipei:.20,keelung:.12,taoyuan:.12};
 for (const c of A.cities) {
   const live = LIVE_CITIES.has(c.city);
   const el = document.createElement(live ? "button" : "div");
@@ -3891,14 +3895,14 @@ for (const c of A.cities) {
   }
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
-  const ci = WORLD.cities.get(c.city), top = ci.coast.reduce((m, q) => (q[1] < m[1] ? q : m));
+  const ci = WORLD.cities.get(c.city);
   const wrap=document.createElement("div");wrap.className="city-sign-anchor";wrap.appendChild(el);
-  const o = new CSS2DObject(wrap); o.center.set(0.5, 1); o.position.set(ci.center[0], live ? 3.4 : 2.2, top[1] - 0.6); scene.add(o);
-  const blocks=WORLD.blockCells.filter(b=>b.city===c.city);
-  const anchor=blocks.reduce((a,b)=>Math.hypot(a.c[0]-top[0],a.c[1]-top[1])<Math.hypot(b.c[0]-top[0],b.c[1]-top[1])?a:b);
-  const path=document.createElementNS(svgNS,"path"),dot=document.createElementNS(svgNS,"circle");
-  path.dataset.city=c.city;dot.setAttribute("r","2.3");cityLeaders.append(path,dot);
-  citySignViews.push({city:c.city,el,wrap,ci,anchor:new THREE.Vector3(anchor.c[0],TOP+.08,anchor.c[1]),path,dot});
+  const candidates=WORLD.blockCells.filter(b=>b.city===c.city).map(b=>[b.c[0]+WORLD.blockHalfSize,b.c[1]+WORLD.blockHalfSize]);
+  const safe=candidates.filter(([x,z])=>!Object.values(WORLD.landmarkSites).some(l=>l.city===c.city&&Math.hypot(x-l.x,z-l.z)<l.r+.2));
+  const [x,z]=(safe.length?safe:candidates).reduce((a,b)=>Math.hypot(a[0]-ci.center[0],a[1]-ci.center[1])<Math.hypot(b[0]-ci.center[0],b[1]-ci.center[1])?a:b);
+  const anchor=new THREE.Vector3(x,TOP+.08,z),o=new CSS2DObject(wrap);o.center.set(.5,1);o.position.copy(anchor).add(new THREE.Vector3(0,10,0));scene.add(o);
+  cityAnchorPositions.set(anchor.toArray(),citySignViews.length*3);
+  citySignViews.push({city:c.city,el,wrap,object:o,anchor,farFactor:cityFarHeights[c.city]||.14});
 }
 
 /* one callout per explored island: the items as a numbered list (no stacked pins); tiny numbers sit on each lot */
@@ -4134,44 +4138,17 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
 new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
 let last = performance.now(), clock = 0;
-function fitCitySigns() {
-  const w=stage.clientWidth,h=stage.clientHeight,frame=stage.getBoundingClientRect(),gap=h<=480?8:12;
-  cityLeaders.setAttribute("viewBox",`0 0 ${w} ${h}`);
-  const project=(x,y,z)=>{const p=new THREE.Vector3(x,y,z).project(camera);return {x:(p.x+1)*w/2,y:(1-p.y)*h/2,z:p.z};};
+function positionCitySigns() {
   const blend=THREE.MathUtils.smoothstep(camera.position.distanceTo(controls.target),citySignNear,citySignFar*.95);
-  const signs=citySignViews.map(v=>{
-    v.el.style.translate="";
-    v.el.style.scale=String(1-.25*blend);
-    const r=v.el.getBoundingClientRect(),a=project(v.anchor.x,v.anchor.y,v.anchor.z);
-    const coast=v.ci.hull.map(([x,z])=>project(x,TOP+4,z));
-    return {...v,a,left:r.left-frame.left,top:r.top-frame.top,width:r.width,height:r.height,minY:Math.min(...coast.map(p=>p.y)),minX:Math.min(...coast.map(p=>p.x)),maxX:Math.max(...coast.map(p=>p.x))};
-  });
-  const twoRows=w<=620&&h>480,maxH=Math.max(...signs.map(s=>s.height)),rowGap=18;
-  const headerBottom=Math.max(84,...[...document.querySelectorAll('header.top .brand h1,.hi-tools-toggle')].map(e=>e.getBoundingClientRect().bottom-frame.top+12));
-  const groupTop=Math.min(...signs.map(s=>s.minY));
-  const top=Math.max(headerBottom,groupTop-30-maxH*(twoRows?2:1)-(twoRows?rowGap:0));
-  const ordered=[...signs].sort((a,b)=>a.a.x-b.a.x);
-  if(twoRows){
-    for(let col=0;col<2;col++){
-      const column=ordered.slice(col*2,col*2+2).sort((a,b)=>a.a.y-b.a.y);
-      column.forEach((s,row)=>{s.row=row;s.col=col;s.farX=THREE.MathUtils.clamp(w*(col?.75:.25)-s.width/2,gap,w-s.width-gap);s.farY=top+row*(maxH+rowGap);});
-    }
-  }else{
-    const total=ordered.reduce((n,s)=>n+s.width,0)+gap*(ordered.length-1),lo=Math.min(...signs.map(s=>s.minX)),hi=Math.max(...signs.map(s=>s.maxX));
-    let x=THREE.MathUtils.clamp((lo+hi-total)/2,gap,Math.max(gap,w-total-gap));
-    ordered.forEach(s=>{s.farX=x;s.farY=top;x+=s.width+gap;});
+  for(let i=0;i<citySignViews.length;i++){
+    const view=citySignViews[i],height=THREE.MathUtils.lerp(10,Math.max(12,citySignFar*view.farFactor),blend);
+    // Both endpoints have the SAME world X/Z. Only world height changes with zoom.
+    view.object.position.copy(view.anchor);view.object.position.y+=height;
+    view.el.style.scale=String(1-.25*blend);view.el.dataset.overview=blend.toFixed(3);
+    cityLeaderPositions.set(view.anchor.toArray(),i*6);cityLeaderPositions.set(view.object.position.toArray(),i*6+3);
   }
-  for(const s of signs){
-    const x=THREE.MathUtils.lerp(s.left,s.farX,blend),y=THREE.MathUtils.lerp(s.top,s.farY,blend);
-    s.el.style.translate=`${x-s.left}px ${y-s.top}px`;
-    s.el.dataset.overview=blend.toFixed(3);
-    const sx=x+s.width/2,sy=y+s.height,ax=s.a.x,ay=s.a.y;
-    const visible=s.wrap.style.display!=="none"&&s.a.z>-1&&s.a.z<1&&sx>=0&&sx<=w&&sy>=0&&sy<=h&&ax>=0&&ax<=w&&ay>=0&&ay<=h&&sy<ay;
-    s.path.style.display=s.dot.style.display=visible?"":"none";
-    if(!visible)continue;
-    s.path.setAttribute("d",`M${sx},${sy} L${ax},${ay}`);
-    s.dot.setAttribute("cx",ax);s.dot.setAttribute("cy",ay);
-  }
+  cityLeaderGeometry.attributes.position.needsUpdate=true;
+  cityLeaderGeometry.computeBoundingSphere();
 }
 
 function fitPolicyLabels() {
@@ -4229,7 +4206,7 @@ function renderFrame(now, forceRender = false) {
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
   if (forceRender || busy || dirty) {
-    renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); fitPolicyLabels(); dirty = false;
+    positionCitySigns(); renderer.render(scene, camera); labelR.render(scene, camera); fitPolicyLabels(); dirty = false;
     if(stage.classList.contains("ready")){document.documentElement.classList.remove("booting");stage.setAttribute("aria-busy","false");}
   }
 }
@@ -4240,7 +4217,7 @@ function loop(now) {
 resize();
 { const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
-window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV, snapshot() {
+window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV, cityLabels:citySignViews, cityLeaders, snapshot() {
   // Complete camera transitions and all dependent scene updates before a deterministic capture.
   if (fly) { camera.position.copy(fly.p1); controls.target.copy(fly.q1); fly = null; }
   ENV.apply(); last = performance.now(); renderFrame(last, true);
