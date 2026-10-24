@@ -104,6 +104,10 @@
 - 工具面板二欄排列，所有操作至少 44px；使用完整「政策清單／政策進度／使用說明」標籤。選擇功能、按 Home、點外側或 Esc 會收合，提供 aria-expanded／aria-controls 與焦點回復；隱藏面板不進鍵盤焦點順序。手機聲明移至底部安全區，導覽／說明與進度面板留出空間，進度面板上緣避開右上角按鈕。
 - 實際瀏覽器點擊六個功能、Home 返回、選單自動收合、Space／Esc、點外側、320px 窄螢幕、640×360 橫向與桌機／手機切換均通過；桌機原工具列位置已檢查。已檢視 out/mobile-tools-closed.png、mobile-tools-open.png、mobile-tools-timeline.png 與 desktop-tools-retained.png。build 與 package no problems，依 §0.8 發佈 Pages。
 
+### 0.17 移除 Home（2026-10-24 台北時間）
+- 使用者認為與全景重複，移除桌機／手機 Home 按鈕與專用樣式。手機右上角僅保留工具，回到預設視角統一使用「全景」。全景同步結束導覽、收合品牌彈窗／使用說明／政策面板與工具選單、清除選取；初始鏡頭不變。
+- 桌機與手機皆確認沒有 Home 節點，進城並開始導覽後按全景，鏡頭位置／目標回到預設且導覽／側欄收合。已檢視 out/no-home-desktop.png、no-home-mobile.png、no-home-mobile-tools.png；build 與 package no problems，沿 §0.8 發佈。
+
 ## 1. 專案是什麼
 
 獨立、非官方的選舉政見網站，把國民黨北北基桃四位市長參選人的政見與任內政績，畫成 **SimCity BuildIt 風格的 3D 城市島嶼**。版面、內容架構參考 <https://puma.taipei/heart-island>。

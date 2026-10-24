@@ -58,9 +58,6 @@ const UI = {};
   for (const [id, name] of MODES) { const b = el("button", null, `<span class="hi-mode-label">${name}</span><span class="hi-mode-short">${id==="list"?"清單":id==="time"?"進度":name}</span>`); b.type = "button"; b.setAttribute("aria-label",name); b.dataset.mode = id; b.onclick = () => setMode(id); modes.appendChild(b); btn[id] = b; }
   const help = el("button", "hi-help", "?"); help.type = "button"; help.setAttribute("aria-label", "使用說明"); help.onclick = () => showIntro(true); modes.appendChild(help);
   help.innerHTML = `<span aria-hidden="true">?</span><span class="hi-help-label">使用說明</span>`;
-  const home = el("button", "hi-home", `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span>Home</span>`);
-  home.type = "button"; home.setAttribute("aria-label", "Home：回到初始全景"); home.title = "回到初始全景";
-  home.onclick = () => { setTools(false); endTour(); setPop(false); showIntro(false); setMode("pano"); };
   const toolsPanel = el("div", "hi-tools-panel"); toolsPanel.id = "hi-tools-panel"; toolsPanel.append(mapTools,modes);
   const toolsToggle = el("button", "hi-tools-toggle", `<span aria-hidden="true">☰</span> 工具`);
   toolsToggle.type = "button"; toolsToggle.setAttribute("aria-label", "地圖工具"); toolsToggle.setAttribute("aria-controls", toolsPanel.id);
@@ -76,12 +73,12 @@ const UI = {};
   toolsPanel.addEventListener("click", (e) => { if (phoneTools.matches && e.target.closest("button")) setTools(false); });
   document.addEventListener("pointerdown", (e) => { if (!toolbar.contains(e.target)) setTools(false); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && phoneTools.matches && !toolsPanel.hidden) { setTools(false); toolsToggle.focus(); } });
-  toolbar.append(toolsPanel,home,toolsToggle);document.querySelector(".mapwrap").appendChild(toolbar);
+  toolbar.append(toolsPanel,toolsToggle);document.querySelector(".mapwrap").appendChild(toolbar);
   let mode = "pano";
   function setMode(m) {
     mode = m; for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === m));
     timeline.hidden = m !== "time";
-    if (m === "pano") { closeDrawer(); clearSel(); MAP3D.panorama(); }
+    if (m === "pano") { setTools(false); endTour(); setPop(false); showIntro(false); closeDrawer(); clearSel(); MAP3D.panorama(); }
     if (m === "list") { A.setCity(LIVE); A.setTab("list"); openDrawer(); }
     if (m === "time") { closeDrawer(true); renderTimeline(); }
   }

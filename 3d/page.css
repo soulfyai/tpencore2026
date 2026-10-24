@@ -43,9 +43,6 @@ html.hi body{padding:0}
 .hi-maptools{display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
 .hi-maptools .lmbtn,.hi-maptools .hi-tourbtn{position:static;display:flex;align-items:center;gap:7px;min-height:40px;min-width:58px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 13.5px var(--f-body);box-shadow:none;white-space:nowrap}
 .hi-maptools button:hover{background:var(--sunk)}
-.hi-home{display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 12px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface) 94%,transparent);color:var(--ink);font:700 13.5px var(--f-body);box-shadow:0 6px 20px rgba(20,33,61,.12);cursor:pointer;white-space:nowrap}
-.hi-home:hover{background:var(--sunk)}
-.hi-home:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
 .hi-tools-panel{display:contents}
 .hi-tools-panel[hidden],.hi-tools-toggle,.hi-help-label{display:none}
 .hi-maptools button:focus-visible,.hi-modes button:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
@@ -157,7 +154,7 @@ html.drawer-open aside.panel{transform:none}
   .hi .notice{bottom:max(12px,env(safe-area-inset-bottom));font-size:10.5px;padding:3px 9px}
   .hi-toolbar{top:12px;right:10px;z-index:45;display:flex;flex-direction:column;align-items:stretch;gap:6px;max-width:none}
   html.drawer-open .hi-toolbar{top:12px;right:10px;max-width:none}
-  .hi-home,.hi-tools-toggle{position:static;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 10px;font-size:12.5px}
+  .hi-tools-toggle{position:static;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 10px;font-size:12.5px}
   .hi-tools-toggle{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:700 12.5px var(--f-body);cursor:pointer;box-shadow:0 6px 20px rgba(20,33,61,.12)}
   .hi-tools-toggle[aria-expanded=true]{background:var(--ink);color:var(--surface)}
   .hi-tools-toggle:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
