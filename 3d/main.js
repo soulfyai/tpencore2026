@@ -169,12 +169,13 @@ function placeBeam() {
 let fly = null;
 function overview() {
   // Reference default: low oblique view, Taipei centred, all four cities below the sea/sky horizon.
-  // This same frame is used on startup, by Panorama, and by the Home button.
+  // The same responsive frame is used on startup and by Panorama.
   const tc = WORLD.cities.get("taipei"), C = tc ? new THREE.Vector3(tc.center[0], 0.3, tc.center[1]) : MID.clone().setY(0.3);
   const aspect = stage.clientWidth / Math.max(1, stage.clientHeight);
   const sx = 2 * Math.max(bounds.max.x - C.x, C.x - bounds.min.x), sz = 2 * Math.max(bounds.max.z - C.z, C.z - bounds.min.z);
   const span = Math.max(sx / Math.max(aspect, 0.25), sz) * 1.02;
-  const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12);
+  const desktopZoom = stage.clientWidth > 860 ? 0.82 : 1;
+  const dist = span / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) * (aspect < 1 ? 1.3 : 1.12) * desktopZoom;
   return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.35, 0.94).normalize().multiplyScalar(dist)), dist };
 }
 function flyTo(target, pos) {
@@ -279,11 +280,13 @@ let labelTH = 99; // camera distance beyond which landmark/policy tags hide (the
 let citySignFar=99,citySignNear=50;
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
+  const refitOverview = stage.classList.contains("ready") && entered===null && !A.state.selTheme && !A.state.selItem && !A.state.selFlow;
   camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); labelR.setSize(w, h);
   const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); // the panorama IS the farthest zoom
   const cityDist=Math.max(...A.cities.filter(c=>LIVE_CITIES.has(c.city)).map(c=>cityFrame(c.city).dist));
   labelTH = Math.min(o.dist * 0.94,cityDist * 1.12);
   citySignFar=o.dist;citySignNear=Math.min(o.dist*.72,cityDist*.95);
+  if(refitOverview){fly=null;camera.position.copy(o.pos);controls.target.copy(o.target);controls.update();}
   dirty = true;
 }
 new ResizeObserver(resize).observe(stage);

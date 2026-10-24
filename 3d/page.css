@@ -1,6 +1,6 @@
 /* ===== policy-island page shell (3D page only) ===== */
 [hidden]{display:none!important}
-html.hi,html.hi body{height:100%;overflow:hidden}
+html.hi,html.hi body{margin:0;width:100%;height:100%;overflow:hidden}
 html.hi body{padding:0}
 html.hi.booting .app{visibility:hidden}
 html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;box-sizing:border-box;margin:0;background:radial-gradient(ellipse at 50% 25%,#214966 0%,#102c45 48%,#0a172d 100%);color:#f3f6fc;text-align:center;font:500 15px/1.6 var(--f-body)}
@@ -32,7 +32,7 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 .hi header.top>*{pointer-events:auto}
 .hi .brand{background:none;padding:0;box-shadow:none}
 /* Approved B artwork, with separately composed mobile typography. */
-.hi .brand h1{width:380px;max-width:calc(100vw - 32px);margin:0;background:none;border:0;border-radius:0;box-shadow:none;animation:none;color:#fff;text-indent:0;letter-spacing:0}
+.hi .brand h1{width:clamp(280px,calc(100vw - 580px),380px);max-width:calc(100vw - 32px);margin:0;background:none;border:0;border-radius:0;box-shadow:none;animation:none;color:#fff;text-indent:0;letter-spacing:0}
 .hi-brandbtn{display:block;width:100%;border:0;background:none;color:inherit;padding:0;margin:0;cursor:pointer;line-height:0}
 .hi-brandart{display:block;pointer-events:none}
 .hi-brandart img{display:block;width:100%;height:auto;aspect-ratio:2158 / 729;object-fit:contain}
@@ -235,7 +235,6 @@ html.drawer-open aside.panel{transform:none}
 .hi-music{white-space:nowrap}
 .hi-music[aria-pressed="true"]{box-shadow:inset 0 0 0 2px #6d9cf4}
 
-@media(min-width:861px) and (max-width:1040px){.hi-toolbar{top:164px;max-width:calc(100% - 32px)}}
 
 /* Approved brighter B lighting: shared by the page sign and initial loader. */
 .hi-brandart img,.loading-brand img{
