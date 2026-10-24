@@ -3486,18 +3486,18 @@ const PEOPLE = { list: [], routes: [] };
   const SKIN = ["#f6d7b8", "#eac39a", "#c99772", "#8d5f3f"];
   const HAIRC = ["#3a2a1e", "#241f1d", "#4e3426", "#5d4030", "#2e2a33"];
   const GREYH = ["#c6c9cd", "#e2e4e6", "#979da3"];
-  const CASUAL = ["#e8713c", "#52a3a3", "#f2c75c", "#e3989f", "#f4f1e8", "#6f8fc0", "#8fb07a", "#c8795a", "#9f8fc4", "#5f7ea0"];
+  const CASUAL = ["#c98a71", "#86b5b1", "#e7cc79", "#d9a4aa", "#f3ede2", "#7da9c8", "#a3b794", "#c79c83", "#aa9fc2", "#87a0b5"];
   const PANTSC = ["#3c4a62", "#55617a", "#6b5a4e", "#44525f", "#8a94a8"];
   const SUITC = ["#46525e", "#3a4652", "#5f6670", "#6b6257"];
   const prop = (o, g, c, p, s, r) => o.props.push({ g, c, p, s, r });
   /* hair caps (reference style): one smooth piece over the head with a clear fringe line — the cap is a dome
      tilted forward so the hem rides high over the brow and low over the nape. Hat-wearing roles pass plain=true. */
   const hairOf = (o, R, colr, plain) => {
-    const c = colr || pick(R, HAIRC), st = plain ? R() * 0.62 : R();
+    const c = colr || pick(R, HAIRC), st = plain ? R() * 0.39 : R();
     o.topC = c; o.topT = [[0, 0.212, -0.008], [0.126, 0.095, 0.129], [0.22, 0, 0]]; // short crop cap
     if (st >= 0.4 && st < 0.62) o.topT = [[0, 0.196, -0.012], [0.136, 0.13, 0.136], [0.1, 0, 0]]; // bob, down over the ears
-    else if (st >= 0.62 && st < 0.76) prop(o, "sph", c, [0, 0.292, -0.025], [0.055, 0.05, 0.055]); // bun on the crop
-    else if (st >= 0.76 && st < 0.88) prop(o, "sph", c, [0, 0.185, -0.085], [0.05, 0.105, 0.055]); // low ponytail
+    else if (st >= 0.62 && st < 0.76) { prop(o, "sph", c, [0, 0.292, -0.025], [0.055, 0.05, 0.055]); o.props[o.props.length-1].hair=true; } // bun on the crop
+    else if (st >= 0.76 && st < 0.88) { prop(o, "sph", c, [0, 0.185, -0.085], [0.05, 0.105, 0.055]); o.props[o.props.length-1].hair=true; } // low ponytail
     else if (st >= 0.88) o.topT = [[0.008, 0.21, -0.006], [0.13, 0.1, 0.132], [0.2, 0, 0.16]]; // side-parted sweep
   };
   const DRESS = {
@@ -3512,13 +3512,13 @@ const PEOPLE = { list: [], routes: [] };
       if (R() < 0.5) prop(o, "cyl", "#f4efe6", [-0.1, 0.05, 0.05], [0.03, 0.042, 0.03]);
     },
     student(o, R) { /* 學童：小黃帽＋書包，個子小、步伐快 */
-      o.sc = 0.56; o.speed *= 1.25; o.shirt = pick(R, ["#f4f1e8", "#6f8fc0", "#8fb07a", "#f2c75c"]); o.pants = pick(R, ["#44525f", "#55617a"]); hairOf(o, R, null, true);
+      o.sc = 0.68; o.speed *= 1.25; o.shirt = pick(R, ["#f4f1e8", "#6f8fc0", "#8fb07a", "#f2c75c"]); o.pants = pick(R, ["#44525f", "#55617a"]); hairOf(o, R, null, true);
       prop(o, "dome", "#f2c84b", [0, 0.198, 0.004], [0.152, 0.082, 0.152]);
       prop(o, "cyl", "#f2c84b", [0, 0.21, 0.088], [0.12, 0.012, 0.1]);
       prop(o, "rbox", pick(R, ["#c4756b", "#6b86a8", "#c9a86b", "#8f6f8f"]), [0, 0.085, -0.078], [0.098, 0.112, 0.052]);
     },
     elder(o, R) { /* 長者：灰髮＋拐杖，微駝、走得慢 */
-      o.sc = 0.74; o.speed = 0.05 + R() * 0.05; o.stoop = true;
+      o.sc = 0.86; o.speed = 0.05 + R() * 0.05; o.stoop = true;
       o.shirt = pick(R, ["#8a94a8", "#6b5a4e", "#9f8fc4", "#52a3a3", "#c8b9a4"]); o.pants = pick(R, ["#6b5a4e", "#55617a", "#8a94a8"]); hairOf(o, R, pick(R, GREYH), true);
       prop(o, "cyl", "#7a5c42", [0.1, -0.015, 0.03], [0.012, 0.135, 0.012]);
     },
@@ -3526,8 +3526,7 @@ const PEOPLE = { list: [], routes: [] };
       o.speed = Math.min(o.speed, 0.12); o.shirt = pick(R, CASUAL); o.pants = pick(R, PANTSC); hairOf(o, R);
       prop(o, "rbox", pick(R, ["#9aa8b5", "#b59aa8", "#a8b59a"]), [0, 0.035, 0.165], [0.11, 0.062, 0.15]);
       prop(o, "dome", pick(R, ["#c9a8a8", "#a8bfc9", "#c2b4a3"]), [0, 0.068, 0.215], [0.115, 0.068, 0.1]);
-      prop(o, "cyl", "#3b4148", [0, -0.063, 0.1], [0.036, 0.128, 0.036], [0, 0, 1.5708]);
-      prop(o, "cyl", "#3b4148", [0, -0.063, 0.235], [0.036, 0.128, 0.036], [0, 0, 1.5708]);
+      for(const x of [-.063,.063])for(const z of [.1,.235])prop(o,"cyl","#3b4148",[x,-.059,z],[.05,.017,.05],[0,0,1.5708]);
       prop(o, "cyl", "#6a6f75", [0, 0.05, 0.085], [0.012, 0.13, 0.012], [0.5, 0, 0]);
     },
     worker(o, R) { /* 工地人員：工程帽（黃/白）＋工作服 */
@@ -3549,9 +3548,9 @@ const PEOPLE = { list: [], routes: [] };
       prop(o, "cone", pick(R, ["#c98a8a", "#8aa6c9", "#a6c98f", "#d9c38c"]), [0.1, 0.35, 0.02], [0.37, 0.1, 0.37]);
     },
     balloonkid(o, R) { /* 拿氣球的小孩 */
-      o.sc = 0.54; o.speed *= 1.3; o.shirt = pick(R, ["#f2c75c", "#6f8fc0", "#8fb07a", "#e3989f"]); o.pants = pick(R, ["#55617a", "#6f8fc0"]); hairOf(o, R);
-      prop(o, "cyl", "#d8d8d8", [0.115, 0.26, 0.015], [0.005, 0.27, 0.005]);
-      prop(o, "sph", pick(R, ["#e88c7d", "#8fb8d8", "#f0c64a", "#9fc48f"]), [0.118, 0.44, 0.015], [0.095, 0.115, 0.095]);
+      o.sc = 0.66; o.speed *= 1.3; o.shirt = pick(R, ["#f2c75c", "#6f8fc0", "#8fb07a", "#e3989f"]); o.pants = pick(R, ["#55617a", "#6f8fc0"]); hairOf(o, R);
+      prop(o, "cyl", "#d8d8d8", [0.09, 0.187, 0.015], [0.005, 0.27, 0.005]); o.props[o.props.length-1].held=true;
+      prop(o, "sph", pick(R, ["#e88c7d", "#8fb8d8", "#f0c64a", "#9fc48f"]), [0.093, 0.38, 0.015], [0.095, 0.115, 0.095]); o.props[o.props.length-1].held=true;
     },
     tourist(o, R) { /* 旅客：遮陽帽＋拖行李箱 */
       o.shirt = pick(R, ["#e8713c", "#52a3a3", "#e3989f", "#f2c75c", "#f4f1e8"]); o.pants = pick(R, ["#f4f1e8", "#55617a", "#8a94a8"]); hairOf(o, R, null, true);
@@ -3581,6 +3580,7 @@ const PEOPLE = { list: [], routes: [] };
     [/治安|消防|防災/, ["worker", "office", "commuter", "elder", "umbrella"]],
   ];
   const MIX = ["commuter", "office", "umbrella", "elder", "parent", "student", "tourist", "commuter", "balloonkid", "hiker", "worker", "farmer"];
+  const ACTIVITIES = {office:"前往辦公室",commuter:"通勤散步",student:"前往學校",elder:"悠閒散步",parent:"推車散步",worker:"巡查街區",hiker:"走訪綠地",umbrella:"撐傘散步",balloonkid:"帶著氣球散步",tourist:"欣賞城市",farmer:"走訪市集"};
   const BEACH = ["tourist", "tourist", "balloonkid", "umbrella", "parent", "hiker", "commuter", "tourist"];
   const poolFor = (name) => { for (const [re, p] of POOLS) if (re.test(name)) return p; return MIX; };
   const routeOf = (pts) => { const cum = [0]; for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + pts[k].distanceTo(pts[k - 1])); return { pts, cum, total: cum[cum.length - 1] }; };
@@ -3603,11 +3603,12 @@ const PEOPLE = { list: [], routes: [] };
 
   /* people */
   const add = (o) => {
-    o.skin = col(pick(R1, SKIN)); o.sc = 0.8; o.props = [];
+    o.skin = col(pick(R1, SKIN)); o.sc = 0.92; o.props = [];
     if (o.kind === "flow") { hairOf(o, R1); o.pants = "#3b4148"; } // flow walkers keep the city-colour shirt they were given (route identification only)
     else (DRESS[o.role] || DRESS.commuter)(o, R1);
     if (!o.sleeve && R1() < 0.4 && ["commuter", "parent", "tourist", "student", "balloonkid", "umbrella"].includes(o.role)) o.sleeve = "#f4f1e8"; // reference-style two-tone shirt: cream sleeves
     o.shirt = col(o.shirt); o.pants = col(o.pants); o.topC = col(o.topC); o.sleeve = col(o.sleeve || o.shirt); o.ph = R1() * 6;
+    o.activity = ACTIVITIES[o.role] || "走訪城市";
     PEOPLE.list.push(o);
   };
   const perRoute = QUALITY === "high" ? 3 : 2;
@@ -3818,7 +3819,7 @@ const PEOPLE = { list: [], routes: [] };
     }
   };
 
-  /* instanced body parts — chibi proportions (head ≈ 1 : body+legs ≈ 1.7); role props share five instanced pools */
+  /* Soft-town figures: round oversized heads, compact rounded shirts and capsule limbs. */
   const N = PEOPLE.list.length;
   const mk = (g, n, mat) => { const m = new THREE.InstancedMesh(g, mat, n); m.castShadow = true; m.frustumCulled = false; scene.add(m); return m; };
   const pm = new THREE.MeshStandardMaterial({ roughness: 0.92 }); // soft matte, clay-like
@@ -3826,19 +3827,19 @@ const PEOPLE = { list: [], routes: [] };
   const faceTex = (() => {
     const c = document.createElement("canvas"); c.width = 256; c.height = 128; const g = c.getContext("2d");
     g.fillStyle = "#ffffff"; g.fillRect(0, 0, 256, 128);
-    const ex = 64; // face centre sits at u = 0.25 — rotated to +z, the way the walker faces
+    const ex = 64; // face centre sits at u = 0.25, facing +z on the spherical head
     g.fillStyle = "#26211f";
-    for (const s of [-1, 1]) { g.beginPath(); g.ellipse(ex + s * 13, 86, 4.6, 5.4, 0, 0, 7); g.fill(); }
+    for (const s of [-1, 1]) { g.beginPath(); g.ellipse(ex + s * 12, 82, 3.0, 3.6, 0, 0, 7); g.fill(); }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   })();
-  /* BRICK-FIG silhouette with a clay finish: rounded-edge blocks, smooth capsule head, matte material.
-     Original homage shape — no brand marks, no text, natural skin tones. */
-  const legG = new RoundedBoxGeometry(0.054, 0.1, 0.06, 1, 0.016).translate(0, -0.05, 0);
-  const armG = new THREE.CylinderGeometry(0.0175, 0.0155, 0.095, 8).translate(0, -0.0475, 0);
+  /* Soft miniature silhouette: large spherical head, compact rounded torso, slim capsule limbs.
+     Matte materials and natural skin tones; no brand marks or candidate likenesses. */
+  const legG = new THREE.CapsuleGeometry(0.018, 0.064, 2, 8).translate(0, -0.05, 0);
+  const armG = new THREE.CapsuleGeometry(0.017, 0.064, 2, 8).translate(0, -0.049, 0);
   const bodyG = new RoundedBoxGeometry(1, 1, 1, 2, 0.14);
-  const headG = new THREE.CapsuleGeometry(0.5, 0.62, 3, 10);
-  const hairG = new THREE.SphereGeometry(0.5, 10, 5, 0, Math.PI * 2, 0, Math.PI / 2);
-  const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), hips = mk(GEO.rbox, N, pm), hands = mk(GEO.ico, N * 2, pm);
+  const headG = new THREE.SphereGeometry(0.5, 14, 10);
+  const hairG = new THREE.SphereGeometry(0.5, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+  const legs = mk(legG, N * 2, pm), arms = mk(armG, N * 2, pm), bodies = mk(bodyG, N, pm), hips = mk(GEO.rbox, N, pm), hands = mk(GEO.sphere, N * 2, pm);
   const heads = mk(headG, N, new THREE.MeshStandardMaterial({ roughness: 0.95, map: faceTex })), tops = mk(hairG, N, pm);
   const PROPG = { rbox: GEO.rbox, cyl: GEO.cyl, dome: GEO.dome, sph: GEO.sphere, cone: GEO.cone };
   const want = {}; for (const o of PEOPLE.list) for (const pr of o.props) want[pr.g] = (want[pr.g] || 0) + 1;
@@ -3849,19 +3850,24 @@ const PEOPLE = { list: [], routes: [] };
     bodies.setColorAt(i, o.shirt); hips.setColorAt(i, o.pants); heads.setColorAt(i, o.skin);
     hands.setColorAt(i * 2, o.skin); hands.setColorAt(i * 2 + 1, o.skin); tops.setColorAt(i, o.topC);
     const st = o.stoop; // elders lean a little forward
-    o.bodyLoc = mat4().compose(new THREE.Vector3(0, 0.1, st ? 0.014 : 0), Q2.setFromEuler(E2.set(st ? 0.18 : 0, 0, 0)), new THREE.Vector3(0.148, 0.125, 0.092));
-    o.hipLoc = mat4().compose(new THREE.Vector3(0, 0.024, 0), Q2.identity(), new THREE.Vector3(0.12, 0.05, 0.066));
-    o.headLoc = mat4().compose(new THREE.Vector3(0, st ? 0.2 : 0.208, st ? 0.02 : 0.002), Q2.setFromEuler(E2.set(0, -Math.PI / 2, 0)), new THREE.Vector3(0.105, 0.062, 0.105));
+    o.bodyLoc = mat4().compose(new THREE.Vector3(0, 0.106, st ? 0.014 : 0), Q2.setFromEuler(E2.set(st ? 0.18 : 0, 0, 0)), new THREE.Vector3(0.112, 0.12, 0.08));
+    o.hipLoc = mat4().compose(new THREE.Vector3(0, 0.024, 0), Q2.identity(), new THREE.Vector3(0.095, 0.05, 0.064));
+    o.headLoc = mat4().compose(new THREE.Vector3(0, st ? 0.223 : 0.231, st ? 0.024 : 0.002), Q2.identity(), new THREE.Vector3(0.148, 0.148, 0.14));
     const ht = o.topT[2] || [0, 0, 0];
-    o.topLoc = mat4().compose(new THREE.Vector3(o.topT[0][0], o.topT[0][1] + 0.022 + (st ? -0.008 : 0), o.topT[0][2] + (st ? 0.018 : 0)), Q2.setFromEuler(E2.set(ht[0], ht[1], ht[2])), new THREE.Vector3(o.topT[1][0], o.topT[1][1], o.topT[1][2]));
+    o.topLoc = mat4().compose(new THREE.Vector3(o.topT[0][0], o.topT[0][1] + 0.040 + (st ? -0.008 : 0), o.topT[0][2]*.25 + .006 + (st ? 0.018 : 0)), Q2.setFromEuler(E2.set(ht[0], ht[1], ht[2])), new THREE.Vector3(o.topT[1][0]*1.34, o.topT[1][1]*1.25, o.topT[1][2]*1.30));
     o.parts = o.props.map((pr) => {
       const k = nextI[pr.g]++; propIM[pr.g].setColorAt(k, col(pr.c));
       const r = pr.r || [0, 0, 0];
-      const py = pr.p[1] + (pr.p[1] > 0.15 ? 0.03 : 0); // hats and hair pieces ride the taller head
-      return { im: propIM[pr.g], i: k, m: mat4().compose(new THREE.Vector3(pr.p[0], py, pr.p[2]), Q2.setFromEuler(E2.set(r[0], r[1], r[2])), new THREE.Vector3(pr.s[0], pr.s[1], pr.s[2])) };
+      const grounded=o.role==="parent"||(o.role==="tourist"&&pr.p[1]<.15)||o.role==="elder";
+      const groundShift = grounded ? .018 : o.role==="hiker"&&pr.g==="cyl"&&pr.p[1]<0 ? .008 : 0;
+      const py = pr.p[1] + (pr.hair ? (pr.p[1]>.25 ? .023 : .04) : pr.held ? 0 : pr.p[1]>.15 ? .06 : 0)-groundShift;
+      const hatHeight=pr.g==="dome"&&pr.p[1]>.15?1.5:1;
+      return { im: propIM[pr.g], i: k, m: mat4().compose(new THREE.Vector3(pr.p[0], py, pr.p[2]), Q2.setFromEuler(E2.set(r[0], r[1], r[2])), new THREE.Vector3(pr.s[0], pr.s[1]*hatHeight, pr.s[2])) };
     });
   });
-  PEOPLE.stats = { people: N, props: want };
+  PEOPLE.stats = { people: N, props: want, style:"soft-town-v3" };
+  PEOPLE.characterKit={legs,arms,bodies,hips,hands,heads,tops,propIM};
+  for(const [name,mesh] of Object.entries({legs,arms,bodies,hips,hands,heads,tops}))mesh.name=`citizen-${name}`;
   /* carry badges over flow walkers */
   const badgeTex = new Map();
   const badgeFor = (txt) => {
@@ -3874,7 +3880,7 @@ const PEOPLE = { list: [], routes: [] };
   for (const o of PEOPLE.list) if (o.kind === "flow") { o.badge = new THREE.Sprite(badgeFor(o.carry)); o.badge.scale.set(0.34, 0.17, 1); o.badge.renderOrder = 5; scene.add(o.badge); }
 
   const P = new THREE.Vector3(), Dv = new THREE.Vector3(), base = new THREE.Matrix4(), loc = new THREE.Matrix4(), out = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1);
-  const out2 = new THREE.Matrix4(), HT = new THREE.Matrix4().compose(new THREE.Vector3(0, -0.105, 0), new THREE.Quaternion(), new THREE.Vector3(0.036, 0.034, 0.036)); // mitt hand rides the swinging arm
+  const out2 = new THREE.Matrix4(), HT = new THREE.Matrix4().compose(new THREE.Vector3(0, -0.098, 0), new THREE.Quaternion(), new THREE.Vector3(0.036, 0.034, 0.036)); // mitt hand rides the swinging arm
   const sample = (rt, s) => {
     let k = 1; while (k < rt.cum.length - 1 && rt.cum[k] < s) k++;
     const a = rt.pts[k - 1], b = rt.pts[k], t = (s - rt.cum[k - 1]) / Math.max(1e-6, rt.cum[k] - rt.cum[k - 1]);
@@ -3894,13 +3900,21 @@ const PEOPLE = { list: [], routes: [] };
       const side = new THREE.Vector3(-dir.z, 0, dir.x).multiplyScalar(o.side);
       const visible = o.kind === "ambient" || !PEOPLE.filter || PEOPLE.filter.has(o.flow);
       const sc = visible ? o.sc : 0.0001;
-      const yaw = Math.atan2(dir.x, dir.z);
+      const idle=moving&&o.wait>0;
+      const yaw = Math.atan2(dir.x, dir.z)+(idle?Math.sin(time*.9+o.ph)*.14:0);
       const walking = moving && o.wait <= 0;
-      const ph = time * (o.sc < 0.7 ? 11 : 9) + o.ph, sw = walking ? Math.sin(ph) * 0.55 : 0, bob = walking ? Math.abs(Math.sin(ph)) * 0.014 : 0;
-      base.compose(new THREE.Vector3(pos.x + side.x, pos.y + lift + (0.084 + bob) * sc, pos.z + side.z), q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
+      const ph = time * (o.sc < 0.7 ? 11 : 9) + o.ph, sw = walking ? Math.sin(ph) * (o.role==="elder"?.30:.48) : 0, bob = walking ? Math.abs(Math.sin(ph)) * (o.role==="parent"?0:o.role==="elder"?.004:.011) : 0;
+      o.position ||= new THREE.Vector3();
+      o.position.set(pos.x + side.x, pos.y + lift + (0.102 + bob) * sc, pos.z + side.z);
+      o.facing=yaw;
+      base.compose(o.position, q.setFromEuler(e.set(0, yaw, 0)), new THREE.Vector3(sc, sc, sc));
       for (const [k, sgn] of [[0, 1], [1, -1]]) {
         loc.compose(new THREE.Vector3(sgn * 0.031, 0, 0), q.setFromEuler(e.set(sgn * sw, 0, 0)), one); legs.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
-        loc.compose(new THREE.Vector3(sgn * 0.09, 0.15, 0), q.setFromEuler(e.set(-sgn * sw * 0.7, 0, sgn * 0.12)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
+        const waving=idle&&((o.role==="balloonkid"&&k===1)||(k===0&&["student","tourist"].includes(o.role)));
+        const holding=(k===0&&["elder","hiker","umbrella","balloonkid","farmer","office"].includes(o.role))||o.props.some(p=>p.g==="cyl"&&p.p[0]*sgn>0&&p.p[1]<.1);
+        const armX=o.role==="parent" ? -.65 : holding ? -.15 : -sgn*sw*.7;
+        const armZ=waving ? sgn*(1.7+Math.sin(time*4+o.ph)*.18) : sgn*.12;
+        loc.compose(new THREE.Vector3(sgn * 0.074, 0.15, 0), q.setFromEuler(e.set(armX, 0, armZ)), one); arms.setMatrixAt(i * 2 + k, out.multiplyMatrices(base, loc));
         hands.setMatrixAt(i * 2 + k, out2.multiplyMatrices(out, HT));
       }
       bodies.setMatrixAt(i, out.multiplyMatrices(base, o.bodyLoc));

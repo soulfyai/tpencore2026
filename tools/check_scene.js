@@ -1,13 +1,14 @@
 (()=>{
  const check=(x,m)=>{if(!x)throw new Error(m)}, C=CITY3D,P=C.PEOPLE,W=C.WORLD;
  const roles=['office','commuter','student','elder','parent','worker','hiker','umbrella','balloonkid','tourist','farmer'];
- check(roles.every(r=>P.list.some(p=>p.role===r))&&new Set(P.list.map(p=>p.role)).size===11,'missing brick-figure roles');
+ check(roles.every(r=>P.list.some(p=>p.role===r))&&new Set(P.list.map(p=>p.role)).size===11,'missing citizen roles');
  check(P.stats.people===P.list.length,'citizen statistics');
  const props=[...new Set(P.list.flatMap(p=>p.parts.map(q=>q.im)))];
  check(props.length===5&&props.every(m=>m.isInstancedMesh),'five instanced prop pools');
  for(const k of ['rbox','cyl','dome','sph','cone'])check(P.stats.props[k]===P.list.reduce((n,p)=>n+p.props.filter(q=>q.g===k).length,0),'prop pool capacity '+k);
- const citizenMeshes=C.scene.children.filter(m=>m.isInstancedMesh&&(m.material===props[0].material||m.geometry.type==='CapsuleGeometry'));
- check(citizenMeshes.length===12,'seven base meshes plus five prop pools');
+ const citizenMeshes=[...Object.values(P.characterKit).filter(m=>m?.isInstancedMesh),...props];
+ check(citizenMeshes.length===12&&P.characterKit.heads.geometry.type==='SphereGeometry','round figures: seven base meshes plus five prop pools');
+ check(P.list.every(p=>p.activity&&p.headLoc.elements[0]>p.bodyLoc.elements[0]),'round heads wider than compact torsos and role activities');
  const carriers=[P.list[0].s,P.ships[0].t,P.planes[1].t];
  for(let i=0;i<12;i++)P.update(1/30,i/30,true);
  check(P.list[0].s!==carriers[0] || P.list[0].wait>0,'citizen motion');
@@ -19,6 +20,8 @@
  };
  C.camera.position.copy(C.controls.target).add(new C.camera.position.constructor(3,2,3));P.update(0,0,false);citizenMatrices();
  C.camera.position.copy(originalCamera);P.update(0,0,false);citizenMatrices();
+ const frozen=citizenMeshes.map(m=>Array.from(m.instanceMatrix.array));P.update(0,123,false);
+ check(citizenMeshes.every((m,i)=>m.instanceMatrix.array.every((v,k)=>v===frozen[i][k])),'citizens respect reduced motion');
  const named=W.bridges.filter(b=>b.name);check(named.length===2,'both named bridges required');
  const [a,b]=named,dist=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
  const gap=Math.min(dist(a.a,b.a),dist(a.b,b.b));check(gap>=W.namedBridgeSpacing,'bridge spacing');
