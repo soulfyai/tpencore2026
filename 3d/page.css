@@ -3,17 +3,17 @@
 html.hi,html.hi body{margin:0;width:100%;height:100%;overflow:hidden}
 html.hi body{padding:0}
 html.hi.booting .app{visibility:hidden}
-html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;box-sizing:border-box;margin:0;background:radial-gradient(ellipse at 50% 25%,#214966 0%,#102c45 48%,#0a172d 100%);color:#f3f6fc;text-align:center;font:500 15px/1.6 var(--f-body)}
+html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;box-sizing:border-box;margin:0;background:#65b6f8 url("__LOADING_SKY__") center center / cover no-repeat;color:#102c50;text-align:center;font:500 15px/1.6 var(--f-body)}
 .loading-brand{width:min(520px,100%);padding:0;border:0;background:none;box-shadow:none;line-height:0}
 .loading-brand img{display:block;width:100%;height:auto;aspect-ratio:2158 / 729;object-fit:contain}
 @media(max-width:860px){.loading-brand{width:min(340px,100%)}.loading-brand img{aspect-ratio:1902 / 827}}
 .loading-status{margin:0;font-size:16px;font-weight:700}
-.loading-hint{margin:-10px 0 0;color:#c8d7e9;font-size:13px}
-.loading-spinner{width:28px;height:28px;margin-top:12px;border:2px solid #ffffff30;border-top-color:#b9d3ff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
+.loading-hint{margin:-10px 0 0;color:#102c50;font-size:13px}
+.loading-spinner{width:28px;height:28px;margin-top:12px;border:3px solid #ffffff65;border-top-color:#fff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
 .loading-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:8px}
 .loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);cursor:pointer}
 .loading-actions :focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
-.loading small{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;color:#c4d2e5;font-size:11px}
+.loading small{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;color:#102c50;font-size:11px;text-shadow:0 1px 3px #ffffffb0}
 @keyframes loading-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.loading-spinner{animation:none}}
 .hi .app{display:block;height:100dvh;padding:0;position:relative}
@@ -242,4 +242,26 @@ html.drawer-open aside.panel{transform:none}
     drop-shadow(0 0 1.5px #8cefffaa)
     drop-shadow(0 0 5px #087dffbb)
     drop-shadow(0 0 11px #005eff88);
+}
+
+/* Day/night display is independent of weather and policy progress. */
+.hi-clock{position:absolute;top:calc(100% + 8px);right:0;color:var(--ink);font:700 13px var(--f-body)}
+.hi-clock button{font:inherit;color:inherit;cursor:pointer;min-height:44px;box-sizing:border-box}
+.hi-clock-trigger{display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(20,33,61,.12)}
+.hi-clock-trigger svg,.hi-clock-options svg{width:19px;height:19px;flex:none}
+.hi-clock-options{position:absolute;top:calc(100% + 6px);right:0;width:180px;padding:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(20,33,61,.2)}
+.hi-clock-options[hidden],.hi-clock-trigger[hidden]{display:none}
+.hi-clock-title{font-size:12px;color:var(--muted);padding:6px 10px 10px;margin:0;border-bottom:1px solid var(--line)}
+.hi-clock-options button{display:flex;align-items:center;gap:9px;width:100%;border:0;border-radius:8px;padding:0 10px;background:transparent;text-align:left}
+.hi-clock-options button:hover{background:var(--sunk)}
+.hi-clock-options button[aria-pressed="true"]{background:var(--sunk)}
+.hi-clock-options button .hi-clock-check{margin-left:auto;color:var(--c-taipei);visibility:hidden}
+.hi-clock-options button[aria-pressed="true"] .hi-clock-check{visibility:visible}
+.hi-clock button:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
+@media(max-width:860px){
+ .hi-tools-panel{width:min(216px,calc(100vw - 20px))}
+ .hi-clock{position:static;border-top:1px solid var(--line);padding-top:4px;margin-top:4px}
+ .hi-clock-options{position:static;width:100%;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+ .hi-clock-title{border:0;padding:8px 14px 4px}
+ .hi-clock-options button{padding:0 14px}
 }

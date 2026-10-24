@@ -84,6 +84,7 @@ const UI = {};
   function setTools(on) {
     const restoreFocus = !on && toolsPanel.contains(document.activeElement);
     toolsPanel.hidden = phoneTools.matches && !on;
+    if(!on&&!phoneTools.matches){const menu=toolsPanel.querySelector(".hi-clock-options");if(menu)menu.hidden=true;toolsPanel.querySelector(".hi-clock-trigger")?.setAttribute("aria-expanded","false");}
     toolsToggle.setAttribute("aria-expanded", String(phoneTools.matches && on));
     if (restoreFocus && phoneTools.matches) toolsToggle.focus();
   }
@@ -129,7 +130,7 @@ const UI = {};
     <div class="hi-eyebrow">使用說明</div>
     <h2>一個政策區塊，一個政策主題。</h2>
     <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
-    <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>政策清單</b>：用文字一項一項瀏覽</li><li><b>政策進度</b>：依已完成、推動中、規劃中排好</li></ul>
+    <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>政策清單</b>：用文字一項一項瀏覽</li><li><b>政策進度</b>：依已完成、推動中、規劃中排好</li><li><b>時間顯示</b>：右上角切換白天、晚上或實際時間（台北時間）</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
     <p><a href="./2d.html">開啟文字政策導覽 ↗</a> · <a href="https://github.com/soulfyai/tpencore2026/issues/new/choose" target="_blank" rel="noopener noreferrer">提供資料／回報問題</a></p>
     <p class="hi-independence">${independence}</p>
@@ -202,15 +203,39 @@ const UI = {};
   const music = el("button", "hi-music", `<span aria-hidden="true">♫</span> 音樂`);
   music.type="button";music.hidden=true;music.setAttribute("aria-pressed","false");
   music.setAttribute("aria-label","播放背景音樂");mapTools.appendChild(music);
+  // Scene lighting modes. The default always follows the actual Taipei clock.
+  const clockIcon=(mode)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${mode==="day"?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':mode==="night"?'<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/>':'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>'}</svg>`;
+  const clockLabels={day:"白天",night:"晚上",live:"實際時間"};
+  const clockControl=el("div","hi-clock");
+  const clockTrigger=el("button","hi-clock-trigger");clockTrigger.type="button";clockTrigger.setAttribute("aria-expanded","false");clockTrigger.setAttribute("aria-controls","hi-clock-options");
+  const clockMenu=el("div","hi-clock-options",'<p class="hi-clock-title">時間顯示</p>');clockMenu.id="hi-clock-options";clockMenu.setAttribute("role","group");clockMenu.setAttribute("aria-label","時間顯示模式");
+  const clockButtons={};
+  function syncClock(){
+    const current=CITY3D.ENV.mode;
+    clockTrigger.innerHTML=`${clockIcon(current)}<span>${clockLabels[current]}</span><span aria-hidden="true">▾</span>`;
+    clockTrigger.setAttribute("aria-label",`時間顯示：${clockLabels[current]}`);
+    for(const [mode,b] of Object.entries(clockButtons))b.setAttribute("aria-pressed",String(current===mode));
+  }
+  for(const [mode,label] of Object.entries(clockLabels)){
+    const b=el("button",null,`${clockIcon(mode)}<span>${label}</span><span class="hi-clock-check" aria-hidden="true">✓</span>`);
+    b.type="button";b.dataset.timeMode=mode;b.setAttribute("aria-pressed",String(mode==="live"));
+    b.onclick=()=>{CITY3D.ENV.setTimeMode(mode);syncClock();if(!phoneTools.matches){clockMenu.hidden=true;clockTrigger.setAttribute("aria-expanded","false");clockTrigger.focus();}};
+    clockButtons[mode]=b;clockMenu.appendChild(b);
+  }
+  clockTrigger.onclick=()=>{clockMenu.hidden=!clockMenu.hidden;clockTrigger.setAttribute("aria-expanded",String(!clockMenu.hidden));};
+  clockControl.append(clockTrigger,clockMenu);syncClock();
+  document.addEventListener("pointerdown",e=>{if(!phoneTools.matches&&!clockControl.contains(e.target)){clockMenu.hidden=true;clockTrigger.setAttribute("aria-expanded","false");}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!phoneTools.matches&&!clockMenu.hidden){clockMenu.hidden=true;clockTrigger.setAttribute("aria-expanded","false");clockTrigger.focus();}});
   // Reuse the same controls and events, with matching visual and keyboard order.
   const phoneOrder=[btn.list,btn.time,help,btn.pano,tourBtn,landmarkButton,music].filter(Boolean);
   function layoutTools(){
+    clockTrigger.hidden=phoneTools.matches;clockMenu.hidden=!phoneTools.matches;clockTrigger.setAttribute("aria-expanded","false");
     if(phoneTools.matches){
-      toolsPanel.replaceChildren(...phoneOrder);
+      toolsPanel.replaceChildren(...phoneOrder,clockControl);
     }else{
       mapTools.replaceChildren(...[landmarkButton,tourBtn,music].filter(Boolean));
       modes.replaceChildren(btn.pano,btn.list,btn.time,help);
-      toolsPanel.replaceChildren(mapTools,modes);
+      toolsPanel.replaceChildren(mapTools,modes,clockControl);
     }
   }
   toolsPanel.setAttribute("role","group");toolsPanel.setAttribute("aria-label","地圖工具");
@@ -265,7 +290,7 @@ const UI = {};
     if(config.musicAutoplay===false)stopAutoStart();else playMusic(true);
   }).catch(()=>{stopAutoStart();/* Hide music when this host has no usable configuration. */});
 
-  UI.hasOverlays=()=>!pop.hidden||!intro.hidden||!timeline.hidden||!tour.hidden||html.classList.contains("drawer-open")||(phoneTools.matches&&!toolsPanel.hidden)||!!(A.state.selTheme||A.state.selFlow);
+  UI.hasOverlays=()=>!pop.hidden||!intro.hidden||!timeline.hidden||!tour.hidden||html.classList.contains("drawer-open")||(phoneTools.matches&&!toolsPanel.hidden)||(!phoneTools.matches&&!clockMenu.hidden)||!!(A.state.selTheme||A.state.selFlow);
   UI.dismissOverlays=()=>{
     const pos=CITY3D.camera.position.clone(),target=CITY3D.controls.target.clone();
     setPop(false);setTools(false);showIntro(false);endTour();timeline.hidden=true;

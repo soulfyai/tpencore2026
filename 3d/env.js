@@ -233,7 +233,7 @@ const ENV = {};
 
   function apply() {
     const W = ENV.forced?.w || ENV.weather || { cloud: 20, code: 1, precip: 0, wind: 10, temp: 25 };
-    const minute = ENV.forced?.minute ?? taipeiMinutes();
+    const minute = ENV.forced?.minute ?? (ENV.mode === "day" ? 720 : ENV.mode === "night" ? 1320 : taipeiMinutes());
     const k = lerpKey(minute), kind = WMO(W.code);
     // 使用者決定：即時天氣只是「資訊」，不改變城市樣貌——場景永遠是晴朗好天氣，
     // 只有台北時間驅動日夜；真實天氣只寫進 ENV.state 給 UI 文字用。
@@ -279,11 +279,12 @@ const ENV = {};
     const moonA = k.night * (0.95 - cloud * 0.12 - wet * 0.12);
     moon.visible = moonA > 0.02;
     moonMat.opacity = moonA; craterMat.opacity = moonA * 0.5; haloMat.opacity = moonA * 0.8;
-    ENV.state = { minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
+    ENV.state = { timeMode: ENV.mode, minute, kind, label: LABEL[kind], temp: W.temp, night: k.night, time: W.time, storm: kind === "storm" };
     renderer.toneMappingExposure = 1 - k.night * 0.15;
     ENV.onChange?.(ENV.state);
   }
   ENV.apply = apply;
+  ENV.setTimeMode = (mode) => { if (!["day", "night", "live"].includes(mode)) return false; ENV.mode = mode; apply(); return true; };
   ENV.setWeather = (w) => { ENV.weather = w; apply(); };
   ENV.retheme = () => apply();
   ENV.update = (dt, t) => {

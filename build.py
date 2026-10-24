@@ -221,6 +221,8 @@ for variant in ("desktop", "mobile"):
     uri = "data:image/webp;base64," + base64.b64encode(asset.read_bytes()).decode("ascii")
     mod = mod.replace(f"__BRAND_B_{variant.upper()}__", uri)
     page = page.replace(f"__BRAND_B_{variant.upper()}__", uri)
+sky_uri = "data:image/webp;base64," + base64.b64encode((ROOT / "3d/assets/loading-sky.webp").read_bytes()).decode("ascii")
+page = page.replace("__LOADING_SKY__", sky_uri)
 imports = "\n".join(l for l in mod.splitlines() if l.startswith("import "))
 body = "\n".join(l for l in mod.splitlines() if not l.startswith("import "))
 sub("</script>\n", """</script>
