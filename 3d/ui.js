@@ -27,7 +27,7 @@ const UI = {};
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
   // City switcher colors match the map and city signs.
-  UI.enterCity = (c) => { endTour(); closeDrawer(true); clearSel(); MAP3D.enterCity(c); };
+  UI.enterCity = (c) => { setMode("pano"); MAP3D.enterCity(c); };
   for (const c of CITIES) { const ci = A.cityById.get(c), b = el("button", null, esc(ci.cityName.replace(/市$/, ""))); b.type = "button"; b.setAttribute("role", "tab"); b.dataset.city = c; b.style.setProperty("--c", `var(--c-${c})`); b.onclick = () => UI.enterCity(c); chips.appendChild(b); }
   const pop = el("div", "hi-pop"); pop.id = "hi-pop"; pop.hidden = true;
   pop.append(cand, count, chips);
@@ -117,7 +117,7 @@ const UI = {};
   document.querySelector(".mapwrap").appendChild(intro);
   const showIntro = (on) => { intro.hidden = !on; try { localStorage.setItem("hi-intro-seen", "1"); } catch {} };
   intro.querySelector(".hi-x").onclick = () => showIntro(false);
-  intro.querySelector(".hi-ghost").onclick = () => { showIntro(false); MAP3D.enterCity(LIVE); };
+  intro.querySelector(".hi-ghost").onclick = () => setMode("pano");
   intro.querySelector(".hi-primary").onclick = () => { showIntro(false); startTour(); };
   let seen = false; try { seen = localStorage.getItem("hi-intro-seen") === "1"; } catch {}
   intro.hidden = seen;

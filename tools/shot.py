@@ -97,8 +97,15 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
                 pg.evaluate("""city => {
                   if (document.getElementById('stage').classList.contains('pano')) throw new Error('City sign did not enter city: '+city);
                   if (document.querySelector('.hi-cities [aria-selected="true"]').dataset.city !== city || document.querySelector('.hi-pop .wx').dataset.city !== city) throw new Error('City sign did not sync selection/weather: '+city);
+                  const labels=[...document.querySelectorAll('.tlabel:not([hidden])')];
+                  if(labels.length!==APP.themes.filter(t=>t.city===city).length||labels.some(e=>e.dataset.city!==city||getComputedStyle(e).display==='none'||getComputedStyle(e.querySelector('span')).display==='none'||parseFloat(getComputedStyle(e.querySelector('span')).fontSize)<11)) throw new Error('City policy names missing: '+city);
+                  for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
+                    const a=labels[i].getBoundingClientRect(),b=labels[j].getBoundingClientRect();
+                    if(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top)throw new Error('City policy titles overlap: '+city);
+                  }
                 }""", city)
             pg.evaluate("MAP3D.panorama(); CITY3D.snapshot()")
+            pg.evaluate("()=>{if([...document.querySelectorAll('.tlabel')].some(e=>getComputedStyle(e).display!=='none'))throw Error('Panorama shows policy labels')}")
             out.append("City signs: pointer clicks and Enter/Space passed for all four cities")
             pg.evaluate("""()=>{
               if (!CITY3D.renderer.info.render.triangles) throw new Error('Scene did not render');

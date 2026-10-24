@@ -127,6 +127,9 @@ html.drawer-open aside.panel{transform:none}
 .hi .stage.far .tlabel:not(.sel):not(.hot) b{font-size:11px}
 .hi .stage.far .tlabel:not(.sel):not(.hot) span{font-size:11px}
 .hi .stage.far .tlabel:not(.sel):not(.hot){padding:4px 7px}
+.hi .stage.city-view .tlabel:not([hidden]){display:flex!important;font-size:12px;padding:5px 7px;gap:5px}
+.hi .stage.city-view .tlabel:not([hidden]) span{display:inline;font-size:12px;line-height:1.2;white-space:normal;max-width:min(152px,calc((100vw - 106px)/2))}
+.hi .stage.city-view .tlabel:not([hidden]) b{font-size:10px}
 .hi .clabel{font-size:40px;letter-spacing:.06em;color:#fff;padding:10px 22px 8px;border-radius:16px;background:rgba(12,20,48,.82);border:3px solid var(--c);text-align:center;
   box-shadow:0 0 0 2px rgba(255,255,255,.6),0 0 18px var(--c),0 0 42px var(--c),inset 0 0 16px color-mix(in srgb,var(--c) 60%,transparent);
   text-shadow:0 0 4px #fff,0 0 12px var(--c),0 0 26px var(--c),0 0 44px var(--c);animation:neon 3.2s ease-in-out infinite}

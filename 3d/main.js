@@ -7,6 +7,7 @@ for (const isl of islands.filter((i) => i.live)) {
   const el = document.createElement("button");
   el.className = "tlabel" + (isl.rec ? " rec" : "");
   el.dataset.city = isl.city;
+  el.dataset.theme = isl.id;
   el.style.setProperty("--c", `var(--c-${isl.city})`);
   el.innerHTML = `<b>${String(isl.t.no).padStart(2, "0")}</b><span>${isl.t.name.replace(/^政績・/, "")}</span>`; // 3D tags show the category only; the 2D list keeps the full name
   el.setAttribute("aria-label", `${A.cityById.get(isl.city).cityName} ${isl.t.name}`);
@@ -319,6 +320,28 @@ function fitCitySigns() {
   }
 }
 
+function fitPolicyLabels() {
+  const labels=[...islandLabels.values()];
+  labels.forEach(l=>{l.el.style.translate="";});
+  if(!stage.classList.contains("city-view")||A.state.selTheme||A.state.selItem||A.state.selFlow)return;
+  const frame=stage.getBoundingClientRect(),w=frame.width,h=frame.height,gap=10;
+  const visible=labels.filter(l=>!l.el.hidden&&l.el.style.display!=="none").map(l=>{
+    const r=l.el.getBoundingClientRect();return {el:l.el,x:r.left-frame.left,y:r.top-frame.top,w:r.width,h:r.height};
+  }).filter(r=>r.x+r.w>0&&r.x<w&&r.y+r.h>0&&r.y<h).sort((a,b)=>a.x-b.x);
+  if(visible.length<2)return;
+  const columns=[visible.slice(0,Math.ceil(visible.length/2)),visible.slice(Math.ceil(visible.length/2))];
+  const widths=columns.map(c=>Math.max(0,...c.map(r=>r.w))),total=widths[0]+widths[1]+gap;
+  const midpoint=visible.reduce((n,r)=>n+r.x+r.w/2,0)/visible.length;
+  const left=THREE.MathUtils.clamp(midpoint-total/2,8,Math.max(8,w-total-8));
+  columns.forEach((column,col)=>{
+    column.sort((a,b)=>a.y-b.y);
+    let bottom=84;
+    for(const r of column){r.toY=Math.max(r.y,bottom);bottom=r.toY+r.h+4;}
+    const overflow=Math.max(0,bottom-(h-42));
+    for(const r of column){const x=col?left+widths[0]+gap:left+widths[0]-r.w;r.el.style.translate=`${x-r.x}px ${r.toY-overflow-r.y}px`;}
+  });
+}
+
 function renderFrame(now, forceRender = false) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   let busy = false;
@@ -340,6 +363,9 @@ function renderFrame(now, forceRender = false) {
   const camDist = camera.position.distanceTo(controls.target);
   stage.classList.toggle("far", camDist > 40);
   stage.classList.toggle("pano", camDist > labelTH);
+  const cityView=!!entered&&camDist<=labelTH;
+  stage.classList.toggle("city-view",cityView);
+  for(const [id,label] of islandLabels)label.el.hidden=cityView&&islandById.get(id).city!==entered;
   { // night-light LOD: halo pools/beams fade out past the city view, so the panorama shows dark islands with crisp warm dots, never a white blob
     const fade = THREE.MathUtils.clamp((labelTH * 2 - camDist) / labelTH, 0.06, 1);
     if (PEOPLE.lampPools) { PEOPLE.lampPools.opacity *= fade; PEOPLE.campusPools.opacity *= fade; PEOPLE.lampBeams.opacity *= fade; }
@@ -348,7 +374,7 @@ function renderFrame(now, forceRender = false) {
   }
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
-  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); dirty = false; }
+  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); fitPolicyLabels(); dirty = false; }
 }
 function loop(now) {
   renderFrame(now);

@@ -83,7 +83,7 @@
  C.ENV.forced={minute:660,w:{code:1,cloud:10,wind:10,temp:25}};C.ENV.apply();MAP3D.panorama();check(C.ENV.state.minute===660&&C.ENV.lampsOn===0,'day mode reset');
  document.querySelector('.hi-brandbtn').click();
  for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch');const wx=document.querySelector('.hi-pop .wx');check(wx.dataset.city===city&&wx.querySelectorAll(':scope > span').length===2,'selected-city weather only')}
- MAP3D.panorama();document.querySelector('.hi-brandbtn').click();
+ MAP3D.panorama();if(document.querySelector('.hi-brandbtn').getAttribute('aria-expanded')==='true')document.querySelector('.hi-brandbtn').click();
  C.snapshot();
  const stage=document.getElementById('stage').getBoundingClientRect(),signs=[...document.querySelectorAll('.clabel')];
  const project=([x,z])=>{const p=new C.camera.position.constructor(x,.65,z).project(C.camera);return [(p.x+1)*stage.width/2,(1-p.y)*stage.height/2]};
