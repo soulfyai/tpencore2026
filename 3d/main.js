@@ -238,10 +238,19 @@ function pickAt(e) {
   return null;
 }
 let down = null, hoverEl = null;
-renderer.domElement.addEventListener("pointerdown", (e) => { down = { x: e.clientX, y: e.clientY }; fly = null; });
+const activePointers = new Set();
+renderer.domElement.addEventListener("pointerdown", (e) => {
+  activePointers.add(e.pointerId); fly = null;
+  down = activePointers.size === 1 ? {x:e.clientX,y:e.clientY,id:e.pointerId,moved:false,dismiss:UI.hasOverlays?.()} : null;
+});
+renderer.domElement.addEventListener("pointercancel", (e) => { activePointers.delete(e.pointerId); down = null; });
 renderer.domElement.addEventListener("pointerup", (e) => {
-  if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) { down = null; return; }
-  down = null; const u = pickAt(e); if (!u) return;
+  activePointers.delete(e.pointerId);
+  if (!down || down.id !== e.pointerId || down.moved || Math.hypot(e.clientX-down.x,e.clientY-down.y)>6) { down = null; return; }
+  const dismiss = down.dismiss; down = null;
+  // The first tap dismisses the overlay, without selecting a building underneath.
+  if (dismiss) { UI.dismissOverlays?.(); return; }
+  const u = pickAt(e); if (!u) return;
   const target = u.type === "island" ? islandById.get(u.id) : null;
   if (target && !target.live) { UI?.toast(`${A.cityById.get(target.city).cityName}還在建設中，先逛逛台北吧。`); return; }
   if (u.type === "item") { if (A.state.selTheme === u.isl) A.openItem(u.id); else A.openTheme(u.isl); }
@@ -250,6 +259,7 @@ renderer.domElement.addEventListener("pointerup", (e) => {
 });
 let hoverT = 0;
 renderer.domElement.addEventListener("pointermove", (e) => {
+  if (down && Math.hypot(e.clientX-down.x,e.clientY-down.y)>6) down.moved=true;
   if (e.buttons || performance.now() - hoverT < 60) return; hoverT = performance.now();
   const u = pickAt(e);
   renderer.domElement.style.cursor = u ? "pointer" : "grab";

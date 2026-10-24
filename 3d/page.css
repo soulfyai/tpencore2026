@@ -4,8 +4,9 @@ html.hi,html.hi body{height:100%;overflow:hidden}
 html.hi body{padding:0}
 html.hi.booting .app{visibility:hidden}
 html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;box-sizing:border-box;margin:0;background:radial-gradient(ellipse at 50% 25%,#214966 0%,#102c45 48%,#0a172d 100%);color:#f3f6fc;text-align:center;font:500 15px/1.6 var(--f-body)}
-.loading-brand{padding:14px 22px;border:2px solid #83acff;border-radius:16px;background:#101d38;box-shadow:0 0 18px #6799ff66,inset 0 0 12px #6799ff33;font:800 32px/1.2 var(--f-display);letter-spacing:.1em;text-shadow:0 0 8px #719fff}
-.loading-brand span{display:block;margin-top:6px;font:700 12px/1.5 var(--f-body);letter-spacing:.13em;color:#ffe9a8}
+.loading-brand{width:min(520px,100%);padding:0;border:0;background:none;box-shadow:none;line-height:0}
+.loading-brand img{display:block;width:100%;height:auto;aspect-ratio:2158 / 729;object-fit:contain}
+@media(max-width:860px){.loading-brand{width:min(340px,100%)}.loading-brand img{aspect-ratio:1902 / 827}}
 .loading-status{margin:0;font-size:16px;font-weight:700}
 .loading-hint{margin:-10px 0 0;color:#c8d7e9;font-size:13px}
 .loading-spinner{width:28px;height:28px;margin-top:12px;border:2px solid #ffffff30;border-top-color:#b9d3ff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
@@ -58,7 +59,7 @@ html.drawer-open .hi-watermark{display:none}
 /* Shared desktop toolbar: landmark / tour controls precede the three policy view modes. */
 .hi-toolbar{position:absolute;right:16px;top:16px;z-index:31;display:flex;align-items:flex-start;justify-content:flex-end;gap:8px;max-width:calc(100% - 290px)}
 .hi-maptools{display:flex;gap:4px;padding:4px;border-radius:14px;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
-.hi-maptools .lmbtn,.hi-maptools .hi-tourbtn{position:static;display:flex;align-items:center;gap:7px;min-height:40px;min-width:58px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 13.5px var(--f-body);box-shadow:none;white-space:nowrap}
+.hi-maptools .lmbtn,.hi-maptools .hi-tourbtn,.hi-maptools .hi-music{position:static;display:flex;align-items:center;gap:7px;min-height:40px;min-width:58px;padding:0 12px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 13.5px var(--f-body);box-shadow:none;white-space:nowrap}
 .hi-maptools button:hover{background:var(--sunk)}
 .hi-tools-panel{display:contents}
 .hi-tools-panel[hidden],.hi-tools-toggle,.hi-help-label{display:none}
@@ -193,7 +194,7 @@ html.drawer-open aside.panel{transform:none}
   .hi-tour{left:10px;right:10px;width:auto;bottom:52px;padding:12px 14px}
   .hi-tour h3{font-size:16px}.hi-tour p{font-size:12.5px}
   .hi-tourbtn{left:10px;bottom:12px;min-height:40px;padding:0 14px;font-size:13px}
-  .hi-timeline{left:8px;right:8px;top:116px;bottom:52px;padding:14px 12px 0}
+  .hi-timeline{left:8px;right:8px;top:28dvh;bottom:52px;padding:14px 12px 0}
   .hi-tl-cols{grid-template-columns:1fr;overflow:auto;display:block}
   .hi-tl-col{margin-bottom:12px}.hi-tl-col ol{overflow:visible}
   .hi aside.panel{left:0;right:0;top:auto;bottom:0;width:auto;height:72dvh;border-radius:18px 18px 0 0;transform:translateY(105%)}
@@ -226,3 +227,8 @@ html.drawer-open aside.panel{transform:none}
 .hi .hi-cities button:is([data-city="newtaipei"],[data-city="keelung"])[aria-selected="true"]{color:#14213D}
 .hi .hi-cities button:focus-visible{outline:2px solid var(--route);outline-offset:2px}
 @media (max-width:860px){.hi .hi-cities{margin-top:6px;gap:5px}.hi .hi-cities button{font-size:14px;padding:5px 13px;min-height:44px}}
+
+.hi-music{white-space:nowrap}
+.hi-music[aria-pressed="true"]{box-shadow:inset 0 0 0 2px #6d9cf4}
+
+@media(min-width:861px) and (max-width:1040px){.hi-toolbar{top:164px;max-width:calc(100% - 32px)}}

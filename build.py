@@ -129,7 +129,7 @@ document.documentElement.classList.add('hi','booting');
 window.cityLoadFailed=function(){
   const status=document.querySelector('#loading .loading-status'),hint=document.querySelector('#loading .loading-hint'),retry=document.getElementById('loading-retry');
   if(status)status.textContent='無法載入城市畫面';
-  if(hint)hint.textContent='請重新整理後再試一次。';
+  if(hint){hint.textContent='請重新整理後再試一次。';hint.hidden=false;}
   if(retry)retry.hidden=false;
   const actions=document.getElementById('loading-actions');if(actions)actions.hidden=false;
   const spinner=document.querySelector('.loading-spinner');if(spinner)spinner.hidden=true;
@@ -143,10 +143,10 @@ sub("--hex-mix:26%; color-scheme:dark", "--hex-mix:26%; --water:#173246; --water
 sub('<svg class="map" id="map" role="img" aria-label="六角格地圖：台北、新北、基隆、桃園，每格是一位候選人的一項政策主題；完整內容請用右側清單"></svg>',
     '<div class="stage" id="stage" role="group" aria-busy="true" aria-label="3D 政策城市：台北、新北、基隆、桃園，每個街區是一項政策主題">'
     '<section class="loading" id="loading" aria-label="城市載入狀態">'
-    '<div class="loading-brand">台北安可<span>一起打造你我的北北基桃</span></div>'
+    '<div class="loading-brand"><picture><source media="(max-width:860px)" srcset="__BRAND_B_MOBILE__"><img src="__BRAND_B_DESKTOP__" width="2158" height="729" alt="台北安可，一起打造你我的北北基桃"></picture></div>'
     '<div class="loading-spinner" aria-hidden="true"></div>'
-    '<p class="loading-status" role="status">正在載入四座政策城市…</p>'
-    '<p class="loading-hint">準備好後，會自動顯示全景。</p>'
+    '<p class="loading-status" role="status">正在載入你的理想城市</p>'
+    '<p class="loading-hint" hidden></p>'
     '<div class="loading-actions" id="loading-actions" hidden><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button></div>'
     '<small>Copyright@TPEncore2026　Contact / TPEncore2026@gmail.com</small>'
     '</section></div>'
@@ -220,6 +220,7 @@ for variant in ("desktop", "mobile"):
     asset = ROOT / "3d" / "assets" / f"brand-b-{variant}.webp"
     uri = "data:image/webp;base64," + base64.b64encode(asset.read_bytes()).decode("ascii")
     mod = mod.replace(f"__BRAND_B_{variant.upper()}__", uri)
+    page = page.replace(f"__BRAND_B_{variant.upper()}__", uri)
 imports = "\n".join(l for l in mod.splitlines() if l.startswith("import "))
 body = "\n".join(l for l in mod.splitlines() if not l.startswith("import "))
 sub("</script>\n", """</script>

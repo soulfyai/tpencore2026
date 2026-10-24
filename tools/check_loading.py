@@ -30,6 +30,10 @@ try:
             page.goto(f"http://127.0.0.1:{server.server_port}/index.html", wait_until="commit")
             page.wait_for_selector("#loading", state="visible")
             page.wait_for_function("document.querySelector('.loading-status')?.textContent.includes('正在載入')")
+            assert page.locator('.loading-status').inner_text() == '正在載入你的理想城市'
+            assert not page.locator('.loading-hint').is_visible()
+            page.locator('.loading-brand img').evaluate('(img)=>img.decode()')
+            assert page.locator('.loading-brand img').evaluate('(img)=>img.naturalWidth') == (1902 if width<=860 else 2158)
             assert not page.locator("#loading a").count()
             assert not page.locator(".loading-actions").is_visible()
             page.evaluate("""()=>{

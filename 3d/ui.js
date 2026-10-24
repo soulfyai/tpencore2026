@@ -183,6 +183,34 @@ const UI = {};
   const toast = el("div", "hi-toast"); toast.setAttribute("role", "status"); document.querySelector(".mapwrap").appendChild(toast);
   let tt = 0; UI.toast = (msg) => { toast.textContent = msg; toast.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => toast.classList.remove("on"), 2600); };
 
+  /* Music is configured per host; NAS-local files remain on the NAS. */
+  const music = el("button", "hi-music", `<span aria-hidden="true">♫</span> 音樂`);
+  music.type="button";music.hidden=true;music.setAttribute("aria-pressed","false");
+  music.setAttribute("aria-label","播放背景音樂");mapTools.appendChild(music);
+  const audio = new Audio();audio.loop=true;audio.preload="none";audio.volume=.35;
+  const syncMusic=()=>{const playing=!audio.paused;music.setAttribute("aria-pressed",String(playing));music.setAttribute("aria-label",playing?"暫停背景音樂":"播放背景音樂");};
+  audio.addEventListener("playing",syncMusic);audio.addEventListener("pause",syncMusic);
+  audio.addEventListener("error",()=>{audio.pause();syncMusic();UI.toast("音樂暫時無法播放，請稍後再試。");});
+  music.onclick=()=>{
+    if(!audio.paused){audio.pause();return;}
+    audio.play().then(syncMusic).catch(e=>{syncMusic();if(e.name!=="AbortError")UI.toast("音樂暫時無法播放，請稍後再試。");});
+  };
+  fetch(new URL("site-config.json",location.href),{cache:"no-cache"}).then(r=>r.ok?r.json():null).then(config=>{
+    if(!config?.musicUrl)return;
+    const url=new URL(config.musicUrl,location.href);
+    if(!["https:","http:"].includes(url.protocol)||location.protocol==="https:"&&url.protocol!=="https:")return;
+    audio.src=url.href;music.hidden=false;
+  }).catch(()=>{/* Music stays hidden until this host provides a configured source. */});
+
+  UI.hasOverlays=()=>!pop.hidden||!intro.hidden||!timeline.hidden||!tour.hidden||html.classList.contains("drawer-open")||(phoneTools.matches&&!toolsPanel.hidden)||!!(A.state.selTheme||A.state.selFlow);
+  UI.dismissOverlays=()=>{
+    const pos=CITY3D.camera.position.clone(),target=CITY3D.controls.target.clone();
+    setPop(false);setTools(false);showIntro(false);endTour();timeline.hidden=true;
+    clearSel();closeDrawer(true);mode="pano";
+    for(const [id] of MODES)btn[id].setAttribute("aria-pressed",String(id==="pano"));
+    MAP3D.flyTo(target,pos);
+  };
+
   // Escape: first collapse the brand popover, then (once the 2D page's handler has cleared any selection) close the drawer
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;

@@ -1,0 +1,49 @@
+#!/bin/sh
+# Usage: sh synology-update.sh /volume1/web/tpencore [https://.../published-site]
+# Download only published website files; never replace local music or an existing config.
+set -eu
+DEPLOY_ROOT=${1:?Provide the existing Web Station document root}
+SITE_SOURCE=${2:-https://soulfyai.github.io/tpencore2026}
+case "$DEPLOY_ROOT" in /*) ;; *) echo 'Document root must be absolute' >&2; exit 1;; esac
+case "$DEPLOY_ROOT" in /|/volume[0-9]|/volume[0-9]/web) echo 'Use a dedicated website subfolder' >&2; exit 1;; esac
+case "$SITE_SOURCE" in https://*) ;; *) echo 'HTTPS source required' >&2; exit 1;; esac
+[ -d "$DEPLOY_ROOT" ] && [ -w "$DEPLOY_ROOT" ] || { echo 'Document root must exist and be writable' >&2; exit 1; }
+LOCK_DIR="$DEPLOY_ROOT/.tpencore-update.lock"
+mkdir "$LOCK_DIR" 2>/dev/null || { echo 'Another deployment is running (or stale lock exists)' >&2; exit 1; }
+STAGE_DIR=''
+cleanup() { [ -z "$STAGE_DIR" ] || rm -rf "$STAGE_DIR"; rmdir "$LOCK_DIR"; }
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+STAGE_DIR=$(mktemp -d /tmp/tpencore-deploy.XXXXXX)
+fetch() { curl --fail --silent --show-error --location --proto '=https' --retry 2 --max-time 90 "$1" -o "$2"; }
+SITE_SOURCE=${SITE_SOURCE%/}
+fetch "$SITE_SOURCE/version.json?nas=$(date +%s)" "$STAGE_DIR/version.json"
+if [ -f "$DEPLOY_ROOT/version.json" ] && cmp -s "$STAGE_DIR/version.json" "$DEPLOY_ROOT/version.json"; then
+  echo 'TPEncore already at the latest published version.'
+  exit 0
+fi
+for file in index.html index3d.html 2d.html site-config.json; do
+  fetch "$SITE_SOURCE/$file?nas=$(date +%s)" "$STAGE_DIR/$file"
+  [ -s "$STAGE_DIR/$file" ] || { echo "Empty file: $file" >&2; exit 1; }
+done
+fetch "$SITE_SOURCE/version.json?nas=$(date +%s)" "$STAGE_DIR/version-check.json"
+cmp -s "$STAGE_DIR/version.json" "$STAGE_DIR/version-check.json" || { echo 'Source changed during download; retry next scheduled run' >&2; exit 1; }
+grep -qi '<!doctype html>' "$STAGE_DIR/index.html" || { echo 'Unexpected website response' >&2; exit 1; }
+# Files are staged on the destination filesystem, then renamed atomically.
+# Each HTML is self-contained; publishing index last avoids partially written pages.
+for file in index3d.html 2d.html; do
+  cp "$STAGE_DIR/$file" "$DEPLOY_ROOT/.$file.next"
+  chmod 644 "$DEPLOY_ROOT/.$file.next"
+  mv -f "$DEPLOY_ROOT/.$file.next" "$DEPLOY_ROOT/$file"
+done
+if [ ! -e "$DEPLOY_ROOT/site-config.json" ]; then
+  cp "$STAGE_DIR/site-config.json" "$DEPLOY_ROOT/.site-config.json.next"
+  chmod 644 "$DEPLOY_ROOT/.site-config.json.next"
+  mv -f "$DEPLOY_ROOT/.site-config.json.next" "$DEPLOY_ROOT/site-config.json"
+fi
+for file in index.html version.json; do
+  cp "$STAGE_DIR/$file" "$DEPLOY_ROOT/.$file.next"
+  chmod 644 "$DEPLOY_ROOT/.$file.next"
+  mv -f "$DEPLOY_ROOT/.$file.next" "$DEPLOY_ROOT/$file"
+done
+echo 'TPEncore website updated; local music and existing site-config.json preserved.'

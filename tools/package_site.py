@@ -27,6 +27,7 @@ def package(output):
                "commit": commit, "built_at": datetime.now(timezone.utc).isoformat()}
     (output / "version.json").write_text(json.dumps(version) + "\n", encoding="utf-8")
     (output / ".nojekyll").touch()
+    (output / "site-config.json").write_text((ROOT / "site-config.json").read_text(encoding="utf-8"), encoding="utf-8")
     print(f"Staged website at {output}; commit={commit}")
 
 
