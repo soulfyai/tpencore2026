@@ -23,7 +23,8 @@ def package(output):
         html = (ROOT / source).read_text(encoding="utf-8")
         (output / target).write_text(prefix + html + "\n</html>\n", encoding="utf-8")
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    version = {"commit": commit, "built_at": datetime.now(timezone.utc).isoformat()}
+    version = {"version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
+               "commit": commit, "built_at": datetime.now(timezone.utc).isoformat()}
     (output / "version.json").write_text(json.dumps(version) + "\n", encoding="utf-8")
     (output / ".nojekyll").touch()
     print(f"Staged website at {output}; commit={commit}")

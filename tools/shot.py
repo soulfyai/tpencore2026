@@ -88,7 +88,11 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
                     sign.focus()
                     sign.press(key)
                 else:
-                    sign.click()
+                    # The scene RAF is paused; click its rendered coordinates without waiting
+                    # for Playwright's RAF-based stability polling. Assertions below verify receipt.
+                    box = sign.bounding_box()
+                    assert box is not None, "City sign is not rendered: " + city
+                    pg.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
                 pg.evaluate("CITY3D.snapshot()")
                 pg.evaluate("""city => {
                   if (document.getElementById('stage').classList.contains('pano')) throw new Error('City sign did not enter city: '+city);

@@ -16,7 +16,10 @@ for (const isl of islands.filter((i) => i.live)) {
   WORLD.bodies.get(isl.id).g.add(o);
   islandLabels.set(isl.id, { o, el });
 }
-const citySigns = [];
+const citySignViews = [];
+const svgNS = "http://www.w3.org/2000/svg";
+const cityLeaders = document.createElementNS(svgNS,"svg");
+cityLeaders.classList.add("city-leaders");cityLeaders.setAttribute("aria-hidden","true");cityLeaders.setAttribute("focusable","false");stage.appendChild(cityLeaders);
 for (const c of A.cities) {
   const live = LIVE_CITIES.has(c.city);
   const el = document.createElement(live ? "button" : "div");
@@ -27,11 +30,15 @@ for (const c of A.cities) {
     el.title = `進入${c.cityName}`;
     el.onclick = () => UI.enterCity(c.city);
   }
-  citySigns.push(el);
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
   const ci = WORLD.cities.get(c.city), top = ci.coast.reduce((m, q) => (q[1] < m[1] ? q : m));
   const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(ci.center[0], live ? 3.4 : 2.2, top[1] - 0.6); scene.add(o);
+  const blocks=WORLD.blockCells.filter(b=>b.city===c.city);
+  const anchor=blocks.reduce((a,b)=>Math.hypot(a.c[0]-top[0],a.c[1]-top[1])<Math.hypot(b.c[0]-top[0],b.c[1]-top[1])?a:b);
+  const path=document.createElementNS(svgNS,"path"),dot=document.createElementNS(svgNS,"circle");
+  path.dataset.city=c.city;dot.setAttribute("r","2.3");cityLeaders.append(path,dot);
+  citySignViews.push({city:c.city,el,ci,anchor:new THREE.Vector3(anchor.c[0],TOP+.08,anchor.c[1]),path,dot});
 }
 
 /* one callout per explored island: the items as a numbered list (no stacked pins); tiny numbers sit on each lot */
@@ -250,11 +257,14 @@ controls.addEventListener("change", () => {
 
 /* ---------- resize / theme / loop ---------- */
 let labelTH = 99; // camera distance beyond which landmark/policy tags hide (the city neon signs always stay)
+let citySignFar=99,citySignNear=50;
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight; if (!w || !h) return;
   camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); labelR.setSize(w, h);
   const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); // the panorama IS the farthest zoom
-  labelTH = Math.min(o.dist * 0.94, Math.max(...A.cities.filter((c) => LIVE_CITIES.has(c.city)).map((c) => cityFrame(c.city).dist)) * 1.12);
+  const cityDist=Math.max(...A.cities.filter(c=>LIVE_CITIES.has(c.city)).map(c=>cityFrame(c.city).dist));
+  labelTH = Math.min(o.dist * 0.94,cityDist * 1.12);
+  citySignFar=o.dist;citySignNear=Math.min(o.dist*.72,cityDist*.95);
   dirty = true;
 }
 new ResizeObserver(resize).observe(stage);
@@ -264,25 +274,51 @@ new MutationObserver(retheme).observe(document.documentElement, { attributes: tr
 
 let last = performance.now(), clock = 0;
 function fitCitySigns() {
-  citySigns.forEach(el => { el.style.translate = ""; });
-  if (stage.clientWidth > 620 || !stage.classList.contains("pano")) return;
-  const frame = stage.getBoundingClientRect(), gap = 8;
-  const signs = citySigns.map(el => {
-    const r = el.getBoundingClientRect();
-    return { el, left: r.left - frame.left, top: r.top - frame.top, width: r.width, height: r.height };
-  }).sort((a, b) => a.top - b.top);
-  for (let i = 0; i < signs.length; i++) {
-    const s = signs[i];
-    s.x = Math.max(gap, Math.min(frame.width - s.width - gap, s.left));
-    s.y = Math.max(110, s.top);
-    for (let j = 0; j < i; j++) {
-      const p = signs[j];
-      if (s.x < p.x + p.width + gap && s.x + s.width + gap > p.x && s.y < p.y + p.height + gap) s.y = p.y + p.height + gap;
+  const w=stage.clientWidth,h=stage.clientHeight,frame=stage.getBoundingClientRect(),gap=h<=480?8:12;
+  cityLeaders.setAttribute("viewBox",`0 0 ${w} ${h}`);
+  const project=(x,y,z)=>{const p=new THREE.Vector3(x,y,z).project(camera);return {x:(p.x+1)*w/2,y:(1-p.y)*h/2,z:p.z};};
+  const blend=THREE.MathUtils.smoothstep(camera.position.distanceTo(controls.target),citySignNear,citySignFar*.95);
+  const signs=citySignViews.map(v=>{
+    v.el.style.translate="";
+    const r=v.el.getBoundingClientRect(),a=project(v.anchor.x,v.anchor.y,v.anchor.z);
+    const coast=v.ci.hull.map(([x,z])=>project(x,TOP+4,z));
+    return {...v,a,left:r.left-frame.left,top:r.top-frame.top,width:r.width,height:r.height,minY:Math.min(...coast.map(p=>p.y)),minX:Math.min(...coast.map(p=>p.x)),maxX:Math.max(...coast.map(p=>p.x))};
+  });
+  const twoRows=w<=620&&h>480,maxH=Math.max(...signs.map(s=>s.height)),rowGap=18;
+  const headerBottom=Math.max(84,...[...document.querySelectorAll('header.top .brand h1,.hi-tools-toggle')].map(e=>e.getBoundingClientRect().bottom-frame.top+12));
+  const groupTop=Math.min(...signs.map(s=>s.minY));
+  const top=Math.max(headerBottom,groupTop-30-maxH*(twoRows?2:1)-(twoRows?rowGap:0));
+  const ordered=[...signs].sort((a,b)=>a.a.x-b.a.x);
+  if(twoRows){
+    for(let col=0;col<2;col++){
+      const column=ordered.slice(col*2,col*2+2).sort((a,b)=>a.a.y-b.a.y);
+      column.forEach((s,row)=>{s.row=row;s.col=col;s.farX=THREE.MathUtils.clamp(w*(col?.75:.25)-s.width/2,gap,w-s.width-gap);s.farY=top+row*(maxH+rowGap);});
     }
+  }else{
+    const total=ordered.reduce((n,s)=>n+s.width,0)+gap*(ordered.length-1),lo=Math.min(...signs.map(s=>s.minX)),hi=Math.max(...signs.map(s=>s.maxX));
+    let x=THREE.MathUtils.clamp((lo+hi-total)/2,gap,Math.max(gap,w-total-gap));
+    ordered.forEach(s=>{s.farX=x;s.farY=top;x+=s.width+gap;});
   }
-  const overflow = Math.max(0, ...signs.map(s => s.y + s.height - (frame.height - 140)));
-  signs.forEach(s => { s.el.style.translate = `${s.x - s.left}px ${s.y - overflow - s.top}px`; });
+  for(const s of signs){
+    const x=THREE.MathUtils.lerp(s.left,s.farX,blend),y=THREE.MathUtils.lerp(s.top,s.farY,blend);
+    s.el.style.translate=`${x-s.left}px ${y-s.top}px`;
+    s.el.dataset.overview=blend.toFixed(3);
+    const sx=x+s.width/2,sy=y+s.height,ax=s.a.x,ay=s.a.y;
+    const visible=s.el.style.display!=="none"&&s.a.z>-1&&s.a.z<1&&sx>=0&&sx<=w&&sy>=0&&sy<=h&&ax>=0&&ax<=w&&ay>=0&&ay<=h&&sy<ay;
+    s.path.style.display=s.dot.style.display=visible?"":"none";
+    if(!visible)continue;
+    if(twoRows&&s.row===0){
+      // Upper-row leaders bypass the lower labels through the centre/right gutters.
+      const exit=THREE.MathUtils.lerp(sx,x+s.width-8,blend),gutter=THREE.MathUtils.lerp(sx,s.col?w-7:w/2,blend);
+      const bend=THREE.MathUtils.lerp(sy+Math.max(8,(ay-sy)*.35),top+2*maxH+rowGap+12,blend);
+      s.path.setAttribute("d",`M${exit},${sy} L${gutter},${sy+8} L${gutter},${Math.min(ay-8,bend)} L${ax},${ay}`);
+    }else{
+      s.path.setAttribute("d",`M${sx},${sy} L${ax},${sy+Math.min(16,Math.max(6,(ay-sy)*.2))} L${ax},${ay}`);
+    }
+    s.dot.setAttribute("cx",ax);s.dot.setAttribute("cy",ay);
+  }
 }
+
 function renderFrame(now, forceRender = false) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   let busy = false;

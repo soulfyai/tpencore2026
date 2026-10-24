@@ -84,6 +84,22 @@
  document.querySelector('.hi-brandbtn').click();
  for(const city of ['taipei','newtaipei','keelung','taoyuan']){document.querySelector('.hi-cities [data-city='+city+']').click();check(document.querySelector('.hi-cities [data-city='+city+']').getAttribute('aria-selected')==='true','city switch');const wx=document.querySelector('.hi-pop .wx');check(wx.dataset.city===city&&wx.querySelectorAll(':scope > span').length===2,'selected-city weather only')}
  MAP3D.panorama();document.querySelector('.hi-brandbtn').click();
+ C.snapshot();
+ const stage=document.getElementById('stage').getBoundingClientRect(),signs=[...document.querySelectorAll('.clabel')];
+ const project=([x,z])=>{const p=new C.camera.position.constructor(x,.65,z).project(C.camera);return [(p.x+1)*stage.width/2,(1-p.y)*stage.height/2]};
+ const coasts=[...W.cities.values()].map(c=>c.hull.map(project));
+ check(document.querySelectorAll('.city-leaders path').length===4&&document.querySelectorAll('.city-leaders circle').length===4,'four white city leaders');
+ check(getComputedStyle(document.querySelector('.city-leaders')).pointerEvents==='none','leaders must not intercept map input');
+ for(const sign of signs){
+   const r=sign.getBoundingClientRect(),box={left:r.left-stage.left,right:r.right-stage.left,top:r.top-stage.top,bottom:r.bottom-stage.top};
+   check(box.left>=0&&box.right<=stage.width&&box.top>=0&&box.bottom<=stage.height,'overview city sign clipped');
+   for(const coast of coasts){const xs=coast.map(p=>p[0]),ys=coast.map(p=>p[1]);check(!(box.left<Math.max(...xs)&&box.right>Math.min(...xs)&&box.top<Math.max(...ys)&&box.bottom>Math.min(...ys)),'overview sign covers an island');}
+   const line=document.querySelector('.city-leaders path[data-city='+sign.dataset.city+']');
+   check(line&&getComputedStyle(line).display!=='none'&&!/NaN|Infinity/.test(line.getAttribute('d')),'visible finite city leader');
+ }
+ for(let i=0;i<signs.length;i++)for(let j=i+1;j<signs.length;j++){
+   const a=signs[i].getBoundingClientRect(),b=signs[j].getBoundingClientRect();check(!(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top),'city title overlap');
+ }
  const r=document.querySelector('.notice').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
  check(l.bottom<=r.top,'landmark control behind notice');
  return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,blockHalfSize:W.blockHalfSize,blockCells:W.blockCells.length,partBatches:C.batches.size,blockTypes:new Set(plans.map(p=>p.plan)).size,architectureTypes:new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size,streets:W.streetTypes,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
