@@ -318,9 +318,11 @@ html.drawer-open aside.panel{transform:none}
 .hi-toast.on{opacity:1;transform:translate(-50%,0)}
 
 /* Policy titles share the city signs' neon motif at a quieter, readable scale. */
-.hi .tlabel{font:800 13px/1.2 var(--f-body);color:#f4f7ff;background:#101d38;border:1px solid var(--c);border-radius:8px;box-shadow:0 0 0 1px rgba(231,240,255,.22),0 0 8px color-mix(in srgb,var(--c) 50%,transparent),inset 0 0 8px color-mix(in srgb,var(--c) 18%,transparent);text-shadow:0 0 2px #fff,0 0 7px var(--c);padding:6px 12px 6px 10px;gap:7px;transform:none;transition:box-shadow .18s ease,background-color .18s ease}
-.hi .tlabel b{font:800 12px var(--f-mono);color:color-mix(in srgb,var(--c) 55%,#fff);text-shadow:0 0 6px var(--c)}
-.hi .tlabel:hover,.hi .tlabel.sel,.hi .tlabel.hot{background:#192a49;box-shadow:0 0 0 1px #e6efff,0 0 12px color-mix(in srgb,var(--c) 75%,transparent),inset 0 0 10px color-mix(in srgb,var(--c) 25%,transparent)}
+.hi .tlabel{font:800 13px/1.2 var(--f-body);color:#fff;background:#244e85;border:1px solid color-mix(in srgb,var(--c) 65%,#fff);border-radius:8px;box-shadow:0 0 0 1px rgba(231,240,255,.22),0 0 8px color-mix(in srgb,var(--c) 50%,transparent),inset 0 0 8px color-mix(in srgb,var(--c) 18%,transparent);text-shadow:0 1px 2px #10244380;padding:6px 12px 6px 10px;gap:7px;transform:none;transition:box-shadow .18s ease,background-color .18s ease}
+.hi .tlabel b{font:800 12px var(--f-mono);color:#fff;text-shadow:none}
+.hi .tlabel:hover,.hi .tlabel.sel,.hi .tlabel.hot{background:#2c619d;color:#fff;border-color:#fff;box-shadow:0 0 0 1px #e6efff,0 0 12px color-mix(in srgb,var(--c) 75%,transparent),inset 0 0 10px color-mix(in srgb,var(--c) 25%,transparent)}
+.hi .tlabel span,.hi .tlabel.sel span,.hi .tlabel.sel b{color:#fff;opacity:1}
+.hi .tlabel.dim{opacity:1}
 .hi .tlabel:focus-visible{outline:2px solid #f4f7ff;outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.hi .tlabel{transition:none}}
 .hi .stage.far .tlabel:not(.sel):not(.hot){font-size:12px;padding:4px 9px 4px 8px;gap:5px}
@@ -392,9 +394,9 @@ html.drawer-open aside.panel{transform:none}
 /* one list bubble per island */
 .callout{pointer-events:auto;width:320px;max-width:calc(100vw - 32px);box-sizing:border-box;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(20,33,61,.28);padding:9px 10px 7px;font-family:var(--f-body);color:#1b2234;position:relative;margin-bottom:12px}
 .callout::after{content:"";position:absolute;left:50%;bottom:-8px;width:16px;height:16px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:3px}
-.co-head{display:flex;align-items:baseline;gap:7px;font:800 14.5px/1.4 var(--f-display);padding:8px 9px;margin-bottom:7px;border:1px solid var(--c);border-radius:9px;background:#101d38;color:#f4f7ff;text-shadow:0 0 2px #fff,0 0 7px var(--c);box-shadow:0 0 7px color-mix(in srgb,var(--c) 40%,transparent),inset 0 0 10px color-mix(in srgb,var(--c) 18%,transparent)}
-.co-head b{font:800 13px var(--f-mono);color:color-mix(in srgb,var(--c) 55%,#fff);text-shadow:0 0 6px var(--c);flex:none}
-.co-head span{margin-left:auto;font:600 11.5px var(--f-body);color:#d8e3f5;text-shadow:none;white-space:nowrap}
+.co-head{display:flex;align-items:baseline;gap:7px;font:800 14.5px/1.4 var(--f-display);padding:8px 9px;margin-bottom:7px;border:1px solid var(--c);border-radius:9px;background:#244e85;color:#fff;text-shadow:0 1px 2px #10244380;box-shadow:0 0 7px color-mix(in srgb,var(--c) 40%,transparent),inset 0 0 10px color-mix(in srgb,var(--c) 18%,transparent)}
+.co-head b{font:800 13px var(--f-mono);color:#fff;text-shadow:none;flex:none}
+.co-head span{margin-left:auto;font:600 11.5px var(--f-body);color:#fff;text-shadow:none;white-space:nowrap}
 .callout ol{list-style:none;margin:0;padding:0;overflow:visible;position:relative;z-index:1;display:grid;grid-template-columns:repeat(var(--co-columns,1),minmax(0,1fr))}
 .callout li button{width:100%;display:flex;align-items:center;gap:8px;text-align:left;border:0;background:transparent;border-radius:9px;padding:6px 6px;font:600 13px/1.35 var(--f-body);color:#1b2234;cursor:pointer;min-height:34px}
 .callout li button:hover,.callout li button.sel{background:color-mix(in srgb,var(--c) 12%,#fff)}
