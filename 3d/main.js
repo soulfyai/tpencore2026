@@ -393,6 +393,7 @@ function renderFrame(now, forceRender = false) {
   const moving = !reduced.matches;
   if (moving) { clock += dt; ENV.update(dt, clock); for (const v of flowViews) if (v.tube.visible) v.mat.uniforms.uTime.value = clock; if (focusId) beamMat.opacity = 0.32 + 0.16 * Math.sin(clock * 3); busy = true; }
   PEOPLE.update(dt, clock, moving);
+  CITY_FLAGS.update(clock,moving);
   ENV.cullClouds(camera);
   const camDist = camera.position.distanceTo(controls.target);
   // A fixed 0.3 near plane loses millimetre-scale coast separation in panorama.
@@ -425,7 +426,7 @@ function loop(now) {
 resize();
 { const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }
 window.MAP3D = { paint, focusTheme, focusItem, focusFlow, home, panorama, enterCity, flyTo, cityFrame };
-window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, renderer, camera, controls, scene, ENV, cityLabels:citySignViews, cityLeaders, snapshot() {
+window.CITY3D = { WORLD, islands, ITEMS3D, parts, batches, PEOPLE, flags:CITY_FLAGS, renderer, camera, controls, scene, ENV, cityLabels:citySignViews, cityLeaders, snapshot() {
   // Complete camera transitions and all dependent scene updates before a deterministic capture.
   if (fly) { camera.position.copy(fly.p1); controls.target.copy(fly.q1); fly = null; }
   ENV.apply(); last = performance.now(); renderFrame(last, true);

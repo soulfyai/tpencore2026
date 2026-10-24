@@ -10,7 +10,7 @@
 
 ### 0.1 現況
 - **第一個階段版本：v1.0.0**。A 白線指引與目前功能作為模型／美術迭代前的基準，詳見 §0.18、CHANGELOG.md 與 VERSION。
-- **目前修正版：v2.0.5**。桌機全景拉近、移除 body 外距白邊及全景響應式取景；底部標示改為 Designed by TPEncore © 2026；手機三線圖示與七項單欄工具選單；加入飛機與商船往返遠方的示意動線；採用加亮 B 招牌效果作為部署版本；跨市平移跟隨縣市、初次載入預設開使用說明；音樂控制、載入招牌／文案與點地圖關閉視窗；聲明移入使用說明、底部版權／聯絡浮水印；B 招牌改用正式圖像資產以修正 mockup 落差；採用 B 版霓虹天際線品牌招牌；改善全景深度精度與海岸閃爍；政策泡泡完整展開、依內容調整尺寸；依標記圖降低新北市全景標牌高度；資訊面板滑動、載入畫面、3D 世界座標標題與既有功能保留，詳見 §0.19–0.37。
+- **目前修正版：v2.0.6**。四市最高建築國旗；桌機全景拉近、移除 body 外距白邊及全景響應式取景；底部標示改為 Designed by TPEncore © 2026；手機三線圖示與七項單欄工具選單；加入飛機與商船往返遠方的示意動線；採用加亮 B 招牌效果作為部署版本；跨市平移跟隨縣市、初次載入預設開使用說明；音樂控制、載入招牌／文案與點地圖關閉視窗；聲明移入使用說明、底部版權／聯絡浮水印；B 招牌改用正式圖像資產以修正 mockup 落差；採用 B 版霓虹天際線品牌招牌；改善全景深度精度與海岸閃爍；政策泡泡完整展開、依內容調整尺寸；依標記圖降低新北市全景標牌高度；資訊面板滑動、載入畫面、3D 世界座標標題與既有功能保留，詳見 §0.19–0.38。
 - **最新街廓定案（2026-10-24 台北時間）**：使用者明示「捨棄六邊形，改為四方形」。目前 3D 採等大方形格網，詳見 §0.15；早期六邊形規格僅保留為歷史紀錄。
 - **Codex 接手進度（2026-10-23 UTC）**：§0.3 六邊形重構與 §0.4 行人檢查已完成，詳見 §0.7；後續都市規劃、單市天氣與正式發佈以 §0.8 為準。程式以 `claude/modest-newton-t9y5uj` 最新 commit 為準；下列線上 V34 尚未重新發佈。
 - **線上**：<https://claude.ai/artifact/Ssboakje3hi8UHQp4nHQQA> Version 34 ＝ 主分支 `claude/modest-newton-t9y5uj` @ `c3a9e99`（已推送，工作樹乾淨，無未合併 WIP）。
@@ -230,6 +230,12 @@
 - ResizeObserver 原已同步 renderer、CSS2D 與 camera.aspect；新增在未選城市／政策的全景中依新視窗立即重取景。進城或選政策時保留相機位置，不將手動視角重設。
 - tools/check_responsive_view.py 驗證 1400×860、1920×1080、1024×768、400×860、320×720 的滿版邊界、投影比例、海岸／標牌可見、桌機拉近，以及全景重取景／進城視角保留。截圖 out/responsive-{1400,1024,400}.png；build／package no problems，版本 2.0.5，NAS ZIP 依既定流程更新。
 
+### 0.38 四市屋頂國旗（2026-10-24 台北時間）
+- 使用者核准 mockup 後實作。新增 3d/flags.js（build 在 coaster 後、main 前串接），掃描既有背景建築及人工地標零件的真實變換 bounding box，於每市最高合適屋頂放一面旗；排除自然景點、橋梁與大觀音塑像。未改島形、城市高度或地標本體。
+- 實測台北為 101 頂點 y=11.736，其餘三市為原有 20 層高樓頂點 y=5.42。旗面 .9×.6、旗桿 1.15，3:2 比例。CanvasTexture 自繪紅地／藍色左上角／十二白色光芒與白色圓心；不使用生成圖片貼圖。國旗材質共用，夜間低量自發光維持可辨識。
+- 頂點 shader 輕微飄動，旗桿不動；CITY_FLAGS.update 跟隨 main 的 clock，減少動態時停止旗面時間，仍跟隨來源建築的 lift。旗面關閉 frustum culling 避免邊界飄動閃現。CITY3D.flags 暴露 sites／uniforms／update 作檢查。
+- tools/check_flags.js 驗證四市各一、旗面比例／紅藍白與十二道光芒、真實屋頂錨點、建築升降跟隨、動畫／減少動態及 GL error。手機／桌機全景、101／基隆高樓近景與夜景檢視；build／package no problems，版本 2.0.6，NAS ZIP 同步更新。
+
 ## 1. 專案是什麼
 
 獨立、非官方的選舉政見網站，把國民黨北北基桃四位市長參選人的政見與任內政績，畫成 **SimCity BuildIt 風格的 3D 城市島嶼**。版面、內容架構參考 <https://puma.taipei/heart-island>。
@@ -256,7 +262,7 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 ```
 
 - 3D 模組依序串接成**同一個 module script**（共用頂層 const），順序寫在 `build.py`：
-  `core, world, env, models, models2, models3, landmarks, ships, decor, people, coaster, main, ui`。
+  `core, world, env, models, models2, models3, landmarks, ships, decor, people, coaster, flags, main, ui`。
   `3d/page.css` 會被插在 3D CSS 最前面。
 - 舊檔 `map3d.js`（根目錄）與 `3d/lots.js` 未被建置使用，已於 2026-10-23 刪除；`3d/` 內現存檔案全部都有用到。
 - 視覺檢查：`tools/shot.py`（Playwright + swiftshader，需先 `npm i --no-save three@0.160.0`）。

@@ -213,7 +213,7 @@ sub("</style>", (ROOT / "3d" / "page.css").read_text(encoding="utf-8") + """
 .mapwrap .legend{bottom:44px}
 @media (max-width:860px){.stage{flex:none;aspect-ratio:1/1;max-width:100%}.mapwrap .legend{bottom:auto}.key .hint{margin-left:0}}
 </style>""")
-mod = "\n".join((ROOT / "3d" / f).read_text(encoding="utf-8") for f in ["core.js", "world.js", "env.js", "models.js", "models2.js", "models3.js", "landmarks.js", "ships.js", "decor.js", "people.js", "coaster.js", "main.js", "ui.js"])
+mod = "\n".join((ROOT / "3d" / f).read_text(encoding="utf-8") for f in ["core.js", "world.js", "env.js", "models.js", "models2.js", "models3.js", "landmarks.js", "ships.js", "decor.js", "people.js", "coaster.js", "flags.js", "main.js", "ui.js"])
 # Keep branded artwork inside the self-contained 3D document.
 import base64
 for variant in ("desktop", "mobile"):
