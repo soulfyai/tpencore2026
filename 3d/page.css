@@ -232,3 +232,11 @@ html.drawer-open aside.panel{transform:none}
 .hi-music[aria-pressed="true"]{box-shadow:inset 0 0 0 2px #6d9cf4}
 
 @media(min-width:861px) and (max-width:1040px){.hi-toolbar{top:164px;max-width:calc(100% - 32px)}}
+
+/* Approved brighter B lighting: shared by the page sign and initial loader. */
+.hi-brandart img,.loading-brand img{
+  filter:brightness(1.25) saturate(1.15)
+    drop-shadow(0 0 1.5px #8cefffaa)
+    drop-shadow(0 0 5px #087dffbb)
+    drop-shadow(0 0 11px #005eff88);
+}

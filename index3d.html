@@ -389,6 +389,14 @@ html.drawer-open aside.panel{transform:none}
 
 @media(min-width:861px) and (max-width:1040px){.hi-toolbar{top:164px;max-width:calc(100% - 32px)}}
 
+/* Approved brighter B lighting: shared by the page sign and initial loader. */
+.hi-brandart img,.loading-brand img{
+  filter:brightness(1.25) saturate(1.15)
+    drop-shadow(0 0 1.5px #8cefffaa)
+    drop-shadow(0 0 5px #087dffbb)
+    drop-shadow(0 0 11px #005eff88);
+}
+
 .stage{position:relative;flex:1;min-height:0;overflow:hidden;background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom))}
 .stage canvas{display:block;touch-action:none}
 .loading{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:var(--muted);font-family:var(--f-display);font-size:18px}
