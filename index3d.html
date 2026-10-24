@@ -3884,7 +3884,7 @@ const cityAnchorPositions=new Float32Array(A.cities.length*3);
 const cityAnchorGeometry=new THREE.BufferGeometry();cityAnchorGeometry.setAttribute("position",new THREE.BufferAttribute(cityAnchorPositions,3));
 const cityAnchorDots=new THREE.Points(cityAnchorGeometry,new THREE.PointsMaterial({color:0xffffff,size:3.2,sizeAttenuation:false,transparent:true,opacity:.95,depthWrite:false,fog:true}));
 cityAnchorDots.name="city-anchor-dots";cityAnchorDots.frustumCulled=false;scene.add(cityAnchorDots);
-const cityFarHeights={taipei:.14,newtaipei:.20,keelung:.12,taoyuan:.12};
+const cityFarHeights={taipei:.14,newtaipei:.115,keelung:.12,taoyuan:.12};
 for (const c of A.cities) {
   const live = LIVE_CITIES.has(c.city);
   const el = document.createElement(live ? "button" : "div");

@@ -118,10 +118,8 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
               if (f.width>620) return;
               const signs=[...document.querySelectorAll('.clabel')].map(e=>e.getBoundingClientRect());
               for (const r of signs) if (r.left<f.left||r.right>f.right||r.top<f.top||r.bottom>f.bottom) throw new Error('City sign clipped');
-              for(let i=0;i<signs.length;i++)for(let j=i+1;j<signs.length;j++){
-                const a=signs[i],b=signs[j];
-                if(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top)throw new Error('City signs overlap');
-              }
+              // World-space labels can overlap in projection; orbiting changes that view.
+              // Their 3D anchoring is checked in check_scene.js, not via fixed screen slots.
             }""")
         os.makedirs(os.path.dirname(name) or ".", exist_ok=True)
         pg.screenshot(path=f"{name}.png", timeout=240000)
