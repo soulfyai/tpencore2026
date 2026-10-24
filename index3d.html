@@ -4529,6 +4529,20 @@ const UI = {};
   notice?.remove();
   const watermark = el("footer", "hi-watermark", `<span>Designed by TPEncore © 2026</span><a href="mailto:TPEncore2026@gmail.com">Contact / TPEncore2026@gmail.com</a>`);
   document.body.appendChild(watermark);
+  const visitCounter=el("span","hi-visit-counter");visitCounter.hidden=true;
+  watermark.insertBefore(visitCounter,watermark.lastElementChild);
+  const recordVisit=config=>{
+    if(config.counterEnabled===false)return;
+    const path=config.counterUrl||(/(^|\.)tpencore\.tw$/i.test(location.hostname)?"counter.php":null);
+    if(!path)return;
+    let url;try{url=new URL(path,location.href);}catch{return;}
+    if(url.origin!==location.origin)return;
+    fetch(url,{method:"POST",credentials:"omit",cache:"no-store",headers:{Accept:"application/json"},signal:AbortSignal.timeout(10000)})
+      .then(r=>r.ok?r.json():null).then(data=>{
+        if(!data?.ok||!Number.isSafeInteger(data.views)||data.views<0)return;
+        visitCounter.textContent=`瀏覽次數 ${data.views.toLocaleString("zh-TW")}`;visitCounter.hidden=false;
+      }).catch(()=>{/* Counter availability never blocks the map or music. */});
+  };
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
   // City switcher colors match the map and city signs.
@@ -4701,19 +4715,54 @@ const UI = {};
   toolsPanel.setAttribute("role","group");toolsPanel.setAttribute("aria-label","地圖工具");
   layoutTools();phoneTools.addEventListener("change",layoutTools);
   const audio = new Audio();audio.loop=true;audio.preload="none";audio.volume=.35;
-  const syncMusic=()=>{const playing=!audio.paused;music.setAttribute("aria-pressed",String(playing));music.setAttribute("aria-label",playing?"暫停背景音樂":"播放背景音樂");};
+  let autoStartPending=true,playSequence=0,manualPlayback=false,musicHint="";
+  const syncMusic=()=>{const playing=!audio.paused;music.setAttribute("aria-pressed",String(playing));music.setAttribute("aria-label",playing?"暫停背景音樂":"播放背景音樂");music.title=playing?"暫停背景音樂":musicHint||"播放背景音樂";};
+  function stopAutoStart(){
+    autoStartPending=false;
+    document.removeEventListener("pointerup",autoStartOnGesture,true);
+    document.removeEventListener("keydown",autoStartOnGesture,true);
+  }
+  function playMusic(automatic){
+    const sequence=++playSequence;manualPlayback=!automatic;musicHint="";
+    if(audio.error)audio.load();
+    audio.play().then(()=>{
+      if(sequence!==playSequence)return;
+      stopAutoStart();syncMusic();
+    }).catch(e=>{
+      if(sequence!==playSequence||e.name==="AbortError")return;
+      syncMusic();
+      if(e.name==="NotAllowedError"){
+        musicHint="點選畫面後播放背景音樂";syncMusic();return;
+      }
+      stopAutoStart();musicHint="音樂暫時無法播放，點此重試";syncMusic();
+      if(!automatic)UI.toast("音樂暫時無法播放，請稍後再試。");
+    });
+  }
+  function autoStartOnGesture(e){
+    if(!autoStartPending||!audio.src||!e.isTrusted||music.contains(e.target))return;
+    if(e.type==="keydown"&&(e.repeat||e.ctrlKey||e.metaKey||e.altKey||["Escape","Shift","Control","Alt","Meta"].includes(e.key)))return;
+    playMusic(true);
+  }
+  document.addEventListener("pointerup",autoStartOnGesture,true);
+  document.addEventListener("keydown",autoStartOnGesture,true);
   audio.addEventListener("playing",syncMusic);audio.addEventListener("pause",syncMusic);
-  audio.addEventListener("error",()=>{audio.pause();syncMusic();UI.toast("音樂暫時無法播放，請稍後再試。");});
+  audio.addEventListener("error",()=>{
+    ++playSequence;stopAutoStart();musicHint="音樂暫時無法播放，點此重試";audio.pause();syncMusic();
+    if(manualPlayback)UI.toast("音樂暫時無法播放，請稍後再試。");
+  });
   music.onclick=()=>{
-    if(!audio.paused){audio.pause();return;}
-    audio.play().then(syncMusic).catch(e=>{syncMusic();if(e.name!=="AbortError")UI.toast("音樂暫時無法播放，請稍後再試。");});
+    stopAutoStart();++playSequence;
+    if(!audio.paused){manualPlayback=false;audio.pause();return;}
+    playMusic(false);
   };
   fetch(new URL("site-config.json",location.href),{cache:"no-cache"}).then(r=>r.ok?r.json():null).then(config=>{
-    if(!config?.musicUrl)return;
+    if(config)recordVisit(config);
+    if(!config?.musicUrl){stopAutoStart();return;}
     const url=new URL(config.musicUrl,location.href);
-    if(!["https:","http:"].includes(url.protocol)||location.protocol==="https:"&&url.protocol!=="https:")return;
+    if(!["https:","http:"].includes(url.protocol)||location.protocol==="https:"&&url.protocol!=="https:"){stopAutoStart();return;}
     audio.src=url.href;music.hidden=false;
-  }).catch(()=>{/* Music stays hidden until this host provides a configured source. */});
+    if(config.musicAutoplay===false)stopAutoStart();else playMusic(true);
+  }).catch(()=>{stopAutoStart();/* Hide music when this host has no usable configuration. */});
 
   UI.hasOverlays=()=>!pop.hidden||!intro.hidden||!timeline.hidden||!tour.hidden||html.classList.contains("drawer-open")||(phoneTools.matches&&!toolsPanel.hidden)||!!(A.state.selTheme||A.state.selFlow);
   UI.dismissOverlays=()=>{

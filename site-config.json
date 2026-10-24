@@ -1,3 +1,4 @@
 {
-  "musicUrl": "https://tpencore.tw/music/tpencoretheme.mp3"
+  "musicUrl": "https://tpencore.tw/music/tpencoretheme.mp3",
+  "musicAutoplay": true
 }

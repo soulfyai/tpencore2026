@@ -10,7 +10,7 @@
 
 ### 0.1 現況
 - **第一個階段版本：v1.0.0**。A 白線指引與目前功能作為模型／美術迭代前的基準，詳見 §0.18、CHANGELOG.md 與 VERSION。
-- **目前修正版：v2.0.6**。四市最高建築國旗；桌機全景拉近、移除 body 外距白邊及全景響應式取景；底部標示改為 Designed by TPEncore © 2026；手機三線圖示與七項單欄工具選單；加入飛機與商船往返遠方的示意動線；採用加亮 B 招牌效果作為部署版本；跨市平移跟隨縣市、初次載入預設開使用說明；音樂控制、載入招牌／文案與點地圖關閉視窗；聲明移入使用說明、底部版權／聯絡浮水印；B 招牌改用正式圖像資產以修正 mockup 落差；採用 B 版霓虹天際線品牌招牌；改善全景深度精度與海岸閃爍；政策泡泡完整展開、依內容調整尺寸；依標記圖降低新北市全景標牌高度；資訊面板滑動、載入畫面、3D 世界座標標題與既有功能保留，詳見 §0.19–0.38。
+- **目前修正版：v2.0.7**。音樂預設啟播、NAS 瀏覽次數計數與自動更新設定包；四市最高建築國旗；桌機全景拉近、移除 body 外距白邊及全景響應式取景；底部標示改為 Designed by TPEncore © 2026；手機三線圖示與七項單欄工具選單；加入飛機與商船往返遠方的示意動線；採用加亮 B 招牌效果作為部署版本；跨市平移跟隨縣市、初次載入預設開使用說明；音樂控制、載入招牌／文案與點地圖關閉視窗；聲明移入使用說明、底部版權／聯絡浮水印；B 招牌改用正式圖像資產以修正 mockup 落差；採用 B 版霓虹天際線品牌招牌；改善全景深度精度與海岸閃爍；政策泡泡完整展開、依內容調整尺寸；依標記圖降低新北市全景標牌高度；資訊面板滑動、載入畫面、3D 世界座標標題與既有功能保留，詳見 §0.19–0.39。
 - **最新街廓定案（2026-10-24 台北時間）**：使用者明示「捨棄六邊形，改為四方形」。目前 3D 採等大方形格網，詳見 §0.15；早期六邊形規格僅保留為歷史紀錄。
 - **Codex 接手進度（2026-10-23 UTC）**：§0.3 六邊形重構與 §0.4 行人檢查已完成，詳見 §0.7；後續都市規劃、單市天氣與正式發佈以 §0.8 為準。程式以 `claude/modest-newton-t9y5uj` 最新 commit 為準；下列線上 V34 尚未重新發佈。
 - **線上**：<https://claude.ai/artifact/Ssboakje3hi8UHQp4nHQQA> Version 34 ＝ 主分支 `claude/modest-newton-t9y5uj` @ `c3a9e99`（已推送，工作樹乾淨，無未合併 WIP）。
@@ -235,6 +235,15 @@
 - 實測台北為 101 頂點 y=11.736，其餘三市為原有 20 層高樓頂點 y=5.42。旗面 .9×.6、旗桿 1.15，3:2 比例。CanvasTexture 自繪紅地／藍色左上角／十二白色光芒與白色圓心；不使用生成圖片貼圖。國旗材質共用，夜間低量自發光維持可辨識。
 - 頂點 shader 輕微飄動，旗桿不動；CITY_FLAGS.update 跟隨 main 的 clock，減少動態時停止旗面時間，仍跟隨來源建築的 lift。旗面關閉 frustum culling 避免邊界飄動閃現。CITY3D.flags 暴露 sites／uniforms／update 作檢查。
 - tools/check_flags.js 驗證四市各一、旗面比例／紅藍白與十二道光芒、真實屋頂錨點、建築升降跟隨、動畫／減少動態及 GL error。手機／桌機全景、101／基隆高樓近景與夜景檢視；build／package no problems，版本 2.0.6，NAS ZIP 同步更新。
+
+### 0.39 音樂預設啟播／無 Cookie 計數／NAS 自動更新（2026-10-24 台北時間）
+- 使用者已完成首次 NAS 部署。已唯讀驗證 https://tpencore.tw/version.json 可連線，為 v2.0.6、commit 231912d；不需重新索取 DSM 基本資料。尚未在 NAS 安裝新排程／PHP，沒有可用 NAS 管理存取方式，不宣稱已代為啟用。
+- 音樂預設 play()，NotAllowedError 時靜默保留首次真實 pointerup／keydown 內直接播放的 fallback，避開音樂按鈕本身以免雙重切換；手動暫停後取消 fallback。序列避免過期 Promise 狀態，失敗可 load() 重試，支援 config.musicAutoplay=false；舊 config 缺欄位預設 true。
+- recordVisit 只在初次取得主機設定後呼叫一次；tpencore.tw 預設同站 counter.php，其他主機可設 counterUrl，GitHub Pages 預設不呼叫。POST credentials:omit，不用 Cookie／localStorage／指紋；底部標示「瀏覽次數」，不是獨立訪客。服務失敗時隱藏，不阻斷場景／音樂。
+- deploy/counter.php：PHP 8.2+、PDO SQLite，僅存 totals(name,value)，POST 原子加一，GET 只讀，不記 IP／UA／訪客識別，移除 Set-Cookie、no-store、拒絕跨源瀏覽器 POST。資料庫預設 /volumeN/tpencore-data/visits.sqlite（網站外），可由 TPENCORE_COUNTER_DB 覆寫。NAS 需先啟用 PHP、pdo_sqlite、http 帳號資料夾讀寫及 open_basedir。
+- tools/package_site.py 發布 counter.php.txt 純原始碼；NAS updater 取得後改存 counter.php，保留 local config／music／外部 DB，版本相同且必需檔齊全才跳過。加入時間戳與版本日誌。tools/package_nas.py 將網站包的 .txt 改回 .php，另產生 automation ZIP（腳本＋兩份指南），不把排程腳本放網站根目錄。
+- tools/check_music_autostart.py 用原生 Chromium 音訊與允許／阻擋 autoplay 政策測首次互動、手動暫停、opt-out、網路錯誤恢復。tools/check_counter.py 用真實 PHP/SQLite 測 40 並行請求、持久化、GET 不增、重新整理增一、只 POST 一次、無 Cookie／識別欄位及跨源拒絕。tools/check_nas_deploy.py 驗證更新／保留資料／無變更／下載失敗。手機、桌機、320px 排版已檢視。版本 2.0.7，build／package no problems。
+- 文件：deploy/NAS_QUICK_START.md 為現有網站的一次性工作排程器步驟，deploy/SYNOLOGY.md 末段為計數器 PHP／私有資料夾啟用步驟。NAS 自動更新從 GitHub Pages 已發布檔拉取，不需 NAS 安裝 Git／Python，且不依賴 cloud session 常駐。
 
 ## 1. 專案是什麼
 

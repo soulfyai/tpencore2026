@@ -22,6 +22,7 @@ try:
   pg.add_init_script("""window.requestAnimationFrame=cb=>{window.__sceneFrame=cb;return 0};const Orig=window.Audio;window.Audio=class extends Orig{constructor(...a){super(...a);window.testAudio=this}};""")
   pg.route('**/three@0.160.0/**',lambda r:r.fulfill(path=str(ROOT/'node_modules/three'/r.request.url.split('three@0.160.0/')[1]),content_type='application/javascript'))
   pg.route('**/fonts.g*/**',lambda r:r.abort())
+  pg.route('**/site-config.json',lambda r:r.fulfill(json={'musicUrl':'https://tpencore.tw/music/tpencoretheme.mp3','musicAutoplay':False}))
   requests=[];errors=[]
   def audio_route(r):
     requests.append(r.request.url);r.fulfill(body=sound.getvalue(),content_type='audio/wav')

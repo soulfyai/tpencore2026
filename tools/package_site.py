@@ -28,6 +28,7 @@ def package(output):
     (output / "version.json").write_text(json.dumps(version) + "\n", encoding="utf-8")
     (output / ".nojekyll").touch()
     (output / "site-config.json").write_text((ROOT / "site-config.json").read_text(encoding="utf-8"), encoding="utf-8")
+    (output / "counter.php.txt").write_bytes((ROOT / "deploy/counter.php").read_bytes())
     print(f"Staged website at {output}; commit={commit}")
 
 

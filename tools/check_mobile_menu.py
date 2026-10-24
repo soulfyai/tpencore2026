@@ -20,6 +20,8 @@ try:
   pg.route('**/three@0.160.0/**',lambda r:r.fulfill(path=str(ROOT/'node_modules/three'/r.request.url.split('three@0.160.0/')[1]),content_type='application/javascript'))
   pg.route('**/fonts.g*/**',lambda r:r.abort())
   errors=[]
+  pg.route('**/site-config.json',lambda r:r.fulfill(json={'musicUrl':'https://tpencore.tw/music/tpencoretheme.mp3','musicAutoplay':False,'counterUrl':'counter.php'}))
+  pg.route('**/counter.php',lambda r:r.fulfill(json={'ok':True,'views':1234}))
   pg.on('pageerror',lambda e:errors.append(str(e)))
   pg.goto(f'http://127.0.0.1:{server.server_port}/index3d.html',wait_until='commit')
   pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')",timeout=300000,polling=100)
