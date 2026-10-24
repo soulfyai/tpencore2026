@@ -143,7 +143,7 @@ sub("--hex-mix:26%; color-scheme:dark", "--hex-mix:26%; --water:#173246; --water
 sub('<svg class="map" id="map" role="img" aria-label="六角格地圖：台北、新北、基隆、桃園，每格是一位候選人的一項政策主題；完整內容請用右側清單"></svg>',
     '<div class="stage" id="stage" role="group" aria-busy="true" aria-label="3D 政策城市：台北、新北、基隆、桃園，每個街區是一項政策主題">'
     '<section class="loading" id="loading" aria-label="城市載入狀態">'
-    '<div class="loading-brand"><picture><source media="(max-width:860px)" srcset="__BRAND_B_MOBILE__"><img src="__BRAND_B_DESKTOP__" width="2158" height="729" alt="台北安可，一起打造你我的北北基桃"></picture></div>'
+    '<div class="loading-brand"><picture><source media="(max-width:860px)" srcset="__BRAND_B_MOBILE__"><img src="__BRAND_B_DESKTOP__" width="2158" height="729" loading="eager" decoding="sync" fetchpriority="high" alt="台北安可，一起打造你我的北北基桃"></picture></div>'
     '<div class="loading-spinner" aria-hidden="true"></div>'
     '<p class="loading-status" role="status">正在載入你的理想城市</p>'
     '<p class="loading-hint" hidden></p>'
@@ -214,6 +214,13 @@ sub("</style>", (ROOT / "3d" / "page.css").read_text(encoding="utf-8") + """
 @media (max-width:860px){.stage{flex:none;aspect-ratio:1/1;max-width:100%}.mapwrap .legend{bottom:auto}.key .hint{margin-left:0}}
 </style>""")
 mod = "\n".join((ROOT / "3d" / f).read_text(encoding="utf-8") for f in ["core.js", "world.js", "env.js", "models.js", "models2.js", "models3.js", "landmarks.js", "ships.js", "decor.js", "people.js", "coaster.js", "flags.js", "main.js", "ui.js"])
+# The loader must be outside .app, whose visibility is hidden during boot.
+# This also keeps filtered artwork out of hidden/overflow-clipped ancestors.
+loader_start = page.index('<section class="loading" id="loading"')
+loader_end = page.index('</section>', loader_start) + len('</section>')
+loader = page[loader_start:loader_end]
+page = page[:loader_start] + page[loader_end:]
+page = page.replace('<div class="app" id="app">', loader + '\n<div class="app" id="app">', 1)
 # Keep branded artwork inside the self-contained 3D document.
 import base64
 for variant in ("desktop", "mobile"):

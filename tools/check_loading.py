@@ -38,6 +38,8 @@ try:
             assert not page.locator(".loading-actions").is_visible()
             page.evaluate("""()=>{
               const loader=document.getElementById('loading'),r=loader.getBoundingClientRect();
+              if(loader.closest('.app'))throw Error('Loader is inside the hidden app');
+              const img=loader.querySelector('img');if(img.getAttribute('loading')!=='eager'||img.getAttribute('decoding')!=='sync')throw Error('Brand is not prioritised');
               if(!document.documentElement.classList.contains('hi')||!document.documentElement.classList.contains('booting'))throw Error('Initial shell missing');
               if(Math.abs(r.width-innerWidth)>1||Math.abs(r.height-innerHeight)>1)throw Error('Loading screen is not full viewport');
               if(getComputedStyle(document.querySelector('.maptools')).display!=='none'||getComputedStyle(document.querySelector('header.top')).visibility!=='hidden')throw Error('Legacy chrome exposed');
