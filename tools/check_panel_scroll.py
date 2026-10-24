@@ -50,9 +50,9 @@ try:
                     page.wait_for_function("document.getElementById('pbody').scrollTop>0")
                 page.evaluate("document.getElementById('pbody').scrollTop=document.getElementById('pbody').scrollHeight")
                 page.evaluate("""expected=>{
-                  const b=document.getElementById('pbody'),r=b.getBoundingClientRect(),last=b.lastElementChild.getBoundingClientRect(),notice=document.querySelector('.notice').getBoundingClientRect();
+                  const b=document.getElementById('pbody'),r=b.getBoundingClientRect(),last=b.lastElementChild.getBoundingClientRect();
                   if(b.scrollHeight-b.clientHeight-b.scrollTop>2)throw Error('Cannot reach drawer bottom');
-                  if(last.bottom>Math.min(r.bottom,innerHeight,notice.top)+1)throw Error('Last content hidden behind notice');
+                  if(last.bottom>Math.min(r.bottom,innerHeight)+1)throw Error('Last content outside panel');
                   if(Math.abs(document.querySelector('.tabs').getBoundingClientRect().top-expected)>1)throw Error('Tabs scrolled away');
                 }""", data["top"])
                 page.screenshot(path=str(ROOT / f"out/panel-scroll-{name}-{tab}.png"))

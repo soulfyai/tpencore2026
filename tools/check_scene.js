@@ -114,7 +114,7 @@
  }
  check(views.some((v,i)=>Math.abs(v.el.getBoundingClientRect().left-originalScreens[i])>20),'titles move when orbiting');
  MAP3D.flyTo(savedTarget,savedPosition);C.snapshot();
- const r=document.querySelector('.notice').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
- check(l.bottom<=r.top,'landmark control behind notice');
+ const r=document.querySelector('.hi-watermark').getBoundingClientRect(), l=document.querySelector('.lmbtn').getBoundingClientRect();
+ check(l.bottom<=r.top,'landmark control behind watermark');
  return {roles:Object.fromEntries(roles.map(r=>[r,P.list.filter(p=>p.role===r).length])),people:P.list.length,propBatches:props.length,blockHalfSize:W.blockHalfSize,blockCells:W.blockCells.length,partBatches:C.batches.size,blockTypes:new Set(plans.map(p=>p.plan)).size,architectureTypes:new Set(plans.flatMap(p=>p.buildings.map(b=>b.type))).size,streets:W.streetTypes,waterfrontPlots:W.waterfrontPlots.length,buildings:W.buildingCounts,bridges:W.bridges.length,gap,requiredGap:W.namedBridgeSpacing,ships:P.ships.length,planes:P.planes.length,shadows:C.renderer.shadowMap.enabled};
 })()

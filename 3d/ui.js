@@ -17,21 +17,18 @@ const UI = {};
   /* ---------- brand block: the neon sign is a persistent tab, details pop out below it ---------- */
   const brand = document.querySelector("header.top .brand");
   const h1 = brand.querySelector("h1");
-  // Original vector skyline: Taipei 101, northern Taiwan bridge, port and airport.
-  // Decorative SVG stays inside the same accessible city-menu button.
-  const skyline = `<svg class="hi-skyline" viewBox="0 0 360 64" aria-hidden="true" focusable="false">
-    <path class="hi-sky-back" d="M2 64V61Q2 51 14 51H22V42H33V51H40V30H44V23H48V17H51V9H54V3H57V9H60V17H63V23H67V30H71V51H81V39H93V51H104L137 24L170 51H185V36H198V51H207V30H221V51H232V18L257 30H247V51H268Q285 34 314 43L327 47V51H333V31H330V26H348V31H345V51H346Q358 51 358 61V64Z"/>
-    <path class="hi-sky-tube" d="M2 64V61Q2 51 14 51H22V42H33V51H40V30H44V23H48V17H51V9H54V3H57V9H60V17H63V23H67V30H71V51H81V39H93V51H104L137 24L170 51H185V36H198V51H207V30H221V51H232V18L257 30H247V51H268Q285 34 314 43L327 47V51H333V31H330V26H348V31H345V51H346Q358 51 358 61V64"/>
-    <path class="hi-sky-detail" d="M46 33H65M48 27H63M50 21H61M52 15H59M45 40H66M137 24V53M108 51H169M137 30L117 51M137 30L128 51M137 30L147 51M137 30L158 51M232 18V51M236 21L236 30H257M245 30V40M271 51Q291 39 324 49M281 48V53M293 45V53M307 47V53M337 33V50"/>
-    <path class="hi-sky-warm" d="M27 45V48M86 43V47M190 40V44M212 34V38M212 43V47M218 34V38M218 43V47M233 56H253M277 21L287 24L305 17L308 19L294 29L282 29L277 26L284 26Z"/>
-  </svg>`;
-  const brandBtn = el("button", "hi-brandbtn", `${skyline}<span class="hi-brandface"><span class="hi-t">台北安可</span><span class="hi-sub">一起打造你我的北北基桃</span><i class="hi-caret" aria-hidden="true">▾</i></span>`);
+  // Art-directed B assets retain the approved neon detail and typography.
+  // Build embeds both images so the standalone HTML has no asset-path dependency.
+  const brandBtn = el("button", "hi-brandbtn", `<picture class="hi-brandart"><source media="(max-width:860px)" srcset="__BRAND_B_MOBILE__"><img src="__BRAND_B_DESKTOP__" width="2158" height="729" alt="" decoding="sync"></picture><span class="hi-brand-copy">台北安可・一起打造你我的北北基桃</span>`);
   brandBtn.type = "button"; brandBtn.setAttribute("aria-expanded", "false"); brandBtn.setAttribute("aria-controls", "hi-pop");
   if (h1) { h1.innerHTML = ""; h1.appendChild(brandBtn); }
   brand.querySelector("p")?.remove(); // no lede under the sign
-  // the independence notice always sits bottom-center of the viewport; move it out of the
-  // header's stacking context (z 30) so nothing — drawer (35) included — can cover it
-  const notice = document.querySelector("header.top .notice"); if (notice) document.body.appendChild(notice);
+  // The user moved the full independence statement into help.
+  const notice = document.querySelector("header.top .notice");
+  const independence = notice?.innerHTML || "獨立整理，非任何候選人或政黨官方網站";
+  notice?.remove();
+  const watermark = el("footer", "hi-watermark", `<span>Copyright@TPEncore2026</span><a href="mailto:TPEncore2026@gmail.com">Contact / TPEncore2026@gmail.com</a>`);
+  document.body.appendChild(watermark);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
   // City switcher colors match the map and city signs.
@@ -120,6 +117,7 @@ const UI = {};
     <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
     <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>政策清單</b>：用文字一項一項瀏覽</li><li><b>政策進度</b>：依已完成、推動中、規劃中排好</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
+    <p class="hi-independence">${independence}</p>
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
   intro.setAttribute("aria-label", "使用說明");
   document.querySelector(".mapwrap").appendChild(intro);

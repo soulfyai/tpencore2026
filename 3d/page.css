@@ -30,22 +30,13 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 .hi header.top{position:absolute;left:20px;top:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(380px,calc(100% - 40px));pointer-events:none}
 .hi header.top>*{pointer-events:auto}
 .hi .brand{background:none;padding:0;box-shadow:none}
-/* B: the skyline forms the sign's crown; vector tubes stay sharp at any DPR. */
-.hi .brand h1{width:360px;max-width:calc(100vw - 32px);margin:0;background:none;border:0;border-radius:0;box-shadow:none;animation:none;color:#fff;text-indent:0;letter-spacing:0}
-.hi-brandbtn{display:block;width:100%;border:0;background:none;color:inherit;padding:0;margin:0;cursor:pointer;filter:drop-shadow(0 3px 8px #08215f55)}
-.hi-skyline{display:block;width:100%;height:auto;overflow:visible;margin-bottom:-2px;pointer-events:none}
-.hi-sky-back{fill:#101d38}
-.hi-sky-tube,.hi-sky-detail,.hi-sky-warm{fill:none;stroke-linejoin:round;stroke-linecap:round}
-.hi-sky-tube{stroke:#b9edff;stroke-width:2;filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 3px #008cff) drop-shadow(0 0 5px #1671ff)}
-.hi-sky-detail{stroke:#a7eaff;stroke-width:1;filter:drop-shadow(0 0 2px #008cff)}
-.hi-sky-warm{stroke:#ffe6a3;stroke-width:1.4;filter:drop-shadow(0 0 3px #ffb83f)}
-.hi-brandface{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:8px 12px 11px;background:#101d38;border:2px solid #89ceff;border-top:0;border-radius:0 0 16px 16px;box-shadow:0 2px 3px #2484ff,inset 0 -3px 9px #2259b866;position:relative}
-.hi-t{font:800 27px/1.2 var(--f-display);letter-spacing:.05em;white-space:nowrap;text-shadow:0 0 2px #fff,0 0 9px #98c4ff99}
-.hi-caret{font-style:normal;font-size:12px;opacity:.9;display:inline-block;transition:transform .2s}
-.hi .brand.open .hi-caret{transform:rotate(180deg)}
-.hi .brand h1 .hi-sub{font:800 11px/1.6 var(--f-body);letter-spacing:.07em;color:#ffe9a8;text-align:left;border-left:1px solid #ffe2a4;padding-left:12px;text-shadow:0 0 3px #fff3c4,0 0 8px #ffb84a88}
-.hi-brandbtn:focus-visible{outline:2px solid #ffe9a8;outline-offset:6px;border-radius:12px}
-@media (prefers-reduced-motion:reduce){.hi-caret{transition:none}}
+/* Approved B artwork, with separately composed mobile typography. */
+.hi .brand h1{width:380px;max-width:calc(100vw - 32px);margin:0;background:none;border:0;border-radius:0;box-shadow:none;animation:none;color:#fff;text-indent:0;letter-spacing:0}
+.hi-brandbtn{display:block;width:100%;border:0;background:none;color:inherit;padding:0;margin:0;cursor:pointer;line-height:0}
+.hi-brandart{display:block;pointer-events:none}
+.hi-brandart img{display:block;width:100%;height:auto;aspect-ratio:2158 / 729;object-fit:contain}
+.hi-brand-copy{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.hi-brandbtn:focus-visible{outline:2px solid #ffe9a8;outline-offset:3px;border-radius:14px}
 /* pop-out info card under the sign */
 .hi-pop{margin-top:8px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px 14px;box-shadow:0 10px 32px rgba(20,33,61,.18)}
 .hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:0;font:800 22px var(--f-display);color:var(--ink)}
@@ -55,8 +46,14 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 .hi-count span{font-size:12.5px;line-height:1.35;color:var(--muted)}
 /* the weather element (built by main.js) docks as a block at the bottom of the popover */
 .hi .hi-pop .wx{position:static;left:auto;right:auto;top:auto;bottom:auto;max-width:none;background:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding:10px 0 0;margin-top:12px}
-/* the independence notice: bottom-center of the viewport, above everything (incl. drawer) */
-.hi .notice{font-size:11.5px;z-index:60;background:color-mix(in srgb,var(--surface) 94%,transparent)}
+/* Quiet attribution; the full independence statement lives inside help. */
+.hi header.top .notice{display:none}
+.hi-watermark{position:fixed;bottom:max(8px,env(safe-area-inset-bottom));left:12px;right:12px;z-index:31;display:flex;justify-content:center;flex-wrap:wrap;gap:0 14px;font:400 10px/1.5 var(--f-body);color:#e1eafa;text-shadow:0 1px 3px #07162d,0 0 4px #07162d;pointer-events:none}
+.hi-watermark a{color:inherit;text-decoration:none;pointer-events:auto}
+.hi-watermark a:hover{text-decoration:underline}
+.hi-watermark a:focus-visible{outline:2px solid #ffe9a8;outline-offset:3px}
+html.drawer-open .hi-watermark{display:none}
+.hi-intro .hi-independence{border-top:1px solid var(--line);padding-top:10px;margin-top:12px;font-size:12px;color:var(--muted)}
 
 /* Shared desktop toolbar: landmark / tour controls precede the three policy view modes. */
 .hi-toolbar{position:absolute;right:16px;top:16px;z-index:31;display:flex;align-items:flex-start;justify-content:flex-end;gap:8px;max-width:calc(100% - 290px)}
@@ -85,7 +82,7 @@ html.drawer-open .hi-modes{right:calc(min(420px,94vw) + 28px)}
 .hi-x:hover{background:var(--sunk)}
 
 /* intro card */
-.hi-intro{position:absolute;left:20px;top:250px;z-index:32;width:min(380px,calc(100% - 40px));background:var(--surface);border-radius:18px;padding:18px 20px 18px;box-shadow:0 12px 40px rgba(20,33,61,.2)}
+.hi-intro{max-height:calc(100dvh - 286px);overflow-y:auto;touch-action:pan-y;box-sizing:border-box;position:absolute;left:20px;top:250px;z-index:32;width:min(380px,calc(100% - 40px));background:var(--surface);border-radius:18px;padding:18px 20px 18px;box-shadow:0 12px 40px rgba(20,33,61,.2)}
 .hi-intro h2{font:800 22px/1.3 var(--f-display);margin:4px 0 8px}
 .hi-intro p{font-size:14px;line-height:1.7;margin:0 0 8px}
 .hi-intro ul{margin:0 0 8px;padding-left:18px;font-size:13.5px;line-height:1.8}
@@ -168,18 +165,14 @@ html.drawer-open aside.panel{transform:none}
 
 @media (max-width:860px){
   .hi header.top{left:10px;top:10px;max-width:calc(100% - 20px)}
-  .hi .brand h1{width:min(250px,calc(100vw - 110px));max-width:none}
-  .hi-brandface{grid-template-columns:1fr auto;gap:3px 6px;padding:6px 10px 9px;border-radius:0 0 13px 13px}
-  .hi-t{font-size:clamp(21px,6vw,26px);text-align:center;grid-column:1;grid-row:1}
-  .hi-caret{grid-column:2;grid-row:1 / 3;font-size:11px}
-  .hi .brand h1 .hi-sub{grid-column:1;grid-row:2;font-size:10px;letter-spacing:.04em;text-indent:0;border:0;padding:0;text-align:center;white-space:nowrap}
+  .hi .brand h1{width:min(260px,calc(100vw - 110px));max-width:none}
+  .hi-brandart img{aspect-ratio:1902 / 827}
   .hi-pop{padding:10px 12px 12px;border-radius:14px}
   .hi-cand{font-size:17px}
   .hi-count{margin-top:4px}.hi-count b{font-size:28px}.hi-count span{font-size:11px}
   /* keep the full weather info readable inside the popover on phones */
   .hi .hi-pop .wx{display:flex;padding:8px 0 0;margin-top:10px}
   .hi .hi-pop .wx span,.hi .hi-pop .wx small{display:inline-block}
-  .hi .notice{bottom:max(12px,env(safe-area-inset-bottom));font-size:10.5px;padding:3px 9px}
   .hi-toolbar{top:12px;right:10px;z-index:45;display:flex;flex-direction:column;align-items:stretch;gap:6px;max-width:none}
   html.drawer-open .hi-toolbar{top:12px;right:10px;max-width:none}
   .hi-tools-toggle{position:static;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 10px;font-size:12.5px}
@@ -195,7 +188,7 @@ html.drawer-open aside.panel{transform:none}
   .hi-modes button{min-width:44px;padding:0 8px;font-size:12.5px;min-height:44px}
   .hi-help-label{display:inline;margin-left:5px}
   html.drawer-open .hi-modes{right:10px}
-  .hi-intro{left:10px;right:10px;top:auto;bottom:52px;width:auto;padding:14px 16px}
+  .hi-intro{max-height:calc(100dvh - 180px);left:10px;right:10px;top:auto;bottom:52px;width:auto;padding:14px 16px}
   .hi-intro h2{font-size:18px}.hi-intro p,.hi-intro ul{font-size:13px}
   .hi-tour{left:10px;right:10px;width:auto;bottom:52px;padding:12px 14px}
   .hi-tour h3{font-size:16px}.hi-tour p{font-size:12.5px}

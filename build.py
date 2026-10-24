@@ -148,7 +148,7 @@ sub('<svg class="map" id="map" role="img" aria-label="六角格地圖：台北�
     '<p class="loading-status" role="status">正在載入四座政策城市…</p>'
     '<p class="loading-hint">準備好後，會自動顯示全景。</p>'
     '<div class="loading-actions" id="loading-actions" hidden><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button></div>'
-    '<small>獨立整理，非任何候選人或政黨官方網站</small>'
+    '<small>Copyright@TPEncore2026　Contact / TPEncore2026@gmail.com</small>'
     '</section></div>'
     '<div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>')
 sub("</style>", (ROOT / "3d" / "page.css").read_text(encoding="utf-8") + """
@@ -214,6 +214,12 @@ sub("</style>", (ROOT / "3d" / "page.css").read_text(encoding="utf-8") + """
 @media (max-width:860px){.stage{flex:none;aspect-ratio:1/1;max-width:100%}.mapwrap .legend{bottom:auto}.key .hint{margin-left:0}}
 </style>""")
 mod = "\n".join((ROOT / "3d" / f).read_text(encoding="utf-8") for f in ["core.js", "world.js", "env.js", "models.js", "models2.js", "models3.js", "landmarks.js", "ships.js", "decor.js", "people.js", "coaster.js", "main.js", "ui.js"])
+# Keep branded artwork inside the self-contained 3D document.
+import base64
+for variant in ("desktop", "mobile"):
+    asset = ROOT / "3d" / "assets" / f"brand-b-{variant}.webp"
+    uri = "data:image/webp;base64," + base64.b64encode(asset.read_bytes()).decode("ascii")
+    mod = mod.replace(f"__BRAND_B_{variant.upper()}__", uri)
 imports = "\n".join(l for l in mod.splitlines() if l.startswith("import "))
 body = "\n".join(l for l in mod.splitlines() if not l.startswith("import "))
 sub("</script>\n", """</script>
