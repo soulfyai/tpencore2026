@@ -148,7 +148,7 @@ sub('<svg class="map" id="map" role="img" aria-label="六角格地圖：台北�
     '<p class="loading-status" role="status">正在載入你的理想城市</p>'
     '<p class="loading-hint" hidden></p>'
     '<div class="loading-actions" id="loading-actions" hidden><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button></div>'
-    '<small>Copyright@TPEncore2026　Contact / TPEncore2026@gmail.com</small>'
+    '<small>Designed by TPEncore © 2026　Contact / TPEncore2026@gmail.com</small>'
     '</section></div>'
     '<div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>')
 sub("</style>", (ROOT / "3d" / "page.css").read_text(encoding="utf-8") + """

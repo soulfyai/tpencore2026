@@ -27,7 +27,7 @@ const UI = {};
   const notice = document.querySelector("header.top .notice");
   const independence = notice?.innerHTML || "獨立整理，非任何候選人或政黨官方網站";
   notice?.remove();
-  const watermark = el("footer", "hi-watermark", `<span>Copyright@TPEncore2026</span><a href="mailto:TPEncore2026@gmail.com">Contact / TPEncore2026@gmail.com</a>`);
+  const watermark = el("footer", "hi-watermark", `<span>Designed by TPEncore © 2026</span><a href="mailto:TPEncore2026@gmail.com">Contact / TPEncore2026@gmail.com</a>`);
   document.body.appendChild(watermark);
   const cand = el("div", "hi-cand"), count = el("div", "hi-count"), chips = el("div", "hi-cities");
   chips.setAttribute("role", "tablist"); chips.setAttribute("aria-label", "選擇城市");
