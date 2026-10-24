@@ -30,17 +30,22 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 .hi header.top{position:absolute;left:20px;top:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(380px,calc(100% - 40px));pointer-events:none}
 .hi header.top>*{pointer-events:auto}
 .hi .brand{background:none;padding:0;box-shadow:none}
-/* brand neon sign: same language as the city neon signs (.hi .clabel); the whole sign is the toggle button */
-.hi .brand h1{display:block;font-size:28px;line-height:1.1;letter-spacing:.12em;text-indent:.12em;color:#fff;margin:0;
-  background:rgba(12,20,48,.85);border:2.5px solid var(--c-taipei);border-radius:14px;
-  box-shadow:0 0 0 1.5px rgba(255,255,255,.55),0 0 14px var(--c-taipei),inset 0 0 14px color-mix(in srgb,var(--c-taipei) 55%,transparent);
-  text-shadow:0 0 4px #fff,0 0 10px var(--c-taipei),0 0 24px var(--c-taipei);animation:neon 3.2s ease-in-out infinite}
-.hi-brandbtn{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-indent:inherit;padding:8px 16px 7px;margin:0;cursor:pointer}
-.hi-t{display:inline-flex;align-items:center}
-.hi-caret{font-style:normal;font-size:13px;margin-left:9px;opacity:.9;display:inline-block;transition:transform .2s}
+/* B: the skyline forms the sign's crown; vector tubes stay sharp at any DPR. */
+.hi .brand h1{width:360px;max-width:calc(100vw - 32px);margin:0;background:none;border:0;border-radius:0;box-shadow:none;animation:none;color:#fff;text-indent:0;letter-spacing:0}
+.hi-brandbtn{display:block;width:100%;border:0;background:none;color:inherit;padding:0;margin:0;cursor:pointer;filter:drop-shadow(0 3px 8px #08215f55)}
+.hi-skyline{display:block;width:100%;height:auto;overflow:visible;margin-bottom:-2px;pointer-events:none}
+.hi-sky-back{fill:#101d38}
+.hi-sky-tube,.hi-sky-detail,.hi-sky-warm{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.hi-sky-tube{stroke:#b9edff;stroke-width:2;filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 3px #008cff) drop-shadow(0 0 5px #1671ff)}
+.hi-sky-detail{stroke:#a7eaff;stroke-width:1;filter:drop-shadow(0 0 2px #008cff)}
+.hi-sky-warm{stroke:#ffe6a3;stroke-width:1.4;filter:drop-shadow(0 0 3px #ffb83f)}
+.hi-brandface{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:8px 12px 11px;background:#101d38;border:2px solid #89ceff;border-top:0;border-radius:0 0 16px 16px;box-shadow:0 2px 3px #2484ff,inset 0 -3px 9px #2259b866;position:relative}
+.hi-t{font:800 27px/1.2 var(--f-display);letter-spacing:.05em;white-space:nowrap;text-shadow:0 0 2px #fff,0 0 9px #98c4ff99}
+.hi-caret{font-style:normal;font-size:12px;opacity:.9;display:inline-block;transition:transform .2s}
 .hi .brand.open .hi-caret{transform:rotate(180deg)}
-.hi .brand h1 .hi-sub{font:800 12.5px var(--f-body);letter-spacing:.3em;text-indent:.3em;color:#ffe9a8;text-shadow:0 0 4px #fff3c4,0 0 10px #ffb84a,0 0 18px #ff8a3c}
-@media (prefers-reduced-motion:reduce){.hi .brand h1{animation:none}.hi-caret{transition:none}}
+.hi .brand h1 .hi-sub{font:800 11px/1.6 var(--f-body);letter-spacing:.07em;color:#ffe9a8;text-align:left;border-left:1px solid #ffe2a4;padding-left:12px;text-shadow:0 0 3px #fff3c4,0 0 8px #ffb84a88}
+.hi-brandbtn:focus-visible{outline:2px solid #ffe9a8;outline-offset:6px;border-radius:12px}
+@media (prefers-reduced-motion:reduce){.hi-caret{transition:none}}
 /* pop-out info card under the sign */
 .hi-pop{margin-top:8px;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px 14px;box-shadow:0 10px 32px rgba(20,33,61,.18)}
 .hi-cand{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:0;font:800 22px var(--f-display);color:var(--ink)}
@@ -163,9 +168,11 @@ html.drawer-open aside.panel{transform:none}
 
 @media (max-width:860px){
   .hi header.top{left:10px;top:10px;max-width:calc(100% - 20px)}
-  .hi .brand h1{font-size:21px;border-width:2px}
-  .hi-brandbtn{padding:6px 12px 5px}
-  .hi .brand h1 .hi-sub{font-size:10.5px;letter-spacing:.24em;text-indent:.24em}
+  .hi .brand h1{width:min(250px,calc(100vw - 110px));max-width:none}
+  .hi-brandface{grid-template-columns:1fr auto;gap:3px 6px;padding:6px 10px 9px;border-radius:0 0 13px 13px}
+  .hi-t{font-size:clamp(21px,6vw,26px);text-align:center;grid-column:1;grid-row:1}
+  .hi-caret{grid-column:2;grid-row:1 / 3;font-size:11px}
+  .hi .brand h1 .hi-sub{grid-column:1;grid-row:2;font-size:10px;letter-spacing:.04em;text-indent:0;border:0;padding:0;text-align:center;white-space:nowrap}
   .hi-pop{padding:10px 12px 12px;border-radius:14px}
   .hi-cand{font-size:17px}
   .hi-count{margin-top:4px}.hi-count b{font-size:28px}.hi-count span{font-size:11px}

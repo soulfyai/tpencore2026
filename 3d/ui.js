@@ -17,7 +17,15 @@ const UI = {};
   /* ---------- brand block: the neon sign is a persistent tab, details pop out below it ---------- */
   const brand = document.querySelector("header.top .brand");
   const h1 = brand.querySelector("h1");
-  const brandBtn = el("button", "hi-brandbtn", `<span class="hi-t">台北安可<i class="hi-caret" aria-hidden="true">▾</i></span><span class="hi-sub">一起打造你我的北北基桃</span>`);
+  // Original vector skyline: Taipei 101, northern Taiwan bridge, port and airport.
+  // Decorative SVG stays inside the same accessible city-menu button.
+  const skyline = `<svg class="hi-skyline" viewBox="0 0 360 64" aria-hidden="true" focusable="false">
+    <path class="hi-sky-back" d="M2 64V61Q2 51 14 51H22V42H33V51H40V30H44V23H48V17H51V9H54V3H57V9H60V17H63V23H67V30H71V51H81V39H93V51H104L137 24L170 51H185V36H198V51H207V30H221V51H232V18L257 30H247V51H268Q285 34 314 43L327 47V51H333V31H330V26H348V31H345V51H346Q358 51 358 61V64Z"/>
+    <path class="hi-sky-tube" d="M2 64V61Q2 51 14 51H22V42H33V51H40V30H44V23H48V17H51V9H54V3H57V9H60V17H63V23H67V30H71V51H81V39H93V51H104L137 24L170 51H185V36H198V51H207V30H221V51H232V18L257 30H247V51H268Q285 34 314 43L327 47V51H333V31H330V26H348V31H345V51H346Q358 51 358 61V64"/>
+    <path class="hi-sky-detail" d="M46 33H65M48 27H63M50 21H61M52 15H59M45 40H66M137 24V53M108 51H169M137 30L117 51M137 30L128 51M137 30L147 51M137 30L158 51M232 18V51M236 21L236 30H257M245 30V40M271 51Q291 39 324 49M281 48V53M293 45V53M307 47V53M337 33V50"/>
+    <path class="hi-sky-warm" d="M27 45V48M86 43V47M190 40V44M212 34V38M212 43V47M218 34V38M218 43V47M233 56H253M277 21L287 24L305 17L308 19L294 29L282 29L277 26L284 26Z"/>
+  </svg>`;
+  const brandBtn = el("button", "hi-brandbtn", `${skyline}<span class="hi-brandface"><span class="hi-t">台北安可</span><span class="hi-sub">一起打造你我的北北基桃</span><i class="hi-caret" aria-hidden="true">▾</i></span>`);
   brandBtn.type = "button"; brandBtn.setAttribute("aria-expanded", "false"); brandBtn.setAttribute("aria-controls", "hi-pop");
   if (h1) { h1.innerHTML = ""; h1.appendChild(brandBtn); }
   brand.querySelector("p")?.remove(); // no lede under the sign
