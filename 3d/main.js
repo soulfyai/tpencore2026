@@ -296,6 +296,30 @@ function positionCitySigns() {
   cityLeaderGeometry.computeBoundingSphere();
 }
 
+// Let the whole list grow, then keep it clear of the header and tour controls.
+// CSS2D still anchors the bubble to its policy block as the camera moves.
+function fitPolicyCallout() {
+  if (!callout || !callout.getClientRects().length) return;
+  callout.style.translate = "";
+  callout.style.removeProperty("--co-columns");
+  callout.style.removeProperty("width");
+  const frame = stage.getBoundingClientRect(), pad = 12;
+  const header = document.querySelector(".hi .brand").getBoundingClientRect();
+  const tour = document.querySelector(".hi-tour:not([hidden])");
+  const top = Math.max(frame.top + pad, header.bottom + pad);
+  const bottom = tour ? tour.getBoundingClientRect().top - 18 : frame.bottom - 60;
+  let r = callout.getBoundingClientRect();
+  // Short landscape screens can use columns instead of hiding rows in a scroll box.
+  if (r.height > bottom - top && frame.width > 540) {
+    callout.style.setProperty("--co-columns", "2");
+    callout.style.width = `${Math.min(600, frame.width - 32)}px`;
+    r = callout.getBoundingClientRect();
+  }
+  const x = THREE.MathUtils.clamp(r.left, frame.left + pad, Math.max(frame.left + pad, frame.right - pad - r.width));
+  const y = THREE.MathUtils.clamp(r.top, top, Math.max(top, bottom - r.height));
+  callout.style.translate = `${x - r.left}px ${y - r.top}px`;
+}
+
 function fitPolicyLabels() {
   const labels=[...islandLabels.values()];
   labels.forEach(l=>{l.el.style.translate="";});
@@ -351,7 +375,7 @@ function renderFrame(now, forceRender = false) {
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
   if (forceRender || busy || dirty) {
-    positionCitySigns(); renderer.render(scene, camera); labelR.render(scene, camera); fitPolicyLabels(); dirty = false;
+    positionCitySigns(); renderer.render(scene, camera); labelR.render(scene, camera); fitPolicyLabels(); fitPolicyCallout(); dirty = false;
     if(stage.classList.contains("ready")){document.documentElement.classList.remove("booting");stage.setAttribute("aria-busy","false");}
   }
 }
