@@ -26,6 +26,9 @@ def package(output):
     version = {"version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
                "commit": commit, "built_at": datetime.now(timezone.utc).isoformat()}
     (output / "version.json").write_text(json.dumps(version) + "\n", encoding="utf-8")
+    # A public HTTPS image is required by social crawlers; data URIs do not work.
+    # Host on existing Pages so already-installed NAS updaters need no new asset step.
+    (output / "social-preview.jpg").write_bytes((ROOT / "assets/social-preview.jpg").read_bytes())
     (output / ".nojekyll").touch()
     (output / "site-config.json").write_text((ROOT / "site-config.json").read_text(encoding="utf-8"), encoding="utf-8")
     (output / "counter.php.txt").write_bytes((ROOT / "deploy/counter.php").read_bytes())

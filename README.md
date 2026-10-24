@@ -17,6 +17,7 @@
 - `template.html`：2D 地圖與共用資料面板。
 - `3d/`：Three.js 場景、模型、互動、音樂與樣式。
 - `build.py`：驗證資料並生成 `index.html`（2D）、`index3d.html`（3D）。
+- `assets/social-preview.jpg`：社群分享全景圖；可用 `tools/capture_social_preview.py` 從實際 3D 頁面重新擷取。分享設定在 `template.html`，圖片由既有 GitHub Pages 提供公開 HTTPS 網址。
 
 ```sh
 python3 build.py

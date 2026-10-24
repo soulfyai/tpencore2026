@@ -124,6 +124,8 @@ def sub(a, b, count=1):
     page = page.replace(a, b, count)
 
 sub("的公開政見，一格一個政策主題</p>", "的公開政見與任內政績</p>")
+sub('<link rel="canonical" href="https://tpencore.tw/2d.html">', '<link rel="canonical" href="https://tpencore.tw/">')
+sub('<meta property="og:url" content="https://tpencore.tw/2d.html">', '<meta property="og:url" content="https://tpencore.tw/">')
 boot = """<script>
 document.documentElement.classList.add('hi','booting');
 window.cityLoadFailed=function(){
