@@ -4156,6 +4156,40 @@ function placeBeam() {
 
 /* ---------- camera ---------- */
 let fly = null;
+// One clockwise revolution per Panorama activation; user input cancels until re-entry.
+const panoramaOrbit = { armed:true, waitingSince:null, angle:0 };
+function stopPanoramaOrbit() { panoramaOrbit.armed=false; panoramaOrbit.waitingSince=null; }
+function armPanoramaOrbit() { panoramaOrbit.armed=true; panoramaOrbit.waitingSince=null; panoramaOrbit.angle=0; }
+function updatePanoramaOrbit(now,dt) {
+  if(!panoramaOrbit.armed)return false;
+  if(reduced.matches){stopPanoramaOrbit();return false;}
+  if(document.hidden||fly||UI.hasOverlays?.()||document.documentElement.classList.contains("booting")){
+    panoramaOrbit.waitingSince=null;return false;
+  }
+  if(entered!==null||A.state.selTheme||A.state.selItem||A.state.selFlow){stopPanoramaOrbit();return false;}
+  if(panoramaOrbit.waitingSince===null){panoramaOrbit.waitingSince=now;return false;}
+  if(now-panoramaOrbit.waitingSince<5000)return false;
+  const step=Math.min(Math.max(0,dt)*Math.PI*2/180,Math.PI*2-panoramaOrbit.angle);
+  const offset=camera.position.clone().sub(controls.target);
+  offset.applyAxisAngle(new THREE.Vector3(0,1,0),-step);
+  camera.position.copy(controls.target).add(offset);
+  panoramaOrbit.angle+=step;
+  if(panoramaOrbit.angle>=Math.PI*2-1e-9)stopPanoramaOrbit();
+  return step>0;
+}
+for(const type of ["pointerdown","wheel","keydown"]){
+  document.addEventListener(type,()=>{
+    // Closing the initial help leaves a fresh five-second viewing interval.
+    if(panoramaOrbit.angle>0||!UI.hasOverlays?.())stopPanoramaOrbit();
+    else panoramaOrbit.waitingSince=null;
+  },{capture:true,passive:true});
+}
+controls.addEventListener("start",stopPanoramaOrbit);
+reduced.addEventListener("change",()=>{if(reduced.matches)stopPanoramaOrbit();});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&panoramaOrbit.angle>0)stopPanoramaOrbit();
+  panoramaOrbit.waitingSince=null;
+});
 function overview() {
   // Reference default: low oblique view, Taipei centred, all four cities below the sea/sky horizon.
   // The same responsive frame is used on startup and by Panorama.
@@ -4168,6 +4202,7 @@ function overview() {
   return { target: C, pos: C.clone().add(new THREE.Vector3(0, 0.35, 0.94).normalize().multiplyScalar(dist)), dist };
 }
 function flyTo(target, pos) {
+  stopPanoramaOrbit();
   if (reduced.matches) { camera.position.copy(pos); controls.target.copy(target); controls.update(); dirty = true; return; }
   fly = { t0: performance.now(), p0: camera.position.clone(), p1: pos, q0: controls.target.clone(), q1: target };
 }
@@ -4180,7 +4215,7 @@ function cityFrame(city) {
   return { target: c, pos: c.clone().add(new THREE.Vector3(0, 0.62, 0.79).normalize().multiplyScalar(dist)), dist };
 }
 function enterCity(city) { entered = city; const f = cityFrame(city); flyTo(drawerShift(f.target, f.dist), drawerShift(f.target, f.dist).add(f.pos.clone().sub(f.target))); showPins(null); }
-function panorama() { entered = null; const o = overview(); flyTo(o.target, o.pos); showPins(null); }
+function panorama() { entered = null; const o = overview(); flyTo(o.target, o.pos); armPanoramaOrbit(); showPins(null); }
 function home() { if (entered) enterCity(entered); else panorama(); }
 function focusTheme(id) {
   const isl = islandById.get(id); if (!isl) return;
@@ -4373,6 +4408,7 @@ function renderFrame(now, forceRender = false) {
     camera.position.lerpVectors(fly.p0, fly.p1, k); controls.target.lerpVectors(fly.q0, fly.q1, k);
     if (t === 1) fly = null; busy = true;
   }
+  if(updatePanoramaOrbit(now,dt))busy=true;
   for (const isl of islands) if (Math.abs(isl.lift - isl.liftTo) > 0.0005) {
     isl.lift += (isl.liftTo - isl.lift) * (reduced.matches ? 1 : Math.min(1, dt * 9));
     WORLD.bodies.get(isl.id).g.position.y = isl.lift; placeIslandParts(isl); busy = true;

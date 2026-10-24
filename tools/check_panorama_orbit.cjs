@@ -1,0 +1,20 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),THREE=require('three');
+const src=fs.readFileSync('3d/main.js','utf8');
+const events={},controlEvents={};let overlays=false;
+const camera={position:new THREE.Vector3(0,35,94)},controls={target:new THREE.Vector3(),addEventListener:(k,f)=>controlEvents[k]=f};
+const document={hidden:false,documentElement:{classList:{contains:()=>false}},addEventListener:(k,f)=>events[k]=f};
+const reduced={matches:false,addEventListener:(k,f)=>events.reduce=f};
+const ctx=vm.createContext({THREE,camera,controls,document,reduced,UI:{hasOverlays:()=>overlays},A:{state:{}},entered:null});
+vm.runInContext(src.slice(src.indexOf('let fly = null;'),src.indexOf('function overview()')),ctx);
+const run=s=>vm.runInContext(s,ctx),step=(t,dt=.05)=>run(`updatePanoramaOrbit(${t},${dt})`);
+const initial=camera.position.clone(),radius=initial.length();
+step(0);assert(!step(4999));assert(camera.position.equals(initial));assert(step(5000));assert(camera.position.x<0,'Clockwise seen from above');
+for(let i=1;i<3600;i++)step(5000+i*50);
+assert(camera.position.distanceTo(initial)<1e-8,'Full 360 return');assert(!run('panoramaOrbit.armed'));assert(Math.abs(camera.position.length()-radius)<1e-8);assert.equal(camera.position.y,35);
+for(const event of ['pointerdown','wheel','keydown']){run('armPanoramaOrbit()');step(0);step(5000);events[event]();const p=camera.position.clone();step(12000);assert(camera.position.equals(p),event);assert(!run('panoramaOrbit.armed'));}
+run('armPanoramaOrbit()');overlays=true;step(0);step(6000);overlays=false;assert(!step(7000));assert(!step(11999));assert(step(12000));
+controlEvents.start();assert(!run('panoramaOrbit.armed'));
+run('armPanoramaOrbit()');reduced.matches=true;step(0);assert(!run('panoramaOrbit.armed'));reduced.matches=false;
+run('armPanoramaOrbit()');step(0);step(5000);document.hidden=true;events.visibilitychange();assert(!run('panoramaOrbit.armed'));document.hidden=false;
+run('armPanoramaOrbit();entered="taipei"');step(0);assert(!run('panoramaOrbit.armed'));
+console.log('PASS: 5-second delay, clockwise 360, stable radius/height, all inputs, overlays, reduced motion, visibility and city entry');

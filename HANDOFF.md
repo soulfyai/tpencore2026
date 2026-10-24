@@ -324,3 +324,8 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - `records-*.json`：現任市長任內政績（主題 kind = `record`）。
 - `flows.json`：15 條跨市協作線。`geo.json`：行政區輪廓。`weather.json`：天氣快照。
 - 資料查核日標示在頁面，唯一來源是 `build.py` 開頭的 `CHECKED_AT` 常數（人工重新查核後才更新）。
+
+### 0.40 全景自動環繞 v2.0.8
+- 全景完成定位、無使用說明／工具／政策視窗遮擋時，等待 5 秒後順時針環繞 360°，一圈約 180 秒。僅改相機方位，維持 target、半徑與高度。
+- pointerdown／wheel／keydown 及 OrbitControls start 停止；重新點選全景重新計時。初次說明關閉後才計時；減少動態設定不啟動，切背景停止已啟動運鏡。
+- 保留 v2.0.7 音樂行為，依使用者要求不再修改自動播放。
