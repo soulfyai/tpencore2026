@@ -168,8 +168,9 @@ const ENV = {};
       const capM = new THREE.Mesh(GEO.cone, redM); capM.scale.set(0.44, 0.3, 0.44); capM.position.y = 2.25; lh.add(capM);
       g.add(lh);
     }
-    deco.add(g); islets.push({ x, z, g });
+    deco.add(g); islets.push({ x, z, radius:s*2.2, g });
   }
+  ENV.seaObstacles=islets.map(({x,z,radius})=>({x,z,radius}));
   const boats = [];
   for (let k = 0; k < 14; k++) {
     const g = new THREE.Group(), sail = k % 3 !== 2;

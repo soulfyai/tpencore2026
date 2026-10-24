@@ -1474,8 +1474,9 @@ const ENV = {};
       const capM = new THREE.Mesh(GEO.cone, redM); capM.scale.set(0.44, 0.3, 0.44); capM.position.y = 2.25; lh.add(capM);
       g.add(lh);
     }
-    deco.add(g); islets.push({ x, z, g });
+    deco.add(g); islets.push({ x, z, radius:s*2.2, g });
   }
+  ENV.seaObstacles=islets.map(({x,z,radius})=>({x,z,radius}));
   const boats = [];
   for (let k = 0; k < 14; k++) {
     const g = new THREE.Group(), sail = k % 3 !== 2;
@@ -3613,6 +3614,19 @@ const PEOPLE = { list: [], routes: [] };
 
   /* ships: a container ship docked at the port, others sailing lanes between the islands.
      Toy-town scale (not true to life, by request): big ships read clearly even from the panorama. */
+  // Clone only travelling actors' materials: fading must never dim other ships or city lights.
+  const travelFadeKit = g => {
+    const pairs=[];g.traverse(o=>{if(!o.isMesh)return;
+      const clone=m=>{const n=m.clone();n.transparent=true;n.depthWrite=false;pairs.push([n,m]);return n;};
+      o.material=Array.isArray(o.material)?o.material.map(clone):clone(o.material);
+    });return pairs;
+  };
+  const travelFade = actor => {
+    const a=actor.wait>0?0:THREE.MathUtils.smoothstep(actor.t,0,.045)*(1-THREE.MathUtils.smoothstep(actor.t,.82,1));
+    actor.g.visible=a>.005;
+    for(const [mat,source] of actor.fade){mat.opacity=source.opacity*a;if(mat.emissive)mat.emissiveIntensity=source.emissiveIntensity;}
+  };
+  const WORLD_REACH = Math.max(bounds.max.x-bounds.min.x,bounds.max.z-bounds.min.z)*.65+105;
   PEOPLE.ships = [];
   const SHIP_SCL = { frigate: 1.5, destroyer: 1.5, coastguard: 1.3, container: 1.9, bulk: 1.8, tanker: 1.8, ferry: 1.6, fishing: 1.15, tug: 1.25, yacht: 1.15 };
   if (typeof SHIPS !== "undefined") {
@@ -3628,8 +3642,27 @@ const PEOPLE = { list: [], routes: [] };
       const x = bx.min.x + Rs() * (bx.max.x - bx.min.x), z = bx.min.z + Rs() * (bx.max.z - bx.min.z), h = Rs() * Math.PI * 2, len = 8 + Rs() * 14, ex = x + Math.cos(h) * len, ez = z + Math.sin(h) * len;
       let ok = true; for (let s = 0; s <= 1.001 && ok; s += 0.1) { const qx = x + (ex - x) * s, qz = z + (ez - z) * s; ok = seaOK(qx, qz) && bridgeClear(qx, qz, m); } if (!ok) continue;
       const g = SHIPS.make(type, rng(tries)); g.scale.setScalar(SHIP_SCL[type] || 1); scene.add(g);
-      PEOPLE.ships.push({ g, ax: x, az: z, bx: ex, bz: ez, t: Rs(), dir: 1, yaw: Math.atan2(ex - x, ez - z), speed: 0.35 / len, bob: Rs() * 6 });
+      PEOPLE.ships.push({ g, type, ax: x, az: z, bx: ex, bz: ez, t: Rs(), dir: 1, yaw: Math.atan2(ex - x, ez - z), speed: 0.35 / len, bob: Rs() * 6 });
     }
+    const merchants=PEOPLE.ships.filter(s=>["container","bulk","tanker"].includes(s.type));
+    const gateways=["keelung","taoyuan","newtaipei","taipei"].slice(0,QUALITY==="high"?4:3);
+    gateways.forEach((city,i)=>{
+      const info=WORLD.cities.get(city),[cx,cz]=info.center;
+      const base=Math.atan2(cz-MID.z,cx-MID.x);let lane=null;
+      for(const turn of [0,.25,-.25,.5,-.5,.8,-.8,1.2,-1.2]){
+        const dx=Math.cos(base+turn),dz=Math.sin(base+turn);
+        for(let r=6;r<90&&!lane;r+=1){
+          const ax=cx+dx*r,az=cz+dz*r,bx=cx+dx*(r+WORLD_REACH),bz=cz+dz*(r+WORLD_REACH);
+          let clear=true;const steps=Math.ceil(WORLD_REACH/.7);
+          for(let k=0;k<=steps&&clear;k++){const t=k/steps,x=ax+(bx-ax)*t,z=az+(bz-az)*t;clear=seaOK(x,z)&&bridgeClear(x,z,5)&&(ENV.seaObstacles||[]).every(o=>Math.hypot(x-o.x,z-o.z)>o.radius+4);}
+          if(clear)lane={ax,az,bx,bz};
+        }
+        if(lane)break;
+      }
+      const ship=merchants[i];if(!lane||!ship)return;
+      Object.assign(ship,lane,{international:true,city,destination:"遠洋航線",dir:i%2?-1:1,t:i%2?.62:.06,speed:1.3/WORLD_REACH,wait:0});
+      ship.yaw=Math.atan2((ship.bx-ship.ax)*ship.dir,(ship.bz-ship.az)*ship.dir);ship.fade=travelFadeKit(ship.g);
+    });
     // fishing fleets working each island's near waters — Keelung, the fishing harbour, gets the biggest one
     for (const c of A.cities) {
       if (!LIVE_CITIES.has(c.city)) continue;
@@ -3655,7 +3688,7 @@ const PEOPLE = { list: [], routes: [] };
     for (const ph of [0, 0.5]) { const type = under ? "ferry" : ph ? "ferry" : (i % 3 === 2 ? "container" : "ferry"), g = SHIPS.make(type, rng(300 + i * 7 + ph * 3)); g.scale.setScalar(under ? 0.8 : Math.min(SHIP_SCL[type], len * (type === "container" ? 0.11 : 0.22))); scene.add(g);
       PEOPLE.ships.push({ g, ax: r.ax, az: r.az, bx: r.bx, bz: r.bz, t: ph, dir: ph ? -1 : 1, yaw: Math.atan2(r.bx - r.ax, r.bz - r.az), speed: 0.6 / len, bob: i + ph * 3, dwell: 2.5, wait: 0 }); }
   });
-  /* airliners: one circles the archipelago, two shuttle 桃園機場 ↔ 松山機場 with a climb-and-descend profile */
+  /* Airliners: two regional shuttles plus two illustrative international corridors. */
   PEOPLE.planes = [];
   if (typeof SHIPS !== "undefined" && WORLD.geo) {
     const blinkR = new THREE.MeshBasicMaterial({ color: 0xff5a5a, toneMapped: false, fog: false });
@@ -3667,12 +3700,15 @@ const PEOPLE = { list: [], routes: [] };
       l1.visible = l2.visible = false; g.add(l1, l2); return { g, l1, l2 };
     };
     const TA = WORLD.geo("taoyuan", 121.233, 25.0797), SS = WORLD.geo("taipei", 121.5525, 25.0694); // 桃園國際機場 / 松山機場
-    const RAD = Math.max(bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) * 0.42;
-    /* deconflicted scheduling: the two shuttles fly parallel offset corridors at different cruise
-       altitudes with opposite phases (always near opposite ends), and the orbiter circles well above
-       both peaks — no two aircraft ever come within a fuselage length of each other */
+    /* Separate airport approaches and altitude bands keep international traffic clear of local shuttles. */
     const dxs = SS[0] - TA[0], dzs = SS[1] - TA[1], Lsh = Math.hypot(dxs, dzs) || 1, nxs = -dzs / Lsh, nzs = dxs / Lsh;
-    PEOPLE.planes.push({ ...mk(), kind: "orbit", r: RAD, h: 22, w: 0.055, a: rng(3)() * 6 });
+    for(const route of [
+      {from:TA,dx:-.78,dz:.63,base:18,destination:"新加坡方向",dir:1,t:.06},
+      {from:SS,dx:.72,dz:-.69,base:25,destination:"東京方向",dir:-1,t:.62}
+    ]){
+      const plane={...mk(),kind:"international",ax:route.from[0],az:route.from[1],bx:route.from[0]+route.dx*WORLD_REACH,bz:route.from[1]+route.dz*WORLD_REACH,base:route.base,hi:24,destination:route.destination,dir:route.dir,t:route.t,speed:6.5/WORLD_REACH,wait:0};
+      plane.fade=travelFadeKit(plane.g);PEOPLE.planes.push(plane);
+    }
     PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] + nxs * 2, az: TA[1] + nzs * 2, bx: SS[0] + nxs * 2, bz: SS[1] + nzs * 2, t: 0.2, dir: 1, speed: 0.045, hi: 8.5 });  // cruise stays above 台北 101
     PEOPLE.planes.push({ ...mk(), kind: "shuttle", ax: TA[0] - nxs * 2, az: TA[1] - nzs * 2, bx: SS[0] - nxs * 2, bz: SS[1] - nzs * 2, t: 0.72, dir: -1, speed: 0.045, hi: 13.5 });
   }
@@ -3680,10 +3716,16 @@ const PEOPLE = { list: [], routes: [] };
     const night = (ENV.lampsOn || 0) > 0.05, on1 = time % 1 < 0.16, on2 = (time + 0.5) % 1 < 0.16;
     for (const pl of PEOPLE.planes) {
       pl.l1.visible = night && on1; pl.l2.visible = night && on2; // blinking navigation lights after dark
-      if (pl.kind === "orbit") {
-        if (moving) pl.a += pl.w * dt;
-        pl.g.position.set(MID.x + Math.cos(pl.a) * pl.r, TOP + pl.h, MID.z + Math.sin(pl.a) * pl.r * 0.82);
-        pl.g.rotation.set(0, Math.atan2(-Math.sin(pl.a), Math.cos(pl.a) * 0.82), 0.12);
+      if(pl.kind==="international"){
+        if(moving){
+          if(pl.wait>0)pl.wait=Math.max(0,pl.wait-dt);
+          else{pl.t+=pl.dir*pl.speed*dt;if(pl.t>1||pl.t<0){pl.t=pl.dir>0?0:1;pl.wait=12;}}
+        }
+        const u=THREE.MathUtils.clamp(pl.t,0,1),climb=THREE.MathUtils.smoothstep(u,0,.4);
+        const derivative=u>0&&u<.4?6*(u/.4)*(1-u/.4)/.4:0;
+        pl.g.position.set(pl.ax+(pl.bx-pl.ax)*u,TOP+pl.base+pl.hi*climb,pl.az+(pl.bz-pl.az)*u);
+        pl.g.rotation.set(-Math.atan2(pl.hi*derivative*pl.dir,Math.hypot(pl.bx-pl.ax,pl.bz-pl.az)),Math.atan2((pl.bx-pl.ax)*pl.dir,(pl.bz-pl.az)*pl.dir),Math.sin(Math.PI*u)*.025*pl.dir);
+        travelFade(pl);
       } else {
         if (moving) { pl.t += pl.dir * pl.speed * dt; if (pl.t > 1) { pl.t = 1; pl.dir = -1; } if (pl.t < 0) { pl.t = 0; pl.dir = 1; } }
         const x = pl.ax + (pl.bx - pl.ax) * pl.t, z = pl.az + (pl.bz - pl.az) * pl.t;
@@ -3696,7 +3738,10 @@ const PEOPLE = { list: [], routes: [] };
   };
   PEOPLE.updateShips = (dt, time, moving) => {
     for (const s of PEOPLE.ships) {
-      if (moving) { if (s.wait > 0) s.wait -= dt; else { s.t += s.dir * s.speed * dt; if (s.t > 1) { s.t = 1; s.dir = -1; s.wait = s.dwell || 0; } if (s.t < 0) { s.t = 0; s.dir = 1; s.wait = s.dwell || 0; } } }
+      if(s.international){
+        if(moving){if(s.wait>0)s.wait=Math.max(0,s.wait-dt);else{s.t+=s.dir*s.speed*dt;if(s.t>1||s.t<0){s.t=s.dir>0?0:1;s.wait=16;}}}
+        travelFade(s);
+      }else if (moving) { if (s.wait > 0) s.wait -= dt; else { s.t += s.dir * s.speed * dt; if (s.t > 1) { s.t = 1; s.dir = -1; s.wait = s.dwell || 0; } if (s.t < 0) { s.t = 0; s.dir = 1; s.wait = s.dwell || 0; } } }
       const target = Math.atan2((s.bx - s.ax) * s.dir, (s.bz - s.az) * s.dir); let d = target - s.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); s.yaw += d * Math.min(1, dt * 0.7);
       s.g.position.set(s.ax + (s.bx - s.ax) * s.t, WATER_Y - 0.06 + Math.sin(time * 1.2 + s.bob) * 0.02, s.az + (s.bz - s.az) * s.t); s.g.rotation.set(Math.sin(time * 0.9 + s.bob) * 0.02, s.yaw, 0);
     }
