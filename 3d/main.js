@@ -270,6 +270,7 @@ function resize() {
   dirty = true;
 }
 new ResizeObserver(resize).observe(stage);
+document.fonts?.addEventListener("loadingdone",()=>{dirty=true;});
 const retheme = () => { ENV.retheme(); for (const v of flowViews) v.mat.uniforms.uColor.value.set(css("--route") || "#c4462b"); dirty = true; };
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
 new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -369,7 +370,10 @@ function renderFrame(now, forceRender = false) {
   }
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
-  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); fitPolicyLabels(); dirty = false; }
+  if (forceRender || busy || dirty) {
+    renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); fitPolicyLabels(); dirty = false;
+    if(stage.classList.contains("ready")){document.documentElement.classList.remove("booting");stage.setAttribute("aria-busy","false");}
+  }
 }
 function loop(now) {
   renderFrame(now);

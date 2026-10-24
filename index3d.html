@@ -1,8 +1,19 @@
+<script>
+document.documentElement.classList.add('hi','booting');
+window.cityLoadFailed=function(){
+  const status=document.querySelector('#loading .loading-status'),hint=document.querySelector('#loading .loading-hint'),retry=document.getElementById('loading-retry');
+  if(status)status.textContent='無法載入城市畫面';
+  if(hint)hint.textContent='請重新整理，或先用文字版瀏覽政策。';
+  if(retry)retry.hidden=false;
+  const spinner=document.querySelector('.loading-spinner');if(spinner)spinner.hidden=true;
+  const stage=document.getElementById('stage');if(stage)stage.setAttribute('aria-busy','false');
+};
+</script>
 <title>台北安可｜北北基桃政策市</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+Sung+HK:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Chiron+Sung+HK:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* Layout: one-screen map app — hex atlas on the left, reading panel on the right; stacks on phones */
 :root{
@@ -146,6 +157,19 @@ details.grp .rows{padding-left:18px}
 [hidden]{display:none!important}
 html.hi,html.hi body{height:100%;overflow:hidden}
 html.hi body{padding:0}
+html.hi.booting .app{visibility:hidden}
+html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;box-sizing:border-box;margin:0;background:radial-gradient(ellipse at 50% 25%,#214966 0%,#102c45 48%,#0a172d 100%);color:#f3f6fc;text-align:center;font:500 15px/1.6 var(--f-body)}
+.loading-brand{padding:14px 22px;border:2px solid #83acff;border-radius:16px;background:#101d38;box-shadow:0 0 18px #6799ff66,inset 0 0 12px #6799ff33;font:800 32px/1.2 var(--f-display);letter-spacing:.1em;text-shadow:0 0 8px #719fff}
+.loading-brand span{display:block;margin-top:6px;font:700 12px/1.5 var(--f-body);letter-spacing:.13em;color:#ffe9a8}
+.loading-status{margin:0;font-size:16px;font-weight:700}
+.loading-hint{margin:-10px 0 0;color:#c8d7e9;font-size:13px}
+.loading-spinner{width:28px;height:28px;margin-top:12px;border:2px solid #ffffff30;border-top-color:#b9d3ff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
+.loading-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:8px}
+.loading-actions a,.loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);text-decoration:none;cursor:pointer}
+.loading-actions :focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
+.loading small{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;color:#c4d2e5;font-size:11px}
+@keyframes loading-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.loading-spinner{animation:none}}
 .hi .app{display:block;height:100dvh;padding:0;position:relative}
 .hi .main{position:absolute;inset:0;display:block}
 .hi .mapwrap{position:absolute;inset:0;border:0;border-radius:0;background:#a9d3de}
@@ -438,7 +462,7 @@ html.drawer-open aside.panel{transform:none}
         <span class="spacer"></span>
         <button class="chip" id="toggleflows" aria-pressed="false">顯示跨市協作線</button>
       </div>
-      <div class="stage" id="stage" role="img" aria-label="3D 政策城市：台北、新北、基隆、桃園連成一片，每個街區是一項政策主題；完整內容請用右側清單"><p class="loading" id="loading">正在搭建城市…</p></div><div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>
+      <div class="stage" id="stage" role="group" aria-busy="true" aria-label="3D 政策城市：台北、新北、基隆、桃園，每個街區是一項政策主題"><section class="loading" id="loading" aria-label="城市載入狀態"><div class="loading-brand">台北安可<span>一起打造你我的北北基桃</span></div><div class="loading-spinner" aria-hidden="true"></div><p class="loading-status" role="status">正在載入四座政策城市…</p><p class="loading-hint">準備好後，會自動顯示全景。</p><div class="loading-actions"><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button><a href="./2d.html">先用文字版瀏覽政策</a></div><small>獨立整理，非任何候選人或政黨官方網站</small></section></div><div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>
       <div class="legend" aria-label="協作線依據">
         <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2"/></svg>官方發布</span>
         <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2" stroke-dasharray="7 5"/></svg>媒體報導</span>
@@ -676,7 +700,7 @@ const h=location.hash.slice(1);
 if(h){if(themeById.has(h))openTheme(h);else if(items.has(h))openItem(h);else if(cityById.has(h)){setCity(h);setTab("list")}}
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script type="module">
+<script type="module" onerror="window.cityLoadFailed()">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
@@ -4104,6 +4128,7 @@ function resize() {
   dirty = true;
 }
 new ResizeObserver(resize).observe(stage);
+document.fonts?.addEventListener("loadingdone",()=>{dirty=true;});
 const retheme = () => { ENV.retheme(); for (const v of flowViews) v.mat.uniforms.uColor.value.set(css("--route") || "#c4462b"); dirty = true; };
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
 new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -4203,7 +4228,10 @@ function renderFrame(now, forceRender = false) {
   }
   if (ENV.fog0) { const fk = Math.max(1, camDist / 80); scene.fog.near = ENV.fog0.near * fk; scene.fog.far = ENV.fog0.far * fk; }
   if (controls.update()) busy = true;
-  if (forceRender || busy || dirty) { renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); fitPolicyLabels(); dirty = false; }
+  if (forceRender || busy || dirty) {
+    renderer.render(scene, camera); labelR.render(scene, camera); fitCitySigns(); fitPolicyLabels(); dirty = false;
+    if(stage.classList.contains("ready")){document.documentElement.classList.remove("booting");stage.setAttribute("aria-busy","false");}
+  }
 }
 function loop(now) {
   renderFrame(now);
@@ -4412,12 +4440,11 @@ const UI = {};
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
   intro.setAttribute("aria-label", "使用說明");
   document.querySelector(".mapwrap").appendChild(intro);
-  const showIntro = (on) => { intro.hidden = !on; try { localStorage.setItem("hi-intro-seen", "1"); } catch {} };
+  const showIntro = (on) => { intro.hidden = !on; };
   intro.querySelector(".hi-x").onclick = () => showIntro(false);
   intro.querySelector(".hi-ghost").onclick = () => setMode("pano");
   intro.querySelector(".hi-primary").onclick = () => { showIntro(false); startTour(); };
-  let seen = false; try { seen = localStorage.getItem("hi-intro-seen") === "1"; } catch {}
-  intro.hidden = seen;
+  intro.hidden = true; // Open directly into the panorama; help is available from the toolbar.
 
   /* ---------- guided tour ---------- */
   let touring = false, step = 0;
@@ -4485,5 +4512,5 @@ const UI = {};
   for (const [id] of MODES) btn[id].setAttribute("aria-pressed", String(id === "pano"));
   paintBrand(); A.setCity(LIVE);
 }
-}catch(err){console.error(err);const l=document.getElementById("loading");if(l)l.textContent="這個瀏覽器無法顯示 3D 城市，請改用右側清單瀏覽。";}
+}catch(err){console.error(err);window.cityLoadFailed();}
 </script>

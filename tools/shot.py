@@ -63,6 +63,7 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
     pg.route("**/three@0.160.0/**", route); pg.route("**/fonts.g*/**", lambda r: r.abort())
     pg.goto(url, wait_until="commit")
     pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')", timeout=300000, polling=100)
+    assert pg.locator(".hi-intro").is_hidden(), "Startup unexpectedly opened the help dialog"
     pg.evaluate("(()=>{const E=CITY3D.ENV;E.forced={minute:660,w:{code:1,cloud:20,wind:10,temp:27}};E.apply();const i=document.querySelector('.hi-intro');if(i)i.hidden=true;})()")
     if sea_check:
         pg.emulate_media(reduced_motion="no-preference")
@@ -79,6 +80,7 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
         r = pg.evaluate(js)
         if r is not None: out.append(f"{name}: {str(r)[:600]}")
         state = pg.evaluate("CITY3D.snapshot()")
+        assert not pg.evaluate("document.documentElement.classList.contains('booting')"), "Loading screen did not dismiss after first frame"
         out.append(f"{name} environment: {json.dumps(state, ensure_ascii=False)}")
         if checking:
             for city, key in [("taipei", None), ("newtaipei", None), ("keelung", "Enter"), ("taoyuan", "Space")]:

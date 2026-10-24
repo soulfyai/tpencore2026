@@ -2,6 +2,19 @@
 [hidden]{display:none!important}
 html.hi,html.hi body{height:100%;overflow:hidden}
 html.hi body{padding:0}
+html.hi.booting .app{visibility:hidden}
+html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:28px;box-sizing:border-box;margin:0;background:radial-gradient(ellipse at 50% 25%,#214966 0%,#102c45 48%,#0a172d 100%);color:#f3f6fc;text-align:center;font:500 15px/1.6 var(--f-body)}
+.loading-brand{padding:14px 22px;border:2px solid #83acff;border-radius:16px;background:#101d38;box-shadow:0 0 18px #6799ff66,inset 0 0 12px #6799ff33;font:800 32px/1.2 var(--f-display);letter-spacing:.1em;text-shadow:0 0 8px #719fff}
+.loading-brand span{display:block;margin-top:6px;font:700 12px/1.5 var(--f-body);letter-spacing:.13em;color:#ffe9a8}
+.loading-status{margin:0;font-size:16px;font-weight:700}
+.loading-hint{margin:-10px 0 0;color:#c8d7e9;font-size:13px}
+.loading-spinner{width:28px;height:28px;margin-top:12px;border:2px solid #ffffff30;border-top-color:#b9d3ff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
+.loading-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:8px}
+.loading-actions a,.loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);text-decoration:none;cursor:pointer}
+.loading-actions :focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
+.loading small{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;color:#c4d2e5;font-size:11px}
+@keyframes loading-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.loading-spinner{animation:none}}
 .hi .app{display:block;height:100dvh;padding:0;position:relative}
 .hi .main{position:absolute;inset:0;display:block}
 .hi .mapwrap{position:absolute;inset:0;border:0;border-radius:0;background:#a9d3de}

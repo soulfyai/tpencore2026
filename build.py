@@ -124,10 +124,31 @@ def sub(a, b, count=1):
     page = page.replace(a, b, count)
 
 sub("的公開政見，一格一個政策主題</p>", "的公開政見與任內政績</p>")
+boot = """<script>
+document.documentElement.classList.add('hi','booting');
+window.cityLoadFailed=function(){
+  const status=document.querySelector('#loading .loading-status'),hint=document.querySelector('#loading .loading-hint'),retry=document.getElementById('loading-retry');
+  if(status)status.textContent='無法載入城市畫面';
+  if(hint)hint.textContent='請重新整理，或先用文字版瀏覽政策。';
+  if(retry)retry.hidden=false;
+  const spinner=document.querySelector('.loading-spinner');if(spinner)spinner.hidden=true;
+  const stage=document.getElementById('stage');if(stage)stage.setAttribute('aria-busy','false');
+};
+</script>
+"""
+sub('<link rel="stylesheet" href="https://fonts.googleapis.com/', '<link rel="stylesheet" media="print" onload="this.media=\'all\'" href="https://fonts.googleapis.com/')
 sub("--hex-mix:20%;", "--hex-mix:20%; --water:#A8CBDF; --water-deep:#86AFC7; --bldg:#F3EFE8; --bldg-shade:#D8D2C8; --sky-top:#7FB0EC; --sky-bottom:#D4E8FA; --f-pixel:\"DotGothic16\",\"Noto Sans TC\",monospace;")
 sub("--hex-mix:26%; color-scheme:dark", "--hex-mix:26%; --water:#173246; --water-deep:#0F2232; --bldg:#C9CED3; --bldg-shade:#9AA2AA; --sky-top:#0E1830; --sky-bottom:#24365A; color-scheme:dark", 2)
 sub('<svg class="map" id="map" role="img" aria-label="六角格地圖：台北、新北、基隆、桃園，每格是一位候選人的一項政策主題；完整內容請用右側清單"></svg>',
-    '<div class="stage" id="stage" role="img" aria-label="3D 政策城市：台北、新北、基隆、桃園連成一片，每個街區是一項政策主題；完整內容請用右側清單"><p class="loading" id="loading">正在搭建城市…</p></div>'
+    '<div class="stage" id="stage" role="group" aria-busy="true" aria-label="3D 政策城市：台北、新北、基隆、桃園，每個街區是一項政策主題">'
+    '<section class="loading" id="loading" aria-label="城市載入狀態">'
+    '<div class="loading-brand">台北安可<span>一起打造你我的北北基桃</span></div>'
+    '<div class="loading-spinner" aria-hidden="true"></div>'
+    '<p class="loading-status" role="status">正在載入四座政策城市…</p>'
+    '<p class="loading-hint">準備好後，會自動顯示全景。</p>'
+    '<div class="loading-actions"><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button><a href="./2d.html">先用文字版瀏覽政策</a></div>'
+    '<small>獨立整理，非任何候選人或政黨官方網站</small>'
+    '</section></div>'
     '<div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>')
 sub("</style>", (ROOT / "3d" / "page.css").read_text(encoding="utf-8") + """
 .stage{position:relative;flex:1;min-height:0;overflow:hidden;background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom))}
@@ -196,12 +217,12 @@ imports = "\n".join(l for l in mod.splitlines() if l.startswith("import "))
 body = "\n".join(l for l in mod.splitlines() if not l.startswith("import "))
 sub("</script>\n", """</script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script type="module">
+<script type="module" onerror="window.cityLoadFailed()">
 """ + imports + """
 try{
 """ + body + """
-}catch(err){console.error(err);const l=document.getElementById("loading");if(l)l.textContent="這個瀏覽器無法顯示 3D 城市，請改用右側清單瀏覽。";}
+}catch(err){console.error(err);window.cityLoadFailed();}
 </script>
 """)
-(ROOT / "index3d.html").write_text(page, encoding="utf-8")
+(ROOT / "index3d.html").write_text(boot + page, encoding="utf-8")
 print("wrote index3d.html")

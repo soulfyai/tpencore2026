@@ -115,12 +115,11 @@ const UI = {};
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
   intro.setAttribute("aria-label", "使用說明");
   document.querySelector(".mapwrap").appendChild(intro);
-  const showIntro = (on) => { intro.hidden = !on; try { localStorage.setItem("hi-intro-seen", "1"); } catch {} };
+  const showIntro = (on) => { intro.hidden = !on; };
   intro.querySelector(".hi-x").onclick = () => showIntro(false);
   intro.querySelector(".hi-ghost").onclick = () => setMode("pano");
   intro.querySelector(".hi-primary").onclick = () => { showIntro(false); startTour(); };
-  let seen = false; try { seen = localStorage.getItem("hi-intro-seen") === "1"; } catch {}
-  intro.hidden = seen;
+  intro.hidden = true; // Open directly into the panorama; help is available from the toolbar.
 
   /* ---------- guided tour ---------- */
   let touring = false, step = 0;
