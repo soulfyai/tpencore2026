@@ -157,6 +157,8 @@ html.hi body{padding:0}
 .city-leaders{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;overflow:hidden}
 .city-leaders path{fill:none;stroke:#fff;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round;opacity:.8;vector-effect:non-scaling-stroke}
 .city-leaders circle{fill:#fff;opacity:.95}
+.hi .city-sign-anchor{z-index:2147483000!important;pointer-events:none}
+.hi .clabel{transform-origin:50% 100%;min-height:60px;box-sizing:border-box}
 
 /* brand, top-left: the neon sign is a persistent tab, the info card pops out below it */
 .hi header.top{position:absolute;left:20px;top:16px;z-index:30;display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(380px,calc(100% - 40px));pointer-events:none}
@@ -3866,12 +3868,13 @@ for (const c of A.cities) {
   el.className = "clabel" + (live ? "" : " soon"); el.style.setProperty("--c", live ? `var(--c-${c.city})` : "#8a8f96");
   el.innerHTML = `${c.cityName}<span>${c.candidate}${live ? "" : "<em>建設中</em>"}</span>`;
   const ci = WORLD.cities.get(c.city), top = ci.coast.reduce((m, q) => (q[1] < m[1] ? q : m));
-  const o = new CSS2DObject(el); o.center.set(0.5, 1); o.position.set(ci.center[0], live ? 3.4 : 2.2, top[1] - 0.6); scene.add(o);
+  const wrap=document.createElement("div");wrap.className="city-sign-anchor";wrap.appendChild(el);
+  const o = new CSS2DObject(wrap); o.center.set(0.5, 1); o.position.set(ci.center[0], live ? 3.4 : 2.2, top[1] - 0.6); scene.add(o);
   const blocks=WORLD.blockCells.filter(b=>b.city===c.city);
   const anchor=blocks.reduce((a,b)=>Math.hypot(a.c[0]-top[0],a.c[1]-top[1])<Math.hypot(b.c[0]-top[0],b.c[1]-top[1])?a:b);
   const path=document.createElementNS(svgNS,"path"),dot=document.createElementNS(svgNS,"circle");
   path.dataset.city=c.city;dot.setAttribute("r","2.3");cityLeaders.append(path,dot);
-  citySignViews.push({city:c.city,el,ci,anchor:new THREE.Vector3(anchor.c[0],TOP+.08,anchor.c[1]),path,dot});
+  citySignViews.push({city:c.city,el,wrap,ci,anchor:new THREE.Vector3(anchor.c[0],TOP+.08,anchor.c[1]),path,dot});
 }
 
 /* one callout per explored island: the items as a numbered list (no stacked pins); tiny numbers sit on each lot */
@@ -4113,6 +4116,7 @@ function fitCitySigns() {
   const blend=THREE.MathUtils.smoothstep(camera.position.distanceTo(controls.target),citySignNear,citySignFar*.95);
   const signs=citySignViews.map(v=>{
     v.el.style.translate="";
+    v.el.style.scale=String(1-.25*blend);
     const r=v.el.getBoundingClientRect(),a=project(v.anchor.x,v.anchor.y,v.anchor.z);
     const coast=v.ci.hull.map(([x,z])=>project(x,TOP+4,z));
     return {...v,a,left:r.left-frame.left,top:r.top-frame.top,width:r.width,height:r.height,minY:Math.min(...coast.map(p=>p.y)),minX:Math.min(...coast.map(p=>p.x)),maxX:Math.max(...coast.map(p=>p.x))};
@@ -4137,17 +4141,10 @@ function fitCitySigns() {
     s.el.style.translate=`${x-s.left}px ${y-s.top}px`;
     s.el.dataset.overview=blend.toFixed(3);
     const sx=x+s.width/2,sy=y+s.height,ax=s.a.x,ay=s.a.y;
-    const visible=s.el.style.display!=="none"&&s.a.z>-1&&s.a.z<1&&sx>=0&&sx<=w&&sy>=0&&sy<=h&&ax>=0&&ax<=w&&ay>=0&&ay<=h&&sy<ay;
+    const visible=s.wrap.style.display!=="none"&&s.a.z>-1&&s.a.z<1&&sx>=0&&sx<=w&&sy>=0&&sy<=h&&ax>=0&&ax<=w&&ay>=0&&ay<=h&&sy<ay;
     s.path.style.display=s.dot.style.display=visible?"":"none";
     if(!visible)continue;
-    if(twoRows&&s.row===0){
-      // Upper-row leaders bypass the lower labels through the centre/right gutters.
-      const exit=THREE.MathUtils.lerp(sx,x+s.width-8,blend),gutter=THREE.MathUtils.lerp(sx,s.col?w-7:w/2,blend);
-      const bend=THREE.MathUtils.lerp(sy+Math.max(8,(ay-sy)*.35),top+2*maxH+rowGap+12,blend);
-      s.path.setAttribute("d",`M${exit},${sy} L${gutter},${sy+8} L${gutter},${Math.min(ay-8,bend)} L${ax},${ay}`);
-    }else{
-      s.path.setAttribute("d",`M${sx},${sy} L${ax},${sy+Math.min(16,Math.max(6,(ay-sy)*.2))} L${ax},${ay}`);
-    }
+    s.path.setAttribute("d",`M${sx},${sy} L${ax},${ay}`);
     s.dot.setAttribute("cx",ax);s.dot.setAttribute("cy",ay);
   }
 }

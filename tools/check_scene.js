@@ -96,6 +96,8 @@
    for(const coast of coasts){const xs=coast.map(p=>p[0]),ys=coast.map(p=>p[1]);check(!(box.left<Math.max(...xs)&&box.right>Math.min(...xs)&&box.top<Math.max(...ys)&&box.bottom>Math.min(...ys)),'overview sign covers an island');}
    const line=document.querySelector('.city-leaders path[data-city='+sign.dataset.city+']');
    check(line&&getComputedStyle(line).display!=='none'&&!/NaN|Infinity/.test(line.getAttribute('d')),'visible finite city leader');
+   check((line.getAttribute('d').match(/[ML]/g)||[]).join('')==='ML','single straight city leader');
+   check(Math.abs(parseFloat(getComputedStyle(sign).scale)-.75)<.001,'overview sign scaled proportionally');
  }
  for(let i=0;i<signs.length;i++)for(let j=i+1;j<signs.length;j++){
    const a=signs[i].getBoundingClientRect(),b=signs[j].getBoundingClientRect();check(!(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top),'city title overlap');

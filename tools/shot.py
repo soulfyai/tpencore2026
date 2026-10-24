@@ -104,6 +104,9 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
                     if(a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top)throw new Error('City policy titles overlap: '+city);
                   }
                 }""", city)
+                if city == "taipei":
+                    os.makedirs("out", exist_ok=True)
+                    pg.screenshot(path="out/check-city-titles-mobile.png" if mobile else "out/check-city-titles-desktop.png", timeout=240000)
             pg.evaluate("MAP3D.panorama(); CITY3D.snapshot()")
             pg.evaluate("()=>{if([...document.querySelectorAll('.tlabel')].some(e=>getComputedStyle(e).display!=='none'))throw Error('Panorama shows policy labels')}")
             out.append("City signs: pointer clicks and Enter/Space passed for all four cities")
