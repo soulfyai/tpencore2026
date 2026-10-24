@@ -368,26 +368,79 @@ function fitPolicyCallout() {
   callout.style.translate = `${x - r.left}px ${y - r.top}px`;
 }
 
+// The guides sit below CSS2D signs and never intercept a map gesture.
+const policyGuides=document.createElementNS("http://www.w3.org/2000/svg","svg");
+policyGuides.classList.add("policy-guides");policyGuides.setAttribute("aria-hidden","true");stage.appendChild(policyGuides);
+let policyLabelLayoutKey="";
 function fitPolicyLabels() {
-  const labels=[...islandLabels.values()];
-  labels.forEach(l=>{l.el.style.translate="";});
-  if(!stage.classList.contains("city-view")||A.state.selTheme||A.state.selItem||A.state.selFlow)return;
-  const frame=stage.getBoundingClientRect(),w=frame.width,h=frame.height,gap=10;
-  const visible=labels.filter(l=>!l.el.hidden&&l.el.style.display!=="none").map(l=>{
-    const r=l.el.getBoundingClientRect();return {el:l.el,x:r.left-frame.left,y:r.top-frame.top,w:r.width,h:r.height};
-  }).filter(r=>r.x+r.w>0&&r.x<w&&r.y+r.h>0&&r.y<h).sort((a,b)=>a.x-b.x);
-  if(visible.length<2)return;
-  const columns=[visible.slice(0,Math.ceil(visible.length/2)),visible.slice(Math.ceil(visible.length/2))];
-  const widths=columns.map(c=>Math.max(0,...c.map(r=>r.w))),total=widths[0]+widths[1]+gap;
-  const midpoint=visible.reduce((n,r)=>n+r.x+r.w/2,0)/visible.length;
-  const left=THREE.MathUtils.clamp(midpoint-total/2,8,Math.max(8,w-total-8));
-  columns.forEach((column,col)=>{
-    column.sort((a,b)=>a.y-b.y);
-    let bottom=84;
-    for(const r of column){r.toY=Math.max(r.y,bottom);bottom=r.toY+r.h+4;}
-    const overflow=Math.max(0,bottom-(h-42));
-    for(const r of column){const x=col?left+widths[0]+gap:left+widths[0]-r.w;r.el.style.translate=`${x-r.x}px ${r.toY-overflow-r.y}px`;}
-  });
+  const labels=[...islandLabels.entries()];
+  if(!stage.classList.contains("city-view")||A.state.selTheme||A.state.selItem||A.state.selFlow){
+    if(policyLabelLayoutKey){for(const [,l] of labels)l.el.style.translate="";policyGuides.replaceChildren();policyLabelLayoutKey="";}
+    return;
+  }
+  const frame=stage.getBoundingClientRect(),w=frame.width,h=frame.height,pad=9,gap=7;
+  policyGuides.setAttribute("viewBox",`0 0 ${w} ${h}`);
+  const project=(x,y,z)=>{
+    const p=new THREE.Vector3(x,y,z).project(camera);
+    return {x:(p.x+1)*w/2,y:(1-p.y)*h/2};
+  };
+  const visible=labels.filter(([,l])=>!l.el.hidden&&l.el.style.display!=="none").map(([id,l])=>{
+    const world=l.o.getWorldPosition(new THREE.Vector3()),anchor=project(world.x,world.y,world.z);
+    return {id,el:l.el,w:l.el.offsetWidth,h:l.el.offsetHeight,ax:anchor.x,ay:anchor.y};
+  }).filter(r=>r.ax+r.w/2>0&&r.ax-r.w/2<w&&r.ay+r.h/2>0&&r.ay-r.h/2<h);
+  const key=JSON.stringify([entered,w,h,...camera.projectionMatrix.elements,...visible.flatMap(r=>[r.id,r.w,r.h,+r.ax.toFixed(2),+r.ay.toFixed(2)])]);
+  if(key===policyLabelLayoutKey)return;
+  policyLabelLayoutKey=key;
+  for(const [,l] of labels)l.el.style.translate="";
+  policyGuides.replaceChildren();
+  if(!visible.length)return;
+  const coast=WORLD.cities.get(entered).coast.map(([x,z])=>project(x,TOP,z));
+  const city={left:Math.max(pad,Math.min(...coast.map(p=>p.x))-14),right:Math.min(w-pad,Math.max(...coast.map(p=>p.x))+14),top:Math.max(90,Math.min(...coast.map(p=>p.y))-18),bottom:Math.min(h-48,Math.max(...coast.map(p=>p.y))+18)};
+  // Protect the skyline, city sign and shell; do not move any 3D building.
+  const obstacles=[];
+  for(const el of [document.querySelector(".hi .brand"),document.querySelector(".hi-toolbar"),citySignViews.find(v=>v.city===entered)?.el]){
+    if(!el)continue;const r=el.getBoundingClientRect();
+    if(r.width&&r.height)obstacles.push({x:r.left-frame.left+r.width/2,y:r.top-frame.top+r.height/2,w:r.width+10,h:r.height+10});
+  }
+  for(const L of LANDMARKS3D.filter(l=>l.city===entered&&!l.nature&&!l.fixed&&l.top>TOP+3).sort((a,b)=>b.top-a.top).slice(0,4)){
+    const a=project(L.isl.c.x+L.x,TOP,L.isl.c.z+L.z),b=project(L.isl.c.x+L.x,L.top,L.isl.c.z+L.z);
+    if(Math.abs(a.y-b.y)>14)obstacles.push({x:(a.x+b.x)/2,y:(a.y+b.y)/2,w:26,h:Math.abs(a.y-b.y)+12});
+  }
+  const overlap=(a,b,space=gap)=>Math.max(0,(a.w+b.w)/2+space-Math.abs(a.x-b.x))*Math.max(0,(a.h+b.h)/2+space-Math.abs(a.y-b.y));
+  const cx=visible.reduce((n,r)=>n+r.ax,0)/visible.length,cy=visible.reduce((n,r)=>n+r.ay,0)/visible.length;
+  const placed=[];
+  // Wide signs get first choice; all candidates remain relative to their projected block.
+  for(const r of visible.sort((a,b)=>b.w-a.w||a.id.localeCompare(b.id))){
+    const rand=rng(hash(r.id)),phase=rand()*Math.PI*2;
+    const dx=r.ax+(r.ax-cx)*.22+(rand()-.5)*18,dy=r.ay+(r.ay-cy)*.18+(rand()-.5)*16;
+    const minX=Math.min(w-r.w/2-pad,Math.max(r.w/2+pad,city.left+r.w/2));
+    const maxX=Math.max(minX,Math.min(w-r.w/2-pad,city.right-r.w/2));
+    const minY=Math.min(h-r.h/2-48,Math.max(90+r.h/2,city.top+r.h/2));
+    const maxY=Math.max(minY,Math.min(h-r.h/2-48,city.bottom-r.h/2));
+    let best=null,bestScore=Infinity;
+    for(let k=0;k<260;k++){
+      const radius=k?9*Math.sqrt(k):0,angle=phase+k*2.399963229728653;
+      const x=THREE.MathUtils.clamp(dx+Math.cos(angle)*radius,minX,maxX),y=THREE.MathUtils.clamp(dy+Math.sin(angle)*radius,minY,maxY);
+      const p={x,y,w:r.w,h:r.h};
+      const collision=placed.reduce((n,q)=>n+overlap(p,q),0);
+      const blocked=obstacles.reduce((n,q)=>n+overlap(p,q,3),0);
+      const score=collision*10000+blocked*80+(x-dx)**2+(y-dy)**2;
+      if(score<bestScore){bestScore=score;best=p;}
+    }
+    Object.assign(r,best);placed.push(r);
+  }
+  for(const r of placed){
+    const tx=r.x-r.ax,ty=r.y-r.ay;
+    r.el.style.translate=`${tx.toFixed(2)}px ${ty.toFixed(2)}px`;
+    if(Math.hypot(tx,ty)<12)continue;
+    const ex=THREE.MathUtils.clamp(r.ax,r.x-r.w/2,r.x+r.w/2),ey=THREE.MathUtils.clamp(r.ay,r.y-r.h/2,r.y+r.h/2);
+    if(Math.hypot(ex-r.ax,ey-r.ay)<5)continue;
+    const color=`var(--c-${entered})`;
+    const line=document.createElementNS(policyGuides.namespaceURI,"line");
+    line.setAttribute("x1",r.ax);line.setAttribute("y1",r.ay);line.setAttribute("x2",ex);line.setAttribute("y2",ey);line.style.stroke=color;
+    const dot=document.createElementNS(policyGuides.namespaceURI,"circle");dot.setAttribute("cx",r.ax);dot.setAttribute("cy",r.ay);dot.setAttribute("r","2.4");dot.style.fill=color;
+    policyGuides.append(line,dot);
+  }
 }
 
 // The map's look-at point, rather than the last button click, owns the city context.
