@@ -1,30 +1,44 @@
-# 北北基桃政策城市 (tpencore2026)
+# 台北安可｜北北基桃政策城市
 
 獨立整理，非任何候選人或政黨官方網站。
 
-北北基桃四位國民黨市長參選人的政見與任內政績，以模擬城市（SimCity BuildIt）風格的 3D 島嶼呈現。
+整理台北、新北、基隆、桃園四位國民黨市長參選人的公開政見與任內政績。以 3D 城市探索，也可使用原有 2D 政策地圖與文字面板查閱內容及原始來源。
 
-- `3d/`：Three.js 3D 場景原始碼（core / world / env / models / models2 / models3 / landmarks / ships / decor / people / coaster / main / ui，樣式在 page.css）
-- `data/`：政見、政績、跨市協作與行政區輪廓（geo.json，內政部開放資料）
-- `template.html`：頁面骨架與 2D 資料面板
-- `build.py`：合併資料並輸出單檔 `index.html`（2D）與 `index3d.html`（3D）
+- [正式網站・3D 城市](https://tpencore.tw/)
+- [2D 政策地圖與文字導覽](https://tpencore.tw/2d.html)
+- [提供資料／回報問題](https://github.com/soulfyai/tpencore2026/issues/new/choose)
+- [貢獻指南](CONTRIBUTING.md)
 
-建置：`python3 build.py`
+台北藍、新北黃、基隆粉紅、桃園紅為四市識別。政策內容、來源及查核日期由共同資料產生，2D 與 3D 同步更新。發現內容有誤，請開 Issue 附上原始來源；提出建議不會直接修改網站。
 
-驗證（已安裝 Playwright、Chromium 與本機 Three.js 後）：
+## 原始碼與建置
 
-```bash
-CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py --check mobile
-CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py '{"out/day":"MAP3D.panorama()"}'
+- `data/`：政策、政績、跨市協作與行政區輪廓。
+- `template.html`：2D 地圖與共用資料面板。
+- `3d/`：Three.js 場景、模型、互動、音樂與樣式。
+- `build.py`：驗證資料並生成 `index.html`（2D）、`index3d.html`（3D）。
+
+```sh
+python3 build.py
+python3 tools/package_site.py
 ```
 
-截圖工具自動啟動 UTF-8 本機 HTTP 伺服器、停用動畫排程，再呼叫完整畫格的 `CITY3D.snapshot()`，保留相機、霧距、人物與燈光更新。`--check` 會驗證十種人物角色、動態矩陣、船與飛機動畫、具名雙橋間距／過水／不交叉，以及手機招牌完整可見。手機預設降低像素倍率並停用陰影；桌機保留陰影。
+建置必須輸出 `no problems`。網站封裝在 `out/site/`：首頁為 3D，文字版為 `2d.html`。不要直接把儲存庫的 2D `index.html` 當成正式 3D 首頁。
 
-部署與持續閱覽：
+安裝 Playwright、Chromium 與 `three@0.160.0` 後，可執行場景檢查：
 
-- `.github/workflows/pages.yml` 會在推送至 `claude/modest-newton-t9y5uj` 後，自動建置並發布 GitHub Pages。後續修改沿用同一網址，通常需等待數分鐘完成發布。
-- 首次啟用需在儲存庫 **Settings → Pages → Build and deployment → Source** 選擇 **GitHub Actions**；若 `github-pages` environment 限制部署分支，需允許上述開發分支。啟用後可重新執行失敗的 Deploy website 工作流程。
-- 預定網址為 `https://soulfyai.github.io/tpencore2026/`；首次部署成功並驗證後才算上線。
-- `/` 為 3D 網站，`/2d.html` 為 2D 地圖，`/index3d.html` 保留 3D 路徑，`/version.json` 可核對目前發布的 commit。
-- 本機用 `python3 tools/package_site.py` 產生 `out/site`。來源驗證失敗會中止發布；僅上傳網站 HTML 與版本資料，不上傳儲存庫、工具或原始資料目錄。
-- GitHub Pages 版目前使用內建天氣快照；原 Claude Artifact 的天氣資料庫與排程不會自動移轉。政策資料查核日仍須人工確認。
+```sh
+CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py --check mobile
+```
+
+## 發布與 NAS 自動更新
+
+開發分支為 `claude/modest-newton-t9y5uj`；通過檢查後更新 `main`。`.github/workflows/pages.yml` 監聽 `main`，建置並發布 [GitHub Pages 預覽](https://soulfyai.github.io/tpencore2026/)。NAS 每 5 分鐘拉取發布檔，無需 cloud session 常駐。
+
+- [NAS 自動更新快速指南](deploy/NAS_QUICK_START.md)
+- [Web Station、網域與計數器設定](deploy/SYNOLOGY.md)
+- [正式網站版本](https://tpencore.tw/version.json)
+
+即時天氣只顯示於城市資訊，不影響場景。計數器使用 NAS PHP／SQLite，需完成一次性設定；只計頁面載入次數，不使用 Cookie。資料查核日期須人工查核後更新。
+
+Designed by TPEncore © 2026 · Contact / TPEncore2026@gmail.com

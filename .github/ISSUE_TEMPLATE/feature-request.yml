@@ -1,0 +1,17 @@
+name: 功能與設計建議
+description: 提出政策瀏覽、操作或設計改善建議。
+title: "[建議] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 想解決的問題
+      description: 說明使用情境與目前遇到的困難。
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 建議的改善方式
+    validations:
+      required: true

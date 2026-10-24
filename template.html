@@ -142,6 +142,14 @@ details.grp .rows{padding-left:18px}
   .notice{font-size:10.5px;padding:3px 10px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Project links retain the original atlas/panel layout and city palette. */
+.project-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12.5px}
+.project-nav a{display:inline-flex;align-items:center;box-sizing:border-box;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none}
+.project-nav a:hover{border-color:var(--ink)}
+.project-nav .project-primary{background:var(--ink);color:var(--surface)}
+.hi .project-nav{display:none}
+.method a{color:inherit;text-underline-offset:3px}
+@media(max-width:860px){.project-nav{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.project-nav a{font-size:11.5px;padding:8px;text-align:center;justify-content:center}}
 </style>
 
 <div class="app" id="app">
@@ -151,6 +159,11 @@ details.grp .rows{padding-left:18px}
       <p>2026 地方選舉・中國國民黨四位直轄市與基隆市長參選人的公開政見，一格一個政策主題</p>
     </div>
     <div class="notice"><b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 <span id="checked"></span></div>
+    <nav class="project-nav" aria-label="專案導覽">
+      <a class="project-primary" href="./index3d.html">進入 3D 城市 ↗</a>
+      <a href="https://github.com/soulfyai/tpencore2026/issues/new/choose" target="_blank" rel="noopener noreferrer">提供資料／回報問題</a>
+      <a href="https://github.com/soulfyai/tpencore2026" target="_blank" rel="noopener noreferrer">GitHub 原始碼 ↗</a>
+    </nav>
   </header>
   <div class="main">
     <section class="mapwrap flows-off" id="mapwrap" aria-label="政見地圖">
@@ -336,6 +349,10 @@ function viewAbout(){
   <p>每一項都標示依據：<b>官方發布</b>指候選人或競選團隊自己的網站、社群或記者會資料；<b>媒體報導</b>指新聞對其政見發表的報導；<b>受訪發言</b>指訪談或辯論中的說法。數字、時程與金額只在來源有寫時列出。</p>
   <p>資料查核日期：${esc(D.meta.checkedAt)}。選舉期間政見仍可能增修，請以候選人最新公開資訊為準。</p>
 
+  <h3 class="sec">參與更新與回報</h3>
+  <p>發現資料有誤或有更新？歡迎到 <a href="https://github.com/soulfyai/tpencore2026/issues/new/choose" target="_blank" rel="noopener noreferrer">GitHub 開 Issue</a>，附上縣市、政策主題、建議修改內容及原始來源連結。我們查核後才會更新網站。</p>
+  <p><a href="./index3d.html">前往 3D 政策城市 ↗</a> · <a href="https://github.com/soulfyai/tpencore2026" target="_blank" rel="noopener noreferrer">查看 GitHub 原始碼</a></p>
+  <p>Designed by TPEncore © 2026 · <a href="mailto:TPEncore2026@gmail.com">TPEncore2026@gmail.com</a></p>
   <h3 class="sec">來源數</h3><p>${sources.size} 個公開來源</p></div>`;
 }
 function openTheme(id){

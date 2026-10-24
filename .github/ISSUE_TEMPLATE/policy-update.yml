@@ -1,0 +1,32 @@
+name: 政策資料更新／更正
+description: 提供北北基桃政策或政績的更正與公開來源。
+title: "[資料更新] "
+body:
+  - type: dropdown
+    id: city
+    attributes:
+      label: 縣市
+      options: [台北市, 新北市, 基隆市, 桃園市, 跨市協作]
+    validations:
+      required: true
+  - type: input
+    id: policy
+    attributes:
+      label: 政策主題／項目
+      description: 請填寫名稱；若知道項目編號或頁面網址，也請附上。
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: 建議更正或補充的內容
+      description: 說明目前內容、建議修改及理由；區分已完成、推動中與政見。
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: 公開來源連結
+      description: 請附原始發布或可靠報導網址、日期與支持修改的段落；僅有主張無法完成查核。
+    validations:
+      required: true

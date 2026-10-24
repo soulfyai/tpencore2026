@@ -1,0 +1,26 @@
+name: 網站問題
+description: 回報 2D／3D 網站的操作、顯示或連結問題。
+title: "[網站問題] "
+body:
+  - type: input
+    id: url
+    attributes:
+      label: 發生問題的網址
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟、實際結果與預期結果
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 裝置與瀏覽器
+      placeholder: 例如 iPhone／Safari，或 Windows／Chrome
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: 截圖或補充資訊
+      description: 可拖曳圖片到此處；請勿提供帳號密碼或私人資料。

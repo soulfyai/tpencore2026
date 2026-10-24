@@ -154,6 +154,14 @@ details.grp .rows{padding-left:18px}
   .notice{font-size:10.5px;padding:3px 10px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Project links retain the original atlas/panel layout and city palette. */
+.project-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:12.5px}
+.project-nav a{display:inline-flex;align-items:center;box-sizing:border-box;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);text-decoration:none}
+.project-nav a:hover{border-color:var(--ink)}
+.project-nav .project-primary{background:var(--ink);color:var(--surface)}
+.hi .project-nav{display:none}
+.method a{color:inherit;text-underline-offset:3px}
+@media(max-width:860px){.project-nav{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.project-nav a{font-size:11.5px;padding:8px;text-align:center;justify-content:center}}
 /* ===== policy-island page shell (3D page only) ===== */
 [hidden]{display:none!important}
 html.hi,html.hi body{margin:0;width:100%;height:100%;overflow:hidden}
@@ -469,6 +477,11 @@ html.drawer-open aside.panel{transform:none}
       <p>2026 地方選舉・中國國民黨四位直轄市與基隆市長參選人的公開政見與任內政績</p>
     </div>
     <div class="notice"><b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 <span id="checked"></span></div>
+    <nav class="project-nav" aria-label="專案導覽">
+      <a class="project-primary" href="./index3d.html">進入 3D 城市 ↗</a>
+      <a href="https://github.com/soulfyai/tpencore2026/issues/new/choose" target="_blank" rel="noopener noreferrer">提供資料／回報問題</a>
+      <a href="https://github.com/soulfyai/tpencore2026" target="_blank" rel="noopener noreferrer">GitHub 原始碼 ↗</a>
+    </nav>
   </header>
   <div class="main">
     <section class="mapwrap flows-off" id="mapwrap" aria-label="政見地圖">
@@ -654,6 +667,10 @@ function viewAbout(){
   <p>每一項都標示依據：<b>官方發布</b>指候選人或競選團隊自己的網站、社群或記者會資料；<b>媒體報導</b>指新聞對其政見發表的報導；<b>受訪發言</b>指訪談或辯論中的說法。數字、時程與金額只在來源有寫時列出。</p>
   <p>資料查核日期：${esc(D.meta.checkedAt)}。選舉期間政見仍可能增修，請以候選人最新公開資訊為準。</p>
 
+  <h3 class="sec">參與更新與回報</h3>
+  <p>發現資料有誤或有更新？歡迎到 <a href="https://github.com/soulfyai/tpencore2026/issues/new/choose" target="_blank" rel="noopener noreferrer">GitHub 開 Issue</a>，附上縣市、政策主題、建議修改內容及原始來源連結。我們查核後才會更新網站。</p>
+  <p><a href="./index3d.html">前往 3D 政策城市 ↗</a> · <a href="https://github.com/soulfyai/tpencore2026" target="_blank" rel="noopener noreferrer">查看 GitHub 原始碼</a></p>
+  <p>Designed by TPEncore © 2026 · <a href="mailto:TPEncore2026@gmail.com">TPEncore2026@gmail.com</a></p>
   <h3 class="sec">來源數</h3><p>${sources.size} 個公開來源</p></div>`;
 }
 function openTheme(id){
@@ -4667,6 +4684,7 @@ const UI = {};
     <p>這裡把北北基桃四位候選人的 <b>${allRows}</b> 項政見與任內政績，分成 <b>${allThemes}</b> 個政策區塊，散在台北、新北、基隆、桃園四座城市島上。每一棟建築就是一項內容，點進去可以看白話說明、怎麼做，以及原始來源。</p>
     <ul><li><b>全景</b>：看整座群島，點島就飛過去</li><li><b>政策清單</b>：用文字一項一項瀏覽</li><li><b>政策進度</b>：依已完成、推動中、規劃中排好</li></ul>
     <p class="hi-soon">拖曳地圖可以移動到其他城市，或用左上角的城市按鈕切換。</p>
+    <p><a href="./2d.html">開啟文字政策導覽 ↗</a> · <a href="https://github.com/soulfyai/tpencore2026/issues/new/choose" target="_blank" rel="noopener noreferrer">提供資料／回報問題</a></p>
     <p class="hi-independence">${independence}</p>
     <div class="hi-actions"><button type="button" class="hi-primary">開始導覽 →</button><button type="button" class="hi-ghost">自己逛逛</button></div>`);
   intro.setAttribute("aria-label", "使用說明");
