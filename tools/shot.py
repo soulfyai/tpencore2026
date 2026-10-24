@@ -63,7 +63,8 @@ HTMLCanvasElement.prototype.getContext = function(type, options) {
     pg.route("**/three@0.160.0/**", route); pg.route("**/fonts.g*/**", lambda r: r.abort())
     pg.goto(url, wait_until="commit")
     pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')", timeout=300000, polling=100)
-    assert pg.locator(".hi-intro").is_hidden(), "Startup unexpectedly opened the help dialog"
+    pg.evaluate("CITY3D.snapshot()")  # Complete the first frame before checking visible startup help.
+    assert pg.locator(".hi-intro").is_visible(), "Startup help is missing"
     pg.evaluate("(()=>{const E=CITY3D.ENV;E.forced={minute:660,w:{code:1,cloud:20,wind:10,temp:27}};E.apply();const i=document.querySelector('.hi-intro');if(i)i.hidden=true;})()")
     if sea_check:
         pg.emulate_media(reduced_motion="no-preference")

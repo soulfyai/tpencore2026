@@ -30,7 +30,7 @@ try:
   pg.goto(f'http://127.0.0.1:{server.server_port}/index3d.html',wait_until='commit')
   pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')",timeout=300000,polling=100)
   pg.wait_for_function("!document.querySelector('.hi-music')?.hidden",polling=100)
-  pg.evaluate('CITY3D.snapshot()')
+  pg.evaluate("CITY3D.snapshot();document.querySelector('.hi-intro .hi-x').click()")
   assert not requests,'Audio loaded before user intent'
   if mobile: pg.locator('.hi-tools-toggle').click()
   pg.locator('.hi-music').click()

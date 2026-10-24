@@ -352,6 +352,27 @@ function fitPolicyLabels() {
   });
 }
 
+// The map's look-at point, rather than the last button click, owns the city context.
+function followVisibleCity(camDist) {
+  if (fly || camDist > labelTH) return;
+  const point = [controls.target.x, controls.target.z];
+  const distanceToCoast = (poly) => {
+    if (GEOM.pip(point[0], point[1], poly)) return 0;
+    let best = Infinity;
+    for (let i=0;i<poly.length;i++) {
+      const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dz=b[1]-a[1];
+      const t=THREE.MathUtils.clamp(((point[0]-a[0])*dx+(point[1]-a[1])*dz)/(dx*dx+dz*dz||1),0,1);
+      best=Math.min(best,Math.hypot(point[0]-a[0]-t*dx,point[1]-a[1]-t*dz));
+    }
+    return best;
+  };
+  const candidates=[...WORLD.cities].filter(([city])=>LIVE_CITIES.has(city)).map(([city,data])=>({city,distance:distanceToCoast(data.coast)})).sort((a,b)=>a.distance-b.distance);
+  const next=candidates[0],current=candidates.find(c=>c.city===entered);
+  // In the water between islands, require a clear lead to avoid rapid toggling.
+  if(next.city===entered||(current&&next.distance>0&&next.distance+1>=current.distance*.8))return;
+  entered=next.city;showPins(null);UI.followCity?.(entered);dirty=true;
+}
+
 function renderFrame(now, forceRender = false) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   let busy = false;
@@ -375,6 +396,7 @@ function renderFrame(now, forceRender = false) {
   // Keep close inspection intact, and spend depth precision on the visible city.
   const near = THREE.MathUtils.clamp(camDist * 0.02, 0.3, 12);
   if (Math.abs(camera.near - near) > 0.0001) { camera.near = near; camera.updateProjectionMatrix(); }
+  followVisibleCity(camDist);
   stage.classList.toggle("far", camDist > 40);
   stage.classList.toggle("pano", camDist > labelTH);
   const cityView=!!entered&&camDist<=labelTH;

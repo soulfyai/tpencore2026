@@ -125,7 +125,7 @@ const UI = {};
   intro.querySelector(".hi-x").onclick = () => showIntro(false);
   intro.querySelector(".hi-ghost").onclick = () => setMode("pano");
   intro.querySelector(".hi-primary").onclick = () => { showIntro(false); startTour(); };
-  intro.hidden = true; // Open directly into the panorama; help is available from the toolbar.
+  intro.hidden = false; // Explain the policy city on each fresh visit; map tap or X dismisses it.
 
   /* ---------- guided tour ---------- */
   let touring = false, step = 0;
@@ -209,6 +209,12 @@ const UI = {};
     clearSel();closeDrawer(true);mode="pano";
     for(const [id] of MODES)btn[id].setAttribute("aria-pressed",String(id==="pano"));
     MAP3D.flyTo(target,pos);
+  };
+
+  UI.followCity=(c)=>{
+    if(c===LIVE)return;
+    if(A.state.selTheme||A.state.selItem||A.state.selFlow||!tour.hidden)UI.dismissOverlays();
+    setCur(c);
   };
 
   // Escape: first collapse the brand popover, then (once the 2D page's handler has cleared any selection) close the drawer
