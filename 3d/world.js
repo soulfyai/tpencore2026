@@ -290,12 +290,17 @@ const GEOM = {};
         }
         seg.push({ a: A0, b: B0, na, nb, type: t });
       }
-      const mk = (arr, mat) => { if (!arr.length) return; const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(arr, 3)); const uv = []; for (let k = 0; k < arr.length; k += 3) uv.push(arr[k] * 0.6, arr[k + 2] * 0.6); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; scene.add(m); };
+      const mk = (arr, mat, name) => { if (!arr.length) return; const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(arr, 3)); const uv = []; for (let k = 0; k < arr.length; k += 3) uv.push(arr[k] * 0.6, arr[k + 2] * 0.6); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.computeVertexNormals(); const m = new THREE.Mesh(g, mat); m.receiveShadow = true; if (name) { m.name = name; m.renderOrder = 2; } scene.add(m); };
       mk(pos.beach, new THREE.MeshStandardMaterial({ map: MESH.TEX.sand, roughness: 0.95, side: THREE.DoubleSide }));
       mk(pos.wet, MESH.mat("#ecd49c", { side: THREE.DoubleSide }));
       mk(pos.quay, MESH.mat(live ? "#d9d6cd" : "#b3b0a9", { side: THREE.DoubleSide }));
       mk(pos.deck, MESH.mat("#efece4", { side: THREE.DoubleSide }));
-      mk(pos.foam, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.75, depthWrite: false, side: THREE.DoubleSide }));
+      // Draw foam after the shallows, once per pixel even at concave joins.
+      const foamMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide,
+        polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2,
+        stencilWrite: true, stencilRef: 4, stencilFuncMask: 4, stencilWriteMask: 4,
+        stencilFunc: THREE.NotEqualStencilFunc, stencilZPass: THREE.ReplaceStencilOp });
+      mk(pos.foam, foamMat, "coast-foam");
       { // sand cones at every beach vertex: the union with the strips is a true offset, so concave corners and notches get beach too
         const cp = [], H0 = TOP - 0.065, H1 = WATER_Y + 0.02, SEGS = 20;
         for (let i = 0; i < n; i++) {
@@ -316,10 +321,11 @@ const GEOM = {};
           }
         }
         const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(sp, 3)); g.setAttribute("color", new THREE.Float32BufferAttribute(sc, 4));
-        const bm = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+        const bm = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+          polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
         // stencil: each pixel of the shallows is blended once, so overlapping strips at bends never stack into bright wedges
-        bm.stencilWrite = true; bm.stencilRef = 1; bm.stencilFunc = THREE.NotEqualStencilFunc; bm.stencilZPass = THREE.ReplaceStencilOp;
-        const m = new THREE.Mesh(g, bm); m.renderOrder = 1; scene.add(m);
+        bm.stencilWrite = true; bm.stencilRef = 1; bm.stencilFuncMask = 1; bm.stencilWriteMask = 1; bm.stencilFunc = THREE.NotEqualStencilFunc; bm.stencilZPass = THREE.ReplaceStencilOp;
+        const m = new THREE.Mesh(g, bm); m.name = "coast-shallows"; m.renderOrder = 1; scene.add(m);
       }
       WORLD.shore = WORLD.shore || new Map(); WORLD.shore.set(c.city, seg);
       WORLD.pockets = WORLD.pockets || new Map(); WORLD.pockets.set(c.city, pockets);

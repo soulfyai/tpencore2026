@@ -361,6 +361,10 @@ function renderFrame(now, forceRender = false) {
   PEOPLE.update(dt, clock, moving);
   ENV.cullClouds(camera);
   const camDist = camera.position.distanceTo(controls.target);
+  // A fixed 0.3 near plane loses millimetre-scale coast separation in panorama.
+  // Keep close inspection intact, and spend depth precision on the visible city.
+  const near = THREE.MathUtils.clamp(camDist * 0.02, 0.3, 12);
+  if (Math.abs(camera.near - near) > 0.0001) { camera.near = near; camera.updateProjectionMatrix(); }
   stage.classList.toggle("far", camDist > 40);
   stage.classList.toggle("pano", camDist > labelTH);
   const cityView=!!entered&&camDist<=labelTH;

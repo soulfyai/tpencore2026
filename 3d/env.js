@@ -111,6 +111,9 @@ const ENV = {};
   surfGeo.setAttribute("outward", new THREE.Float32BufferAttribute(surfNormals,2));
   const surfMat = new THREE.ShaderMaterial({
     transparent:true, depthWrite:false, side:THREE.DoubleSide, fog:true,
+    polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-3,
+    stencilWrite:true, stencilRef:2, stencilFuncMask:2, stencilWriteMask:2,
+    stencilFunc:THREE.NotEqualStencilFunc, stencilZPass:THREE.ReplaceStencilOp,
     extensions:{derivatives:true},
     uniforms:THREE.UniformsUtils.merge([THREE.UniformsLib.fog,{uTime:{value:0},uNight:{value:0}}]),
     vertexShader:`attribute vec2 outward;varying vec2 vSurf;uniform float uTime;
@@ -124,16 +127,20 @@ const ENV = {};
       #include <fog_pars_fragment>
       void main(){float x=vSurf.x,s=vSurf.y,t=uTime;
         float phase=x*7.0+t*1.18+0.36*sin(s*0.85-t*0.27)+0.16*sin(s*2.1+t*0.32);
-        float w=0.5+0.5*sin(phase),aa=max(fwidth(w),0.025);
+        // Filter by phase footprint: derivatives of sin vanish at bright crests.
+        // Subpixel lace fades into a broad, quiet wash instead of sparkling.
+        float footprint=max(fwidth(phase),fwidth(s*2.8));
+        float detail=1.0-smoothstep(0.65,2.4,footprint);
+        float w=0.5+0.5*sin(phase),aa=max(fwidth(phase)*0.25,0.04);
         float crest=smoothstep(0.82-aa,0.98+aa,w);
         float edge=smoothstep(0.0,0.16,x)*(1.0-smoothstep(0.75,1.65,x));
         float lace=0.6+0.4*sin(s*2.8+sin(s*0.7)-t*0.65);
-        float a=crest*edge*lace*0.52;
+        float a=edge*mix(0.10,crest*lace*0.42,detail);
         gl_FragColor=vec4(mix(vec3(0.86,0.98,0.97),vec3(0.33,0.52,0.61),uNight),a);
         #include <fog_fragment>
       }`
   });
-  const surf = new THREE.Mesh(surfGeo,surfMat); surf.name="coastal-surf"; surf.renderOrder=2; scene.add(surf);
+  const surf = new THREE.Mesh(surfGeo,surfMat); surf.name="coastal-surf"; surf.renderOrder=3; scene.add(surf);
 
   /* ---------- islets, lighthouses and boats out at sea (decorative) ---------- */
   const deco = new THREE.Group(); scene.add(deco);
