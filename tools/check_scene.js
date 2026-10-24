@@ -74,7 +74,7 @@
    for(const type of ['fire','police','hospital'])check(buildings.some(b=>b.type===type),'public facility '+city+' '+type);
    for(const floors of [10,15,20])check(buildings.some(b=>b.type==='highrise'&&b.floors===floors),'high-rise floors '+city+' '+floors);
  }
- const toolbar=document.querySelector('.hi-toolbar'),landmarks=toolbar.querySelector('.lmbtn'),tour=toolbar.querySelector('.hi-tourbtn'),modes=toolbar.querySelector('.hi-modes');
+ const toolbar=document.querySelector('.hi-toolbar'),landmarks=toolbar.querySelector('.lmbtn'),tour=toolbar.querySelector('.hi-tourbtn'),modes=toolbar.querySelector('.hi-modes')||toolbar.querySelector('.hi-tools-panel');
  check(landmarks&&tour&&modes,'integrated map tools');
  if(innerWidth>860){const a=landmarks.getBoundingClientRect(),b=tour.getBoundingClientRect(),c=modes.getBoundingClientRect();check(a.right<=b.left&&b.right<=c.left&&Math.abs(a.top-c.top)<8,'desktop toolbar order');}
  landmarks.click();check(landmarks.getAttribute('aria-pressed')==='true','landmark toggle');landmarks.click();

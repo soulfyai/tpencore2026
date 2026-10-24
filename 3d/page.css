@@ -176,11 +176,15 @@ html.drawer-open aside.panel{transform:none}
   .hi .hi-pop .wx span,.hi .hi-pop .wx small{display:inline-block}
   .hi-toolbar{top:12px;right:10px;z-index:45;display:flex;flex-direction:column;align-items:stretch;gap:6px;max-width:none}
   html.drawer-open .hi-toolbar{top:12px;right:10px;max-width:none}
-  .hi-tools-toggle{position:static;display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 10px;font-size:12.5px}
+  .hi-tools-toggle{position:static;display:flex;align-items:center;justify-content:center;gap:0;min-width:44px;width:44px;min-height:44px;padding:0;font-size:20px}
   .hi-tools-toggle{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:700 12.5px var(--f-body);cursor:pointer;box-shadow:0 6px 20px rgba(20,33,61,.12)}
   .hi-tools-toggle[aria-expanded=true]{background:var(--ink);color:var(--surface)}
   .hi-tools-toggle:focus-visible{outline:2px solid var(--c-taipei);outline-offset:2px}
-  .hi-tools-panel{position:absolute;top:100%;right:0;margin-top:8px;width:min(252px,calc(100vw - 20px));max-height:calc(100dvh - 180px);overflow:auto;padding:8px;box-sizing:border-box;display:grid;gap:8px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 12px 32px rgba(20,33,61,.24)}
+  .hi-tools-panel{position:absolute;top:100%;right:0;margin-top:8px;width:min(180px,calc(100vw - 20px));max-height:calc(100dvh - 180px);overflow:auto;padding:8px;box-sizing:border-box;display:grid;grid-template-columns:1fr;gap:3px;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 12px 32px rgba(20,33,61,.24)}
+  .hi .hi-tools-panel>button{position:static;display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;min-width:0;min-height:44px;padding:0 14px;margin:0;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 13.5px var(--f-body);text-align:left;box-shadow:none;white-space:nowrap;cursor:pointer}
+  .hi .hi-tools-panel>button:hover{background:var(--sunk)}
+  .hi .hi-tools-panel>button[aria-pressed="true"],.hi .hi-tools-panel>.lmbtn.on{background:var(--ink);color:var(--surface)}
+  .hi .hi-tools-panel>button:focus-visible{outline:2px solid var(--c-taipei);outline-offset:-2px}
   .hi-maptools,.hi-modes{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0;background:none;box-shadow:none;backdrop-filter:none}
   .hi-modes{border-top:1px solid var(--line);padding-top:8px}
   .hi-mode-label{display:inline}.hi-mode-short{display:none}

@@ -64,7 +64,7 @@ const UI = {};
   const help = el("button", "hi-help", "?"); help.type = "button"; help.setAttribute("aria-label", "使用說明"); help.onclick = () => showIntro(true); modes.appendChild(help);
   help.innerHTML = `<span aria-hidden="true">?</span><span class="hi-help-label">使用說明</span>`;
   const toolsPanel = el("div", "hi-tools-panel"); toolsPanel.id = "hi-tools-panel"; toolsPanel.append(mapTools,modes);
-  const toolsToggle = el("button", "hi-tools-toggle", `<span aria-hidden="true">☰</span> 工具`);
+  const toolsToggle = el("button", "hi-tools-toggle", `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`);
   toolsToggle.type = "button"; toolsToggle.setAttribute("aria-label", "地圖工具"); toolsToggle.setAttribute("aria-controls", toolsPanel.id);
   const phoneTools = matchMedia("(max-width:860px)");
   function setTools(on) {
@@ -187,6 +187,19 @@ const UI = {};
   const music = el("button", "hi-music", `<span aria-hidden="true">♫</span> 音樂`);
   music.type="button";music.hidden=true;music.setAttribute("aria-pressed","false");
   music.setAttribute("aria-label","播放背景音樂");mapTools.appendChild(music);
+  // Reuse the same controls and events, with matching visual and keyboard order.
+  const phoneOrder=[btn.list,btn.time,help,btn.pano,tourBtn,landmarkButton,music].filter(Boolean);
+  function layoutTools(){
+    if(phoneTools.matches){
+      toolsPanel.replaceChildren(...phoneOrder);
+    }else{
+      mapTools.replaceChildren(...[landmarkButton,tourBtn,music].filter(Boolean));
+      modes.replaceChildren(btn.pano,btn.list,btn.time,help);
+      toolsPanel.replaceChildren(mapTools,modes);
+    }
+  }
+  toolsPanel.setAttribute("role","group");toolsPanel.setAttribute("aria-label","地圖工具");
+  layoutTools();phoneTools.addEventListener("change",layoutTools);
   const audio = new Audio();audio.loop=true;audio.preload="none";audio.volume=.35;
   const syncMusic=()=>{const playing=!audio.paused;music.setAttribute("aria-pressed",String(playing));music.setAttribute("aria-label",playing?"暫停背景音樂":"播放背景音樂");};
   audio.addEventListener("playing",syncMusic);audio.addEventListener("pause",syncMusic);
