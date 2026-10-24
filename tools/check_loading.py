@@ -30,6 +30,8 @@ try:
             page.goto(f"http://127.0.0.1:{server.server_port}/index.html", wait_until="commit")
             page.wait_for_selector("#loading", state="visible")
             page.wait_for_function("document.querySelector('.loading-status')?.textContent.includes('正在載入')")
+            assert not page.locator("#loading a").count()
+            assert not page.locator(".loading-actions").is_visible()
             page.evaluate("""()=>{
               const loader=document.getElementById('loading'),r=loader.getBoundingClientRect();
               if(!document.documentElement.classList.contains('hi')||!document.documentElement.classList.contains('booting'))throw Error('Initial shell missing');
@@ -50,11 +52,10 @@ try:
             assert not page.locator(".loading-spinner").is_visible()
             assert page.locator("#stage").get_attribute("aria-busy") == "false"
             (ROOT / f"out/loading-{name}-failure.png").write_bytes(b64decode(capture.send("Page.captureScreenshot", {"format": "png"})["data"]))
-            page.locator(".loading-actions a").click()
-            page.wait_for_selector("svg#map", state="visible")
-            assert not page.locator("#loading").count()
-            assert not page.evaluate("document.documentElement.classList.contains('hi')")
-            print(f"PASS {name}: delayed imports, full-screen shell, reduced motion, failed imports, retry and working 2D fallback")
+            assert not page.locator("#loading a").count()
+            assert "文字版" not in page.locator("#loading").inner_text()
+            assert page.locator("#loading-retry").get_attribute("onclick") == "location.reload()"
+            print(f"PASS {name}: delayed imports, full-screen shell, reduced motion, failed imports, retry and no text-version link")
             page.close()
         browser.close()
 finally:

@@ -129,8 +129,9 @@ document.documentElement.classList.add('hi','booting');
 window.cityLoadFailed=function(){
   const status=document.querySelector('#loading .loading-status'),hint=document.querySelector('#loading .loading-hint'),retry=document.getElementById('loading-retry');
   if(status)status.textContent='無法載入城市畫面';
-  if(hint)hint.textContent='請重新整理，或先用文字版瀏覽政策。';
+  if(hint)hint.textContent='請重新整理後再試一次。';
   if(retry)retry.hidden=false;
+  const actions=document.getElementById('loading-actions');if(actions)actions.hidden=false;
   const spinner=document.querySelector('.loading-spinner');if(spinner)spinner.hidden=true;
   const stage=document.getElementById('stage');if(stage)stage.setAttribute('aria-busy','false');
 };
@@ -146,7 +147,7 @@ sub('<svg class="map" id="map" role="img" aria-label="六角格地圖：台北�
     '<div class="loading-spinner" aria-hidden="true"></div>'
     '<p class="loading-status" role="status">正在載入四座政策城市…</p>'
     '<p class="loading-hint">準備好後，會自動顯示全景。</p>'
-    '<div class="loading-actions"><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button><a href="./2d.html">先用文字版瀏覽政策</a></div>'
+    '<div class="loading-actions" id="loading-actions" hidden><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button></div>'
     '<small>獨立整理，非任何候選人或政黨官方網站</small>'
     '</section></div>'
     '<div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>')

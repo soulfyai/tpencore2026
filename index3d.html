@@ -3,8 +3,9 @@ document.documentElement.classList.add('hi','booting');
 window.cityLoadFailed=function(){
   const status=document.querySelector('#loading .loading-status'),hint=document.querySelector('#loading .loading-hint'),retry=document.getElementById('loading-retry');
   if(status)status.textContent='無法載入城市畫面';
-  if(hint)hint.textContent='請重新整理，或先用文字版瀏覽政策。';
+  if(hint)hint.textContent='請重新整理後再試一次。';
   if(retry)retry.hidden=false;
+  const actions=document.getElementById('loading-actions');if(actions)actions.hidden=false;
   const spinner=document.querySelector('.loading-spinner');if(spinner)spinner.hidden=true;
   const stage=document.getElementById('stage');if(stage)stage.setAttribute('aria-busy','false');
 };
@@ -165,7 +166,7 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 .loading-hint{margin:-10px 0 0;color:#c8d7e9;font-size:13px}
 .loading-spinner{width:28px;height:28px;margin-top:12px;border:2px solid #ffffff30;border-top-color:#b9d3ff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
 .loading-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:8px}
-.loading-actions a,.loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);text-decoration:none;cursor:pointer}
+.loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);cursor:pointer}
 .loading-actions :focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
 .loading small{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;color:#c4d2e5;font-size:11px}
 @keyframes loading-spin{to{transform:rotate(360deg)}}
@@ -459,7 +460,7 @@ html.drawer-open aside.panel{transform:none}
         <span class="spacer"></span>
         <button class="chip" id="toggleflows" aria-pressed="false">顯示跨市協作線</button>
       </div>
-      <div class="stage" id="stage" role="group" aria-busy="true" aria-label="3D 政策城市：台北、新北、基隆、桃園，每個街區是一項政策主題"><section class="loading" id="loading" aria-label="城市載入狀態"><div class="loading-brand">台北安可<span>一起打造你我的北北基桃</span></div><div class="loading-spinner" aria-hidden="true"></div><p class="loading-status" role="status">正在載入四座政策城市…</p><p class="loading-hint">準備好後，會自動顯示全景。</p><div class="loading-actions"><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button><a href="./2d.html">先用文字版瀏覽政策</a></div><small>獨立整理，非任何候選人或政黨官方網站</small></section></div><div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>
+      <div class="stage" id="stage" role="group" aria-busy="true" aria-label="3D 政策城市：台北、新北、基隆、桃園，每個街區是一項政策主題"><section class="loading" id="loading" aria-label="城市載入狀態"><div class="loading-brand">台北安可<span>一起打造你我的北北基桃</span></div><div class="loading-spinner" aria-hidden="true"></div><p class="loading-status" role="status">正在載入四座政策城市…</p><p class="loading-hint">準備好後，會自動顯示全景。</p><div class="loading-actions" id="loading-actions" hidden><button id="loading-retry" type="button" onclick="location.reload()" hidden>重新整理</button></div><small>獨立整理，非任何候選人或政黨官方網站</small></section></div><div class="key" aria-label="圖例"><span><i class="k-done"></i>已完成</span><span><i class="k-build"></i>施工中</span><span><i class="k-planb"></i>政見</span><span class="lm">白色標籤＝城市地標・一個大街區＝一個政策主題</span><span class="hint">拖曳旋轉・滾輪或雙指縮放・點街區看細項</span></div>
       <div class="legend" aria-label="協作線依據">
         <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2"/></svg>官方發布</span>
         <span><svg viewBox="0 0 26 6"><line x1="0" y1="3" x2="26" y2="3" stroke="var(--route)" stroke-width="2" stroke-dasharray="7 5"/></svg>媒體報導</span>

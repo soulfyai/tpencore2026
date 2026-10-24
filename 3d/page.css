@@ -10,7 +10,7 @@ html.hi.booting .stage .loading{position:fixed;inset:0;z-index:70;visibility:vis
 .loading-hint{margin:-10px 0 0;color:#c8d7e9;font-size:13px}
 .loading-spinner{width:28px;height:28px;margin-top:12px;border:2px solid #ffffff30;border-top-color:#b9d3ff;border-radius:50%;animation:loading-spin 1.2s linear infinite}
 .loading-actions{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin-top:8px}
-.loading-actions a,.loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);text-decoration:none;cursor:pointer}
+.loading-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;box-sizing:border-box;border:1px solid #9ebce0;border-radius:10px;background:#152e4a;color:#e7f0ff;font:600 13px var(--f-body);cursor:pointer}
 .loading-actions :focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
 .loading small{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:16px;right:16px;color:#c4d2e5;font-size:11px}
 @keyframes loading-spin{to{transform:rotate(360deg)}}
