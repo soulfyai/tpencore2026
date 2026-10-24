@@ -120,7 +120,8 @@ html.drawer-open .hi-modes{right:calc(min(420px,94vw) + 28px)}
 /* detail drawer: the existing panel slides in from the right */
 .hi aside.panel{position:absolute;right:12px;top:12px;bottom:12px;width:min(420px,94vw);z-index:35;border-radius:18px;box-shadow:0 12px 40px rgba(20,33,61,.24);transform:translateX(calc(100% + 24px));transition:transform .32s ease;display:flex;flex-direction:column}
 html.drawer-open aside.panel{transform:none}
-.hi aside.panel .tabs{padding-right:48px}
+.hi aside.panel .tabs{padding-right:48px;flex:0 0 auto}
+.hi aside.panel .pbody{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(64px + env(safe-area-inset-bottom,0px));scroll-padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 .hi-close{position:absolute;right:6px;top:4px;width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;z-index:2}
 .hi-close:hover{background:var(--sunk)}
 @media (prefers-reduced-motion:reduce){.hi aside.panel{transition:none}}
