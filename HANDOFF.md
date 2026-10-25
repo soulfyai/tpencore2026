@@ -381,3 +381,9 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 使用者要求更靠近原示意圖，包含房屋組合多樣性。獨立taipei-preview升為rev=2；新增taipei-architecture.js的11種組合，依機能分區與相鄰避讓選擇，保留政策、地標配置及高樓。新街區樣貌視角供近看差異。
 - 暖色牆面、坡屋頂、廊架／陽台／花台／庭園／退台、藍色海面與3D雲層；RoomEnvironment提供材質反射，高畫質用SSAOPass接觸陰影，標準關閉AO。EffectComposer MSAA與OutputPass統一渲染。
 - street-art-kit僅供新預覽，合批時保留castShadow／receiveShadow，避免不應投影的細瓦線被重新開啟；原street-test仍未改。check_taipei_preview驗證11種組合、實際操作及正式檔未變。版本號仍2.0.18，沒有替換正式城市，需等待使用者明確確認。
+
+### 0.52 都市天際線範例：修正低樓小鎮方向
+- 使用者指出rev=2仍是相同風格，要求依新附SimCity式高低混合都市範例，並問高度限制。已說明舊7／8層一般建物及少量10／15／20層為程式自訂，不是引擎上限。
+- 新增獨立skyline-study.html／.js與urban-buildings.js，展示圓筒雙塔、尖塔斜撐、斜冠、曲面玻璃、ArtDeco、錯位雙塔、退台住宅、中層圍合、複合街廓、弧頂場館共10種都市量體；最高配置48F，45F尖塔另有冠頂，前景保留低樓住宅。僅為建築語彙審查，沒有套進臺北島或替換正式網站。
+- 街廓尺寸亦要改：舊臺北每格約14.4、占地8×8，新裙樓可32×25；後續需先確認樣本，再合併街廓與重新規劃高／中／低區及101縮尺。不能只把舊方盒拉高。
+- 提供四視角、建築目錄與點選、日／夕陽、畫質與名牌。check_skyline_study.py實際驗證10種、48F、高低差、操作與既有頁面未改。詳docs/URBAN_SKYLINE_STUDY.md。沿用2.0.18版本號與現有三套預覽，各檔保持隔離。

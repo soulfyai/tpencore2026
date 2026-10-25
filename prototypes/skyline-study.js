@@ -1,0 +1,87 @@
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {Sky} from 'three/addons/objects/Sky.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {SSAOPass} from 'three/addons/postprocessing/SSAOPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {createStreetArt} from './street-art-kit.js?rev=2';
+import {createArchitecture} from './taipei-architecture.js?rev=2';
+import {createUrbanBuildings} from './urban-buildings.js?rev=1';
+
+const scene=new THREE.Scene();scene.background=new THREE.Color('#8cc6e2');scene.fog=new THREE.Fog('#a8cddd',550,1600);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.info.autoReset=false;document.querySelector('#stage').append(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(40,innerWidth/innerHeight,.4,2200),controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.075;controls.minDistance=10;controls.maxDistance=780;controls.minPolarAngle=.13;controls.maxPolarAngle=Math.PI*.48;
+const hemi=new THREE.HemisphereLight('#d6edff','#7b856b',1.35);scene.add(hemi);
+const sun=new THREE.DirectionalLight('#fff0d4',2.8);sun.position.set(-180,310,160);sun.castShadow=true;sun.shadow.mapSize.set(4096,4096);Object.assign(sun.shadow.camera,{left:-230,right:230,top:230,bottom:-230,near:1,far:1000});sun.shadow.normalBias=.09;sun.shadow.bias=-.00012;sun.shadow.radius=3;scene.add(sun,sun.target);
+const sky=new Sky();sky.scale.setScalar(1800);sky.material.uniforms.turbidity.value=3;sky.material.uniforms.rayleigh.value=1.15;sky.material.uniforms.sunPosition.value.copy(sun.position);scene.add(sky);
+const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment(),env=pmrem.fromScene(room,.04);scene.environment=env.texture;room.dispose();pmrem.dispose();
+const art=createStreetArt(renderer,scene),architecture=createArchitecture(art,scene),models=createUrbanBuildings(art,scene),{box,shape,batch,line,mat,slab,rand,between}=art;
+function roundedLand(w,d,r,y,material){const s=new THREE.Shape();s.moveTo(-w/2+r,-d/2);s.lineTo(w/2-r,-d/2);s.quadraticCurveTo(w/2,-d/2,w/2,-d/2+r);s.lineTo(w/2,d/2-r);s.quadraticCurveTo(w/2,d/2,w/2-r,d/2);s.lineTo(-w/2+r,d/2);s.quadraticCurveTo(-w/2,d/2,-w/2,d/2-r);s.lineTo(-w/2,-d/2+r);s.quadraticCurveTo(-w/2,-d/2,-w/2+r,-d/2);const g=new THREE.ShapeGeometry(s,12).rotateX(-Math.PI/2);const m=new THREE.Mesh(g,typeof material==='string'?mat(material):material);m.position.y=y;m.receiveShadow=true;scene.add(m);return m;}
+roundedLand(250,273,25,-.27,'#d0c299');roundedLand(242,265,21,.01,art.grass);
+const sea=new THREE.Mesh(new THREE.PlaneGeometry(2800,2800,80,80),new THREE.MeshStandardMaterial({color:'#2587a9',roughness:.33,metalness:.07,envMapIntensity:.3}));sea.rotation.x=-Math.PI/2;sea.position.y=-1.15;scene.add(sea);
+const streetX=[-83,-36,11,58,105],streetZ=[-89,-30,28,86,125],streetWidth=7.4;
+for(const x of streetX){slab(art.pavement,x,18,11.2,225,.09,.16);slab(art.asphalt,x,18,streetWidth,225,.17,.06);art.reserve(x,18,11.2,225);for(let z=-90;z<128;z+=5.5){if(streetZ.some(t=>Math.abs(t-z)<8))continue;batch('box','#e7e0b9',x,.207,z,.1,.01,2.4);}}
+for(const z of streetZ){slab(art.pavement,11,z,194,11.2,.09,.16);slab(art.asphalt,11,z,194,streetWidth,.17,.06);art.reserve(11,z,194,11.2);for(let x=-83;x<110;x+=5.5){if(streetX.some(t=>Math.abs(t-x)<8))continue;batch('box','#e7e0b9',x,.208,z,2.4,.01,.1);}}
+for(const x of streetX)for(const z of streetZ)if((Math.round(x)+Math.round(z))%3===0){for(let k=0;k<5;k++)batch('box','#e8e9dc',x-2.3+k*1.15,.214,z+6,.62,.01,4.4);}
+const specs=[
+ {id:'bracedSpire',name:'外露斜撐尖塔',floors:'45F',x:-59,z:-59,w:27,d:27,n:45,detail:'深藍玻璃、外露斜撐、收尖屋頂與獨立裙樓，從遠處就能辨認輪廓。'},
+ {id:'twinCylinders',name:'圓筒雙塔',floors:'38F / 32F',x:-12,z:-59,w:35,d:27,n:38,detail:'兩棟不同高度的圓筒塔樓，以空中連廊與共同裙樓連接；曲面、水平樓帶和金屬冠頂形成不同語彙。'},
+ {id:'slopedCrown',name:'斜冠玻璃高樓',floors:'48F',x:35,z:-59,w:27,d:26,n:48,detail:'斜切屋頂、斜向結構與直立玻璃帷幕，取代所有高樓都使用平頂方盒的做法。'},
+ {id:'curvedGlass',name:'曲面玻璃辦公樓',floors:'36F',x:82,z:-59,w:29,d:27,n:36,detail:'圓角量體、連續曲面玻璃與細緻水平樓帶，和圓筒及尖塔形成不同的天際線。'},
+ {id:'artDeco',name:'階梯式 Art Deco',floors:'26F',x:-59,z:-1,w:30,d:28,n:26,detail:'石材感立面、深窗洞、垂直壁柱與逐層收分的冠頂，讓中高層也有可辨識的風格。'},
+ {id:'asymmetricTwins',name:'錯位雙塔辦公群',floors:'35F / 28F',x:-12,z:-1,w:35,d:28,n:35,detail:'錯位塔樓、玻璃連廊與不同大小的裙樓，測試建築群的組合，而非只改單棟外觀。'},
+ {id:'setbackResidential',name:'退台式都會住宅',floors:'24F',x:35,z:-1,w:31,d:27,n:24,detail:'磚色牆面、不同寬度的分段退台、屋頂花園與低層基座，建立住宅區的層次。'},
+ {id:'mixedUse',name:'商業與辦公複合街廓',floors:'6F + 裙樓',x:82,z:-1,w:31,d:28,n:8,detail:'低層商業、偏置辦公量體與遮棚形成可步行的臨街面，銜接高樓與中低層街區。'},
+ {id:'perimeterBlock',name:'中層磚造圍合街區',floors:'10F',x:-59,z:57,w:31,d:31,n:10,detail:'U 形磚造街廓包圍內院，提供與獨棟高樓不同的城市尺度及綠化空間。'},
+ {id:'cultureHall',name:'弧頂文化場館',floors:'約 5F 量體',x:-12,z:57,w:33,d:29,n:5,detail:'低而寬的曲面金屬屋頂、通透立面與前廣場，作為城市中高度較低的公共建築。'}
+];
+const picks=[];
+for(const s of specs){s.height=models[s.id](s.x,s.z);s.anchor=new THREE.Vector3(s.x,s.height+4,s.z);const pick=new THREE.Mesh(new THREE.BoxGeometry(s.w,s.height,s.d),new THREE.MeshBasicMaterial({visible:false}));pick.position.set(s.x,s.height/2,s.z);pick.userData.sample=s.id;scene.add(pick);picks.push(pick);}
+// The foreground deliberately retains a much smaller residential scale.
+for(const [x,z,k] of [[-69,105,0],[-51,105,1],[-22,105,2],[0,105,3],[28,105,4],[46,105,5]]){if(k%2)architecture.gardenVilla(x,z,k);else architecture.townhouses(x,z,k);}
+for(const [x,z,k] of [[69,54,2],[87,54,4],[69,70,5],[87,70,7]]){if(k%2)architecture.cornerShop(x,z,k);else architecture.arcadeRow(x,z,k);}
+// A genuine open park and pond breaks up the built mass, rather than filling every parcel.
+slab('#d9d0b5',35,57,34,43,.05,.08);shape('urbanRound',new THREE.MeshPhysicalMaterial({color:'#70b1bb',roughness:.17,metalness:.05,envMapIntensity:.4}),35,.12,57,28,.06,34);
+for(const [x,z] of [[18,41],[51,42],[18,76],[51,76],[16,56],[54,59]]){art.tree(x,z,between(4,6.5),0,true);art.bench(x,z+2.2);}
+box('#d6c7a2',35,.5,57,32,.3,2.1);for(const side of [-1,1]){line('#8d9c91',[19,.95,57+side],[51,.95,57+side],.05);for(let x=19;x<=51;x+=2.5)line('#8d9c91',[x,.55,57+side],[x,.95,57+side],.035);}
+// Fixed, varied planting at sidewalks and exposed coastal margins.
+art.setLandCheck((x,z,r)=>Math.abs(x)<118-r&&Math.abs(z)<129-r&&Math.hypot(Math.max(0,Math.abs(x)-100),Math.max(0,Math.abs(z)-111.5))<18-r);
+for(let k=0;k<specs.length;k++){const s=specs[k];art.reserve(s.x,s.z,s.w+3,s.d+3);for(const side of [-1,1])art.tree(s.x+side*(s.w/2+1.8),s.z+15,between(4.6,6.2),0,true);}
+for(let i=0;i<1800;i++){const x=between(-117,117),z=between(-126,128);if(!art.clearAt(x,z,1.4))continue;art.tree(x,z,between(3.5,6.5),rand()<.13?1:0);}
+for(const x of [-89,-42,5,52,111])for(const z of [-73,-10,49,102]){if(rand()<.6)art.lamp(x,z);}
+for(const [x,z,a,c] of [[-36,12,0,'#a7bdc7'],[40,28,Math.PI/2,'#d8bb8b'],[-64,86,Math.PI/2,'#7e999e'],[105,-40,0,'#a7b7ad'],[-20,-30,Math.PI/2,'#c8c9bc']])art.car(x,z,c,a);
+for(const [x,z] of [[-46,86],[20,85],[76,84],[-33,42],[52,30],[57,110]])art.person(x,z,.95,'#b0c8c4','#8a9992','#67513e','idle',.5);
+const geometryStats=art.flush();
+// Preserve every tree while drawing its soft contact shadow in shared instance batches.
+scene.updateMatrixWorld(true);const shadowGroups=new Map();
+for(const o of [...scene.children]){if(!o.isMesh||o.isInstancedMesh||o.geometry.type!=='PlaneGeometry'||!o.material.isMeshBasicMaterial||!o.material.transparent||o.material.depthWrite||!o.material.map)continue;const key=o.material.map.uuid+'/'+o.material.opacity;if(!shadowGroups.has(key))shadowGroups.set(key,[]);shadowGroups.get(key).push(o);}
+for(const group of shadowGroups.values()){const mesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),group[0].material,group.length);for(let i=0;i<group.length;i++){const o=group[i],parameters=o.geometry.parameters,matrix=o.matrixWorld.clone().multiply(new THREE.Matrix4().makeScale(parameters.width,parameters.height,1));mesh.setMatrixAt(i,matrix);o.removeFromParent();o.geometry.dispose();if(i)o.material.dispose();}mesh.castShadow=false;mesh.receiveShadow=false;scene.add(mesh);}
+
+const composer=new EffectComposer(renderer);if(renderer.capabilities.isWebGL2){composer.renderTarget1.samples=4;composer.renderTarget2.samples=4;}composer.addPass(new RenderPass(scene,camera));const ao=new SSAOPass(scene,camera,innerWidth,innerHeight);ao.kernelRadius=1.9;ao.minDistance=.00005;ao.maxDistance=.008;composer.addPass(ao);composer.addPass(new OutputPass());
+const views={overview:{pos:[235,195,300],target:[8,43,0]},towers:{pos:[173,139,192],target:[6,76,-42]},transition:{pos:[182,99,217],target:[1,27,32]},waterfront:{pos:[163,55,149],target:[31,12,55]}};
+const reduced=matchMedia('(prefers-reduced-motion: reduce)'),drawer=document.querySelector('.drawer'),body=document.querySelector('.body'),labelLayer=document.querySelector('.labels');let view='overview',quality='high',light='day',flight=null,labelsOn=false,lastLabelKey='',lastFocus=null;
+function move(pos,target,instant=false){if(instant||reduced.matches){flight=null;camera.position.fromArray(pos);controls.target.fromArray(target);controls.update();}else flight={t:performance.now(),from:camera.position.clone(),to:new THREE.Vector3(...pos),start:controls.target.clone(),end:new THREE.Vector3(...target)};lastLabelKey='';}
+function go(name,instant=false){view=name;const v=views[name],target=new THREE.Vector3(...v.target),pos=new THREE.Vector3(...v.pos);if(name==='overview'){
+ const dir=pos.clone().sub(target).normalize(),right=new THREE.Vector3(0,1,0).cross(dir).normalize(),up=dir.clone().cross(right).normalize(),tanV=Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),tanH=tanV*camera.aspect;
+ const pts=[[-119,0,-130],[119,0,-130],[-119,0,130],[119,0,130],...specs.flatMap(s=>[[s.x-s.w/2,s.height,s.z],[s.x+s.w/2,s.height,s.z]])];let distance=0;
+ for(const p of pts){const q=new THREE.Vector3(...p).sub(target),d=q.dot(dir),vertical=q.dot(up),margin=vertical>0?1-2*150/innerHeight:1-2*(innerWidth<760?160:130)/innerHeight;distance=Math.max(distance,d+Math.abs(q.dot(right))/(tanH*(1-28/innerWidth)),d+Math.abs(vertical)/(tanV*margin));}controls.maxDistance=Math.max(780,distance*1.08);pos.copy(target).addScaledVector(dir,distance*1.025);
+ }move(pos.toArray(),v.target,instant);document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===name)));}
+function el(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
+function open(title){if(drawer.hidden)lastFocus=document.activeElement;drawer.hidden=false;document.querySelector('#drawer-title').textContent=title;body.replaceChildren();document.querySelector('#catalogue').setAttribute('aria-expanded','true');}
+function close(){drawer.hidden=true;document.querySelector('#catalogue').setAttribute('aria-expanded','false');lastFocus?.focus?.({preventScroll:true});}
+function catalogue(){open('都市建築目錄');body.append(el('p','這次用不同的結構輪廓、裙樓與高度組合來比較。樓層數是本次範例設定，不是 Three.js 上限。','hint'));for(const s of specs){const b=el('button',undefined,'row');b.dataset.sample=s.id;b.append(el('span',s.name),el('small',s.floors+' →'));b.onclick=()=>select(s.id);body.append(b);}}
+function select(id){const s=specs.find(s=>s.id===id);if(!s)return;const target=new THREE.Vector3(s.x,s.height*.45,s.z),distance=Math.max(60,s.height*2.05),pos=target.clone().add(new THREE.Vector3(1,.7,1.4).normalize().multiplyScalar(distance));move(pos.toArray(),target.toArray());open(s.name);body.append(el('div',s.floors,'spec'),el('span','獨立美術範例・非真實建築','pill'),el('p',s.detail),el('p','此處測試高樓、中層街廓與低樓住宅之間的量體差異。未更動正式網站，也未將範例建築描述為已完成的政策。','hint'));const b=el('button','← 返回建築目錄','back');b.onclick=catalogue;body.append(b);}
+const labels=specs.map(s=>{const b=el('button',undefined,'label');b.append(el('span',s.name),el('strong',s.floors));b.onclick=()=>select(s.id);labelLayer.append(b);return {s,b};});
+function updateLabels(){labelLayer.hidden=!labelsOn;if(!labelsOn)return;const key=[innerWidth,innerHeight,...camera.matrixWorld.elements.map(v=>v.toFixed(3))].join('/');if(key===lastLabelKey)return;lastLabelKey=key;const used=[];for(const {s,b} of labels){const p=s.anchor.clone().project(camera),x=(p.x+1)*innerWidth/2,y=(1-p.y)*innerHeight/2;b.hidden=p.z<-1||p.z>1||x<14||x>innerWidth-14||y<145||y>innerHeight-140;if(b.hidden)continue;const w=b.offsetWidth,h=b.offsetHeight;let yy=y;while(used.some(o=>Math.abs(o.x-x)<(o.w+w)/2+5&&Math.abs(o.y-yy)<h+5))yy-=h+6;if(yy<145){b.hidden=true;continue;}used.push({x,y:yy,w});b.style.left=Math.max(w/2+8,Math.min(innerWidth-w/2-8,x))+'px';b.style.top=yy+'px';}}
+function setLight(mode){light=mode;const dusk=mode==='sunset';sun.position.set(...(dusk?[-220,135,150]:[-180,310,160]));sun.color.set(dusk?'#ffd09b':'#fff0d4');sun.intensity=dusk?2.55:2.8;hemi.intensity=dusk?1.05:1.35;hemi.color.set(dusk?'#d0d9e9':'#d6edff');sky.material.uniforms.sunPosition.value.copy(sun.position);scene.fog.color.set(dusk?'#d5bda7':'#a8cddd');document.querySelectorAll('[data-light]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.light===mode)));}
+function setQuality(value){quality=value;renderer.setPixelRatio(Math.min(devicePixelRatio,value==='high'?2:1.25));sun.shadow.mapSize.setScalar(value==='high'?4096:2048);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}renderer.setSize(innerWidth,innerHeight);composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(innerWidth,innerHeight);ao.enabled=value==='high';document.querySelector('#quality').value=value;}
+document.querySelector('#catalogue').onclick=catalogue;document.querySelector('.close').onclick=close;document.querySelector('#labels').onclick=()=>{labelsOn=!labelsOn;document.querySelector('#labels').setAttribute('aria-pressed',String(labelsOn));lastLabelKey='';updateLabels();};document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{close();go(b.dataset.view);});document.querySelectorAll('[data-light]').forEach(b=>b.onclick=()=>setLight(b.dataset.light));document.querySelector('#quality').onchange=e=>setQuality(e.target.value);controls.addEventListener('start',()=>flight=null);
+let down=null;const raycaster=new THREE.Raycaster();renderer.domElement.addEventListener('pointerdown',e=>down={x:e.clientX,y:e.clientY,id:e.pointerId});renderer.domElement.addEventListener('pointercancel',()=>down=null);renderer.domElement.addEventListener('pointerup',e=>{if(!down||down.id!==e.pointerId||Math.hypot(e.clientX-down.x,e.clientY-down.y)>6){down=null;return;}down=null;if(!drawer.hidden){close();return;}raycaster.setFromCamera(new THREE.Vector2(e.clientX/innerWidth*2-1,1-e.clientY/innerHeight*2),camera);const hit=raycaster.intersectObjects(picks)[0];if(hit)select(hit.object.userData.sample);});document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);lastLabelKey='';});renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();document.querySelector('.loading').hidden=false;document.querySelector('#loading-text').textContent='3D 顯示中斷，請重新載入。';document.querySelector('#retry').hidden=false;document.querySelector('#retry').onclick=()=>location.reload();});
+function draw(){const near=Math.max(.25,Math.min(4,camera.position.distanceTo(controls.target)*.008));if(Math.abs(near-camera.near)>.01){camera.near=near;camera.updateProjectionMatrix();}renderer.info.reset();composer.render();}
+go('overview',true);let first=true,lastLabel=0;
+function render(t=0){if(flight){const a=Math.min(1,(t-flight.t)/1100),s=a*a*(3-2*a);camera.position.lerpVectors(flight.from,flight.to,s);controls.target.lerpVectors(flight.start,flight.end,s);if(a===1)flight=null;}controls.update();draw();if(first||t-lastLabel>70){updateLabels();lastLabel=t;}if(first){document.querySelector('.loading').hidden=true;document.documentElement.dataset.ready='true';first=false;}requestAnimationFrame(render);}
+window.SKYLINE={scene,camera,controls,renderer,composer,ao,specs,picks,architecture,art,go,select,catalogue,close,setLight,setQuality,snapshot(name){if(name)go(name,true);if(flight){camera.position.copy(flight.to);controls.target.copy(flight.end);flight=null;}controls.update();camera.updateMatrixWorld();draw();lastLabelKey='';updateLabels();return {view,quality,light,types:specs.length,maxFloors:Math.max(...specs.map(s=>s.n)),tallest:Math.max(...specs.map(s=>s.height)),...geometryStats,calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};}};
+render();
