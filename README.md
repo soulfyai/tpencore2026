@@ -9,6 +9,7 @@
 - [提供資料／回報問題](https://github.com/soulfyai/tpencore2026/issues/new/choose)
 - [貢獻指南](CONTRIBUTING.md)
 - [市民角色與政策任務完整企劃](docs/CITIZEN_GAME_PLAN.md)
+- [臺北市政策與都市生活預覽](https://soulfyai.github.io/tpencore2026/taipei-city.html?v=1)（政策主題建築、複合街廓、池湖與人車動態，尚未替換正式網站）
 - [都市天際線建築範例](https://soulfyai.github.io/tpencore2026/skyline-study.html?rev=2)（複合街廓、自然湖泊與24–48層高樓，獨立審查）
 - [臺北市全市美術預覽](https://soulfyai.github.io/tpencore2026/taipei-preview.html?rev=2)（待確認，尚未套用正式城市）
 - [獨立 3D 街景美術測試](https://soulfyai.github.io/tpencore2026/street-test.html)（可旋轉／縮放、日景／夕陽）

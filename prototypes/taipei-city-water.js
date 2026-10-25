@@ -1,0 +1,11 @@
+import * as THREE from 'three';
+import {createOrganicDistrictLayout,inside,edgeDistance} from './organic-district.js?rev=1';
+export {inside,edgeDistance};
+export function planTaipeiWater(plan){const samples=createOrganicDistrictLayout().ponds;return plan.parcels.filter(p=>p.kind==='park').map((p,i)=>{const source=samples[i%samples.length],xs=source.points.map(v=>v[0]),zs=source.points.map(v=>v[1]),cx=(Math.min(...xs)+Math.max(...xs))/2,cz=(Math.min(...zs)+Math.max(...zs))/2,sx=p.usableW*.74/(Math.max(...xs)-Math.min(...xs)),sz=p.usableD*.74/(Math.max(...zs)-Math.min(...zs));const points=source.points.map(([x,z])=>[p.x+(x-cx)*sx,p.z+(z-cz)*sz]);const expand=(points,amount)=>points.map(([x,z])=>{const l=Math.hypot(x-p.x,z-p.z);return [x+(x-p.x)/l*amount,z+(z-p.z)/l*amount];});return {...p,points,bank:expand(points,.85),walk:expand(points,1.6),path:i%2===0};});}
+export function buildTaipeiWater(art,scene,ponds){function surface(points,y,material,holes=[]){const s=new THREE.Shape(points.map(([x,z])=>new THREE.Vector2(x,-z)));for(const hole of holes)s.holes.push(new THREE.Path(hole.map(([x,z])=>new THREE.Vector2(x,-z))));const mesh=new THREE.Mesh(new THREE.ShapeGeometry(s).rotateX(-Math.PI/2),material);mesh.position.y=y;mesh.receiveShadow=true;scene.add(mesh);return mesh;}
+ const water=new THREE.MeshPhysicalMaterial({color:'#4e99a4',roughness:.28,metalness:.04,envMapIntensity:.65});
+ for(const [index,p] of ponds.entries()){if(p.path)surface(p.walk,.025,art.pavement,[p.bank]);surface(p.bank,-.025,art.mat('#c1b995'),[p.points]);p.mesh=surface(p.points,-.09,water);p.mesh.name=p.id;
+  for(let i=index+1;i<p.bank.length;i+=7+index){const a=p.bank[i],b=p.points[i];art.shape('leaf','#b8ae92',a[0],.12,a[1],.45,.24,.35);for(let k=0;k<3;k++)art.line('#8c9e64',[b[0]+k*.14,-.05,b[1]],[b[0]+k*.14+.12,.6+k*.13,b[1]+.13],.025);}
+  if(index===0){const length=p.usableW*.87,bridge=new THREE.Group();bridge.position.set(p.x,.38,p.z);bridge.rotation.y=.16;scene.add(bridge);art.box('#b99a6d',0,0,0,length,.28,2.6,bridge);for(let x=-length/2;x<length/2;x+=.7)art.box('#8d7857',x,.15,0,.035,.02,2.6,bridge);for(const side of [-1,1]){art.line('#9ca28c',[-length/2,1.2,side*1.2],[length/2,1.2,side*1.2],.055,bridge);for(let x=-length/2;x<=length/2;x+=2.8)art.line('#9ca28c',[x,0,side*1.2],[x,1.2,side*1.2],.05,bridge);}art.reserve(p.x,p.z,length+2,5);}
+ }
+}
