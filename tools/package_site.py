@@ -25,6 +25,8 @@ def package(output):
     # Standalone art study, deliberately separate from the production city.
     for name in ["street-test.html", "street-test.js", "taipei-preview.html", "taipei-preview.js",
                  "taipei-city.html", "taipei-city.js", "taipei-city-layout.js", "taipei-city-kit.js", "taipei-city-water.js", "taipei-city-life.js", "taipei-city-roads.js", "taipei-city-nature.js",
+                 "city-review.html", "regional-city.html", "regional-city.js", "regional-config.js", "regional-layout.js", "regional-kit.js", "regional-life.js",
+                 "newtaipei-preview-data.json", "keelung-preview-data.json", "taoyuan-preview-data.json", "aircraft-review-data.json", "review-models.js", "model-study.html", "model-study.js",
                  "skyline-study.html", "skyline-study.js", "urban-buildings.js", "organic-district.js",
                  "street-art-kit.js", "taipei-architecture.js", "taipei-landmarks.js", "taipei-preview-data.json"]:
         (output / name).write_bytes((ROOT / "prototypes" / name).read_bytes())
