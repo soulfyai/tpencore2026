@@ -22,8 +22,11 @@ try:
   except Exception:print('ERRORS',errors,flush=True);raise
   result=page.evaluate("TAIPEI_PREVIEW.snapshot('overview')");print('STATS',result,flush=True)
   assert result['themes']==17 and result['landmarks']==16 and result['buildings']>65 and result['trees']>100
+  assert page.evaluate('TAIPEI_PREVIEW.scene.children.some(o=>o.isInstancedMesh&&!o.castShadow)')
+  assert len(result['architecture'])>=10, result['architecture']
+  assert all(result['architecture'].get(k,0)>0 for k in ['townhouses','gardenVilla','courtyard','terraces','balconyApartment','cornerShop','arcadeRow','glassOffice','labCampus','preschool'])
   assert page.evaluate("TAIPEI_PREVIEW.data.city.city==='taipei'&&TAIPEI_PREVIEW.data.city.cityName==='台北市'")
-  for name in ['overview','landmarks','childcare','garden']:
+  for name in ['overview','landmarks','childcare','neighbourhood','garden']:
    page.locator(f'[data-view={name}]').click();page.evaluate('TAIPEI_PREVIEW.snapshot()')
    assert page.locator(f'[data-view={name}]').get_attribute('aria-pressed')=='true'
    page.screenshot(path=str(ROOT/f'out/taipei-preview-{name}-desktop.png'),timeout=240000);print('SHOT',name,flush=True)
@@ -31,6 +34,7 @@ try:
   page.screenshot(path=str(ROOT/'out/taipei-preview-sunset-desktop.png'),timeout=240000)
   assert page.evaluate('TAIPEI_PREVIEW.snapshot().light')=='sunset'
   page.locator('#quality').select_option('standard');assert page.evaluate('TAIPEI_PREVIEW.snapshot().quality')=='standard'
+  assert page.evaluate('TAIPEI_PREVIEW.ao.enabled') is False
   page.locator('#policy-list').click();assert page.locator('.list-row[data-theme]').count()==17
   assert page.locator('#drawer-body').evaluate('(e)=>e.scrollHeight>e.clientHeight')
   page.locator('[data-theme=tp-childcare].list-row').click();page.evaluate('TAIPEI_PREVIEW.snapshot()')

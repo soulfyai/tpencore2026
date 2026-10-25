@@ -376,3 +376,8 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 四個可操作視角、高／標準畫質、白天／夕陽；政策面板呈現既有62筆條目與來源，區分9政見／8政績，非任務遊戲。
 - `tools/export_taipei_preview.py` 以UTF-8讀取本機正式HTML並刻意更新快照，勿在CI自動重新佈局；check_taipei_preview.py驗證原生控制、來源、政策文字編碼、全市視角、避讓、面板捲動與正式檔案未變。詳docs/TAIPEI_PREVIEW.md。
 - 後續整合／替換正式模型必須等使用者明確確認，目前僅提供美術審查。
+
+### 0.51 臺北預覽第二輪：建築組合與微縮風格
+- 使用者要求更靠近原示意圖，包含房屋組合多樣性。獨立taipei-preview升為rev=2；新增taipei-architecture.js的11種組合，依機能分區與相鄰避讓選擇，保留政策、地標配置及高樓。新街區樣貌視角供近看差異。
+- 暖色牆面、坡屋頂、廊架／陽台／花台／庭園／退台、藍色海面與3D雲層；RoomEnvironment提供材質反射，高畫質用SSAOPass接觸陰影，標準關閉AO。EffectComposer MSAA與OutputPass統一渲染。
+- street-art-kit僅供新預覽，合批時保留castShadow／receiveShadow，避免不應投影的細瓦線被重新開啟；原street-test仍未改。check_taipei_preview驗證11種組合、實際操作及正式檔未變。版本號仍2.0.18，沒有替換正式城市，需等待使用者明確確認。

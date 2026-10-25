@@ -7,7 +7,7 @@ let scene=worldScene;
 let seed=73129;const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
 const between=(a,b)=>a+(b-a)*rand();
 const mats=new Map();
-function mat(c,roughness=.86,metalness=0){const k=`${c}/${roughness}/${metalness}`;if(!mats.has(k))mats.set(k,new THREE.MeshStandardMaterial({color:c,roughness,metalness}));return mats.get(k);}
+function mat(c,roughness=.86,metalness=0){const k=`${c}/${roughness}/${metalness}`;if(!mats.has(k))mats.set(k,new THREE.MeshStandardMaterial({color:c,roughness,metalness,envMapIntensity:.25}));return mats.get(k);}
 const geo={box:new THREE.BoxGeometry(1,1,1),round:new RoundedBoxGeometry(1,1,1,2,.12),sphere:new THREE.SphereGeometry(1,16,12),leaf:new THREE.IcosahedronGeometry(1,1),cyl:new THREE.CylinderGeometry(1,1,1,12),cone:new THREE.ConeGeometry(1,1,10),foliage:new THREE.PlaneGeometry(1,1)};
 const instances=new Map();
 function shape(g,m,x,y,z,sx,sy,sz,parent=scene,rot=0){const o=new THREE.Mesh(geo[g],typeof m==='string'?mat(m):m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
@@ -29,9 +29,9 @@ const leafMap=texture(128,(g,s)=>{
 });
 leafMap.wrapS=leafMap.wrapT=THREE.ClampToEdgeWrapping;
 const foliageMaterials=new Map();
-function foliageMaterial(c){if(!foliageMaterials.has(c))foliageMaterials.set(c,new THREE.MeshStandardMaterial({map:leafMap,color:c,alphaTest:.45,side:THREE.DoubleSide,roughness:.95}));return foliageMaterials.get(c);}
+function foliageMaterial(c){if(!foliageMaterials.has(c))foliageMaterials.set(c,new THREE.MeshStandardMaterial({map:leafMap,color:c,alphaTest:.45,side:THREE.DoubleSide,roughness:.95,envMapIntensity:.2}));return foliageMaterials.get(c);}
 const grassMap=texture(512,(g,s)=>{g.fillStyle='#7d9950';g.fillRect(0,0,s,s);for(let i=0;i<65000;i++){g.fillStyle=rand()<.45?'rgba(228,223,127,.13)':'rgba(35,72,34,.12)';g.fillRect(rand()*s,rand()*s,between(.5,1.7),between(1,3.5));}},1);
-const grass=new THREE.MeshStandardMaterial({map:grassMap,color:'#b9cd87',roughness:1});
+const grass=new THREE.MeshStandardMaterial({map:grassMap,color:'#b9cd87',roughness:1,envMapIntensity:.15});
 grass.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vGround;').replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nvec4 groundPoint=vec4(transformed,1.);\n#ifdef USE_INSTANCING\ngroundPoint=instanceMatrix*groundPoint;\n#endif\nvGround=(modelMatrix*groundPoint).xyz;');sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
 varying vec3 vGround;
 float hashG(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -49,7 +49,7 @@ const brickMap=texture(256,(g,s)=>{g.fillStyle='#b98a65';g.fillRect(0,0,s,s);for
 const brick=new THREE.MeshStandardMaterial({map:brickMap,roughness:.95});
 const glass=new THREE.MeshPhysicalMaterial({color:'#628795',roughness:.23,metalness:.22,clearcoat:.75,clearcoatRoughness:.2});
 function slab(material,x,z,w,d,y=.025,h=.05){return box(material,x,y,z,w,h,d);}
-function label(text,x,y,z,w,h,bg='#f3ead6',color='#3a555c',parent=scene){const cv=document.createElement('canvas');cv.width=1024;cv.height=256;const g=cv.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,1024,256);g.fillStyle=color;g.textAlign='center';g.textBaseline='middle';g.font='600 105px "Microsoft JhengHei",sans-serif';g.fillText(text,512,134,960);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;const m=new THREE.MeshStandardMaterial({map:t,roughness:.8});const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(x,y,z);parent.add(p);return p;}
+function label(text,x,y,z,w,h,bg='#f3ead6',color='#3a555c',parent=scene){const cv=document.createElement('canvas');cv.width=512;cv.height=128;const g=cv.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,512,128);g.fillStyle=color;g.textAlign='center';g.textBaseline='middle';g.font='600 52px "Microsoft JhengHei",sans-serif';g.fillText(text,256,67,480);const t=new THREE.CanvasTexture(cv);t.colorSpace=THREE.SRGBColorSpace;const m=new THREE.MeshStandardMaterial({map:t,roughness:.8});const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(x,y,z);parent.add(p);return p;}
 
 const exclusion=[],treeSites=[],residents=[];let landCheck=()=>true;
 function reserve(x,z,w,d){if(scene!==worldScene){scene.updateMatrixWorld(true);const p=new THREE.Vector3(x,0,z).applyMatrix4(scene.matrixWorld),s=new THREE.Vector3();scene.getWorldScale(s);x=p.x;z=p.z;w*=s.x;d*=s.z;}exclusion.push({x,z,w,d});}
@@ -105,7 +105,7 @@ function person(x,z,scale,shirt,pants,hair,pose='idle',turn=0){
  shape('round',shirt,0,.88,0,.62,.65,.39,g);ball(skin,0,1.61,.015,.46,.48,.43,g);
  const cap=new THREE.Mesh(new THREE.SphereGeometry(.475,20,14,0,Math.PI*2,0,Math.PI*.56),mat(hair));cap.position.set(0,1.69,-.02);cap.castShadow=true;g.add(cap);
  for(let k=0;k<5;k++){const angle=-.9+k*.38;const lock=ball(hair,Math.sin(angle)*.32,1.91-Math.abs(angle)*.1,.24,.17,.16,.17,g);lock.rotation.z=angle*.6;}
- for(const xx of [-.16,.16]){ball('#293b3b',xx,1.61,.412,.038,.052,.018,g);ball('#f4d0b4',xx*1.65,1.51,.36,.07,.035,.012,g);}
+ for(const xx of [-.16,.16]){ball('#293b3b',xx,1.61,.412,.056,.074,.027,g);ball('#fff9e7',xx-.013,1.635,.439,.015,.019,.006,g);ball('#e6a99c',xx*1.65,1.51,.36,.071,.037,.012,g);}
  const smile=new THREE.EllipseCurve(0,0,.07,.035,Math.PI,Math.PI*2,false,0).getPoints(12);const smileMesh=new THREE.Line(new THREE.BufferGeometry().setFromPoints(smile.map(p=>new THREE.Vector3(p.x,p.y+1.49,.435))),new THREE.LineBasicMaterial({color:'#9a7060'}));g.add(smileMesh);
  for(const side of [-1,1]){const arm=new THREE.Group();arm.position.set(side*.37,1.08,0);g.add(arm);shape('round',shirt,0,-.19,0,.19,.4,.22,arm);shape('round',skin,0,-.45,0,.15,.26,.16,arm);ball(skin,0,-.6,0,.1,.105,.09,arm);arm.rotation.z=pose==='wave'&&side===1?-2.1:side*.1;if(pose==='wave'&&side===1)residents.push({arm,base:-2.1});}
  return g;
@@ -155,8 +155,8 @@ function flush(){
   transforms.forEach((t,i)=>{dummy.position.set(t.x,t.y,t.z);dummy.rotation.set(t.rx,t.ry,t.rz);dummy.scale.set(t.sx,t.sy,t.sz);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);});mesh.castShadow=true;mesh.receiveShadow=true;worldScene.add(mesh);instanceCount+=transforms.length;
  }
  const groups=new Map();worldScene.updateMatrixWorld(true);
- worldScene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.keepDynamic)return;let par=o.parent;while(par&&par!==worldScene){if(par.userData.keepDynamic)return;par=par.parent;}if(!Object.values(geo).includes(o.geometry)||!o.material.isMeshStandardMaterial)return;const key=o.geometry.uuid+'/'+o.material.uuid;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(o);});
- for(const objects of groups.values()){if(objects.length<2)continue;const first=objects[0],mesh=new THREE.InstancedMesh(first.geometry,first.material,objects.length);objects.forEach((o,i)=>{mesh.setMatrixAt(i,o.matrixWorld);o.removeFromParent();});mesh.castShadow=true;mesh.receiveShadow=true;worldScene.add(mesh);}
+ worldScene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.keepDynamic)return;let par=o.parent;while(par&&par!==worldScene){if(par.userData.keepDynamic)return;par=par.parent;}if(!Object.values(geo).includes(o.geometry)||!o.material.isMeshStandardMaterial)return;const key=o.geometry.uuid+'/'+o.material.uuid+'/'+o.castShadow+'/'+o.receiveShadow;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(o);});
+ for(const objects of groups.values()){if(objects.length<2)continue;const first=objects[0],mesh=new THREE.InstancedMesh(first.geometry,first.material,objects.length);objects.forEach((o,i)=>{mesh.setMatrixAt(i,o.matrixWorld);o.removeFromParent();});mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;worldScene.add(mesh);}
  return {trees:treeSites.length,instances:instanceCount,batches:instances.size};
 }
 return {mat,geo,box,ball,batch,line,shape,slab,label,texture,grass,pavement,asphalt,plaster,brick,glass,apartment,school,tree,bench,lamp,car,person,residents,treeSites,exclusion,reserve,clearAt,rand,between,contact,flush,setLandCheck:fn=>landCheck=fn};

@@ -24,7 +24,7 @@ def package(output):
         (output / target).write_text(prefix + html + "\n</html>\n", encoding="utf-8")
     # Standalone art study, deliberately separate from the production city.
     for name in ["street-test.html", "street-test.js", "taipei-preview.html", "taipei-preview.js",
-                 "street-art-kit.js", "taipei-landmarks.js", "taipei-preview-data.json"]:
+                 "street-art-kit.js", "taipei-architecture.js", "taipei-landmarks.js", "taipei-preview-data.json"]:
         (output / name).write_bytes((ROOT / "prototypes" / name).read_bytes())
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     version = {"version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
