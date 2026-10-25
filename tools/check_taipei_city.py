@@ -26,6 +26,7 @@ try:
   except Exception:print('ERRORS',errors,flush=True);raise
   stats=pg.evaluate('TAIPEI_CITY.snapshot(undefined,false)');print('STATS',stats,flush=True)
   assert stats['themes']==17 and stats['landmarks']==16 and stats['buildings']>=90 and stats['merged']>=20 and stats['lakes']==4
+  assert pg.evaluate('TAIPEI_CITY.roadSurface.meshes.length===2&&TAIPEI_CITY.camera.near>10')
   assert stats['people']>=60 and stats['cars']>=16 and stats['calls']<1800
   assert not stats['motion'],'Reduced motion should pause startup movement'
   assert len({s['kind'] for s in stats['policyScenes']})>=12

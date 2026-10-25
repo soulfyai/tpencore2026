@@ -6,6 +6,7 @@ import {createTaipeiCityPlan} from './taipei-city-layout.js?rev=1';
 import {createTaipeiCityKit} from './taipei-city-kit.js?rev=1';
 import {planTaipeiWater,buildTaipeiWater,inside,edgeDistance} from './taipei-city-water.js?rev=1';
 import {createTaipeiLife} from './taipei-city-life.js?rev=1';
+import {createTaipeiRoads} from './taipei-city-roads.js?rev=1';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
@@ -48,22 +49,9 @@ const sea=new THREE.Mesh(new THREE.PlaneGeometry(6000,6000,160,160),seaMaterial)
 art.setLandCheck((x,z,r)=>pip(x,z)&&boundaryDist(x,z)>r+2&&ponds.every(p=>!inside([x,z],p.walk)&&edgeDistance([x,z],p.walk)>r));
 const landmarks=plan.landmarks;
 for(const l of landmarks)reserve(l.x,l.z,l.r*2+.8,l.r*2+.8);
-const roads=[];
-for(const rd of plan.roads){
- const a=rd.a,b=rd.b,cx=(a[0]+b[0])/2,cz=(a[1]+b[1])/2,len=Math.hypot(b[0]-a[0],b[1]-a[1]);
-
- const horizontal=Math.abs(a[0]-b[0])>Math.abs(a[1]-b[1]),width=rd.pedestrian?2.8:4.8;
- roads.push({a,b,horizontal,pedestrian:rd.pedestrian});reserve(cx,cz,horizontal?len+1:width+2,horizontal?width+2:len+1);
- slab(art.pavement,cx,cz,horizontal?len+1:width+1.9,horizontal?width+1.9:len+1,.075,.14);
- slab(rd.pedestrian?art.pavement:art.asphalt,cx,cz,horizontal?len+.15:width,horizontal?width:len+.15,.125,.06);
- if(!rd.pedestrian){for(let p=2;p<len-1;p+=3.7){const t=p/len,x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;batch('box','#e5dfbf',x,.162,z,horizontal?1.7:.065,.009,horizontal?.065:1.7);}}
- // Curb edges form a continuous street section, not a slab beneath every building.
- const nx=horizontal?0:1,nz=horizontal?1:0;
- for(const side of [-1,1])box('#d7d3c4',cx+nx*(width/2+.95)*side,.11,cz+nz*(width/2+.95)*side,horizontal?len:.13,.22,horizontal?.13:len);
-}
-// Street furniture and selected crossing approaches use the retained road graph.
-const junctions=new Map();for(const rd of roads)for(const point of [rd.a,rd.b]){const key=point.map(v=>v.toFixed(3)).join('/');if(!junctions.has(key))junctions.set(key,[]);junctions.get(key).push(rd);}
-let crossingIndex=0;for(const [key,edges] of junctions){if(edges.length<3||crossingIndex++%3)continue;const [x,z]=key.split('/').map(Number),rd=edges.find(e=>!e.pedestrian);if(!rd)continue;const other=Math.hypot(rd.a[0]-x,rd.a[1]-z)<.1?rd.b:rd.a,dx=rd.horizontal?Math.sign(other[0]-x):0,dz=rd.horizontal?0:Math.sign(other[1]-z);for(let k=0;k<5;k++)batch('box','#ebe9d7',x+dx*(4.2+k*.8),.168,z+dz*(4.2+k*.8),rd.horizontal?.4:4.3,.009,rd.horizontal?4.3:.4);}
+const roads=plan.roads;
+for(const rd of roads){const a=rd.a,b=rd.b,x=(a[0]+b[0])/2,z=(a[1]+b[1])/2,length=Math.hypot(b[0]-a[0],b[1]-a[1]),width=rd.pedestrian?2.8:4.8;reserve(x,z,rd.horizontal?length+1:width+2,rd.horizontal?width+2:length+1);}
+const roadSurface=createTaipeiRoads(art,scene,renderer,roads);
 for(let i=0;i<roads.length;i+=10){const rd=roads[i],x=(rd.a[0]+rd.b[0])/2+(rd.horizontal?0:3.1),z=(rd.a[1]+rd.b[1])/2+(rd.horizontal?3.1:0);if(pip(x,z))art.lamp(x,z);}
 const byCell=new Map(data.cells.map(c=>[c.id,c]));
 const themeMeta=plan.parcels.filter(p=>p.kind==='policy').map(p=>({...p.theme,x:p.x,z:p.z,w:p.usableW,d:p.usableD,sceneKind:p.sceneKind,sceneName:p.sceneName,sceneNote:p.sceneNote,anchor:new THREE.Vector3(),height:6}));
@@ -215,7 +203,7 @@ addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updat
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();document.querySelector('#loading').hidden=false;document.querySelector('#loading-text').textContent='3D 顯示已中斷，請重新載入。';document.querySelector('#retry').hidden=false;document.querySelector('#retry').onclick=()=>location.reload();});
 const initialView=new URLSearchParams(location.search).get('view');go(Object.hasOwn(views,initialView)?initialView:'overview',true);
 let first=true,lastLabelUpdate=0,lastFrame=null;
-function updateNear(){const near=Math.max(.2,Math.min(4,camera.position.distanceTo(controls.target)*.008));if(Math.abs(camera.near-near)>.01){camera.near=near;camera.updateProjectionMatrix();}}
+function updateNear(){const near=Math.max(.25,Math.min(80,camera.position.distanceTo(controls.target)*.035,camera.position.y*.2));if(Math.abs(camera.near-near)>.01){camera.near=near;camera.updateProjectionMatrix();}}
 function render(t=0){const dt=lastFrame===null?0:Math.min(.05,Math.max(0,(t-lastFrame)/1000));lastFrame=t;life.update(dt);if(flight){const a=Math.min(1,(t-flight.t)/1200),s=a*a*(3-2*a);camera.position.lerpVectors(flight.from,flight.to,s);controls.target.lerpVectors(flight.startTarget,flight.endTarget,s);if(a===1)flight=null;}controls.update();updateNear();if(seaMaterial.userData.shader)seaMaterial.userData.shader.uniforms.uSeaTime.value=reduced.matches?0:t*.001;draw();if(t-lastLabelUpdate>70||first){updateLabels();lastLabelUpdate=t;}if(first){document.querySelector('#loading').hidden=true;document.documentElement.dataset.ready='true';document.querySelector('#stats').textContent=`17 個主題場景・${ponds.length} 處水景・${people.length} 位民眾／${cars.length} 輛車`;first=false;}requestAnimationFrame(render);}
-window.TAIPEI_CITY={scene,camera,controls,renderer,data,buildings,landmarks,roads,people,cars,themeMeta,art,cityKit,plan,ponds,life,ao,composer,views,go,showPolicy,showPolicyList,showLandmark,showLandmarkList,closeDrawer,setLight,setQuality,geometryStats,snapshot(name,renderScene=true){if(name)go(name,true);if(flight){camera.position.copy(flight.to);controls.target.copy(flight.endTarget);flight=null;}controls.update();updateNear();camera.updateMatrixWorld();scene.updateMatrixWorld(true);if(renderScene)draw();labelKey='';updateLabels();return {view,light:lightMode,quality,themes:themeMeta.length,landmarks:builtLandmarks,buildings:buildings.length,...geometryStats,people:people.length,cars:cars.length,lakes:ponds.length,animationTime:life.clock,motion:life.enabled,merged:plan.parcels.filter(p=>p.cells.length>1).length,policyScenes:themeMeta.map(t=>({id:t.id,kind:t.sceneKind,features:t.features})),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};}};
+window.TAIPEI_CITY={scene,camera,controls,renderer,data,buildings,landmarks,roads,people,cars,themeMeta,art,cityKit,plan,ponds,life,roadSurface,ao,composer,views,go,showPolicy,showPolicyList,showLandmark,showLandmarkList,closeDrawer,setLight,setQuality,geometryStats,snapshot(name,renderScene=true){if(name)go(name,true);if(flight){camera.position.copy(flight.to);controls.target.copy(flight.endTarget);flight=null;}controls.update();updateNear();camera.updateMatrixWorld();scene.updateMatrixWorld(true);if(renderScene)draw();labelKey='';updateLabels();return {view,light:lightMode,quality,themes:themeMeta.length,landmarks:builtLandmarks,buildings:buildings.length,...geometryStats,people:people.length,cars:cars.length,lakes:ponds.length,animationTime:life.clock,motion:life.enabled,merged:plan.parcels.filter(p=>p.cells.length>1).length,policyScenes:themeMeta.map(t=>({id:t.id,kind:t.sceneKind,features:t.features})),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};}};
 window.__taipeiCityFrame=render;render();
