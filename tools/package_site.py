@@ -24,7 +24,7 @@ def package(output):
         (output / target).write_text(prefix + html + "\n</html>\n", encoding="utf-8")
     # Standalone art study, deliberately separate from the production city.
     for name in ["street-test.html", "street-test.js", "taipei-preview.html", "taipei-preview.js",
-                 "taipei-city.html", "taipei-city.js", "taipei-city-layout.js", "taipei-city-kit.js", "taipei-city-water.js", "taipei-city-life.js", "taipei-city-roads.js",
+                 "taipei-city.html", "taipei-city.js", "taipei-city-layout.js", "taipei-city-kit.js", "taipei-city-water.js", "taipei-city-life.js", "taipei-city-roads.js", "taipei-city-nature.js",
                  "skyline-study.html", "skyline-study.js", "urban-buildings.js", "organic-district.js",
                  "street-art-kit.js", "taipei-architecture.js", "taipei-landmarks.js", "taipei-preview-data.json"]:
         (output / name).write_bytes((ROOT / "prototypes" / name).read_bytes())

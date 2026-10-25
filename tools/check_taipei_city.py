@@ -28,6 +28,11 @@ try:
   assert stats['themes']==17 and stats['landmarks']==16 and stats['buildings']>=90 and stats['merged']>=20 and stats['lakes']==4
   assert pg.evaluate('TAIPEI_CITY.roadSurface.meshes.length===2&&TAIPEI_CITY.camera.near>10')
   assert stats['people']>=60 and stats['cars']>=16 and stats['calls']<1800
+  assert stats['trees']>=1800 and stats['forest']>=1600
+  assert pg.evaluate("TAIPEI_CITY.sky.material.fragmentShader.includes('cityCloudCoverage')&&!TAIPEI_CITY.scene.children.some(o=>o.isSprite)")
+  assert pg.evaluate("()=>{const P=TAIPEI_CITY;P.ao.overrideVisibility();const skipped=!P.sky.visible;P.ao.restoreVisibility();return skipped&&P.sky.visible}")
+  coverage=pg.evaluate("""()=>{const P=TAIPEI_CITY,xs=P.plan.coast.map(p=>p[0]),zs=P.plan.coast.map(p=>p[1]);let maxGap=0,samples=0;for(let z=Math.min(...zs)+5;z<Math.max(...zs);z+=9)for(let x=Math.min(...xs)+5;x<Math.max(...xs);x+=9){if(!P.art.clearAt(x,z,1.8))continue;samples++;maxGap=Math.max(maxGap,Math.min(...P.art.treeSites.map(t=>Math.hypot(t.x-x,t.z-z))));}return {samples,maxGap}}""")
+  print('FOREST COVERAGE',coverage,flush=True);assert coverage['samples']>100 and coverage['maxGap']<12
   assert not stats['motion'],'Reduced motion should pause startup movement'
   assert len({s['kind'] for s in stats['policyScenes']})>=12
   assert pg.evaluate('TAIPEI_CITY.themeMeta.every(t=>t.features.length>=3)')
@@ -67,6 +72,8 @@ try:
   before=pg.evaluate('TAIPEI_CITY.camera.position.toArray()');pg.mouse.wheel(0,-400);pg.evaluate('TAIPEI_CITY.snapshot(undefined,false)');assert before!=pg.evaluate('TAIPEI_CITY.camera.position.toArray()')
   click('[data-view=garden]');click('[data-light=sunset]');pg.evaluate('TAIPEI_CITY.snapshot()');shot('garden-desktop')
   assert pg.evaluate('TAIPEI_CITY.snapshot(undefined,false).light')=='sunset'
+  pg.evaluate("TAIPEI_CITY.setLight('day');TAIPEI_CITY.camera.position.set(480,90,480);TAIPEI_CITY.controls.target.set(-40,15,15);TAIPEI_CITY.snapshot()");shot('sky-desktop')
+  assert pg.evaluate('TAIPEI_CITY.sky.position.distanceTo(TAIPEI_CITY.camera.position)<.00001')
   pg.locator('#quality').select_option('standard');assert not pg.evaluate('TAIPEI_CITY.ao.enabled');pg.locator('#quality').select_option('high');assert pg.evaluate('TAIPEI_CITY.ao.enabled')
   pg.set_viewport_size({'width':400,'height':860});pg.evaluate('window.dispatchEvent(new Event("resize"))');pg.wait_for_function('Math.abs(TAIPEI_CITY.camera.aspect-innerWidth/innerHeight)<.0001',polling=100)
   click('[data-light=day]');pg.evaluate("TAIPEI_CITY.snapshot('overview')");shot('overview-mobile')

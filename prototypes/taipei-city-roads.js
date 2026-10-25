@@ -11,6 +11,9 @@ export function createRoadSurfacePlan(roads){
   if(!rd.pedestrian)for(let p=5;p<length-4;p+=3.7){const t=p/length,px=a[0]+(b[0]-a[0])*t,pz=a[1]+(b[1]-a[1])*t;markings.push({kind:'center',x:px,z:pz,w:horizontal?1.7:.18,d:horizontal?.18:1.7});}
   for(const point of [a,b]){const key=point.map(v=>v.toFixed(3)).join('/');if(!junctions.has(key))junctions.set(key,[]);junctions.get(key).push({...rd,horizontal});}
  }
+ // A full join at each node fills the outside quadrant of L bends as well as
+ // crossings. Butt-ended segment rectangles alone leave a white corner notch.
+ for(const [key,edges] of junctions){if(edges.length<2)continue;const [x,z]=key.split('/').map(Number),vehicle=edges.some(r=>!r.pedestrian);for(const [kind,width] of [[1,vehicle?6.7:4.7],...(vehicle?[[2,4.8]]:[])])rectangles.push({kind,x0:rounded(x-width/2),x1:rounded(x+width/2),z0:rounded(z-width/2),z1:rounded(z+width/2)});}
  let crossingIndex=0;for(const [key,edges] of junctions){if(edges.length<3||crossingIndex++%3)continue;const [x,z]=key.split('/').map(Number),rd=edges.find(r=>!r.pedestrian);if(!rd)continue;const other=Math.hypot(rd.a[0]-x,rd.a[1]-z)<.1?rd.b:rd.a,dx=rd.horizontal?Math.sign(other[0]-x):0,dz=rd.horizontal?0:Math.sign(other[1]-z);for(let k=0;k<5;k++)markings.push({kind:'crossing',x:x+dx*(4.2+k*.8),z:z+dz*(4.2+k*.8),w:rd.horizontal?.4:4.3,d:rd.horizontal?4.3:.4});}
  const xs=[...new Set(rectangles.flatMap(r=>[r.x0,r.x1]))].sort((a,b)=>a-b),zs=[...new Set(rectangles.flatMap(r=>[r.z0,r.z1]))].sort((a,b)=>a-b),nx=xs.length-1,nz=zs.length-1,xIndex=new Map(xs.map((x,i)=>[x,i])),zIndex=new Map(zs.map((z,i)=>[z,i])),mask=new Uint8Array(nx*nz);
  for(const r of rectangles){for(let j=zIndex.get(r.z0);j<zIndex.get(r.z1);j++)for(let i=xIndex.get(r.x0);i<xIndex.get(r.x1);i++)mask[j*nx+i]|=r.kind;}

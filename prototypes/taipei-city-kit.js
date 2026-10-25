@@ -11,6 +11,7 @@ export function createTaipeiCityKit(art,scene){
  const picks=[],records=[];let current=null,features=null;
  function wing(root,x,z,w,d,floors,color=cream,style='masonry',angle=0){
   const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=angle;root.add(g);const h=floors*2.65;
+  const c=Math.abs(Math.cos(angle)),sn=Math.abs(Math.sin(angle));art.reserve(root.position.x+x,root.position.z+z,c*w+sn*d+1.2,c*d+sn*w+1.2);
   box(color,0,h/2,0,w,h,d,g);box('#ded8c7',0,h+.15,0,w+.3,.3,d+.3,g);
   for(let f=0;f<floors;f++)for(const side of [-1,1]){
    const y=1.45+f*2.65,zz=side*(d/2+.08);
@@ -25,7 +26,7 @@ export function createTaipeiCityKit(art,scene){
  }
  function sign(root,text,x,y,z,w=8){label(text,x,y,z,w,.8,'#f0eadb','#386279',root);}
  function canopy(root,x,z,w,d,y=3.1,color='#6a969b'){box(color,x,y,z,w,.25,d,root);for(const xx of [-w/2+.25,w/2-.25])for(const zz of [-d/2+.25,d/2-.25])box('#9caa9e',x+xx,y/2,z+zz,.13,y,.13,root);}
- function path(root,x,z,w,d){box(art.pavement,x,.055,z,w,.11,d,root);}
+ function path(root,x,z,w,d){box(art.pavement,x,.055,z,w,.11,d,root);art.reserve(root.position.x+x,root.position.z+z,w+.6,d+.6);}
  function solar(root,x,y,z,w,d){box('#b5bdba',x,y,z,w+.2,.15,d+.2,root);box('#466f86',x,y+.11,z,w,.1,d,root);for(let xx=-w/2+.65;xx<w/2;xx+=1)box('#a5b8bd',x+xx,y+.17,z,.03,.02,d,root);}
  function planter(root,x,z,w=2.4,d=1.2){box('#b9ad90',x,.23,z,w,.46,d,root);box('#6b6047',x,.48,z,w-.2,.06,d-.2,root);for(let k=-1;k<=1;k++)shape('leaf','#779859',x+k*w*.25,.8,z,.55,.55,.5,root);}
  function seats(root,x,z){for(const dx of [-1,1]){box('#a6855e',x+dx*.8,.55,z,1.4,.15,.65,root);box('#a6855e',x+dx*.8,.95,z-.3,1.4,.65,.1,root);}}
@@ -89,7 +90,7 @@ export function createTaipeiCityKit(art,scene){
   else if(k===1){h=wing(root,-w*.2,-d*.2,w*.53,d*.55,5,'#c1a789','arcade');wing(root,w*.26,d*.18,w*.39,d*.5,8,'#a3b6b3','glass',-.08);}
   else if(k===2){h=wing(root,0,-d*.14,w*.8,d*.65,8,'#aab9ae','balcony');wing(root,w*.15,-d*.2,w*.4,d*.4,4,'#e0ceb0');}
   else{h=wing(root,-w*.25,0,w*.35,d*.88,7,'#b4c5bd','glass');wing(root,w*.2,-d*.23,w*.5,d*.4,4,'#b8876b','gable');}
-  path(root,0,d*.34,w*.55,1.6);planter(root,w*.27,d*.28,2.7,1.3);art.reserve(parcel.x,parcel.z,w+.8,d+.8);parcel.height=h;parcel.family=['courtyard','arcade','terraces','passage','balcony','mixed'][k];return h;
+  path(root,0,d*.34,w*.55,1.6);planter(root,w*.27,d*.28,2.7,1.3);art.reserve(parcel.x+w*.27,parcel.z+d*.28,3.3,1.9);parcel.height=h;parcel.family=['courtyard','arcade','terraces','passage','balcony','mixed'][k];return h;
  }
  return {policy,urban,highrise,picks,records};
 }

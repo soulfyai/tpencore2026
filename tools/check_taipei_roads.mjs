@@ -13,3 +13,9 @@ check(cross);
 const data=JSON.parse(fs.readFileSync(new URL('../prototypes/taipei-preview-data.json',import.meta.url))),city=createTaipeiCityPlan(data),plan=createRoadSurfacePlan(city.roads);check(plan);
 assert(plan.markings.some(m=>m.kind==='crossing'));assert(plan.faces.length<1000);
 console.log(`PASS ${city.roads.length} street sections → ${plan.faces.length} non-overlapping surface faces; no junction overlap, no missing coverage, integrated markings.`);
+
+const elbow=createRoadSurfacePlan([{a:[-20,0],b:[0,0],pedestrian:false},{a:[0,0],b:[0,20],pedestrian:false}]);
+for(const [x,z] of [[-1,-1],[-1,1],[1,-1],[1,1]])assert(elbow.faces.some(f=>f.kind===2&&x>f.x0&&x<f.x1&&z>f.z0&&z<f.z1),'L-bend leaves an unfilled outside corner');
+const key=p=>p.map(v=>v.toFixed(3)).join('/'),graph=new Map();for(const r of city.roads){assert(!r.pedestrian,'white pedestrian segment interrupts a street');for(const [a,b] of [[r.a,r.b],[r.b,r.a]]){if(!graph.has(key(a)))graph.set(key(a),new Set());graph.get(key(a)).add(key(b));}}
+assert([...graph.values()].every(v=>v.size>=2),'street ends abruptly in a lawn');const seen=new Set(),todo=[graph.keys().next().value];while(todo.length){const k=todo.pop();if(seen.has(k))continue;seen.add(k);todo.push(...graph.get(k));}assert.equal(seen.size,graph.size,'vehicle streets are disconnected');
+console.log(`PASS complete elbow joins; one connected vehicle network, ${city.prunedSpurs} orphan spurs removed, no white street interruptions.`);

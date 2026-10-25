@@ -39,6 +39,13 @@ export function createTaipeiCityPlan(data){
  const owners=new Map();for(const c of data.cells)for(let i=0;i<4;i++){const k=edgeKey(c.poly[i],c.poly[(i+1)%4]);if(!owners.has(k))owners.set(k,[]);owners.get(k).push(c.id);}
  const distance=(x,z,a,b)=>{const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz)));return Math.hypot(x-a[0]-t*dx,z-a[1]-t*dz);};
  let removedInternal=0;const roads=[];
- for(const rd of data.roads){const ids=owners.get(edgeKey(rd.a,rd.b))||[];if(ids.length===2&&claimed.has(ids[0])&&claimed.get(ids[0])===claimed.get(ids[1])){removedInternal++;continue;}const a=rd.a.map(v=>v*S),b=rd.b.map(v=>v*S);if(landmarks.some(l=>distance(l.x,l.z,a,b)<l.r*.82))continue;roads.push({...rd,a,b,horizontal:Math.abs(a[0]-b[0])>Math.abs(a[1]-b[1])});}
- return {scale:S,coast,landmarks,parcels,roads,removedInternal,byId};
+ for(const rd of data.roads){const ids=owners.get(edgeKey(rd.a,rd.b))||[];if(ids.length===2&&claimed.has(ids[0])&&claimed.get(ids[0])===claimed.get(ids[1])){removedInternal++;continue;}const a=rd.a.map(v=>v*S),b=rd.b.map(v=>v*S);if(landmarks.some(l=>distance(l.x,l.z,a,b)<l.r*.82))continue;roads.push({...rd,sourcePedestrian:rd.pedestrian,pedestrian:false,a,b,horizontal:Math.abs(a[0]-b[0])>Math.abs(a[1]-b[1])});}
+ // Remove orphan spurs left by landmark clearance; the remaining street graph
+ // is one continuous network of blocks, without half-streets ending in lawns.
+ const nodeKey=p=>p.map(v=>v.toFixed(3)).join('/'),links=new Map(),removed=new Set();
+ roads.forEach((r,i)=>{for(const p of [r.a,r.b]){const k=nodeKey(p);if(!links.has(k))links.set(k,new Set());links.get(k).add(i);}});
+ const queue=[...links].filter(([,v])=>v.size===1).map(([k])=>k);
+ while(queue.length){const k=queue.pop(),ids=links.get(k);if(ids.size!==1)continue;const i=[...ids][0];removed.add(i);for(const p of [roads[i].a,roads[i].b]){const n=nodeKey(p),edges=links.get(n);edges.delete(i);if(edges.size===1)queue.push(n);}}
+ const connectedRoads=roads.filter((_,i)=>!removed.has(i));
+ return {scale:S,coast,landmarks,parcels,roads:connectedRoads,removedInternal,prunedSpurs:removed.size,byId};
 }

@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {Sky} from 'three/addons/objects/Sky.js';
 import {createStreetArt} from './street-art-kit.js?rev=2';
-import {createTaipeiCityPlan} from './taipei-city-layout.js?rev=1';
-import {createTaipeiCityKit} from './taipei-city-kit.js?rev=1';
+import {createTaipeiCityPlan} from './taipei-city-layout.js?rev=2';
+import {createTaipeiCityKit} from './taipei-city-kit.js?rev=2';
 import {planTaipeiWater,buildTaipeiWater,inside,edgeDistance} from './taipei-city-water.js?rev=1';
 import {createTaipeiLife} from './taipei-city-life.js?rev=1';
-import {createTaipeiRoads} from './taipei-city-roads.js?rev=1';
+import {createTaipeiRoads} from './taipei-city-roads.js?rev=2';
+import {plantTaipeiForest,installTaipeiSkyClouds,excludeSkyOverlaysFromAO} from './taipei-city-nature.js?rev=1';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
@@ -79,16 +80,11 @@ for(const p of ordinary){const index=highCandidates.indexOf(p);if(index>=0)cityK
 const buildings=cityKit.records;
 // Open lots and land between districts stay green, with deliberate clear lawns and planted groves.
 const xs=coast.map(p=>p[0]),zs=coast.map(p=>p[1]);
-for(let i=0;i<14000&&art.treeSites.length<900;i++){
- const x=between(Math.min(...xs),Math.max(...xs)),z=between(Math.min(...zs),Math.max(...zs));if(!pip(x,z)||boundaryDist(x,z)<5)continue;
- const dense=.5+.25*Math.sin(x*.055+z*.03)+.25*Math.cos(z*.06-x*.03);
- if(rand()>dense*.85)continue;
- tree(x,z,between(4.8,8.2),rand()<.07?1:rand()<.18?2:0);
-}
+const forestStats=plantTaipeiForest(art,coast);
 // New foliage in the park and mountain landmark grounds is placed at the existing terrain height.
 for(const l of landmarks.filter(l=>['daan','yangming','beitou'].includes(l.id))){
- const sc=l.scale*SCALE,placed=[];const count=l.id==='yangming'?36:l.id==='daan'?13:9;
- for(let n=0;n<250&&placed.length<count;n++){
+ const sc=l.scale*SCALE,placed=[];const count=l.id==='yangming'?85:l.id==='daan'?28:24;
+ for(let n=0;n<1200&&placed.length<count;n++){
   const a=rand()*Math.PI*2,r=Math.sqrt(rand())*(l.id==='yangming'?.92:.78),lx=Math.cos(a)*r,lz=Math.sin(a)*r*.82;
   if(l.id==='daan'&&(Math.hypot(lx-.45,lz-.25)<.47||Math.hypot(lx+.45,lz-.3)<.42))continue;
   if(l.id==='beitou'&&(Math.hypot(lx+.25,lz-.15)<.55||Math.hypot(lx-.5,lz+.25)<.48))continue;
@@ -99,7 +95,7 @@ for(const l of landmarks.filter(l=>['daan','yangming','beitou'].includes(l.id)))
    const cones=[[0,-.1,1.1,.95,0,1.4],[.2,-.25,.6,.55,.55,1],[.25,-.28,.2,.18,1.51,.22]];
    y=0;for(const [cx,cz,rx,rz,base,height] of cones){const d=Math.hypot((lx-cx)/rx,(lz-cz)/rz);if(d<=1)y=Math.max(y,base+(1-d)*height);}
   }
-  tree(x,z,between(3,4.8),0,true,.1+y*sc);placed.push({x,z});
+  tree(x,z,between(4,6.3),0,true,.1+y*sc);placed.push({x,z});
  }
 }
 // Finer planting on a subset of open street corners, always respecting the same footprint map.
@@ -117,8 +113,7 @@ const tallest=landmarks.find(l=>l.id==='t101'),flagPoleY=tallest.height;
 line('#c5d0c8',[tallest.x,flagPoleY,tallest.z],[tallest.x,flagPoleY+3.5,tallest.z],.045);
 const flagTex=art.texture(256,(g,s)=>{g.fillStyle='#c73e36';g.fillRect(0,0,s,s);g.fillStyle='#20447e';g.fillRect(0,0,s*.52,s*.52);g.save();g.translate(s*.26,s*.26);g.fillStyle='#fffdf1';for(let i=0;i<12;i++){g.save();g.rotate(i*Math.PI/6);g.beginPath();g.moveTo(-3,-14);g.lineTo(0,-25);g.lineTo(3,-14);g.fill();g.restore();}g.beginPath();g.arc(0,0,12,0,Math.PI*2);g.fill();g.restore();});
 const flag=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.65),new THREE.MeshStandardMaterial({map:flagTex,side:THREE.DoubleSide,roughness:.9}));flag.position.set(tallest.x+1.2,flagPoleY+2.5,tallest.z);scene.add(flag);
-const cloudTexture=art.texture(256,(g,size)=>{g.clearRect(0,0,size,size);for(let k=0;k<11;k++){const x=between(45,210),y=between(85,160),r=between(20,53),gradient=g.createRadialGradient(x,y,0,x,y,r);gradient.addColorStop(0,'rgba(255,253,242,.8)');gradient.addColorStop(.5,'rgba(255,253,242,.55)');gradient.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gradient;g.fillRect(x-r,y-r,r*2,r*2);}});cloudTexture.wrapS=cloudTexture.wrapT=THREE.ClampToEdgeWrapping;
-const clouds=[];for(let k=0;k<12;k++){const a=k*Math.PI/6,o=new THREE.Sprite(new THREE.SpriteMaterial({map:cloudTexture,transparent:true,opacity:.75,depthWrite:false,toneMapped:false,fog:true}));o.position.set(Math.cos(a)*850,170+(k%3)*22,Math.sin(a)*850);o.scale.set(190+(k%3)*20,95,1);scene.add(o);clouds.push(o);}
+installTaipeiSkyClouds(sky);
 const geometryStats=art.flush();
 // Reuse the approved soft-contact batching without discarding any trees.
 scene.updateMatrixWorld(true);const shadowGroups=new Map();
@@ -127,7 +122,7 @@ for(const group of shadowGroups.values()){const mesh=new THREE.InstancedMesh(new
 const cluster=ordinary.filter(p=>p.cells.length>1).sort((a,b)=>Math.hypot(a.x+75,a.z-10)-Math.hypot(b.x+75,b.z-10))[0]||ordinary[0],garden=ponds[0];
 const views={neighbourhood:{pos:[cluster.x+63,55,cluster.z+77],target:[cluster.x,13,cluster.z]},overview:{pos:[430,360,570],target:[-35,26,6]},landmarks:{pos:[-250,210,300],target:[-25,55,60]},childcare:{pos:[cx+49,31,cz+57],target:[cx,3.5,cz]},garden:{pos:[garden.x-48,37,garden.z+59],target:[garden.x,3,garden.z]}};
 const composer=new EffectComposer(renderer);if(renderer.capabilities.isWebGL2){composer.renderTarget1.samples=4;composer.renderTarget2.samples=4;}composer.addPass(new RenderPass(scene,camera));
-const ao=new SSAOPass(scene,camera,innerWidth,innerHeight);ao.kernelRadius=1.8;ao.minDistance=.00005;ao.maxDistance=.008;composer.addPass(ao);composer.addPass(new OutputPass());
+const ao=new SSAOPass(scene,camera,innerWidth,innerHeight);ao.kernelRadius=1.8;ao.minDistance=.00005;ao.maxDistance=.008;excludeSkyOverlaysFromAO(ao,scene);composer.addPass(ao);composer.addPass(new OutputPass());
 renderer.info.autoReset=false;
 function draw(){renderer.info.reset();composer.render();}
 const reduced=matchMedia('(prefers-reduced-motion: reduce)'),drawers=document.querySelector('#drawer'),drawerBody=document.querySelector('#drawer-body'),labelsEl=document.querySelector('.labels'),svg=document.querySelector('.guides');
@@ -188,7 +183,7 @@ function updateLabels(){
   if(Math.hypot(placed.xx-x,placed.yy-y)>12){const l=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,v] of Object.entries({x1:x,y1:y,x2:placed.xx,y2:placed.yy,stroke:'#e9f7ff','stroke-width':1.2,'stroke-opacity':.85}))l.setAttribute(k,String(v));svg.append(l);}
  }
 }
-function setLight(mode){lightMode=mode;const evening=mode==='sunset';sun.position.set(...(evening?[-420,230,250]:[-320,560,290]));sun.color.set(evening?'#ffd09a':'#fff1d8');sun.intensity=evening?2.55:2.8;hemisphere.intensity=evening?1.05:1.35;hemisphere.color.set(evening?'#d0d8ea':'#d5edff');hemisphere.groundColor.set(evening?'#7f6e52':'#6d7650');sky.material.uniforms.sunPosition.value.copy(sun.position);sky.material.uniforms.turbidity.value=evening?5:3;scene.fog.color.set(evening?'#d5bca4':'#a9cddd');clouds.forEach(c=>c.material.color.set(evening?'#ffe4c4':'#ffffff'));document.querySelectorAll('[data-light]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.light===mode)));}
+function setLight(mode){lightMode=mode;const evening=mode==='sunset';sun.position.set(...(evening?[-420,230,250]:[-320,560,290]));sun.color.set(evening?'#ffd09a':'#fff1d8');sun.intensity=evening?2.55:2.8;hemisphere.intensity=evening?1.05:1.35;hemisphere.color.set(evening?'#d0d8ea':'#d5edff');hemisphere.groundColor.set(evening?'#7f6e52':'#6d7650');sky.material.uniforms.sunPosition.value.copy(sun.position);sky.material.uniforms.turbidity.value=evening?5:3;scene.fog.color.set(evening?'#d5bca4':'#a9cddd');sky.material.uniforms.cityCloudColor.value.set(evening?'#ffe3bf':'#fffaf0');sky.material.uniforms.citySkyTint.value.set(evening?'#c0a596':'#80b8e4');document.querySelectorAll('[data-light]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.light===mode)));}
 function setQuality(value){quality=value;renderer.setPixelRatio(Math.min(devicePixelRatio,value==='high'?2:1.25));sun.shadow.mapSize.setScalar(value==='high'?4096:2048);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null;}renderer.shadowMap.needsUpdate=true;renderer.setSize(innerWidth,innerHeight);composer.setPixelRatio(renderer.getPixelRatio());composer.setSize(innerWidth,innerHeight);ao.enabled=value==='high';document.querySelector('#quality').value=value;}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{closeDrawer();go(b.dataset.view);});document.querySelectorAll('[data-light]').forEach(b=>b.onclick=()=>setLight(b.dataset.light));document.querySelector('#quality').onchange=e=>setQuality(e.target.value);
 document.querySelector('#policy-list').onclick=showPolicyList;document.querySelector('#landmark-list').onclick=showLandmarkList;document.querySelector('#close-drawer').onclick=closeDrawer;
@@ -204,6 +199,6 @@ renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();d
 const initialView=new URLSearchParams(location.search).get('view');go(Object.hasOwn(views,initialView)?initialView:'overview',true);
 let first=true,lastLabelUpdate=0,lastFrame=null;
 function updateNear(){const near=Math.max(.25,Math.min(80,camera.position.distanceTo(controls.target)*.035,camera.position.y*.2));if(Math.abs(camera.near-near)>.01){camera.near=near;camera.updateProjectionMatrix();}}
-function render(t=0){const dt=lastFrame===null?0:Math.min(.05,Math.max(0,(t-lastFrame)/1000));lastFrame=t;life.update(dt);if(flight){const a=Math.min(1,(t-flight.t)/1200),s=a*a*(3-2*a);camera.position.lerpVectors(flight.from,flight.to,s);controls.target.lerpVectors(flight.startTarget,flight.endTarget,s);if(a===1)flight=null;}controls.update();updateNear();if(seaMaterial.userData.shader)seaMaterial.userData.shader.uniforms.uSeaTime.value=reduced.matches?0:t*.001;draw();if(t-lastLabelUpdate>70||first){updateLabels();lastLabelUpdate=t;}if(first){document.querySelector('#loading').hidden=true;document.documentElement.dataset.ready='true';document.querySelector('#stats').textContent=`17 個主題場景・${ponds.length} 處水景・${people.length} 位民眾／${cars.length} 輛車`;first=false;}requestAnimationFrame(render);}
-window.TAIPEI_CITY={scene,camera,controls,renderer,data,buildings,landmarks,roads,people,cars,themeMeta,art,cityKit,plan,ponds,life,roadSurface,ao,composer,views,go,showPolicy,showPolicyList,showLandmark,showLandmarkList,closeDrawer,setLight,setQuality,geometryStats,snapshot(name,renderScene=true){if(name)go(name,true);if(flight){camera.position.copy(flight.to);controls.target.copy(flight.endTarget);flight=null;}controls.update();updateNear();camera.updateMatrixWorld();scene.updateMatrixWorld(true);if(renderScene)draw();labelKey='';updateLabels();return {view,light:lightMode,quality,themes:themeMeta.length,landmarks:builtLandmarks,buildings:buildings.length,...geometryStats,people:people.length,cars:cars.length,lakes:ponds.length,animationTime:life.clock,motion:life.enabled,merged:plan.parcels.filter(p=>p.cells.length>1).length,policyScenes:themeMeta.map(t=>({id:t.id,kind:t.sceneKind,features:t.features})),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};}};
+function render(t=0){const dt=lastFrame===null?0:Math.min(.05,Math.max(0,(t-lastFrame)/1000));lastFrame=t;life.update(dt);if(flight){const a=Math.min(1,(t-flight.t)/1200),s=a*a*(3-2*a);camera.position.lerpVectors(flight.from,flight.to,s);controls.target.lerpVectors(flight.startTarget,flight.endTarget,s);if(a===1)flight=null;}controls.update();sky.position.copy(camera.position);updateNear();if(seaMaterial.userData.shader)seaMaterial.userData.shader.uniforms.uSeaTime.value=reduced.matches?0:t*.001;draw();if(t-lastLabelUpdate>70||first){updateLabels();lastLabelUpdate=t;}if(first){document.querySelector('#loading').hidden=true;document.documentElement.dataset.ready='true';document.querySelector('#stats').textContent=`17 個主題場景・${ponds.length} 處水景・${people.length} 位民眾／${cars.length} 輛車`;first=false;}requestAnimationFrame(render);}
+window.TAIPEI_CITY={scene,camera,controls,renderer,data,buildings,landmarks,roads,people,cars,themeMeta,art,cityKit,plan,ponds,life,roadSurface,sky,forestStats,ao,composer,views,go,showPolicy,showPolicyList,showLandmark,showLandmarkList,closeDrawer,setLight,setQuality,geometryStats,snapshot(name,renderScene=true){if(name)go(name,true);if(flight){camera.position.copy(flight.to);controls.target.copy(flight.endTarget);flight=null;}controls.update();sky.position.copy(camera.position);updateNear();camera.updateMatrixWorld();scene.updateMatrixWorld(true);if(renderScene)draw();labelKey='';updateLabels();return {view,light:lightMode,quality,themes:themeMeta.length,landmarks:builtLandmarks,buildings:buildings.length,...geometryStats,forest:forestStats.planted,people:people.length,cars:cars.length,lakes:ponds.length,animationTime:life.clock,motion:life.enabled,merged:plan.parcels.filter(p=>p.cells.length>1).length,policyScenes:themeMeta.map(t=>({id:t.id,kind:t.sceneKind,features:t.features})),calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};}};
 window.__taipeiCityFrame=render;render();
