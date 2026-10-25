@@ -361,3 +361,6 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 使用者要求依新附圖調整人物、規劃互動遊戲。人物改球形大頭／柔色衣服／膠囊手腳，重做臉部 UV 朝向、帽髮與道具垂直位置；成人／學童／長者保留比例差異。保持 11 roles，7 基本 InstancedMesh＋5 道具池。
 - 加入停步張望、部分學童／旅客揮手，家長推車與長者拐杖手勢；moving=false 不更新動作。新增 PEOPLE.characterKit、activity、position、facing 供檢查與後續互動使用。check_scene.js 改依 characterKit 取得 12 批次，不再依舊 Capsule 頭幾何判斷。
 - docs/INTERACTION_PLAN.md 為具體規劃：第一期市民小任務＋探索護照，第二期跟居民散步／找一找／生活情境入口。遊戲尚未實作，未新增任務 UI、探索紀錄或事件蒐集。
+
+### 0.48 背景計數 v2.0.17
+- NAS PHP／SQLite 已啟用，GET counter.php 回傳 ok:true。使用者要求前台不顯示數字，移除 visitCounter DOM，保留每次載入 POST；counter.php 仍公開可查，尚無管理者登入。

@@ -14,7 +14,7 @@ subprocess.run(php+['-l',str(ROOT/'deploy/counter.php')],check=True)
 with TemporaryDirectory(prefix='tpencore-counter-') as tmp:
     tmp=Path(tmp);web=tmp/'public';web.mkdir();database=tmp/'private.sqlite'
     shutil.copy(ROOT/'deploy/counter.php',web/'counter.php')
-    ui=(ROOT/'3d/ui.js').read_text();counter=ui[ui.index('  const visitCounter='):ui.index('  const cand =')]
+    ui=(ROOT/'3d/ui.js').read_text();counter=ui[ui.index('  const recordVisit='):ui.index('  const cand =')]
     (web/'index.html').write_text('<meta charset="utf-8"><footer id="watermark"><span>Designed by TPEncore © 2026</span><a>Contact</a></footer><button id="other">Map</button><script>const el=(tag,cls)=>{const e=document.createElement(tag);e.className=cls;return e;};const watermark=document.getElementById("watermark");'+counter+'recordVisit({counterUrl:"counter.php"});</script>')
     with socket.socket() as s:s.bind(('127.0.0.1',0));port=s.getsockname()[1]
     url=f'http://127.0.0.1:{port}'
@@ -47,11 +47,16 @@ with TemporaryDirectory(prefix='tpencore-counter-') as tmp:
             browser=p.chromium.launch(executable_path='/usr/bin/chromium')
             page=browser.new_page();posts=[]
             page.on('request',lambda r:posts.append(r) if r.url.endswith('/counter.php') else None)
-            page.goto(url+'/');page.wait_for_selector('.hi-visit-counter:not([hidden])')
-            assert '41' in page.locator('.hi-visit-counter').inner_text()
+            with page.expect_response(lambda r:r.url.endswith('/counter.php')):
+                page.goto(url+'/')
+            assert request()['views']==41
+            assert page.locator('.hi-visit-counter').count()==0
+            assert '瀏覽次數' not in page.locator('body').inner_text()
             assert len(posts)==1 and posts[0].method=='POST' and 'cookie' not in posts[0].all_headers()
             page.locator('#other').click();assert request()['views']==41
-            page.reload();page.wait_for_selector('.hi-visit-counter:not([hidden])');assert request()['views']==42
+            with page.expect_response(lambda r:r.url.endswith('/counter.php')):
+                page.reload()
+            assert request()['views']==42
             assert browser.contexts[0].cookies()==[]
             browser.close()
         os.killpg(process.pid,signal.SIGTERM);process.wait();process=start()

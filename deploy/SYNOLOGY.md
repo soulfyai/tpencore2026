@@ -66,7 +66,7 @@ GitHub Pages 暫時維持作為可預覽的發布來源。勿停用 Pages；若�
 3. 在 DSM 建立網站根目錄以外的共用資料夾 **`tpencore-data`**，例如 `/volume1/tpencore-data`，給 Web Station 服務帳號 `http` 讀寫權限。**不要放在 `web/tpencore` 裡**。PHP 的 `open_basedir` 若有限制，加入此目錄；保留原有網站／暫存目錄允許路徑。
 4. 部署包已包含 `counter.php`。預設資料庫為 `/volume1/tpencore-data/visits.sqlite`（網站在 `/volume1/web/tpencore`）；不同目錄配置可設定 PHP 環境變數 `TPENCORE_COUNTER_DB` 為私有資料庫完整路徑。
 5. 開啟 `https://tpencore.tw/counter.php`，應看到類似 `{"ok":true,"views":0}` 的 JSON，不能是 PHP 原始碼或下載提示。這個 GET 不計次。若回 `counter_unavailable`，先檢查 PHP SQLite 擴充、資料夾權限及 `open_basedir`。
-6. 開啟首頁後，底部會顯示「瀏覽次數」。切換城市／選單不會增加，重新整理會增加。計數服務未啟用或失敗時隱藏文字，網站其他功能不受影響。
+6. 網站不顯示瀏覽次數，只在背景計數。管理者可開啟 `https://tpencore.tw/counter.php` 查看累計數字；此端點目前沒有登入限制，知道網址的人也可查詢。切換城市／選單不會增加，重新整理會增加。計數服務失敗不影響網站其他功能。
 
 不需修改既有 `site-config.json`：`tpencore.tw` 及子網域預設使用同站 `counter.php`。可設 `counterEnabled:false` 關閉，或以 `counterUrl:"counter.php"` 在其他同站網址測試。前端只接受同源端點，請求使用 `credentials:"omit"`。GitHub Pages 不執行 PHP，因此預覽站預設不顯示計數；公開來源 `counter.php.txt` 只是開源程式碼，不含金鑰或資料庫。
 
