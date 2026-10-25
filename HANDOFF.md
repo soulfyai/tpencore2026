@@ -369,3 +369,10 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 使用者要求將示意圖街角做成可操作的真實 3D。prototypes/street-test.html、street-test.js 為獨立 Three.js 0.160.0 實作，package_site.py 複製到 Pages 根目錄 street-test.html / street-test.js。NAS 原有更新腳本不抓新獨立檔，因此先提供 Pages 測試網址，不聲稱 NAS 有此頁。
 - 高畫質為預設，提供標準、三視角、日景／夕陽；固定種子自然樹群、草地 shader、道路人行道、托育建築／公寓／人物與原生拾取。無玩家移動、任務或新資料蒐集。
 - docs/CITIZEN_GAME_PLAN.md 是完整角色與政策任務企劃，docs/CITY_ART_DIRECTION.md 為全城美術目標；POLICY_MISSION_INVENTORY.json 為128政策／83筆待去重政績的規劃盤點，非已完成任務。正式城市未換模。
+
+### 0.50 臺北市獨立預覽（待確認，不替換正式城市）
+- 使用者肯定街景樣板，要求以同樣美術先做臺北全市，但明確要求確認後才替換正式網站。新增 `taipei-preview.html` 獨立 Pages 入口，沿用正式輪廓／160街區／17主題與16地標的快照，採街景樣板衍生素材與草地、葉片樹冠、建築、人物、光影。正式兩版HTML、3d/、data/及street-test均未改。
+- 新增street-art-kit.js、taipei-landmarks.js、taipei-preview-data.json，package_site.py只增封裝檔案清單，版本號維持2.0.18。既有NAS更新器不抓新預覽檔，預覽網址在Pages，不聲稱NAS已有預覽。
+- 四個可操作視角、高／標準畫質、白天／夕陽；政策面板呈現既有62筆條目與來源，區分9政見／8政績，非任務遊戲。
+- `tools/export_taipei_preview.py` 以UTF-8讀取本機正式HTML並刻意更新快照，勿在CI自動重新佈局；check_taipei_preview.py驗證原生控制、來源、政策文字編碼、全市視角、避讓、面板捲動與正式檔案未變。詳docs/TAIPEI_PREVIEW.md。
+- 後續整合／替換正式模型必須等使用者明確確認，目前僅提供美術審查。
