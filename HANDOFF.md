@@ -364,3 +364,8 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 
 ### 0.48 背景計數 v2.0.17
 - NAS PHP／SQLite 已啟用，GET counter.php 回傳 ok:true。使用者要求前台不顯示數字，移除 visitCounter DOM，保留每次載入 POST；counter.php 仍公開可查，尚無管理者登入。
+
+### 0.49 獨立街景美術測試 v2.0.18
+- 使用者要求將示意圖街角做成可操作的真實 3D。prototypes/street-test.html、street-test.js 為獨立 Three.js 0.160.0 實作，package_site.py 複製到 Pages 根目錄 street-test.html / street-test.js。NAS 原有更新腳本不抓新獨立檔，因此先提供 Pages 測試網址，不聲稱 NAS 有此頁。
+- 高畫質為預設，提供標準、三視角、日景／夕陽；固定種子自然樹群、草地 shader、道路人行道、托育建築／公寓／人物與原生拾取。無玩家移動、任務或新資料蒐集。
+- docs/CITIZEN_GAME_PLAN.md 是完整角色與政策任務企劃，docs/CITY_ART_DIRECTION.md 為全城美術目標；POLICY_MISSION_INVENTORY.json 為128政策／83筆待去重政績的規劃盤點，非已完成任務。正式城市未換模。

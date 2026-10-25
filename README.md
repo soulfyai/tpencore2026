@@ -8,7 +8,8 @@
 - [2D 政策地圖與文字導覽](https://tpencore.tw/2d.html)
 - [提供資料／回報問題](https://github.com/soulfyai/tpencore2026/issues/new/choose)
 - [貢獻指南](CONTRIBUTING.md)
-- [城市互動與市民任務規劃](docs/INTERACTION_PLAN.md)
+- [市民角色與政策任務完整企劃](docs/CITIZEN_GAME_PLAN.md)
+- [獨立 3D 街景美術測試](https://soulfyai.github.io/tpencore2026/street-test.html)（可旋轉／縮放、日景／夕陽）
 
 台北藍、新北黃、基隆粉紅、桃園紅為四市識別。政策內容、來源及查核日期由共同資料產生，2D 與 3D 同步更新。發現內容有誤，請開 Issue 附上原始來源；提出建議不會直接修改網站。
 

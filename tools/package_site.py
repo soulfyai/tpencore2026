@@ -22,6 +22,9 @@ def package(output):
                            ("index.html", "2d.html")]:
         html = (ROOT / source).read_text(encoding="utf-8")
         (output / target).write_text(prefix + html + "\n</html>\n", encoding="utf-8")
+    # Standalone art study, deliberately separate from the production city.
+    for name in ["street-test.html", "street-test.js"]:
+        (output / name).write_bytes((ROOT / "prototypes" / name).read_bytes())
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     version = {"version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
                "commit": commit, "built_at": datetime.now(timezone.utc).isoformat()}
