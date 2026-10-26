@@ -1,11 +1,12 @@
 import * as THREE from 'three';
-export const COMPOSITION_HOUSING=[[-35,-48,7,7,5],[-22,-49,7,7,7],[-9,-50,7,7,4],[18,-49,7,7,5],[33,-49,7,7,6],[-54,-31,8,8,4],[-32,-30,8,8,4],[-55,-7,8,8,3],[-35,-3,8,8,4],[-8,-6,8,8,3],[3,-6,7,7,4],[46,-24,8,8,5],[56,-13,6,7,3],[47,-12,6,7,2],[36,33,8,8,3],[50,30,7,8,2],[-33,49,6,5,2],[-58,-19,6,6,3],[-43,-46.5,5,4,2],[48,-42,7,5,2],[59,1,6,6,3],[56,21,6,6,2],[44,39,6,6,2]];
+export const COMPOSITION_HOUSING=[[-35,-48,7,7,5],[-22,-49,7,7,7],[-9,-50,7,7,4],[18,-49,7,7,5],[33,-49,7,7,6],[-54,-31,8,8,4],[-32,-30,8,8,4],[-55,-7,8,8,3],[-35,-3,8,8,4],[-8,-6,8,8,3],[3,-6,7,7,4],[46,-24,8,8,5],[56,-13,6,7,3],[47,-12,6,7,2],[36,33,8,8,3],[50,30,7,8,2],[-33,49,6,5,2],[-18,55,6,5,3,Math.PI],[0,54,6,6,2,Math.PI],[20,52,7,5,4,Math.PI],[33,48,6,6,2,-Math.PI/2],[56,21,6,6,2],[44,39,6,6,2]];
 export const COMPOSITION_COAST=[[-69,0,-13],[-58,0,-42],[-29,0,-57],[7,0,-59],[45,0,-53],[64,0,-29],[67,0,7],[56,0,35],[35,0,54],[0,0,62],[-34,0,59],[-58,0,45],[-70,0,17]];
 
 // A deliberately planned scene inventory. Each required reference element has a
 // named object and review camera; none is substituted by a background image.
 export function buildCompositionElements(art,scene,{apartment,group,paving,glass,windowBay,sign}){
  const {box,line,shape,mat,texture}=art,inventory=[],boats=[];
+ function completeFacades(root,w,d,floors){for(const [x,z,angle,span] of [[0,-d/2,Math.PI,w],[-w/2,0,-Math.PI/2,d],[w/2,0,Math.PI/2,d]]){const face=new THREE.Group();face.position.set(x,0,z);face.rotation.y=angle;root.add(face);const cols=Math.max(1,Math.floor(span/2.6));for(let f=0;f<floors;f++)for(let j=0;j<cols;j++)windowBay(-span/2+(j+.5)*span/cols,1.7+f*2.8,.07,1.55,1.65,face);}}
  function record(id,name,x,z,r,root){root.name=id;inventory.push({id,name,x,z,r,root});return root;}
  const civic=record('school-track','校園與完整跑道',-43,29,18,group(-43,29));
  art.reserve(-43,27,38,29);
@@ -20,7 +21,7 @@ export function buildCompositionElements(art,scene,{apartment,group,paving,glass
  for(const x of [-8.7,8.7]){box('#f5eedb',x,.65,0,.08,1.1,2.9,civic);box('#f5eedb',x+Math.sign(x)*.65,.65,-1.4,1.3,1.1,.06,civic);box('#f5eedb',x+Math.sign(x)*.65,.65,1.4,1.3,1.1,.06,civic);}
  const school=group(-43,16);box('#e0c9a1',0,3.3,0,28,6.4,3.8,school);box('#decfb1',0,6.7,0,28.8,.35,4.4,school);
  for(let f=0;f<2;f++)for(let j=0;j<10;j++)windowBay(-12+j*2.65,1.8+f*2.8,1.98,1.6,1.65,school);
- sign('臺北・校園與運動',0,3.6,2.3,8,.65,'#e9dcba','#547c6b',school);
+ completeFacades(school,28,3.8,2);sign('臺北・校園與運動',0,3.6,2.3,8,.65,'#e9dcba','#547c6b',school);
  for(let j=0;j<4;j++)box('#c6c3af',0,.45+j*.38,11.5+j*.45,24,.35,.8,civic);
  for(const x of [-16,16])for(const z of [-11,11]){line('#8a9d91',[x,.2,z],[x,8,z],.07,civic);box('#e5dfbe',x,8,z,1.8,.5,.3,civic);}
  inventory.push({id:'school-building',name:'校舍與看台',x:-43,z:16,r:15,root:school});
@@ -34,10 +35,10 @@ export function buildCompositionElements(art,scene,{apartment,group,paving,glass
  const care=record('care-center','社區照護與醫療',39,21.5,7,group(39,21.5));art.reserve(39,21.5,14,14);
  box('#e1e1cb',0,5,0,11,9.8,9,care);box('#c6d0c0',0,10,0,11.5,.35,9.5,care);
  for(let f=0;f<3;f++)for(let j=0;j<4;j++)windowBay(-3.9+j*2.6,1.7+f*2.8,4.56,1.6,1.8,care);
- box('#dfd9bd',0,10.8,0,6,1.3,5,care);box('#c77a64',0,12.2,0,.6,1.7,.16,care);box('#c77a64',0,12.2,0,1.7,.6,.16,care);sign('社區照護',0,3.35,4.8,5,.6,'#ecedd9','#547d7b',care);
+ completeFacades(care,11,9,3);box('#dfd9bd',0,10.8,0,6,1.3,5,care);box('#c77a64',0,12.2,0,.6,1.7,.16,care);box('#c77a64',0,12.2,0,1.7,.6,.16,care);sign('社區照護',0,3.35,4.8,5,.6,'#ecedd9','#547d7b',care);
  const housing=COMPOSITION_HOUSING;
  const tones=['#ccb093','#c6c9b0','#c2d0c1','#d6c7a8','#c6a08d','#b6c9c3'];
- housing.forEach(([x,z,w,d,floors],i)=>{apartment({name:`生活街區${i+1}`,x,z,w,d,floors,tone:tones[i%tones.length],rotation:i%7===0?Math.PI/2:0,shops:i%4===0?[['街角日常','#668b7b']]:[]});});
+ housing.forEach(([x,z,w,d,floors,orientation],i)=>{apartment({name:`生活街區${i+1}`,x,z,w,d,floors,tone:tones[i%tones.length],rotation:orientation??(i%7===0?Math.PI/2:0),shops:i>=17&&i<=20?[[['湖畔書屋','水岸咖啡','生活小店','散步茶屋'][i-17],'#668b7b']]:i%4===0?[['街角日常','#668b7b']]:[]});});
  inventory.push({id:'mixed-neighbourhoods',name:'高低混合生活街區',x:-20,z:-8,r:25,root:null,count:housing.length});
 
  // A small harbour has a landward approach and piers extending out over sea.

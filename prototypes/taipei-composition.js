@@ -7,7 +7,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {SSAOPass} from 'three/addons/postprocessing/SSAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {createTaipeiRoads} from './taipei-city-roads.js?rev=2';
-import {buildCompositionElements,COMPOSITION_COAST} from './taipei-composition-elements.js?rev=1';
+import {buildCompositionElements,COMPOSITION_COAST} from './taipei-composition-elements.js?rev=2';
 import {createStreetArt} from './street-art-kit.js?rev=2';
 import {installTaipeiSkyClouds,excludeSkyOverlaysFromAO} from './taipei-city-nature.js?rev=1';
 
@@ -62,7 +62,7 @@ function storefront(g,x,z,w,name,color){features.shopfronts++;box('#e4dbc4',x,1.
  for(const xx of [-w*.38,w*.38])planter(x+xx,.32,z+1.2,.52,.52,g);
  // Display shelves behind the shop glass, with handmade books/bread.
  for(let i=0;i<3;i++){box('#ae8d62',x, .55+i*.5,z-.03,w*.7,.06,.25,g);for(let q=0;q<7;q++)box(['#c38b56','#b9b17e','#b66e51','#799c96'][q%4],x-w*.29+q*w*.095,.7+i*.5,z+.03,w*.055,.22,.12,g);}}
-function apartment({name,x,z,w,d,floors,tone,rotation=0,shops=[]}){art.reserve(x,z,(rotation?d:w)+3,(rotation?w:d)+5);const g=group(x,z,rotation),wall=material(tone,tile),h=3.45+floors*2.65;features.buildings.push({name,x,z,width:w,depth:d,rotation,height:h,type:'住宅與騎樓',detail:'磁磚立面、退台、陽台花台、屋頂設備、店面騎樓'});
+function apartment({name,x,z,w,d,floors,tone,rotation=0,shops=[]}){const worldW=Math.abs(Math.cos(rotation))*w+Math.abs(Math.sin(rotation))*d,worldD=Math.abs(Math.sin(rotation))*w+Math.abs(Math.cos(rotation))*d;art.reserve(x,z,worldW+3,worldD+5);const g=group(x,z,rotation),wall=material(tone,tile),h=3.45+floors*2.65;features.buildings.push({name,x,z,width:w,depth:d,rotation,height:h,type:'住宅與騎樓',detail:'磁磚立面、退台、陽台花台、屋頂設備、店面騎樓'});
  box(wall,0,h/2+.2,0,w,h,d,g);box('#c4bdab',0,.2,0,w+.6,.4,d+.6,g);
  // Ground floor recessed arcade, columns support the balcony above.
  box('#666b5a',0,1.6,d/2+.04,w-.3,2.8,.08,g);paving(0,d/2+.9,w+1,2.8,.19,g);
@@ -71,6 +71,9 @@ function apartment({name,x,z,w,d,floors,tone,rotation=0,shops=[]}){art.reserve(x
   for(let j=0;j<cols;j++)windowBay(-w/2+(j+.5)*w/cols,y,d/2+.07,1.55,1.8,g,(j+f)%3!==1);}
  // Both side elevations have actual inset frames, not blank colored blocks.
  for(const side of [-1,1]){const face=new THREE.Group();face.position.x=side*w/2;face.rotation.y=side*Math.PI/2;g.add(face);for(let f=0;f<floors;f++)for(let j=0;j<Math.floor(d/2.8);j++)windowBay(-d/2+(j+.5)*d/Math.floor(d/2.8),4.65+f*2.65,.06,1.4,1.75,face,j%3===0);}
+ const rear=new THREE.Group();rear.position.z=-d/2;rear.rotation.y=Math.PI;g.add(rear);
+ for(let f=0;f<floors;f++)for(let j=0;j<cols;j++)windowBay(-w/2+(j+.5)*w/cols,4.65+f*2.65,.06,1.5,1.75,rear,false);
+ box('#a5ad9b',0,1.5,.08,1.5,2.8,.16,rear);box(darkGlass,0,1.5,.19,1.22,2.5,.06,rear);box('#d7cbb0',0,2.98,.25,2.1,.12,.7,rear);
  shops.forEach((s,i)=>storefront(g,-w/2+(i+.5)*w/shops.length,d/2+.13,w/shops.length-.45,s[0],s[1]));roofGarden(g,w,d,h+.2);return g;}
 
 // A unified textured ground with a real hole for the irregular lake.
@@ -110,6 +113,8 @@ const pent=group(-21,-3);box(material('#e3c4a3',tile),1,18.6,-1,9,2.8,7,pent);fo
 const childcare=group(-9,-26),cw=material('#e7d9b8',tile);features.buildings.push({name:'生活托育館',type:'托育與家庭',x:-9,z:-26,height:9.9,detail:'三翼庭院、木百葉、無障礙入口、遊戲區'});
 box(cw,0,4.2,-3,19,8.1,7,childcare);box(cw,-8,2.7,3,4,5.2,8,childcare);box('#d0b593',7,2.7,2,4.8,5.2,8,childcare);
 for(let f=0;f<3;f++)for(let j=0;j<7;j++)windowBay(-7.8+j*2.6,1.5+f*2.5,.56,1.65,1.7,childcare);
+const childcareRear=new THREE.Group();childcareRear.position.z=-6.5;childcareRear.rotation.y=Math.PI;childcare.add(childcareRear);
+for(let f=0;f<3;f++)for(let j=0;j<7;j++)windowBay(-7.8+j*2.6,1.5+f*2.5,.07,1.65,1.7,childcareRear);
 for(let j=0;j<13;j++)box('#aa8d62',-8.9+j*.37,2.6,7.1,.09,4.3,.25,childcare);
 box('#729b95',0,3.2,4.5,7,.22,5.6,childcare);for(const x of [-3.1,3.1])line('#768982',[x,.2,6.8],[x,3.2,6.8],.055,childcare);
 sign('臺北・生活托育館',0,3.35,7.34,6.3,.65,'#eee2bd','#457575',childcare);paving(0,3,7.5,8,.18,childcare);roofGarden(childcare,19,7,8.3);
@@ -126,14 +131,21 @@ box('#d2ccba',0,2.1,0,17,4.1,14,office);box(darkGlass,0,21.9,-1.3,10,35,9,office
 for(let f=0;f<13;f++){box('#9eafa7',0,4.8+f*2.65,3.28,10.15,.095,.16,office);box('#9eafa7',5.05,4.8+f*2.65,-1.3,.13,.095,9,office);}
 for(let x=-4.5;x<5;x+=.85)box('#c6cbb7',x,22.1,3.38,.07,34.4,.18,office);
 for(let z=-5.5;z<3;z+=.85)box('#c6cbb7',5.13,22.1,z,.17,34.4,.07,office);
+for(let f=0;f<13;f++){box('#9eafa7',0,4.8+f*2.65,-5.88,10.15,.095,.16,office);box('#9eafa7',-5.05,4.8+f*2.65,-1.3,.13,.095,9,office);}
+for(let x=-4.5;x<5;x+=.85)box('#c6cbb7',x,22.1,-5.93,.07,34.4,.18,office);
+for(let z=-5.5;z<3;z+=.85)box('#c6cbb7',-5.13,22.1,z,.17,34.4,.07,office);
+for(let f=0;f<8;f++){box('#b5c1af',-4.1,5+f*2.65,6.08,5,.08,.13,office);box('#b5c1af',-6.67,5+f*2.65,3,.1,.08,6,office);}
+for(let z=.4;z<5.9;z+=.8)box('#b5c1af',-6.7,15,z,.1,20,.045,office);
 roofGarden(office,10,9,39.5);for(let x=-6;x<7;x+=2.5)planter(x,4.45,5.4,2,.75,office);
 sign('臺北・共創',0,3.5,7.07,6,.7,'#d9d6bd','#3e626b',office);
 // Recognizable Taipei context; hand-modelled tiered crown and facade fins.
 const tower=group(5,-42);features.buildings.push({name:'臺北101',x:5,z:-42,height:62,type:'城市地標',detail:'逐節退收塔身、水平簷線、垂直帷幕與國旗'});
 box('#b1c0ae',0,3.2,0,10,6.4,8,tower);for(let section=0;section<8;section++){
  const y=7+section*5.5,w=7.2-section*.38,d=w*.78;box(mat('#4d8c85',.27,.3),0,y+2.3,0,w,4.7,d,tower);
- for(const yy of [0,1,2,3,4])box('#9ebdb0',0,y+yy+.2,d/2+.035,w,.065,.12,tower);
- for(let j=-3;j<=3;j++)box('#9ebdb0',j*w/8,y+2.3,d/2+.1,.045,4.7,.1,tower);
+ for(const side of [-1,1]){
+ for(let yy=0;yy<5;yy++){box('#9ebdb0',0,y+yy+.2,side*(d/2+.035),w,.065,.12,tower);box('#9ebdb0',side*(w/2+.035),y+yy+.2,0,.12,.065,d,tower);}
+ for(let j=-3;j<=3;j++){box('#9ebdb0',j*w/8,y+2.3,side*(d/2+.1),.045,4.7,.1,tower);box('#9ebdb0',side*(w/2+.1),y+2.3,j*d/8,.1,4.7,.045,tower);}
+ }
  box('#7ba69a',0,y+4.8,0,w+1.15,.38,d+.85,tower);box('#c1ccb2',0,y+4.98,0,w+1.25,.08,d+.95,tower);}
 box('#83aaa0',0,53.2,0,3.3,4.3,2.9,tower);line('#9ebcb0',[0,55,0],[0,62,0],.08,tower);
 const flagMap=texture(256,(g,s)=>{g.fillStyle='#d33b35';g.fillRect(0,0,s,s);g.fillStyle='#17477c';g.fillRect(0,0,s*.5,s*.5);g.save();g.translate(s*.25,s*.25);g.fillStyle='#fff';for(let i=0;i<12;i++){g.save();g.rotate(i*Math.PI/6);g.beginPath();g.moveTo(-3,-14);g.lineTo(0,-25);g.lineTo(3,-14);g.fill();g.restore();}g.beginPath();g.arc(0,0,12,0,Math.PI*2);g.fill();g.restore();});
@@ -143,6 +155,15 @@ const flag=new THREE.Mesh(new THREE.PlaneGeometry(2.2,1.47),new THREE.MeshStanda
 const pathCurve=new THREE.CatmullRomCurve3([[-64,.15,21],[-56,.15,43],[-33,.15,52],[-3,.15,48],[25,.15,45],[50,.15,40],[59,.15,17]].map(p=>new THREE.Vector3(...p)),false,'catmullrom',.4);
 function ribbon(curve,width,material,y=.12){const points=curve.getPoints(180),vertices=[],indices=[],uvs=[];points.forEach((p,i)=>{const a=points[Math.max(0,i-1)],b=points[Math.min(points.length-1,i+1)],v=new THREE.Vector3(b.z-a.z,0,a.x-b.x).normalize().multiplyScalar(width/2);for(const side of [-1,1]){vertices.push(p.x+v.x*side,y,p.z+v.z*side);uvs.push(i/12,side===-1?0:1);}if(i<points.length-1){const j=i*2;indices.push(j,j+1,j+2,j+1,j+3,j+2);}});const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(indices);g.computeVertexNormals();const mesh=new THREE.Mesh(g,material);mesh.receiveShadow=true;scene.add(mesh);return mesh;}
 ribbon(pathCurve,2.8,pavement,.18);
+const shoreAccess=[
+ {id:'bridge-west-access',points:[[-6,31],[-8,37],[-8,45],[-3,48]],width:1.8},
+ {id:'bridge-east-access',points:[[26,31],[28,35],[28,43],[25,45]],width:1.8},
+ {id:'waterfront-shop-center-access',points:[[0,49.7],[0,47.9]],width:1.4},
+ {id:'waterfront-shop-east-access',points:[[20,48.2],[20,45.7]],width:1.4},
+ {id:'waterfront-house-side-access',points:[[28.6,48],[28,45],[25,45]],width:1.4}
+];
+for(const access of shoreAccess){const curve=new THREE.CatmullRomCurve3(access.points.map(([x,z])=>new THREE.Vector3(x,.18,z)),false,'catmullrom',.2);const layerPavement=pavement.clone();Object.assign(layerPavement,{polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2-shoreAccess.indexOf(access)*2});access.mesh=ribbon(curve,access.width,layerPavement,.2);access.mesh.name=access.id;const samples=curve.getPoints(24);for(let i=1;i<samples.length;i++){const a=samples[i-1],b=samples[i];art.reserve((a.x+b.x)/2,(a.z+b.z)/2,Math.abs(a.x-b.x)+access.width,Math.abs(a.z-b.z)+access.width);}}
+art.reserve(-15,44,10,7);
 ribbon(new THREE.CatmullRomCurve3(coast.map(p=>new THREE.Vector3(p.x*1.055,0,p.z*1.055)),true,'catmullrom',.3),.7,new THREE.MeshBasicMaterial({color:'#d2ece0',transparent:true,opacity:.55,depthWrite:false}),-1.29);
 lakePoints.forEach((p,i)=>{if(i%2===0){const h=between(.18,.46);shape('leaf',['#a6a898','#b9b39b','#8e9a89'][i%3],p.x,-.02,p.z,between(.25,.55),h,between(.25,.5));}if(i%4===0){for(let j=0;j<4;j++)line('#839263',[p.x,-.25,p.z],[p.x+between(-.2,.2),between(.25,.65),p.z+between(-.2,.2)],.018);}});
 // Timber landing at the lake's western end.
@@ -153,7 +174,7 @@ for(const [x,z] of [[-46,16],[-30,16],[-13,16],[4,16],[23,16],[41,16],[18,-26],[
 for(const [x,z] of [[-35,17],[2,19],[35,18]]){shape('cyl','#658172',x,.65,z,.27,1,.27);shape('cyl','#a3b19d',x,1.19,z,.3,.1,.3);}
 // Café tables, chairs, terrace pergola, bicycle stand and small pavement details.
 for(const x of [-25,-21,-17]){shape('cyl','#d7c6a1',x,.95,5.2,.47,.08,.47);line('#6d7c6c',[x,.3,5.2],[x,.9,5.2],.04);for(const side of [-1,1]){box('#8a9b82',x+side*.8,.6,5.2,.5,.07,.5);box('#8a9b82',x+side*1,.9,5.2,.07,.6,.5);for(const zz of [-.18,.18])line('#667c70',[x+side*.8,.2,5.2+zz],[x+side*.8,.6,5.2+zz],.025);}}
-const pergola=group(31,43);for(const x of [-4,4])for(const z of [-2,2])box('#a98e64',x,1.65,z,.18,3,.18,pergola);for(let i=0;i<13;i++)box('#b8a078',-4.4+i*.73,3.15,0,.12,.18,5.1,pergola);for(const z of [-2,2])box('#a88c60',0,3,z,9,.2,.18,pergola);
+const pergola=group(-15,44);for(const x of [-4,4])for(const z of [-2,2])box('#a98e64',x,1.65,z,.18,3,.18,pergola);for(let i=0;i<13;i++)box('#b8a078',-4.4+i*.73,3.15,0,.12,.18,5.1,pergola);for(const z of [-2,2])box('#a88c60',0,3,z,9,.2,.18,pergola);
 for(let i=0;i<4;i++){const ring=new THREE.Mesh(new THREE.TorusGeometry(.4,.035,6,20),mat('#7c9188',.5,.3));ring.position.set(-12+i*.7,.6,17);ring.rotation.y=Math.PI/2;scene.add(ring);}
 const neighbourhoodRoads=[{a:[-54,-38.5],b:[-10,-38.5],horizontal:true},{a:[-25.5,-43],b:[-25.5,3.1],horizontal:false,pedestrian:true},{a:[39.5,-44],b:[39.5,3.1],horizontal:false,pedestrian:true}];createTaipeiRoads(art,scene,renderer,neighbourhoodRoads);for(const r of neighbourhoodRoads)art.reserve((r.a[0]+r.b[0])/2,(r.a[1]+r.b[1])/2,r.horizontal?Math.abs(r.a[0]-r.b[0])+1:5,r.horizontal?7:Math.abs(r.a[1]-r.b[1])+1);
 const composition=buildCompositionElements(art,scene,{apartment,group,paving,glass,windowBay,sign});composition.inventory.push({id:'central-lake',name:'中央不規則湖泊',x:10,z:31,r:17,root:water});
@@ -164,13 +185,13 @@ for(const [x,z,h] of treeSites)art.tree(x,z,h,0,false);
 for(let i=0;i<300;i++){const x=between(-59,59),z=between(19,56);if(lakePoints.some(p=>Math.hypot(p.x-x,p.z-z)<3))continue;
  let inside=false;for(let j=0,k=lakePoints.length-1;j<lakePoints.length;k=j++){const a=lakePoints[j],b=lakePoints[k];if((a.z>z)!==(b.z>z)&&x<(b.x-a.x)*(z-a.z)/(b.z-a.z)+a.x)inside=!inside;}
  const pathDistance=Math.min(...pathCurve.getPoints(120).map(p=>Math.hypot(p.x-x,p.z-z)));
- if(!art.clearAt(x,z,1.8)||art.treeSites.some(t=>Math.hypot(t.x-x,t.z-z)<3)||inside||pathDistance<2.7||Math.abs(x-31)<6&&Math.abs(z-31)<4||Math.abs(x)<7&&Math.abs(z-31)<5)continue;art.tree(x,z,between(3.8,7),i%9===0?1:0,true);}
+ if(!art.clearAt(x,z,1.8)||art.treeSites.some(t=>Math.hypot(t.x-x,t.z-z)<3)||inside||pathDistance<2.7||Math.abs(x+15)<6&&Math.abs(z-44)<4||Math.abs(x)<7&&Math.abs(z-31)<5)continue;art.tree(x,z,between(3.8,7),i%9===0?1:0,true);}
 for(let z=-42;z<1;z+=4.2)for(let x=-51;x<52;x+=4.2){if(rand()<.6)art.tree(x+between(-.7,.7),z+between(-.7,.7),between(4.2,6.7),0,false);}
 for(const scale of [.83,.91])for(let i=0;i<coast.length;i+=3){const x=coast[i].x*scale,z=coast[i].z*scale;if(lakePoints.some(p=>Math.hypot(p.x-x,p.z-z)<4)||pathCurve.getPoints(120).some(p=>Math.hypot(p.x-x,p.z-z)<2.5))continue;art.tree(x,z,between(4.6,6.7),0,false);}
 // Flowers are separate petals at close range, batched by material.
 for(let i=0;i<250;i++){const x=between(27,44),z=between(39,46),h=between(.15,.36);if(!art.clearAt(x,z,.2))continue;batch('cyl','#798e53',x,h/2,z,.012,h,.012);for(let j=0;j<4;j++){const a=j*Math.PI/2;batch('sphere',i%3?'#e4c586':'#c5969d',x+Math.cos(a)*.065,h,z+Math.sin(a)*.065,.055,.035,.055);}batch('sphere','#cfa965',x,h+.02,z,.035,.035,.035);}
 // Residents and vehicles share the existing family-friendly character language.
-for(const [i,p] of [[-24,5],[-22,5],[-5,-15],[-3,-16],[1,-16],[20,15],[23,16],[-34,26],[-32,28],[-8,40],[-2,22],[28,28],[30,31],[45,23]].entries()){
+for(const [i,p] of [[-24,5],[-22,5],[-5,-15],[-3,-16],[1,-16],[20,15],[23,16],[-34,26],[-32,28],[-8,40],[-2,22],[28,28],[30,31],[45,23],[-18,51.2],[0,49.5],[20,48],[28.6,48]].entries()){
  const resident=art.person(p[0],p[1],i===3||i===4?.58:.9,['#739baf','#bb9277','#93a179','#d3b36e'][i%4],'#697570',i%5===0?'#b9b7a2':'#594937',i%4===0?'wave':'idle',between(-1,1));keep(resident);features.people++;}
 const cars=[];for(const [i,p] of [[-40,8],[-7,8],[31,12],[13,-22]].entries()){const c=keep(art.car(p[0],p[1],['#e4dbbd','#628f97','#bd836a','#9cab9b'][i],i===3?0:Math.PI/2*(i===2?-1:1)));cars.push(c);features.cars++;}
 features.trees=art.treeSites.length;const batchStats=art.flush();
@@ -182,6 +203,8 @@ const views={overview:{target:[-2,12,8],position:[132,145,175]},street:{target:[
 let activeView='overview',sunset=false,moving=false,elapsed=0;const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 function render(){controls.update();sky.position.copy(camera.position);renderer.info.reset();composer.render();updatePlaces();}
 function setView(name){activeView=name;const v=views[name];controls.target.fromArray(v.target);const pos=new THREE.Vector3(...v.position),offset=pos.sub(controls.target);if(innerWidth<760&&name==='overview')offset.set(40,205,330);camera.position.copy(controls.target).add(offset);controls.update();document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===name));render();}
+function orbitQuarter(){const damping=controls.enableDamping;controls.enableDamping=false;controls.update();camera.position.sub(controls.target).applyAxisAngle(new THREE.Vector3(0,1,0),Math.PI/2).add(controls.target);controls.update();controls.enableDamping=damping;render();}
+document.querySelector('#orbit').onclick=orbitQuarter;
 function setTime(value){sunset=value;sun.color.set(value?'#ffbe83':'#fff0cc');sun.intensity=value?3:3.3;sun.position.set(value?-65:-45,value?33:82,value?20:36);sky.material.uniforms.sunPosition.value.copy(sun.position);sky.material.uniforms.cityCloudColor.value.set(value?'#ffe1bc':'#fffaf0');hemi.intensity=value?1.15:1.65;scene.background.set(value?'#c6cfcc':'#b9dbe2');scene.fog.color.copy(scene.background);document.querySelector('#time').setAttribute('aria-pressed',String(value));render();}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));document.querySelector('#time').onclick=()=>setTime(!sunset);
 document.querySelector('#motion').onclick=()=>{moving=!moving;document.querySelector('#motion').setAttribute('aria-pressed',String(moving));};
@@ -189,5 +212,5 @@ document.querySelector('#quality').onchange=e=>{renderer.setPixelRatio(e.target.
 reduced.addEventListener('change',()=>{if(reduced.matches){moving=false;document.querySelector('#motion').setAttribute('aria-pressed','false');}});
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);render();});
 const clock=new THREE.Clock();function frame(){requestAnimationFrame(frame);const dt=Math.min(clock.getDelta(),.05);if(moving){elapsed+=dt;composition.advance(elapsed);waterUniform.value=elapsed;cars[0].position.x=-45+(elapsed*2)%96;cars[1].position.x=-30+(elapsed*1.5)%80;art.residents.forEach(r=>r.arm.rotation.z=r.base+Math.sin(elapsed*2)*.15);}render();}
-const initialView=new URLSearchParams(location.search).get('view');setView(Object.hasOwn(views,initialView)?initialView:'overview');window.TAIPEI_COMPOSITION={composition,onLand,scene,renderer,camera,controls,features,views,setView,setTime,cars,snapshot(){render();return {inventory:composition.inventory.map(({root,...item})=>item),boats:composition.boats.length,features,batchStats,view:activeView,sunset,moving,triangles:renderer.info.render.triangles,calls:renderer.info.render.calls};}};
+const initialView=new URLSearchParams(location.search).get('view');setView(Object.hasOwn(views,initialView)?initialView:'overview');window.TAIPEI_COMPOSITION={composition,shoreAccess,onLand,orbitQuarter,scene,renderer,camera,controls,features,views,setView,setTime,cars,snapshot(){render();return {inventory:composition.inventory.map(({root,...item})=>item),boats:composition.boats.length,features,batchStats,view:activeView,sunset,moving,triangles:renderer.info.render.triangles,calls:renderer.info.render.calls};}};
 document.querySelector('#loading').hidden=true;document.documentElement.dataset.ready='true';frame();

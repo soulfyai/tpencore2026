@@ -42,9 +42,9 @@ try:
         assert len(stats['features']['buildings']) >= 28
         assert stats['features']['trees'] >= 15
         assert stats['features']['shopfronts'] >= 10
-        assert stats['features']['flag'] and stats['features']['people'] == 14
+        assert stats['features']['flag'] and stats['features']['people'] == 18
         footprints = page.evaluate('''(()=>{const violations=[];for(const b of TAIPEI_COMPOSITION.features.buildings.filter(b=>b.width)){
-            const w=b.rotation?b.depth:b.width,d=b.rotation?b.width:b.depth;
+            const w=Math.abs(Math.cos(b.rotation))*b.width+Math.abs(Math.sin(b.rotation))*b.depth,d=Math.abs(Math.sin(b.rotation))*b.width+Math.abs(Math.cos(b.rotation))*b.depth;
             for(const sx of [-1,1])for(const sz of [-1,1])if(!TAIPEI_COMPOSITION.onLand(b.x+sx*w/2,b.z+sz*d/2))violations.push(b.name+':shore');
             const overlap=(x0,z0,x1,z1)=>b.x+w/2>x0+.05&&b.x-w/2<x1-.05&&b.z+d/2>z0+.05&&b.z-d/2<z1-.05;
             if(overlap(-56,6.5,55,13.5)||overlap(9.5,-37.2,16.5,6.5)||overlap(-54,-40.9,-10,-36.1))violations.push(b.name+':road');
@@ -73,13 +73,22 @@ try:
             print('SHOT', name, flush=True)
 
         shot('overview-desktop')
+        origin=page.evaluate('({position:TAIPEI_COMPOSITION.camera.position.toArray(),target:TAIPEI_COMPOSITION.controls.target.toArray(),radius:TAIPEI_COMPOSITION.camera.position.distanceTo(TAIPEI_COMPOSITION.controls.target)})')
+        for angle in [90,180,270,360]:
+            click('#orbit')
+            assert page.evaluate('TAIPEI_COMPOSITION.controls.target.toArray()')==origin['target']
+            radius=page.evaluate('TAIPEI_COMPOSITION.camera.position.distanceTo(TAIPEI_COMPOSITION.controls.target)')
+            assert abs(radius-origin['radius'])<.0001
+            if angle<360:shot(f'orbit-{angle}-desktop')
+        returned=page.evaluate('TAIPEI_COMPOSITION.camera.position.toArray()')
+        assert max(abs(a-b) for a,b in zip(returned,origin['position']))<.0001
+        assert len(page.evaluate('TAIPEI_COMPOSITION.shoreAccess.map(p=>p.id)'))==5
         for view in ['street', 'courtyard', 'lake']:
             click(f'[data-view={view}]')
             assert page.evaluate('TAIPEI_COMPOSITION.snapshot().view') == view
-            shot(f'{view}-desktop')
+            if view=='lake':shot(f'{view}-desktop')
         click('#time')
         assert page.evaluate('TAIPEI_COMPOSITION.snapshot().sunset')
-        shot('sunset-desktop')
         click('#time')
         page.locator('#quality').select_option('standard')
         assert not page.evaluate('TAIPEI_COMPOSITION.renderer.shadowMap.enabled')
@@ -100,8 +109,9 @@ try:
         click('[data-view=overview]')
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         shot('overview-mobile')
-        click('[data-view=street]')
-        shot('street-mobile')
+        click('#orbit')
+        click('#orbit')
+        shot('orbit-180-mobile')
         assert not errors, errors
         browser.close()
     subprocess.run(['git', 'diff', '--exit-code', 'e678bd9', '--',

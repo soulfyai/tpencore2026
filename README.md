@@ -9,7 +9,7 @@
 - [提供資料／回報問題](https://github.com/soulfyai/tpencore2026/issues/new/choose)
 - [貢獻指南](CONTRIBUTING.md)
 - [市民角色與政策任務完整企劃](docs/CITIZEN_GAME_PLAN.md)
-- [臺北城市內容與構圖樣板](https://soulfyai.github.io/tpencore2026/taipei-composition.html?v=1)（操場、湖橋、碼頭、客船與帆船，獨立審查）
+- [臺北城市內容與構圖樣板](https://soulfyai.github.io/tpencore2026/taipei-composition.html?v=2)（操場、湖橋、碼頭、客船與帆船，獨立審查）
 - [臺北生活街區細節樣板](https://soulfyai.github.io/tpencore2026/taipei-detail.html?v=1)（實際3D模型，騎樓、立面、庭院與湖岸，獨立審查）
 - [四市獨立美術預覽入口](https://soulfyai.github.io/tpencore2026/city-review.html)（臺北、新北、基隆、桃園，尚未替換正式網站）
 - [飛機、車輛與人物細節](https://soulfyai.github.io/tpencore2026/model-study.html?model=aircraft)（實際模型，可旋轉、縮放與查看局部）
