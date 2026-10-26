@@ -68,3 +68,7 @@ Designed by TPEncore © 2026 · Contact / TPEncore2026@gmail.com
 ### Mobile opening preview v0.4.2
 
 [Open the city](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.2.html). Portrait phones open on the closer diagonal Taipei city view; Home returns to the same frame. Desktop/landscape, geometry, buildings, UI and frozen earlier previews are retained. `?view=street` is still available for deliberate close-up review.
+
+### Mobile panorama preview v0.4.3
+
+[Two-city panorama](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.3.html?view=panorama) · [Ordinary Taipei opening](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.3.html). Phone Full View uses the reference two-island composition; Home retains the v0.4.2 Taipei frame. Desktop, models and earlier previews remain unchanged.

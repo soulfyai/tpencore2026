@@ -1,0 +1,12 @@
+{
+  "preview_version": "0.4.3",
+  "base": "preview-v0.4.2",
+  "scope": "mobile-two-city-panorama-camera",
+  "entry": "greater-taipei-v0.4.3.html",
+  "reference_viewport": [
+    392,
+    697
+  ],
+  "base_entry_sha256": "7941899fd26823148e585fc21e24e510107434e31d667bfa3fc4dddaca9566d1",
+  "status": "review-only"
+}

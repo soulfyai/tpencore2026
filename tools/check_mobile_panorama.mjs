@@ -1,0 +1,8 @@
+import * as THREE from '../node_modules/three/build/three.module.js';import fs from 'node:fs';import assert from 'node:assert/strict';
+const source=fs.readFileSync(new URL('../prototypes/mobile-panorama-v043.js',import.meta.url),'utf8'),cities=new Map();
+for(const id of ['taipei','newtaipei']){const d=JSON.parse(fs.readFileSync(new URL(`../prototypes/${id}-preview-data.json`,import.meta.url))),o=d.sourceCenter||[0,0];cities.set(id,{coast:d.coast.map(([x,z])=>[x+o[0],z+o[1]])});}
+for(const [w,h]of [[392,697],[375,667],[400,860],[430,740],[600,700],[1000,760],[697,392]]){const camera=new THREE.PerspectiveCamera(32,w/h,.3,1000),base={target:new THREE.Vector3(0,0,0),pos:new THREE.Vector3(0,120,300),dist:323},fn=new Function('THREE','stage','camera','WORLD',source+';return mobileTwoCityPanorama;')(THREE,{clientWidth:w,clientHeight:h},camera,{cities}),saved=JSON.stringify(base),f=fn(base);assert.equal(JSON.stringify(base),saved);
+ if(w>600||w>=h){assert.equal(f,base);console.log('PASS original desktop/landscape panorama',w,h);continue;}
+ camera.position.copy(f.pos);camera.lookAt(f.target);camera.updateMatrixWorld(true);const result={};for(const [id,c]of cities){const a=c.coast.map(([x,z])=>new THREE.Vector3(x,0,z).project(camera)).map(p=>[p.x/2+.5,.5-p.y/2]),bounds=[Math.min(...a.map(p=>p[0])),Math.min(...a.map(p=>p[1])),Math.max(...a.map(p=>p[0])),Math.max(...a.map(p=>p[1]))];assert.ok(bounds[0]>=.005&&bounds[2]<=1.055&&bounds[1]>.25&&bounds[3]<.845,{w,h,id,bounds});result[id]=bounds.map(v=>+v.toFixed(3));}
+ assert.ok(result.taipei[1]<result.newtaipei[1]);console.log('PASS full two-city phone framing',w,h,f.dist.toFixed(1),result);
+}
