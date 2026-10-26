@@ -475,3 +475,7 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - archives/preview-v0.4.0.zip 固定保存當前完整公開執行資源與逐檔manifest，封存頁僅加版本title/meta；index alias直接開雙市預覽。package_site校驗ZIP及逐檔hash後解至 /previews/preview-v0.4.0/，並發布ZIP下載，不從之後的根目錄模組重建舊版。禁止覆寫舊封存或移動既有tag，未來另開新版本。
 - docs/mockups行政區底圖由現有geo.json同一經緯度投影繪製，維持臺北內側、新北環繞與板橋西南／淡水西北／新店南／汐止東的關係。生成概念圖參考此底圖與指定detail街景，沒有修改Logo／UI／現行兩島預覽。Google Maps 未直接擷取；生成建築與河線只作風格／配置示意。
 - 真正實作若獲確認，應直接用行政區共同座標與新北內環，不能依生成圖再任意重畫地形。當前預覽HTML及正式首頁保持原hash。詳docs/PREVIEW_VERSIONS.md。
+
+## Active baseline: v0.4.0 resumed
+
+User rejected v0.5.0 and explicitly requested returning to v0.4.0. Resume work from this branch (`preview/0.4.0-resumed`), based on the pre-v0.5 freeze commit `2b3b808`. Do not use v0.5 geographic placement or architecture as the active design. v0.5 remains recoverable in its prior branch/tag and independent public page. Production homepage remains unchanged. Verified immutable v0.4 URL HTTP 200, version manifest 0.4.0: https://soulfyai.github.io/tpencore2026/previews/preview-v0.4.0/?view=street . Future design changes must start from v0.4, retaining native production interface/logo proportions.
