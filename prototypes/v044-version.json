@@ -1,0 +1,62 @@
+{
+  "preview_version": "0.4.4",
+  "base": "preview-v0.4.3",
+  "scope": "grouped-policy-records-larger-ring-campuses",
+  "entry": "greater-taipei-v0.4.4.html",
+  "audit": {
+    "taipei": {
+      "topicsBefore": 17,
+      "topicsAfter": 12,
+      "items": 62,
+      "recordItems": 27,
+      "validCells": 78,
+      "policyCells": 46,
+      "oldPolicyCells": 24,
+      "policyCampusSizes": [
+        6,
+        3,
+        6,
+        6,
+        2,
+        4,
+        3,
+        2,
+        2,
+        4,
+        2,
+        6
+      ],
+      "ordinaryParcels": 2,
+      "amenityParcels": 16,
+      "maxAngularGapDegrees": 80.13643143527979,
+      "roadComponents": 1,
+      "prunedRoads": 8
+    },
+    "newtaipei": {
+      "topicsBefore": 9,
+      "topicsAfter": 9,
+      "items": 56,
+      "recordItems": 0,
+      "validCells": 61,
+      "policyCells": 38,
+      "oldPolicyCells": 15,
+      "policyCampusSizes": [
+        4,
+        3,
+        3,
+        2,
+        8,
+        6,
+        3,
+        6,
+        3
+      ],
+      "ordinaryParcels": 0,
+      "amenityParcels": 8,
+      "maxAngularGapDegrees": 86.01760015811705,
+      "roadComponents": 1,
+      "prunedRoads": 7
+    }
+  },
+  "status": "review-only"
+}

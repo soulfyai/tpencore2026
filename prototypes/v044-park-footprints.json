@@ -1,0 +1,77 @@
+{
+  "taipei": [
+    {
+      "id": "lake-0",
+      "cells": [
+        "taipei:-6:-3",
+        "taipei:-6:-2",
+        "taipei:-5:-3",
+        "taipei:-5:-2"
+      ],
+      "seed": 3461639190
+    },
+    {
+      "id": "lake-1",
+      "cells": [
+        "taipei:-7:4",
+        "taipei:-7:5"
+      ],
+      "seed": 3478416809
+    },
+    {
+      "id": "lake-2",
+      "cells": [
+        "taipei:0:0",
+        "taipei:1:0"
+      ],
+      "seed": 3428083952
+    },
+    {
+      "id": "lake-3",
+      "cells": [
+        "taipei:1:9",
+        "taipei:1:10"
+      ],
+      "seed": 3444861571
+    }
+  ],
+  "newtaipei": [
+    {
+      "id": "lake-0",
+      "cells": [
+        "newtaipei:-5:-2"
+      ],
+      "seed": 3461639190
+    },
+    {
+      "id": "lake-1",
+      "cells": [
+        "newtaipei:-4:3",
+        "newtaipei:-4:4",
+        "newtaipei:-3:3",
+        "newtaipei:-3:4"
+      ],
+      "seed": 3478416809
+    },
+    {
+      "id": "lake-2",
+      "cells": [
+        "newtaipei:0:-1",
+        "newtaipei:0:0",
+        "newtaipei:1:-1",
+        "newtaipei:1:0"
+      ],
+      "seed": 3428083952
+    },
+    {
+      "id": "lake-3",
+      "cells": [
+        "newtaipei:-3:6",
+        "newtaipei:-3:7",
+        "newtaipei:-2:6",
+        "newtaipei:-2:7"
+      ],
+      "seed": 3444861571
+    }
+  ]
+}
