@@ -3,6 +3,7 @@ import {loadReviewAircraft} from './review-models.js?rev=1';
 const V=(x,y,z)=>new THREE.Vector3(x,y,z);
 const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
 export function deckHeight(b,f){return .018+(b.deck-.018)*smooth(Math.min(f,1-f)*b.length/b.ramp);}
+export function deckWidth(b,f){return .34+(b.width-.34)*smooth(Math.min(f,1-f)*b.length/1.3);}
 export function routePoint(r,a){return [0,1].map(i=>r.center[i]+r.tangent[i]*Math.cos(a)*r.length+r.out[i]*Math.sin(a)*.45);}
 export async function buildTransportNetwork(scene,cities,plan,ships,random,waterY){
  const root=new THREE.Group();root.name='reviewed-bridges-and-traffic-v046';scene.add(root);
@@ -14,10 +15,10 @@ export async function buildTransportNetwork(scene,cities,plan,ships,random,water
  const carArt=cities.get('taipei').art;
  for(const b of plan.bridges){const g=new THREE.Group();g.name=b.name;root.add(g);const ux=(b.b[0]-b.a[0])/b.length,uz=(b.b[1]-b.a[1])/b.length,nx=-uz,nz=ux;
   const at=(f,y=deckHeight(b,f),side=0)=>V(b.a[0]+ux*b.length*f+nx*side,y,b.a[1]+uz*b.length*f+nz*side);
-  const N=Math.ceil(b.length/.2),pos=[],idx=[];const width=f=>.34+(b.width-.34)*smooth(Math.min(f,1-f)*b.length/1.3);
+  const N=Math.ceil(b.length/.2),pos=[],idx=[];const width=f=>deckWidth(b,f);
   for(let k=0;k<=N;k++){const f=k/N,w=width(f)/2;for(const y of [deckHeight(b,f),deckHeight(b,f)-.10])for(const side of [-w,w])pos.push(...at(f,y,side).toArray());if(k<N){const i=k*4;idx.push(i,i+4,i+1,i+1,i+4,i+5,i+2,i+3,i+6,i+3,i+7,i+6,i,i+2,i+4,i+2,i+6,i+4,i+1,i+5,i+3,i+3,i+5,i+7);}}
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setIndex(idx);geo.computeVertexNormals();const deck=new THREE.Mesh(geo,mat('#657176'));deck.receiveShadow=deck.castShadow=true;g.add(deck);
-  for(const side of [-1,1]){const pts=Array.from({length:N+1},(_,k)=>{const f=k/N;return at(f,deckHeight(b,f)+.12,side*(width(f)/2-.025));});tube(g,'#dddcc9',pts,.018);for(let k=0;k<=N;k+=5){const f=k/N;rod(g,'#bec8c3',at(f,deckHeight(b,f)+.015,side*width(f)/2),at(f,deckHeight(b,f)+.12,side*width(f)/2),.009);}}
+  for(const side of [-1,1]){const pts=Array.from({length:N+1},(_,k)=>{const f=k/N;return at(f,deckHeight(b,f)+.12,side*width(f)/2);});tube(g,'#dddcc9',pts,.018);for(let k=0;k<=N;k+=5){const f=k/N;rod(g,'#bec8c3',at(f,deckHeight(b,f)+.015,side*width(f)/2),at(f,deckHeight(b,f)+.12,side*width(f)/2),.009);}}
   for(let k=1;k<N;k+=3){const f=k/N,p=at(f,deckHeight(b,f)+.012);box(g,'#efe5c5',p.x,p.y,p.z,.018,.009,.19,Math.atan2(ux,uz));}
   for(let k=1;k<10;k++){const f=k/10,side=k%2?-.27:.27,p=at(f,deckHeight(b,f),side);rod(g,'#657772',p,p.clone().add(V(0,.42,0)),.014);const light=new THREE.Mesh(new THREE.SphereGeometry(.035,8,6),mat('#e7ce96',true));light.position.copy(p).y+=.43;g.add(light);}
   const supports=[];
@@ -45,7 +46,7 @@ export async function buildTransportNetwork(scene,cities,plan,ships,random,water
  function update(dt=0,time=0,moving=false){if(moving)clock+=Math.max(0,Math.min(.1,dt));
   for(const v of vessels){const a=v.phase+clock*v.speed,p=routePoint(v,a),dx=-v.tangent[0]*Math.sin(a)*v.length+v.out[0]*Math.cos(a)*.45,dz=-v.tangent[1]*Math.sin(a)*v.length+v.out[1]*Math.cos(a)*.45;v.root.position.set(p[0],waterY-.04+(moving?Math.sin(clock*1.3+v.phase)*.012:0),p[1]);v.root.rotation.set(moving?Math.sin(clock+v.phase)*.012:0,Math.atan2(dx,dz),0);v.wake.visible=moving;}
   for(const p of planes){const a=p.phase+clock*p.speed;p.root.position.set(p.cx+Math.cos(a)*p.rx,p.height,p.cz+Math.sin(a)*p.rz);p.root.rotation.set(0,Math.atan2(-Math.sin(a)*p.rx,Math.cos(a)*p.rz),-.025*Math.sin(a));}
-  for(const c of cars){const f=((c.phase+clock*.013*c.dir)%1+1)%1,p=c.at(f,deckHeight(c.bridge,f)+.025,c.dir*.105);c.root.position.copy(p);c.root.rotation.y=Math.atan2(c.bridge.b[0]-c.bridge.a[0],c.bridge.b[1]-c.bridge.a[1])+(c.dir<0?Math.PI:0);const f2=Math.min(1,Math.max(0,f+.002*c.dir));c.root.rotation.x=-Math.atan2(deckHeight(c.bridge,f2)-deckHeight(c.bridge,f),Math.abs(f2-f)*c.bridge.length);}
+  for(const c of cars){const f=((c.phase+clock*.013*c.dir)%1+1)%1,p=c.at(f,deckHeight(c.bridge,f)+.025,c.dir*Math.min(.105,deckWidth(c.bridge,f)/2-.094));c.root.position.copy(p);c.root.rotation.y=Math.atan2(c.bridge.b[0]-c.bridge.a[0],c.bridge.b[1]-c.bridge.a[1])+(c.dir<0?Math.PI:0);const f2=Math.min(1,Math.max(0,f+.002*c.dir));c.root.rotation.x=-Math.atan2(deckHeight(c.bridge,f2)-deckHeight(c.bridge,f),Math.abs(f2-f)*c.bridge.length);}
  }
  function frame(camera,id=null){const selected=bridges.filter(b=>!id||b.id===id),box=new THREE.Box3();for(const b of selected){box.expandByPoint(V(b.a[0],waterY,b.a[1]));box.expandByPoint(V(b.b[0],b.top,b.b[1]));}const target=box.getCenter(new THREE.Vector3());target.y=.7;const corners=[];for(const x of [box.min.x-.3,box.max.x+.3])for(const y of [waterY,box.max.y])for(const z of [box.min.z-.3,box.max.z+.3])corners.push(V(x,y,z));const probe=camera.clone(),dir=V(.6,.9,1).normalize(),size=box.getSize(new THREE.Vector3()).length();const fits=distance=>{probe.position.copy(target).addScaledVector(dir,distance);probe.lookAt(target);probe.updateMatrixWorld(true);return corners.every(p=>{const q=p.clone().project(probe);return q.z>-1&&q.z<1&&Math.abs(q.x)<.82&&Math.abs(q.y)<.74;});};let low=size*.25,high=size*2;while(!fits(high))high*=1.4;for(let i=0;i<35;i++){const mid=(low+high)/2;if(fits(mid))high=mid;else low=mid;}return {target,pos:target.clone().addScaledVector(dir,high*1.015)};}
 
