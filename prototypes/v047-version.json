@@ -1,0 +1,10 @@
+{
+  "preview_version": "0.4.7",
+  "base": "preview-v0.4.6",
+  "scope": "four-bridge-landing-art-and-contact-refinement",
+  "entry": "greater-taipei-v0.4.7.html",
+  "landings": 4,
+  "boats": 24,
+  "aircraft": 8,
+  "status": "review-only"
+}

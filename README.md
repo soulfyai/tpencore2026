@@ -4,6 +4,7 @@
 
 整理台北、新北、基隆、桃園四位國民黨市長參選人的公開政見與任內政績。以 3D 城市探索，也可使用原有 2D 政策地圖與文字面板查閱內容及原始來源。
 
+- [橋梁接岸美術預覽 v0.4.7](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.7.html?view=joint-danjiang-taipei)（四處街口、護欄收頭、橋台及坡道標線修整；[版本說明](docs/BRIDGE_ART_V047.md)；未替換正式網站）
 - [橋梁與海空交通預覽 v0.4.6](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.6.html?view=bridges)（關渡大橋、淡江大橋，24 艘船與 8 架飛機；[版本說明](docs/TRANSPORT_PREVIEW_V046.md)；未替換正式網站）
 - [街區補齊預覽 v0.4.5](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.5.html)（多式樣建築補齊空格、加密植栽、放大屋頂國旗；[版本說明](docs/STREET_INFILL_V045.md)；未替換正式網站）
 - [政策街區預覽 v0.4.4](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.4.html)（同類政策與戰績整併、放大政策設施並環島分散；[版本說明](docs/POLICY_DISTRICTS_V044.md)；待確認，未替換正式網站）
