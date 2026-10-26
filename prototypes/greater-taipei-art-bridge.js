@@ -1,5 +1,5 @@
 /* This file runs in the production module's scope, before its unchanged UI. */
-import {buildApprovedCityArt,buildReviewedBoats} from './greater-taipei-art.js?rev=3';
+import {buildApprovedCityArt,buildReviewedBoats} from './greater-taipei-art.js?rev=4';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
@@ -7,12 +7,12 @@ import {SSAOPass} from 'three/addons/postprocessing/SSAOPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {Sky} from 'three/addons/objects/Sky.js';
 import {installTaipeiSkyClouds,excludeSkyOverlaysFromAO} from './taipei-city-nature.js?rev=1';
-const APPROVED_ART={cities:new Map(),picks:[],boats:[],revision:3,baseY:0};
+const APPROVED_ART={cities:new Map(),picks:[],boats:[],revision:4,baseY:0};
 // Remove the earlier city meshes, retaining environment and all native label/UI anchors.
 const retired=[];
 scene.traverse(o=>{if((o.isMesh||o.isLine||o.isPoints||o.isSprite)&&!ENV.preservedObjects.has(o))retired.push(o);});
 for(const o of retired)o.removeFromParent();
-const inputs=await fetch('./greater-taipei-art-data.json?rev=3',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('City art data unavailable');return r.json();});
+const inputs=await fetch('./greater-taipei-art-data.json?rev=4',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('City art data unavailable');return r.json();});
 for(const input of inputs){
  const city=input.city.city,offset=input.sourceCenter||[0,0],built=await buildApprovedCityArt(input,renderer),S=built.plan.scale;
  // The reviewed road mask/grass shaders use city-local metres. Keep those
@@ -23,6 +23,7 @@ for(const input of inputs){
  const grassCompile=built.art.grass.onBeforeCompile;
  built.art.grass.onBeforeCompile=shader=>{grassCompile(shader);shader.vertexShader=shader.vertexShader.replace('vGround=(modelMatrix*groundPoint).xyz;','vGround=groundPoint.xyz;');};
  built.art.grass.customProgramCacheKey=()=> 'approved-city-local-grass-v3';
+ const scaledMaterials=new Set();built.root.traverse(o=>{if(o.isMesh)for(const m of [o.material].flat()){if(m?.bumpMap&&!scaledMaterials.has(m)){m.bumpScale/=S;scaledMaterials.add(m);}}});
  built.root.name='approved-city-'+city;built.root.scale.setScalar(1/S);built.root.position.set(offset[0],APPROVED_ART.baseY,offset[1]);scene.add(built.root);
  built.root.updateMatrixWorld(true);APPROVED_ART.cities.set(city,built);
  for(const p of built.picks){if(p.userData.theme){p.userData.type='island';p.userData.id=p.userData.theme;APPROVED_ART.picks.push(p);}}
@@ -63,18 +64,28 @@ gl_FragColor=vec4(c,1.0);`);
 nativeSky.material.needsUpdate=true;
 const artWindowMaterials=new Set();
 for(const c of APPROVED_ART.cities.values())c.root.traverse(o=>{if(o.isMesh)for(const m of [o.material].flat()){if(m?.isMeshStandardMaterial&&m.roughness<=.4)artWindowMaterials.add(m);}});
-const artSun=scene.children.find(o=>o.isDirectionalLight&&o.castShadow);if(artSun){artSun.shadow.autoUpdate=false;artSun.shadow.needsUpdate=true;}
-let artNight=-1,artShadowMinute=-1,artShadowTime=0;
+const artSun=scene.children.find(o=>o.isDirectionalLight&&o.castShadow);if(artSun){artSun.shadow.normalBias=.025/14;artSun.shadow.bias=-.00001;artSun.shadow.autoUpdate=false;artSun.shadow.needsUpdate=true;}
+if(artSun){const originalShadowUpdate=artSun.shadow.updateMatrices.bind(artSun.shadow),originalHalf=artSun.shadow.camera.right;
+artSun.shadow.updateMatrices=light=>{originalShadowUpdate(light);const cam=artSun.shadow.camera,center=controls.target.clone().applyMatrix4(cam.matrixWorldInverse),half=Math.max(3.5,Math.min(originalHalf,camera.position.distanceTo(controls.target)*.9));cam.left=center.x-half;cam.right=center.x+half;cam.top=center.y+half;cam.bottom=center.y-half;cam.updateProjectionMatrix();originalShadowUpdate(light);};}
+let artNight=-1,artShadowMinute=-1,artShadowTime=0,artShadowView='';
 function updateArtLight(){const night=ENV.state?.night||0;artSky.visible=night<.55;
 const sourceSun=scene.children.find(o=>o.isDirectionalLight&&o.castShadow);if(sourceSun)artSky.material.uniforms.sunPosition.value.copy(sourceSun.position).sub(sourceSun.target.position);
+const viewKey=[...controls.target.toArray(),camera.position.distanceTo(controls.target)].map(n=>n.toFixed(2)).join('/');if(artSun&&viewKey!==artShadowView){artShadowView=viewKey;artSun.shadow.needsUpdate=true;}
 if(artSun&&ENV.state?.minute!==artShadowMinute){artShadowMinute=ENV.state?.minute;artSun.shadow.needsUpdate=true;}
 if(Math.abs(night-artNight)>.01){artNight=night;for(const m of artWindowMaterials){m.emissive.set('#efd5a0');m.emissiveIntensity=night*.35;}}}
 const artComposer=new EffectComposer(renderer);if(renderer.capabilities.isWebGL2){artComposer.renderTarget1.samples=4;artComposer.renderTarget2.samples=4;}
 artComposer.addPass(new RenderPass(scene,camera));
-const artAO=new SSAOPass(scene,camera,1,1,16);artAO.kernelRadius=.13;artAO.minDistance=.00005;artAO.maxDistance=.008;
+const artAO=new SSAOPass(scene,camera,1,1,16);artAO.kernelRadius=.6/14;artAO.minDistance=.0005;artAO.maxDistance=.025;
 excludeSkyOverlaysFromAO(artAO,scene);artComposer.addPass(artAO);artComposer.addPass(new OutputPass());
 let artWidth=0,artHeight=0;
 APPROVED_ART.render=()=>{const w=stage.clientWidth,h=stage.clientHeight;if(w!==artWidth||h!==artHeight){artWidth=w;artHeight=h;artComposer.setSize(w,h);const aoRatio=renderer.getPixelRatio()*.5;artAO.setSize(Math.ceil(w*aoRatio),Math.ceil(h*aoRatio));}updateArtLight();artSky.position.copy(camera.position);artComposer.render();};
 APPROVED_ART.update=(dt,time,moving)=>{if(moving&&artSun&&time-artShadowTime>.25){artShadowTime=time;artSun.shadow.needsUpdate=true;}for(const c of APPROVED_ART.cities.values()){c.life.setEnabled(moving);c.life.update(dt);if(moving)c.airTraffic?.update(dt);}if(moving)for(const [i,b]of APPROVED_ART.boats.entries()){b.root.position.y=b.base.y+Math.sin(time*.7+i)*.045;b.root.rotation.z=Math.sin(time*.5+i)*.012;}};
 APPROVED_ART.ao=artAO;
+APPROVED_ART.streetFrame=(city='taipei')=>{const c=APPROVED_ART.cities.get(city),S=c.plan.scale,offset=c.root.position;
+const choices=c.streetDetails.sites.filter(s=>s.w>=9&&s.height>=15&&s.height<=25);
+const score=s=>Math.min(...c.ponds.map(p=>Math.hypot(s.x-p.x,s.z-p.z)))+c.landmarks.reduce((n,l)=>n+Math.max(0,l.r+28-Math.hypot(s.x-l.x,s.z-l.z))*4,0);
+choices.sort((a,b)=>score(a)-score(b));const s=choices[0]||c.streetDetails.sites[0];
+const target=new THREE.Vector3(s.x/S+offset.x,7/S,s.z/S+offset.z);
+const delta=new THREE.Vector3(22,20,43).applyAxisAngle(new THREE.Vector3(0,1,0),s.rotation).divideScalar(S).multiplyScalar(Math.max(1,.85/camera.aspect));
+return {target,pos:target.clone().add(delta),parcel:s.parcel};};
 window.APPROVED_ART=APPROVED_ART;

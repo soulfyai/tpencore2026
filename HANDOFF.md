@@ -462,3 +462,10 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - package_site 另發布 greater-taipei-art.js 及 scoped art-data.json，bridge 嵌入獨立 HTML。正式來源／VERSION 及 NAS 首頁不替換。checker 對照原版全部 CSS、Logo picture、1440／400 寬度下 Logo 矩形，及兩市 coast／cells／theme 位置；新版模型不能再斷言等於舊模型 bounds。另檢查美術清單、日夜、兩市政策及桌機手機。
 - 實拍回歸另外發現兩項：main 開頭 buildBatches 會在 bridge 後重新加入舊城市，現於建立後立即撤下；天空改把已審查程序雲函式接入原 ENV dome，避免另建覆蓋層。原生道路材質局部座標已校正。
 - §0.62 的預覽複製原始 build fragment，漏了正式 package 的 document prefix，造成手機缺 viewport、無 charset 主機亂碼。現兩個預覽均加與正式包相同的 doctype/lang/UTF-8/viewport。先前桌機瀏覽器寬度檢查不足以偵測真實手機 layout viewport，此修正也必須檢查 mobile context。擷取時需 gl.finish 與兩個原生 RAF，再從 surface 取得畫面，避免拿到尚未呈現的 canvas；原先 fromSurface=false 有空白假象。
+
+### 0.64 依使用者指定 taipei-detail 街景套用概念與元素
+- 最新明確基準是 taipei-detail.html?view=street&v=1；整合於同一 greater-taipei 預覽，保留正式介面／Logo／比例與原兩市海岸、政策位置。原 detail 樣板與正式站不改。
+- build_approved_city_art 改直接提取 detail 的材質／騎樓／立面／店面函式，使用 composition 的完整背面、托育館與退台辦公樓補充 360°造型。detail-street-elements.js 在既有基地放入長條／多棟／不同朝向街屋，而非僅 8／6 組點綴：臺北43、新北37；高樓保留並加入底層店面。托育、住宅、研發對應細緻模板，保留政策語義及來源。
+- 街屋包圍盒經適配不越原基地，前庭接至人行道（top=.16，低於既有 pavement .18，避免共面重疊）；加桌椅、自行車架、花台、花圃與廊架。森林1883／1180點，另含自然地標植栽；原89人26車／4湖與國旗仍在。
+- 新view=street（可加city=newtaipei）提供近景驗收，主入口仍預設臺北及原使用說明。近景不新增版面控件；手機退後取景。材質bumpScale及shadow normalBias依scale14換算；陰影orthographic範圍跟隨檢視區，不改原日夜演算法。
+- 新check_detail_street_concept.py驗證資料、基地包圍盒、原CSS、政策118項與26主題、原模型已撤下、直接近景與桌機手機實拍。道路530個不重疊表面／256段的原檢查通過。封裝增加detail-street-elements.js，art import升rev4；正式VERSION維持2.0.18，NAS首頁內容保持原hash。

@@ -17,13 +17,27 @@ import {createRegionalLife} from './regional-life.js?rev=1';
 import {createRegionalAircraft} from './review-models.js?rev=1';
 import {createTaipeiRoads} from './taipei-city-roads.js?rev=2';
 import {plantTaipeiForest} from './taipei-city-nature.js?rev=1';
+import {createDetailStreetElements} from './detail-street-elements.js?rev=1';
 import {LANDMARK_BUILD} from './taipei-landmarks.js?rev=1';
 '''
     output=[imports]
     # Use the actual approved facade functions, including rear/side elevations.
-    detail=(P/'taipei-composition.js').read_text()
-    detail=detail[detail.index('const features='):detail.index('// A unified textured ground')]
-    output.append('function createReviewedFacades(art,scene){const {box,ball,line,shape,batch,texture,mat,between,rand}=art;\n'+detail+'\nreturn {apartment,features};}\n')
+    reference=(P/'taipei-detail.js').read_text()
+    composition=(P/'taipei-composition.js').read_text()
+    detail=reference[reference.index('const features='):reference.index('// A unified textured ground')]
+    # Keep the review's exact street materials and facade vocabulary, completing
+    # the rear elevation for a city that users can inspect from all directions.
+    detail=detail.replace('art.reserve(x,z,(rotation?d:w)+3,(rotation?w:d)+5);', 'art.reserve(x,z,Math.abs(Math.cos(rotation))*w+Math.abs(Math.sin(rotation))*d+3,Math.abs(Math.sin(rotation))*w+Math.abs(Math.cos(rotation))*d+5);')
+    rear=composition[composition.index('const rear=new THREE.Group()'):composition.index(' shops.forEach')]
+    detail=detail.replace(' shops.forEach',rear+' shops.forEach')
+    child=composition[composition.index('const childcare=group('):composition.index('// A slim modern office')]
+    child=child.replace('group(-9,-26)','group(0,0)').replace("'臺北・生活托育館'","cityLabel+'・生活托育館'")
+    child=child.replace("paving(-7,-14,17,3);sign('遊戲與散步的日常',-8,1.2,-12.48,5,.6);","")
+    child=child.replace('const playground=group(1,-15);','const playground=new THREE.Group();playground.position.set(10,0,11);childcare.add(playground);')
+    office=composition[composition.index('const office=group('):composition.index('// Recognizable Taipei context')].replace('group(28,-31)','group(0,0)').replace("'臺北・共創'","cityLabel+'・共創'")
+    detail+='\nfunction childcare(){'+child+'\nreturn childcare;}\nfunction office(){'+office+'\nreturn office;}\n'
+
+    output.append('function createReviewedFacades(art,scene,cityLabel){const {box,ball,line,shape,batch,texture,mat,between,rand}=art;\n'+detail+'\nreturn {apartment,features,childcare,office,material,tile,pavement,asphalt,planter,storefront,roofGarden};}\n')
     for city,source,plan_func in [('Taipei','taipei-city.js','createTaipeiCityPlan'),('NewTaipei','regional-city.js','createRegionalCityPlan')]:
         s=(P/source).read_text()
         body=s[s.index('const art=createStreetArt'):s.index('const cluster=ordinary')]
@@ -35,17 +49,16 @@ import {LANDMARK_BUILD} from './taipei-landmarks.js?rev=1';
         body=body[:start]+body[end:]
         body=body.replace('installTaipeiSkyClouds(sky);','')
         # Add details to existing urban parcels, keeping their footprints and roads.
-        body=body.replace('const ordinary=plan.parcels', 'const reviewedFacades=createReviewedFacades(art,scene);\nconst ordinary=plan.parcels')
+        body=body.replace('const SCALE=plan.scale,coast=plan.coast;', 'const reviewedFacades=createReviewedFacades(art,scene,data.city.cityName),streetDetails=createDetailStreetElements(art,scene,reviewedFacades);\nart.pavement=reviewedFacades.pavement;art.asphalt=reviewedFacades.asphalt;art.grass.color.set("#d4dfb5");\nconst SCALE=plan.scale,coast=plan.coast;')
+        body=body.replace('cityKit.policy(p);', 'if(!streetDetails.policy(p))cityKit.policy(p);')
         old='else cityKit.urban(p);'
         assert old in body
-        body=body.replace(old,'''else if(p.seed%3===0){const w=Math.min(14,p.usableW-6),d=Math.min(11,p.usableD-8),floors=3+p.seed%5;
-const rotation=p.seed%2?Math.PI:0;reviewedFacades.apartment({name:'湖岸生活街宅',x:p.x,z:p.z,w,d,floors,tone:['#d8ae8b','#b2c4ac','#dbcdb1','#bf8a70'][p.seed%4],rotation,shops:[['街角書屋','#527e7c'],['日常咖啡','#ae6d4e']]});
-p.height=3.45+floors*2.65;buildDetailRecords.push({x:p.x,z:p.z,w,d,height:p.height,style:'reviewed-arcade'});
-}else cityKit.urban(p);''')
-        body=body.replace('const reviewedFacades=', 'const buildDetailRecords=[];const reviewedFacades=')
+        body=body.replace(old,'else streetDetails.urban(p);')
+        body=body.replace('if(index>=0)cityKit.highrise(p,highKinds[index]);','if(index>=0){cityKit.highrise(p,highKinds[index]);streetDetails.highriseFront(p);}')
+        body=body.replace('const forestStats=plantTaipeiForest(art,coast);','streetDetails.parks(ponds);\nconst forestStats=plantTaipeiForest(art,coast);')
         # Descriptor includes the added detailed homes, without altering original builders.
-        body=body.replace('const buildings=cityKit.records;', 'const buildings=[...cityKit.records,...buildDetailRecords];')
-        output.append(f'async function build{city}(data,renderer){{\nconst scene=new THREE.Group(),plan={plan_func}(data),ponds=planTaipeiWater(plan);\nconst cityId=data.city.city,cityConfig=REGIONAL_CITIES[cityId];\n'+body+'\nreturn {root:scene,art,plan,ponds,themeMeta,buildings,landmarks,life,forestStats,geometryStats,flag,tallest,roadSurface,picks:cityKit.picks,facadeDetails:reviewedFacades.features,...(typeof airTraffic!=="undefined"?{airTraffic}:{})};\n}\n')
+        body=body.replace('const buildings=cityKit.records;', 'const buildings=[...cityKit.records,...streetDetails.records];')
+        output.append(f'async function build{city}(data,renderer){{\nconst scene=new THREE.Group(),plan={plan_func}(data),ponds=planTaipeiWater(plan);\nconst cityId=data.city.city,cityConfig=REGIONAL_CITIES[cityId];\n'+body+'\nreturn {root:scene,art,plan,ponds,themeMeta,buildings,landmarks,life,forestStats,geometryStats,flag,tallest,roadSurface,picks:[...cityKit.picks,...streetDetails.picks],streetDetails,facadeDetails:reviewedFacades.features,...(typeof airTraffic!=="undefined"?{airTraffic}:{})};\n}\n')
     # Reuse the approved passenger/sailing-boat geometry independently of its old island.
     output.append('''export async function buildApprovedCityArt(data,renderer){return data.city.city==='taipei'?buildTaipei(data,renderer):buildNewTaipei(data,renderer);}
 ''')

@@ -123,6 +123,7 @@ def build():
         path = stage / '3d/ui.js'
         text = path.read_text().replace('new URL("site-config.json",location.href)', 'new URL("greater-taipei-config.json",location.href)')
         text = text.replace('intro.querySelector(".hi-ghost").onclick = () => setMode("pano");', 'intro.querySelector(".hi-ghost").onclick = () => {setMode("pano");MAP3D.home();};')
+        text+='\n{const q=new URLSearchParams(location.search);if(q.get("view")==="street"){const city=q.get("city")==="newtaipei"?"newtaipei":"taipei";UI.dismissOverlays?.();MAP3D.enterCity(city);const f=APPROVED_ART.streetFrame(city);MAP3D.flyTo(f.target,f.pos);}}\n'
         path.write_text(text)
         subprocess.run([sys.executable, str(stage / 'build.py')], cwd=stage, check=True)
         page = (stage / 'index3d.html').read_text()

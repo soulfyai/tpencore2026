@@ -1,6 +1,6 @@
 # 大台北範圍調整預覽
 
-[開啟預覽](https://soulfyai.github.io/tpencore2026/greater-taipei.html?v=2)。此版本沿用正式站的地圖與介面，僅供確認；不替換正式網站，VERSION 維持 2.0.18。
+[開啟預覽](https://soulfyai.github.io/tpencore2026/greater-taipei.html?v=4)。此版本沿用正式站的地圖與介面，僅供確認；不替換正式網站，VERSION 維持 2.0.18。
 
 ## 沿用與調整
 
@@ -35,3 +35,15 @@ python3 tools/check_greater_taipei_mobile.py
 WebGL 檢查直接載入正式 index3d.html 與預覽，比對兩市所有海岸座標、完整街區多邊形／主題指派、主題中心、政策街區指派與主題中心，容差 1e-8；新版模型的高度與包圍盒依新美術更新，不再要求等於舊模型。另比對所有正式 CSS、Logo picture 的完整內容、桌機／手機實際 Logo 矩形均相同；另驗證臺北預設視角、兩市數量、內容範圍、預設說明、主題面板、手機寬度與瀏覽器錯誤。實拍在 out/preserved-*.png。
 
 封裝只發布 greater-taipei.html、greater-taipei-2d.html、greater-taipei-config.json 預覽檔及兩個美術資源檔。NAS 原更新腳本不下載這些獨立入口。正式首頁的內容須與此次更改前保持相同；確認後才能規劃正式替換。
+
+## 指定街景樣板套用（v4）
+
+使用者指定 [taipei-detail.html?view=street&v=1](https://soulfyai.github.io/tpencore2026/taipei-detail.html?view=street&v=1) 作為美術基準。本輪直接重用其磁磚／石材／柏油材質、窗框與陽台花台、騎樓、條紋遮棚、店面、屋頂設備及生活設施語彙；補齊背面立面以支援旋轉。不是移植樣板的獨立版面或另建島嶼。
+
+- 一般街區依實際基地長寬放入不同高度、方向與組合的街屋：臺北 43 組、新北 37 組，保留既有高樓語彙並補上底層店面。新 detail-street-elements.js 負責基地適配及生活設施，build_approved_city_art.py 提取參考模型函式。
+- 托育政策使用三翼庭院、木百葉、雨棚、屋頂花園、斜坡與遊戲區；住宅政策使用高低住宅與騎樓；研發政策使用退台玻璃辦公樓、垂直遮陽、屋頂及裙樓植栽。其他類別沿用已確認的機能設施，政策 ID、內容與原始來源不改。
+- 街屋前庭接到既有人行道，維持不同高度面的所有權，沒有在柏油或標線上再加共面薄片。加入戶外桌椅、自行車架、花台、廊架及花圃；保留兩市各 89 位居民／26 車、4 湖與最高模型國旗。空隙持續密植，森林點數為 1883／1180（另有地標植栽）。
+- 保留正式介面、Logo、尺寸與主入口臺北預設視角。另提供 `greater-taipei.html?view=street&v=4` 直達街景，`city=newtaipei` 可切到新北；手機近景依畫面比例退後取景，不更改介面尺度。
+- 紋理凹凸與接觸陰影按原尺度 14 換算，日夜仍由既有 ENV 決定；近景陰影範圍跟隨鏡頭，讓立面與屋頂細節有足夠陰影解析度。
+
+驗證：`python3 tools/package_site.py` 後執行 `python3 tools/check_detail_street_concept.py`。檢查兩市新街屋／生活設施數量、實際模型包圍盒不超出原基地、政策總數與正式 CSS 保持一致、舊模型不重複加入、街景連結及桌機手機實拍。圖片位於 out/detail-concept-*.png。原道路聯集測試保持通過。

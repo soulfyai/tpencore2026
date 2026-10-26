@@ -11,9 +11,10 @@ import {createRegionalLife} from './regional-life.js?rev=1';
 import {createRegionalAircraft} from './review-models.js?rev=1';
 import {createTaipeiRoads} from './taipei-city-roads.js?rev=2';
 import {plantTaipeiForest} from './taipei-city-nature.js?rev=1';
+import {createDetailStreetElements} from './detail-street-elements.js?rev=1';
 import {LANDMARK_BUILD} from './taipei-landmarks.js?rev=1';
 
-function createReviewedFacades(art,scene){const {box,ball,line,shape,batch,texture,mat,between,rand}=art;
+function createReviewedFacades(art,scene,cityLabel){const {box,ball,line,shape,batch,texture,mat,between,rand}=art;
 const features={buildings:[],trees:0,benches:0,shopfronts:0,people:0,cars:0,flag:false};
 const keep=o=>{o.userData.keepDynamic=true;return o;};
 function group(x,z,rotation=0){const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rotation;scene.add(g);return g;}
@@ -48,7 +49,7 @@ function storefront(g,x,z,w,name,color){features.shopfronts++;box('#e4dbc4',x,1.
  for(const xx of [-w*.38,w*.38])planter(x+xx,.32,z+1.2,.52,.52,g);
  // Display shelves behind the shop glass, with handmade books/bread.
  for(let i=0;i<3;i++){box('#ae8d62',x, .55+i*.5,z-.03,w*.7,.06,.25,g);for(let q=0;q<7;q++)box(['#c38b56','#b9b17e','#b66e51','#799c96'][q%4],x-w*.29+q*w*.095,.7+i*.5,z+.03,w*.055,.22,.12,g);}}
-function apartment({name,x,z,w,d,floors,tone,rotation=0,shops=[]}){const worldW=Math.abs(Math.cos(rotation))*w+Math.abs(Math.sin(rotation))*d,worldD=Math.abs(Math.sin(rotation))*w+Math.abs(Math.cos(rotation))*d;art.reserve(x,z,worldW+3,worldD+5);const g=group(x,z,rotation),wall=material(tone,tile),h=3.45+floors*2.65;features.buildings.push({name,x,z,width:w,depth:d,rotation,height:h,type:'住宅與騎樓',detail:'磁磚立面、退台、陽台花台、屋頂設備、店面騎樓'});
+function apartment({name,x,z,w,d,floors,tone,rotation=0,shops=[]}){art.reserve(x,z,Math.abs(Math.cos(rotation))*w+Math.abs(Math.sin(rotation))*d+3,Math.abs(Math.sin(rotation))*w+Math.abs(Math.cos(rotation))*d+5);const g=group(x,z,rotation),wall=material(tone,tile),h=3.45+floors*2.65;features.buildings.push({name,x,z,height:h,type:'住宅與騎樓',detail:'磁磚立面、退台、陽台花台、屋頂設備、店面騎樓'});
  box(wall,0,h/2+.2,0,w,h,d,g);box('#c4bdab',0,.2,0,w+.6,.4,d+.6,g);
  // Ground floor recessed arcade, columns support the balcony above.
  box('#666b5a',0,1.6,d/2+.04,w-.3,2.8,.08,g);paving(0,d/2+.9,w+1,2.8,.19,g);
@@ -57,19 +58,53 @@ function apartment({name,x,z,w,d,floors,tone,rotation=0,shops=[]}){const worldW=
   for(let j=0;j<cols;j++)windowBay(-w/2+(j+.5)*w/cols,y,d/2+.07,1.55,1.8,g,(j+f)%3!==1);}
  // Both side elevations have actual inset frames, not blank colored blocks.
  for(const side of [-1,1]){const face=new THREE.Group();face.position.x=side*w/2;face.rotation.y=side*Math.PI/2;g.add(face);for(let f=0;f<floors;f++)for(let j=0;j<Math.floor(d/2.8);j++)windowBay(-d/2+(j+.5)*d/Math.floor(d/2.8),4.65+f*2.65,.06,1.4,1.75,face,j%3===0);}
- const rear=new THREE.Group();rear.position.z=-d/2;rear.rotation.y=Math.PI;g.add(rear);
+const rear=new THREE.Group();rear.position.z=-d/2;rear.rotation.y=Math.PI;g.add(rear);
  for(let f=0;f<floors;f++)for(let j=0;j<cols;j++)windowBay(-w/2+(j+.5)*w/cols,4.65+f*2.65,.06,1.5,1.75,rear,false);
  box('#a5ad9b',0,1.5,.08,1.5,2.8,.16,rear);box(darkGlass,0,1.5,.19,1.22,2.5,.06,rear);box('#d7cbb0',0,2.98,.25,2.1,.12,.7,rear);
  shops.forEach((s,i)=>storefront(g,-w/2+(i+.5)*w/shops.length,d/2+.13,w/shops.length-.45,s[0],s[1]));roofGarden(g,w,d,h+.2);return g;}
 
 
-return {apartment,features};}
+function childcare(){const childcare=group(0,0),cw=material('#e7d9b8',tile);features.buildings.push({name:'生活托育館',type:'托育與家庭',x:-9,z:-26,height:9.9,detail:'三翼庭院、木百葉、無障礙入口、遊戲區'});
+box(cw,0,4.2,-3,19,8.1,7,childcare);box(cw,-8,2.7,3,4,5.2,8,childcare);box('#d0b593',7,2.7,2,4.8,5.2,8,childcare);
+for(let f=0;f<3;f++)for(let j=0;j<7;j++)windowBay(-7.8+j*2.6,1.5+f*2.5,.56,1.65,1.7,childcare);
+const childcareRear=new THREE.Group();childcareRear.position.z=-6.5;childcareRear.rotation.y=Math.PI;childcare.add(childcareRear);
+for(let f=0;f<3;f++)for(let j=0;j<7;j++)windowBay(-7.8+j*2.6,1.5+f*2.5,.07,1.65,1.7,childcareRear);
+for(let j=0;j<13;j++)box('#aa8d62',-8.9+j*.37,2.6,7.1,.09,4.3,.25,childcare);
+box('#729b95',0,3.2,4.5,7,.22,5.6,childcare);for(const x of [-3.1,3.1])line('#768982',[x,.2,6.8],[x,3.2,6.8],.055,childcare);
+sign(cityLabel+'・生活托育館',0,3.35,7.34,6.3,.65,'#eee2bd','#457575',childcare);paving(0,3,7.5,8,.18,childcare);roofGarden(childcare,19,7,8.3);
+// Actual ramp and low safety fence.
+const ramp=box(pavement,3,.34,8,2,.2,5,childcare);ramp.rotation.x=-.09;for(const x of [2,4])line('#7d8d7e',[x,.8,10.4],[x,1.25,5.6],.035,childcare);
+for(const x of [-9.8,9.8])for(let z=1;z<8;z+=.4)box('#8a9d85',x,.7,z,.055,1.2,.055,childcare);
+
+const playground=new THREE.Group();playground.position.set(10,0,11);childcare.add(playground);box('#c9a56b',0,.2,0,7,.18,4,playground);for(const x of [-1,1])for(const z of [-.7,.7])box('#ad8e61',x,1,z,.12,2,.12,playground);box('#deb877',0,1.2,0,2.5,.15,2,playground);
+const canopy=shape('cone','#587e7a',0,2.6,0,1.8,1.1,1.8,playground);canopy.rotation.y=Math.PI/4;
+for(let j=0;j<6;j++)box('#cfa257',2-j*.23,.2+j*.17,.8,.5,.08,.4,playground);line('#e1bb63',[0,1.3,1],[1.9,.3,2],.17,playground);
+
+return childcare;}
+function office(){const office=group(0,0);features.buildings.push({name:'退台玻璃辦公樓',x:28,z:-31,height:42,type:'產業與工作',detail:'玻璃帷幕、垂直遮陽、退台植栽、裙樓'});
+box('#d2ccba',0,2.1,0,17,4.1,14,office);box(darkGlass,0,21.9,-1.3,10,35,9,office);box(glass,-4.1,14.8,3,5,21,6,office);
+for(let f=0;f<13;f++){box('#9eafa7',0,4.8+f*2.65,3.28,10.15,.095,.16,office);box('#9eafa7',5.05,4.8+f*2.65,-1.3,.13,.095,9,office);}
+for(let x=-4.5;x<5;x+=.85)box('#c6cbb7',x,22.1,3.38,.07,34.4,.18,office);
+for(let z=-5.5;z<3;z+=.85)box('#c6cbb7',5.13,22.1,z,.17,34.4,.07,office);
+for(let f=0;f<13;f++){box('#9eafa7',0,4.8+f*2.65,-5.88,10.15,.095,.16,office);box('#9eafa7',-5.05,4.8+f*2.65,-1.3,.13,.095,9,office);}
+for(let x=-4.5;x<5;x+=.85)box('#c6cbb7',x,22.1,-5.93,.07,34.4,.18,office);
+for(let z=-5.5;z<3;z+=.85)box('#c6cbb7',-5.13,22.1,z,.17,34.4,.07,office);
+for(let f=0;f<8;f++){box('#b5c1af',-4.1,5+f*2.65,6.08,5,.08,.13,office);box('#b5c1af',-6.67,5+f*2.65,3,.1,.08,6,office);}
+for(let z=.4;z<5.9;z+=.8)box('#b5c1af',-6.7,15,z,.1,20,.045,office);
+roofGarden(office,10,9,39.5);for(let x=-6;x<7;x+=2.5)planter(x,4.45,5.4,2,.75,office);
+sign(cityLabel+'・共創',0,3.5,7.07,6,.7,'#d9d6bd','#3e626b',office);
+
+return office;}
+
+return {apartment,features,childcare,office,material,tile,pavement,asphalt,planter,storefront,roofGarden};}
 
 async function buildTaipei(data,renderer){
 const scene=new THREE.Group(),plan=createTaipeiCityPlan(data),ponds=planTaipeiWater(plan);
 const cityId=data.city.city,cityConfig=REGIONAL_CITIES[cityId];
 const art=createStreetArt(renderer,scene),{box,ball,batch,line,mat,shape,slab,label,rand,between,tree,reserve,clearAt}=art;
 const cityKit=createTaipeiCityKit(art,scene);
+const reviewedFacades=createReviewedFacades(art,scene,data.city.cityName),streetDetails=createDetailStreetElements(art,scene,reviewedFacades);
+art.pavement=reviewedFacades.pavement;art.asphalt=reviewedFacades.asphalt;art.grass.color.set("#d4dfb5");
 const SCALE=plan.scale,coast=plan.coast;
 function pip(x,z,P=coast){let inside=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;}
 function distSeg(x,z,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(x-a[0]-t*dx,z-a[1]-t*dz);}
@@ -104,18 +139,15 @@ for(const l of landmarks){
  if(!l.nature)art.contact(l.x,l.z,l.r*2.7,l.r*2.7,.35);
 }
 for(const {geometry,material,matrices} of landmarkBuckets.values()){const mesh=new THREE.InstancedMesh(geometry,material,matrices.length);matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);}
-for(const p of plan.parcels.filter(p=>p.kind==='policy')){cityKit.policy(p);const t=themeMap.get(p.id);t.height=p.height;t.anchor.copy(p.anchor);t.features=p.features;}
-const buildDetailRecords=[];const reviewedFacades=createReviewedFacades(art,scene);
+for(const p of plan.parcels.filter(p=>p.kind==='policy')){if(!streetDetails.policy(p))cityKit.policy(p);const t=themeMap.get(p.id);t.height=p.height;t.anchor.copy(p.anchor);t.features=p.features;}
 const ordinary=plan.parcels.filter(p=>p.kind==='urban');
 const highCandidates=ordinary.filter(p=>['commercial','technology'].includes(p.zone)).sort((a,b)=>Math.hypot(a.x+40,a.z-10)-Math.hypot(b.x+40,b.z-10)).slice(0,8);
 const highKinds=['curvedGlass','artDeco','twinCylinders','slopedCrown','asymmetricTwins','setbackResidential','mixedUse','bracedSpire'];
-for(const p of ordinary){const index=highCandidates.indexOf(p);if(index>=0)cityKit.highrise(p,highKinds[index]);else if(p.seed%3===0){const w=Math.min(14,p.usableW-6),d=Math.min(11,p.usableD-8),floors=3+p.seed%5;
-const rotation=p.seed%2?Math.PI:0;reviewedFacades.apartment({name:'湖岸生活街宅',x:p.x,z:p.z,w,d,floors,tone:['#d8ae8b','#b2c4ac','#dbcdb1','#bf8a70'][p.seed%4],rotation,shops:[['街角書屋','#527e7c'],['日常咖啡','#ae6d4e']]});
-p.height=3.45+floors*2.65;buildDetailRecords.push({x:p.x,z:p.z,w,d,height:p.height,style:'reviewed-arcade'});
-}else cityKit.urban(p);}
-const buildings=[...cityKit.records,...buildDetailRecords];
+for(const p of ordinary){const index=highCandidates.indexOf(p);if(index>=0){cityKit.highrise(p,highKinds[index]);streetDetails.highriseFront(p);}else streetDetails.urban(p);}
+const buildings=[...cityKit.records,...streetDetails.records];
 // Open lots and land between districts stay green, with deliberate clear lawns and planted groves.
 const xs=coast.map(p=>p[0]),zs=coast.map(p=>p[1]);
+streetDetails.parks(ponds);
 const forestStats=plantTaipeiForest(art,coast);
 // New foliage in the park and mountain landmark grounds is placed at the existing terrain height.
 for(const l of landmarks.filter(l=>['daan','yangming','beitou'].includes(l.id))){
@@ -156,7 +188,7 @@ scene.updateMatrixWorld(true);const shadowGroups=new Map();
 for(const o of [...scene.children]){if(!o.isMesh||o.isInstancedMesh||o.geometry.type!=='PlaneGeometry'||!o.material.isMeshBasicMaterial||!o.material.transparent||o.material.depthWrite||!o.material.map)continue;const key=o.material.map.uuid+'/'+o.material.opacity;if(!shadowGroups.has(key))shadowGroups.set(key,[]);shadowGroups.get(key).push(o);}
 for(const group of shadowGroups.values()){const mesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),group[0].material,group.length);for(let i=0;i<group.length;i++){const o=group[i],p=o.geometry.parameters;mesh.setMatrixAt(i,o.matrixWorld.clone().multiply(new THREE.Matrix4().makeScale(p.width,p.height,1)));o.removeFromParent();o.geometry.dispose();if(i)o.material.dispose();}mesh.castShadow=false;mesh.receiveShadow=false;scene.add(mesh);}
 
-return {root:scene,art,plan,ponds,themeMeta,buildings,landmarks,life,forestStats,geometryStats,flag,tallest,roadSurface,picks:cityKit.picks,facadeDetails:reviewedFacades.features,...(typeof airTraffic!=="undefined"?{airTraffic}:{})};
+return {root:scene,art,plan,ponds,themeMeta,buildings,landmarks,life,forestStats,geometryStats,flag,tallest,roadSurface,picks:[...cityKit.picks,...streetDetails.picks],streetDetails,facadeDetails:reviewedFacades.features,...(typeof airTraffic!=="undefined"?{airTraffic}:{})};
 }
 
 async function buildNewTaipei(data,renderer){
@@ -164,6 +196,8 @@ const scene=new THREE.Group(),plan=createRegionalCityPlan(data),ponds=planTaipei
 const cityId=data.city.city,cityConfig=REGIONAL_CITIES[cityId];
 const art=createStreetArt(renderer,scene),{box,ball,batch,line,mat,shape,slab,label,rand,between,tree,reserve,clearAt}=art;
 const cityKit=createRegionalCityKit(art,scene);
+const reviewedFacades=createReviewedFacades(art,scene,data.city.cityName),streetDetails=createDetailStreetElements(art,scene,reviewedFacades);
+art.pavement=reviewedFacades.pavement;art.asphalt=reviewedFacades.asphalt;art.grass.color.set("#d4dfb5");
 const SCALE=plan.scale,coast=plan.coast;
 function pip(x,z,P=coast){let inside=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])inside=!inside;}return inside;}
 function distSeg(x,z,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz||1)));return Math.hypot(x-a[0]-t*dx,z-a[1]-t*dz);}
@@ -198,18 +232,15 @@ for(const l of landmarks){
  if(!l.nature)art.contact(l.x,l.z,l.r*2.7,l.r*2.7,.35);
 }
 for(const {geometry,material,matrices} of landmarkBuckets.values()){const mesh=new THREE.InstancedMesh(geometry,material,matrices.length);matrices.forEach((m,i)=>mesh.setMatrixAt(i,m));mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);}
-for(const p of plan.parcels.filter(p=>p.kind==='policy')){cityKit.policy(p);const t=themeMap.get(p.id);t.height=p.height;t.anchor.copy(p.anchor);t.features=p.features;}
-const buildDetailRecords=[];const reviewedFacades=createReviewedFacades(art,scene);
+for(const p of plan.parcels.filter(p=>p.kind==='policy')){if(!streetDetails.policy(p))cityKit.policy(p);const t=themeMap.get(p.id);t.height=p.height;t.anchor.copy(p.anchor);t.features=p.features;}
 const ordinary=plan.parcels.filter(p=>p.kind==='urban');
 const highCandidates=ordinary.filter(p=>['commercial','technology'].includes(p.zone)).sort((a,b)=>Math.hypot(a.x+40,a.z-10)-Math.hypot(b.x+40,b.z-10)).slice(0,8);
 const highKinds=['curvedGlass','artDeco','twinCylinders','slopedCrown','asymmetricTwins','setbackResidential','mixedUse','bracedSpire'];
-for(const p of ordinary){const index=highCandidates.indexOf(p);if(index>=0)cityKit.highrise(p,highKinds[index]);else if(p.seed%3===0){const w=Math.min(14,p.usableW-6),d=Math.min(11,p.usableD-8),floors=3+p.seed%5;
-const rotation=p.seed%2?Math.PI:0;reviewedFacades.apartment({name:'湖岸生活街宅',x:p.x,z:p.z,w,d,floors,tone:['#d8ae8b','#b2c4ac','#dbcdb1','#bf8a70'][p.seed%4],rotation,shops:[['街角書屋','#527e7c'],['日常咖啡','#ae6d4e']]});
-p.height=3.45+floors*2.65;buildDetailRecords.push({x:p.x,z:p.z,w,d,height:p.height,style:'reviewed-arcade'});
-}else cityKit.urban(p);}
-const buildings=[...cityKit.records,...buildDetailRecords];
+for(const p of ordinary){const index=highCandidates.indexOf(p);if(index>=0){cityKit.highrise(p,highKinds[index]);streetDetails.highriseFront(p);}else streetDetails.urban(p);}
+const buildings=[...cityKit.records,...streetDetails.records];
 // Open lots and land between districts stay green, with deliberate clear lawns and planted groves.
 const xs=coast.map(p=>p[0]),zs=coast.map(p=>p[1]);
+streetDetails.parks(ponds);
 const forestStats=plantTaipeiForest(art,coast);
 // Finer planting on a subset of open street corners, always respecting the same footprint map.
 for(let i=0;i<1100;i++){
@@ -234,7 +265,7 @@ scene.updateMatrixWorld(true);const shadowGroups=new Map();
 for(const o of [...scene.children]){if(!o.isMesh||o.isInstancedMesh||o.geometry.type!=='PlaneGeometry'||!o.material.isMeshBasicMaterial||!o.material.transparent||o.material.depthWrite||!o.material.map)continue;const key=o.material.map.uuid+'/'+o.material.opacity;if(!shadowGroups.has(key))shadowGroups.set(key,[]);shadowGroups.get(key).push(o);}
 for(const group of shadowGroups.values()){const mesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1),group[0].material,group.length);for(let i=0;i<group.length;i++){const o=group[i],p=o.geometry.parameters;mesh.setMatrixAt(i,o.matrixWorld.clone().multiply(new THREE.Matrix4().makeScale(p.width,p.height,1)));o.removeFromParent();o.geometry.dispose();if(i)o.material.dispose();}mesh.castShadow=false;mesh.receiveShadow=false;scene.add(mesh);}
 
-return {root:scene,art,plan,ponds,themeMeta,buildings,landmarks,life,forestStats,geometryStats,flag,tallest,roadSurface,picks:cityKit.picks,facadeDetails:reviewedFacades.features,...(typeof airTraffic!=="undefined"?{airTraffic}:{})};
+return {root:scene,art,plan,ponds,themeMeta,buildings,landmarks,life,forestStats,geometryStats,flag,tallest,roadSurface,picks:[...cityKit.picks,...streetDetails.picks],streetDetails,facadeDetails:reviewedFacades.features,...(typeof airTraffic!=="undefined"?{airTraffic}:{})};
 }
 
 export async function buildApprovedCityArt(data,renderer){return data.city.city==='taipei'?buildTaipei(data,renderer):buildNewTaipei(data,renderer);}
