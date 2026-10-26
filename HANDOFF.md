@@ -447,3 +447,9 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 政策面板／搜尋／來源／進度／地標、導覽音樂、日／夜／臺灣實際時間、兩市切換、Home、全景及操作停止環繞均可使用。進入預設顯示使用說明，點地圖／Escape關閉。手機只有三線工具圖示、單欄七項原順序。未載入正式計數器、沒有公開計數或新增追蹤。
 - check_greater_taipei.py驗證兩市、118項及來源、文案與保留地名、臺北入口／Home、選單、導覽音樂、時間、搜尋、桌機手機、正式內容不變。out/greater-*.png為實際畫面。共用模型先以局部座標合批再套城市變換，海面只建一次，避免重疊及位移重複。
 - package_site增加五個獨立發布檔；NAS腳本不下載新入口，提供Pages連結。正式VERSION維持2.0.18，正式替換須等待使用者確認。詳docs/GREATER_TAIPEI_PREVIEW.md。
+
+### 0.62 撤回重製城市，改為正式版增量預覽
+- 使用者否決 §0.61 圓形重製地圖，要求優化迭代。該方案已撤回，移除專用 JS／資料／SVG 與匯出器；同一 greater-taipei.html?v=2 改由正式版來源派生。前節的重新建模與功能敘述不再代表現行預覽。
+- build_greater_taipei_preserved.py 僅修改暫存來源：兩市 scope、副標、臺北入口／Home 與必要的雙市相容處理。使用既有快照凍結 coast/cells/themeCells 與世界位置，避免範圍縮減導致重新分配街區。原地標及政策建築模型沿用，原生 UI／互動保留。基隆河／路依最新指示保留。
+- check_greater_taipei_preserved.py 載入正式 index3d.html 與新版，直接逐一比較兩市海岸、所有街區與指派、主題中心、政策建築 bounds、地標位置尺寸，容差 1e-8。另檢查 2 市／26 主題／118 項、預設說明、臺北初始視角、全部主題文案與桌機手機畫面。舊 check_greater_taipei.py 轉為新檢查入口。
+- 原生 2D 頁同樣派生為 greater-taipei-2d.html；預覽配置只關 counter。package_site 現發布三個預覽檔，正式首頁、3d/、data/、template.html、build.py、VERSION 不修改。正式替換仍須等待確認。

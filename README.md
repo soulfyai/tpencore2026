@@ -5,7 +5,7 @@
 整理台北、新北、基隆、桃園四位國民黨市長參選人的公開政見與任內政績。以 3D 城市探索，也可使用原有 2D 政策地圖與文字面板查閱內容及原始來源。
 
 - [正式網站・3D 城市](https://tpencore.tw/)
-- [大台北改版預覽・臺北與新北](https://soulfyai.github.io/tpencore2026/greater-taipei.html?v=1)（新範圍、新招牌與臺北預設入口，待確認後才替換正式站）
+- [大台北改版預覽・臺北與新北](https://soulfyai.github.io/tpencore2026/greater-taipei.html?v=2)（沿用原版輪廓與街區，僅調整雙市範圍、文案及臺北預設視角；待確認）
 - [2D 政策地圖與文字導覽](https://tpencore.tw/2d.html)
 - [提供資料／回報問題](https://github.com/soulfyai/tpencore2026/issues/new/choose)
 - [貢獻指南](CONTRIBUTING.md)
