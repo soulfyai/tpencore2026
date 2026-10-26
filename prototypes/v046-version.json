@@ -1,0 +1,11 @@
+{
+  "preview_version": "0.4.6",
+  "base": "preview-v0.4.5",
+  "scope": "guandu-danjiang-bridges-more-boats-and-planes",
+  "entry": "greater-taipei-v0.4.6.html",
+  "bridges": 2,
+  "boats": 24,
+  "aircraft": 8,
+  "placement": "illustrative-two-island-crossings-not-geographic-survey",
+  "status": "review-only"
+}
