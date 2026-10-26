@@ -24,6 +24,7 @@
 python tools/plan_transport_v046.py    # 重新求解；修改既有布局後才需要
 python tools/build_transport_preview.py
 python tools/check_transport_plan_v046.py
+node tools/check_transport_frames_v046.mjs
 python tools/check_transport_v046.py --no-screenshots
 python tools/package_site.py
 ```
