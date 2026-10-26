@@ -64,3 +64,7 @@ Designed by TPEncore © 2026 · Contact / TPEncore2026@gmail.com
 ### Current review: v0.4.1 architecture diversity
 
 [City street preview](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.1.html?view=street) · [24 building types](https://soulfyai.github.io/tpencore2026/architecture-v041-types.html). Uses the v0.4.0 map, policy campuses, existing towers and native UI; ordinary street buildings use different massings and facade systems. Production and the frozen v0.4.0 preview remain unchanged.
+
+### Mobile opening preview v0.4.2
+
+[Open the city](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.2.html). Portrait phones open on the closer diagonal Taipei city view; Home returns to the same frame. Desktop/landscape, geometry, buildings, UI and frozen earlier previews are retained. `?view=street` is still available for deliberate close-up review.

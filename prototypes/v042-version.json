@@ -1,0 +1,12 @@
+{
+  "preview_version": "0.4.2",
+  "base": "preview-v0.4.1",
+  "scope": "mobile-portrait-taipei-opening-camera",
+  "entry": "greater-taipei-v0.4.2.html",
+  "reference_viewport": [
+    392,
+    697
+  ],
+  "base_entry_sha256": "11d70ef7ce4cb2c37d6f544033a9d39d41c2481779103c14c92393efcea98f57",
+  "status": "review-only"
+}
