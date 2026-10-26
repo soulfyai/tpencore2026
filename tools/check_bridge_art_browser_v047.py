@@ -15,6 +15,7 @@ try:
   browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-webgl','--ignore-gpu-blocklist'])
   page=browser.new_page(viewport={'width':392,'height':697},is_mobile=True,has_touch=True,reduced_motion='reduce');errors=[];page.set_default_timeout(300000)
   page.on('pageerror',lambda e:(errors.append(str(e)),print('ERROR',str(e),flush=True)))
+  page.on('console',lambda m:errors.append(m.text) if m.type=='error' and ('THREE.WebGLProgram' in m.text or 'Shader Error' in m.text) else None)
   page.add_init_script('window.__nativeRAF=requestAnimationFrame.bind(window);requestAnimationFrame=cb=>cb.name==="loop"?0:__nativeRAF(cb);')
   page.route('**/three@0.160.0/**',lambda r:r.fulfill(path=str(R/'node_modules/three'/r.request.url.split('three@0.160.0/')[1]),content_type='application/javascript'))
   page.route('**/fonts.googleapis.com/**',lambda r:r.fulfill(body='',content_type='text/css'))
@@ -52,7 +53,7 @@ try:
     page.evaluate('()=>new Promise(r=>__nativeRAF(()=>__nativeRAF(r)))')
     cap=page.context.new_cdp_session(page).send('Page.captureScreenshot',{'format':'png','fromSurface':True,'captureBeyondViewport':False})
     (R/f'out/v047-{name}.png').write_bytes(base64.b64decode(cap['data']));print('SHOT',name,flush=True)
-   shots=[('danjiang-taipei','shore',392,697),('guandu-newtaipei','top',392,697),('danjiang-newtaipei','city',900,700),('guandu-taipei','shore',900,700)]
+   shots=[('danjiang-taipei','shore',392,697),('guandu-newtaipei','top',392,697),('danjiang-newtaipei','shore',900,700),('guandu-taipei','shore',900,700)]
    for id,angle,w,h in shots:
     page.set_viewport_size({'width':w,'height':h})
     page.evaluate("([id,angle])=>{window.dispatchEvent(new Event('resize'));MAP3D.panorama();const f=APPROVED_ART.transport.jointFrame(CITY3D.camera,id,angle);CITY3D.camera.position.copy(f.pos);CITY3D.controls.target.copy(f.target);CITY3D.controls.update()}",[id,angle])
