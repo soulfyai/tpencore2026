@@ -56,3 +56,7 @@ CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py --check mobile
 即時天氣只顯示於城市資訊，不影響場景。計數器使用 NAS PHP／SQLite，需完成一次性設定；只計頁面載入次數，不使用 Cookie。資料查核日期須人工查核後更新。
 
 Designed by TPEncore © 2026 · Contact / TPEncore2026@gmail.com
+
+### Geographic and architecture preview v0.5.0
+
+[Review v0.5.0](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.5.0.html) · [Street view](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.5.0.html?view=street) · [Technical notes](docs/GEOGRAPHIC_PREVIEW_V05.md). Real relative administrative placement, continuous mainland and structurally diverse buildings; separate from production and frozen v0.4.0.
