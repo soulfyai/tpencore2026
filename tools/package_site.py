@@ -1,5 +1,8 @@
 """Build and stage only public website files for static hosting."""
 import argparse
+import hashlib
+import shutil
+import zipfile
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -33,6 +36,26 @@ def package(output):
                  "skyline-study.html", "skyline-study.js", "urban-buildings.js", "organic-district.js",
                  "street-art-kit.js", "taipei-architecture.js", "taipei-landmarks.js", "taipei-preview-data.json"]:
         (output / name).write_bytes((ROOT / "prototypes" / name).read_bytes())
+    # Versioned previews come from immutable archives, never today's generated files.
+    for archive in sorted((ROOT / "archives").glob("preview-*.zip")):
+        metadata = json.loads(archive.with_suffix(".json").read_text())
+        if hashlib.sha256(archive.read_bytes()).hexdigest() != metadata["archive_sha256"]:
+            raise RuntimeError(f"Preview archive checksum changed: {archive.name}")
+        destination = output / "previews" / archive.stem
+        destination.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(archive) as snapshot:
+            for name in snapshot.namelist():
+                if not (destination / name).resolve().is_relative_to(destination.resolve()):
+                    raise RuntimeError("Unsafe preview archive path")
+            manifest = json.loads(snapshot.read("preview-version.json"))
+            for name, checksum in manifest["files_sha256"].items():
+                if hashlib.sha256(snapshot.read(name)).hexdigest() != checksum:
+                    raise RuntimeError(f"Frozen preview file changed: {name}")
+            snapshot.extractall(destination)
+        shutil.copy2(archive, output / "previews" / archive.name)
+    mockups = ROOT / "docs" / "mockups"
+    if mockups.exists():
+        shutil.copytree(mockups, output / "mockups", dirs_exist_ok=True)
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     version = {"version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
                "commit": commit, "built_at": datetime.now(timezone.utc).isoformat()}

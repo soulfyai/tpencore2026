@@ -469,3 +469,9 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - 街屋包圍盒經適配不越原基地，前庭接至人行道（top=.16，低於既有 pavement .18，避免共面重疊）；加桌椅、自行車架、花台、花圃與廊架。森林1883／1180點，另含自然地標植栽；原89人26車／4湖與國旗仍在。
 - 新view=street（可加city=newtaipei）提供近景驗收，主入口仍預設臺北及原使用說明。近景不新增版面控件；手機退後取景。材質bumpScale及shadow normalBias依scale14換算；陰影orthographic範圍跟隨檢視區，不改原日夜演算法。
 - 新check_detail_street_concept.py驗證資料、基地包圍盒、原CSS、政策118項與26主題、原模型已撤下、直接近景與桌機手機實拍。道路530個不重疊表面／256段的原檢查通過。封裝增加detail-street-elements.js，art import升rev4；正式VERSION維持2.0.18，NAS首頁內容保持原hash。
+
+### 0.65 封存預覽 v0.4.0，行政區關係僅出示意圖
+- 使用者要求先標記目前預覽以便回溯，再嘗試 Google Maps 般的真實行政區相對位置；本輪只產圖，不實作新地理場景。Git annotated tag preview-v0.4.0 固定於 de9bab2，正式 VERSION 仍2.0.18。
+- archives/preview-v0.4.0.zip 固定保存當前完整公開執行資源與逐檔manifest，封存頁僅加版本title/meta；index alias直接開雙市預覽。package_site校驗ZIP及逐檔hash後解至 /previews/preview-v0.4.0/，並發布ZIP下載，不從之後的根目錄模組重建舊版。禁止覆寫舊封存或移動既有tag，未來另開新版本。
+- docs/mockups行政區底圖由現有geo.json同一經緯度投影繪製，維持臺北內側、新北環繞與板橋西南／淡水西北／新店南／汐止東的關係。生成概念圖參考此底圖與指定detail街景，沒有修改Logo／UI／現行兩島預覽。Google Maps 未直接擷取；生成建築與河線只作風格／配置示意。
+- 真正實作若獲確認，應直接用行政區共同座標與新北內環，不能依生成圖再任意重畫地形。當前預覽HTML及正式首頁保持原hash。詳docs/PREVIEW_VERSIONS.md。
