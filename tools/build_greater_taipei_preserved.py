@@ -7,9 +7,14 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from build_approved_city_art import build as build_art
 
 ROOT = Path(__file__).resolve().parents[1]
 KEEP = {'taipei', 'newtaipei'}
+# Match the actual production package, including mobile layout and decoding.
+DOCUMENT_PREFIX = ('<!doctype html>\n<html lang="zh-Hant">\n'
+                   '<meta charset="utf-8">\n'
+                   '<meta name="viewport" content="width=device-width, initial-scale=1">\n')
 OUTSIDE = re.compile(r'桃園|基隆(?!河|路)|北北基桃')
 
 
@@ -29,6 +34,12 @@ def replace(text, old, new):
 
 
 def build():
+    build_art()
+    art_data=[]
+    for city in ["taipei","newtaipei"]:
+        source=json.loads((ROOT/f"prototypes/{city}-preview-data.json").read_text())
+        art_data.append(scope(source))
+    (ROOT/"prototypes/greater-taipei-art-data.json").write_text(json.dumps(art_data,ensure_ascii=False,separators=(",",":")))
     frozen = {}
     for city in ['taipei', 'newtaipei']:
         snap = json.loads((ROOT / f'prototypes/{city}-preview-data.json').read_text())
@@ -68,6 +79,11 @@ def build():
             path.write_text(json.dumps(raw, ensure_ascii=False))
         path = stage / 'build.py'
         path.write_text(replace(path.read_text(), 'CITIES = ["taipei", "newtaipei", "keelung", "taoyuan"]', 'CITIES = ["taipei", "newtaipei"]'))
+        build_text=path.read_text().replace('"flags.js", "main.js"','"flags.js", "approved-art.js", "main.js"')
+        path.write_text(build_text)
+        (stage/'3d/approved-art.js').write_text((ROOT/'prototypes/greater-taipei-art-bridge.js').read_text())
+        env=stage/'3d/env.js'
+        env.write_text('const beforeArtEnv=new Set();scene.traverse(o=>beforeArtEnv.add(o));\n'+env.read_text().replace('ENV.cullClouds = (cam) => { clouds.visible = cam.position.distanceTo(controls.target) > 12; };','ENV.cullClouds = () => { clouds.visible=false; };')+'\nENV.preservedObjects=new Set();scene.traverse(o=>{if(!beforeArtEnv.has(o))ENV.preservedObjects.add(o);});\n')
         path = stage / '3d/core.js'
         text = path.read_text().replace('new Set(["taipei", "newtaipei", "keelung", "taoyuan"])', 'new Set(["taipei", "newtaipei"])')
         text = text.replace('for (const c of ["newtaipei", "keelung", "taoyuan"])', 'for (const c of ["newtaipei"])')
@@ -98,33 +114,28 @@ def build():
         text = path.read_text()
         text = replace(text, 'function home() { if (entered) enterCity(entered); else panorama(); }', 'function home() { enterCity("taipei"); }')
         text = replace(text, '{ const o = overview(); controls.maxDistance = o.dist; ENV.fit?.(o.dist); camera.position.copy(o.pos); controls.target.copy(o.target); controls.update(); stage.classList.add("pano"); }', '{ const o=overview(),f=cityFrame("taipei");controls.maxDistance=o.dist;ENV.fit?.(o.dist);entered="taipei";camera.position.copy(f.pos);controls.target.copy(f.target);controls.update();stage.classList.remove("pano"); }')
+        text=replace(text,'buildBatches();','buildBatches();for(const mesh of batches.values())mesh.removeFromParent();')
+        text=text.replace('const pickables = () => [...batches.values(), ...[...WORLD.bodies.values()].flatMap((b) => [b.top, b.cliff]), ...flowViews.filter((v) => v.tube.visible).map((v) => v.tube)];','const pickables = () => [...APPROVED_ART.picks,...flowViews.filter(v=>v.tube.visible).map(v=>v.tube)];')
+        text=text.replace('isl.liftTo = sel ? 0.14 : 0;', 'isl.liftTo = 0;')
+        text=text.replace('PEOPLE.update(dt, clock, moving);','APPROVED_ART.update(dt,clock,moving);')
+        text=text.replace('renderer.render(scene, camera);', 'APPROVED_ART.render();')
         path.write_text(text)
         path = stage / '3d/ui.js'
         text = path.read_text().replace('new URL("site-config.json",location.href)', 'new URL("greater-taipei-config.json",location.href)')
         text = text.replace('intro.querySelector(".hi-ghost").onclick = () => setMode("pano");', 'intro.querySelector(".hi-ghost").onclick = () => {setMode("pano");MAP3D.home();};')
-        text = text.replace('</picture><span class="hi-brand-copy">', '</picture><span class="preserved-tagline" aria-hidden="true">一起打造你我的大台北</span><span class="hi-brand-copy">')
         path.write_text(text)
         subprocess.run([sys.executable, str(stage / 'build.py')], cwd=stage, check=True)
         page = (stage / 'index3d.html').read_text()
         page = page.replace('北北基桃', '大台北').replace('台北、新北、基隆、桃園', '台北、新北').replace('四座城市島', '兩座城市島').replace('四位候選人', '兩位參選人').replace('四位參選人', '兩位參選人').replace('四位直轄市與基隆市長參選人', '兩位市長參選人')
         page = page.replace('./2d.html', './greater-taipei-2d.html')
         page = page.replace('<meta name="description"', '<meta name="robots" content="noindex,nofollow"><meta name="description"', 1)
-        page = re.sub(r'(<div class="loading-brand">.*?</picture>)(</div>)', r'\1<span class="preserved-tagline" aria-hidden="true">一起打造你我的大台北</span>\2', page, count=1, flags=re.S)
-        # Product text layer over the original sign: keep the original skyline,
-        # title, frame and glow assets; do not generate replacement artwork.
-        css = '''
-.hi-brandbtn,.loading-brand{position:relative;container-type:inline-size}
-.preserved-tagline{position:absolute;left:48.7%;top:61.5%;width:42.3%;height:21%;display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:5px;background:linear-gradient(#001429,#00152e);color:#ffe6ac;font:800 3.05cqw/1.2 "Noto Sans TC",sans-serif;letter-spacing:.15cqw;text-shadow:0 0 2px #fff6cb,0 0 7px #ffbf58;pointer-events:none;white-space:nowrap}
-@media(max-width:860px){.preserved-tagline{left:14%;top:75%;width:73%;height:12%;font-size:5cqw;letter-spacing:.55cqw}}
-.preserved-preview{position:fixed;bottom:45px;left:12px;z-index:30;font-size:10px;color:#dce8f1;background:#14243ac9;border-radius:5px;padding:5px 9px;pointer-events:none}
-'''
-        page = page.replace('</style>', css + '</style>', 1)
-        page += '<div class="preserved-preview">大台北範圍調整預覽・沿用原版地圖・尚未替換正式網站</div>'
-        (ROOT / 'prototypes/greater-taipei.html').write_text(page)
+        # Preserve the production CSS, picture sources, image sizes and markup exactly.
+        # Scope changes affect accessible text; the existing raster logo stays untouched.
+        (ROOT / 'prototypes/greater-taipei.html').write_text(DOCUMENT_PREFIX+page+'\n</html>\n')
         text_page=(stage/'index.html').read_text()
         text_page=text_page.replace('北北基桃','大台北').replace('台北、新北、基隆、桃園','台北、新北').replace('四位參選人','兩位參選人').replace('四位直轄市與基隆市長參選人','兩位市長參選人').replace('index3d.html','greater-taipei.html')
         text_page=text_page.replace('<meta name="description"','<meta name="robots" content="noindex,nofollow"><meta name="description"',1)
-        (ROOT/'prototypes/greater-taipei-2d.html').write_text(text_page)
+        (ROOT/'prototypes/greater-taipei-2d.html').write_text(DOCUMENT_PREFIX+text_page+'\n</html>\n')
         config = json.loads((ROOT / 'site-config.json').read_text())
         config['counterEnabled'] = False
         (ROOT / 'prototypes/greater-taipei-config.json').write_text(json.dumps(config, ensure_ascii=False))

@@ -453,3 +453,12 @@ python3 build.py          # 合併 data/ + template.html + 3d/*.js → index.htm
 - build_greater_taipei_preserved.py 僅修改暫存來源：兩市 scope、副標、臺北入口／Home 與必要的雙市相容處理。使用既有快照凍結 coast/cells/themeCells 與世界位置，避免範圍縮減導致重新分配街區。原地標及政策建築模型沿用，原生 UI／互動保留。基隆河／路依最新指示保留。
 - check_greater_taipei_preserved.py 載入正式 index3d.html 與新版，直接逐一比較兩市海岸、所有街區與指派、主題中心、政策建築 bounds、地標位置尺寸，容差 1e-8。另檢查 2 市／26 主題／118 項、預設說明、臺北初始視角、全部主題文案與桌機手機畫面。舊 check_greater_taipei.py 轉為新檢查入口。
 - 原生 2D 頁同樣派生為 greater-taipei-2d.html；預覽配置只關 counter。package_site 現發布三個預覽檔，正式首頁、3d/、data/、template.html、build.py、VERSION 不修改。正式替換仍須等待確認。
+
+### 0.63 正式介面搭配新版美術，撤回舊模型基準
+- 使用者再次指出 §0.62 漏掉已確認的新美術，並確認介面以目前 tpencore.tw 正式站為準；Logo、版面與尺寸比例不變。現在保留原版海岸／政策位置與正式 CSS／Logo picture，移除先前覆蓋副標層及額外預覽橫幅；不以新 UI 或新島型替換。
+- build_approved_city_art.py 提取已審查 taipei-city v3／regional-city 的實際場景建置，重用原有 kit／layout／water／roads／nature／life，不載入樣板介面。另重用 composition v2 的四面立面騎樓模型、屋頂設備、店面與船模；置入既有一般街廓，不移植其另一座概念島。兩市各 4 湖、89 人、26 車；臺北 1907 植栽、新北 1337（另含自然地標植栽），細緻街屋 8／6 組。國旗沿用新版最高模型配置。
+- greater-taipei-art-bridge.js 在正式 main/UI 之前建立場景，從渲染樹撤下舊城市網格，保留原生標牌／列表／政策面板／音樂／日夜／手勢。原 scale=14 轉回原世界位置，海岸陸面基準 y=0，銜接原海面；road/grass shader 以局部座標採樣避免縮尺後標線錯位。新 policy picks 接回原 A.openTheme；政策 box／anchor 改依新建物，舊位置仍保留。
+- 新材質反射、接觸陰影與無貼片框背景雲；AO 使用半解析度、16 sample，顏色維持完整解析度；靜態陰影快取，動態最多每秒 4 次，日夜改變重算。原站的所有 CSS、Logo 圖檔／picture 尺寸不改；既有招牌圖片內原副標依最新「Logo 不變」要求保留，頁面文字使用大台北。
+- package_site 另發布 greater-taipei-art.js 及 scoped art-data.json，bridge 嵌入獨立 HTML。正式來源／VERSION 及 NAS 首頁不替換。checker 對照原版全部 CSS、Logo picture、1440／400 寬度下 Logo 矩形，及兩市 coast／cells／theme 位置；新版模型不能再斷言等於舊模型 bounds。另檢查美術清單、日夜、兩市政策及桌機手機。
+- 實拍回歸另外發現兩項：main 開頭 buildBatches 會在 bridge 後重新加入舊城市，現於建立後立即撤下；天空改把已審查程序雲函式接入原 ENV dome，避免另建覆蓋層。原生道路材質局部座標已校正。
+- §0.62 的預覽複製原始 build fragment，漏了正式 package 的 document prefix，造成手機缺 viewport、無 charset 主機亂碼。現兩個預覽均加與正式包相同的 doctype/lang/UTF-8/viewport。先前桌機瀏覽器寬度檢查不足以偵測真實手機 layout viewport，此修正也必須檢查 mobile context。擷取時需 gl.finish 與兩個原生 RAF，再從 surface 取得畫面，避免拿到尚未呈現的 canvas；原先 fromSurface=false 有空白假象。
