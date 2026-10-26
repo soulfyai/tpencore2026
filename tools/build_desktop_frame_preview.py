@@ -7,7 +7,7 @@ frame='''function desktopReferencePanorama(){
  const points=[],box=new THREE.Box3();
  for(const id of ['taipei','newtaipei'])for(const [x,z] of WORLD.cities.get(id).coast){const p=new THREE.Vector3(x,0,z);points.push(p);box.expandByPoint(p);}
  const target=box.getCenter(new THREE.Vector3());target.y=.3;
- const direction=new THREE.Vector3(1,.75,.15).normalize(),probe=camera.clone();
+ const direction=new THREE.Vector3(-1,.55,-.15).normalize(),probe=camera.clone();
  const fits=d=>{probe.position.copy(target).addScaledVector(direction,d);probe.lookAt(target);probe.updateMatrixWorld(true);return points.every(p=>{const q=p.clone().project(probe);return Math.abs(q.x)<.79&&q.y>-.72&&q.y<.48&&q.z<1;});};
  let lo=1,hi=box.getSize(new THREE.Vector3()).length()*3;
  for(let i=0;i<40;i++){const mid=(lo+hi)/2;if(fits(mid))hi=mid;else lo=mid;}
