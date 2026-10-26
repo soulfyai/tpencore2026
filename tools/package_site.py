@@ -23,7 +23,7 @@ def package(output):
         html = (ROOT / source).read_text(encoding="utf-8")
         (output / target).write_text(prefix + html + "\n</html>\n", encoding="utf-8")
     # Standalone art study, deliberately separate from the production city.
-    for name in ["taipei-composition.html", "taipei-composition.js", "taipei-composition-elements.js", "taipei-detail.html", "taipei-detail.js", "street-test.html", "street-test.js", "taipei-preview.html", "taipei-preview.js",
+    for name in ["greater-taipei.html", "greater-taipei.js", "greater-taipei-city.js", "greater-taipei-data.json", "greater-taipei-sign.svg", "taipei-composition.html", "taipei-composition.js", "taipei-composition-elements.js", "taipei-detail.html", "taipei-detail.js", "street-test.html", "street-test.js", "taipei-preview.html", "taipei-preview.js",
                  "taipei-city.html", "taipei-city.js", "taipei-city-layout.js", "taipei-city-kit.js", "taipei-city-water.js", "taipei-city-life.js", "taipei-city-roads.js", "taipei-city-nature.js",
                  "city-review.html", "regional-city.html", "regional-city.js", "regional-config.js", "regional-layout.js", "regional-kit.js", "regional-life.js",
                  "newtaipei-preview-data.json", "keelung-preview-data.json", "taoyuan-preview-data.json", "aircraft-review-data.json", "review-models.js", "model-study.html", "model-study.js",
