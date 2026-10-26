@@ -57,6 +57,10 @@ CHROMIUM_EXECUTABLE=/usr/bin/chromium python3 tools/shot.py --check mobile
 
 Designed by TPEncore © 2026 · Contact / TPEncore2026@gmail.com
 
-### Geographic and architecture preview v0.5.0
+### Archived experiment: geography preview v0.5.0
 
 [Review v0.5.0](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.5.0.html) · [Street view](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.5.0.html?view=street) · [Technical notes](docs/GEOGRAPHIC_PREVIEW_V05.md). Real relative administrative placement, continuous mainland and structurally diverse buildings; separate from production and frozen v0.4.0.
+
+### Current review: v0.4.1 architecture diversity
+
+[City street preview](https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.1.html?view=street) · [24 building types](https://soulfyai.github.io/tpencore2026/architecture-v041-types.html). Uses the v0.4.0 map, policy campuses, existing towers and native UI; ordinary street buildings use different massings and facade systems. Production and the frozen v0.4.0 preview remain unchanged.

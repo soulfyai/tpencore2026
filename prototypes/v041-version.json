@@ -1,0 +1,8 @@
+{
+  "preview_version": "0.4.1",
+  "base": "preview-v0.4.0",
+  "scope": "ordinary-street-architecture-only",
+  "layout_sha256": "ebfa16b497dbd96960f841b5a717679e0c1c9a9e3730a3954228e7007c40b6ce",
+  "entry": "greater-taipei-v0.4.1.html",
+  "status": "review-only"
+}
