@@ -533,3 +533,13 @@ User rejected v0.5.0 and explicitly requested returning to v0.4.0. Resume work f
 - Publication to existing GitHub Pages preview path is already explicitly authorized by user; production tpencore.tw must remain unchanged.
 
 - v0.4.4 published: main/source commit `198a420`, annotated tag `preview-v0.4.4`, Pages run40324461087 success. Live https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.4.html?v=198a420 verified HTTP200 with version0.4.4 and JS assets. Public production index and original greater-taipei hashes unchanged. Static data and actual WebGL tests passed, including full main/amenity bounds. Desktop/mobile captures `out/v044-taipei-default-desktop.png` and `out/v044-taipei-default-mobile.png` visually reviewed. CSS and v042/v043 camera helper source unchanged. Working branch `preview/0.4.4-policy-districts`.
+
+
+## Current review: v0.4.5 filled streets, dense planting and flags
+
+- User screenshot corrections: sparse trees, flags too small, blank street cells must receive varied buildings. Independent preview only; keep v0.4.4 and production. Branch `preview/0.4.5-filled-streets`.
+- New `greater-taipei-v0.4.5.html`, `v045-art.js`, `v045-version.json`; reused unchanged v044 data/config/architecture/life. `tools/build_street_infill_preview.py` clones v044 output and hooks `street-infill-v045.js`, never edits v044. Package builds/inclusions extended.
+- Root issue: v044 planner excluded broad landmark radius squares; TP82/NT24 original street cells were unallocated. Infill now checks actual non-ground landmark part bounds, parks/nature/roads/claimed campuses, then fits varied architecture into remaining block rectangles. Runtime covers all uncovered interior cells with buildings or genuine landmarks/nature; coastal leftover strips receive dense planting. TP36 + NT16 new buildings;52 canonical structures across all24 massing types. Bounds stay inside slots; no policy regroup/content/camera/style changes.
+- Broad landmark tree exclusion replaced by actual solid footprints plus protected natural ground. Dense two-pass planting produces forestStats1960TP/1216NT, plus original nature-landmark trees, versus207/188. Original tree crown/coast/pond/road clearances retained.
+- Flags created in new module:12.6x8.4 (old2.5x1.65), pole15.7 (old3.5),768x512 correct national texture, mild time-controlled wind/night illumination. Remain on actual highest city building. HTML art update invokes flag clock only when motion enabled.
+- `tools/check_street_infill_v045.py` checks runtime counts/diversity/coverage/tree density/flag dimensions/record links/main+amenity+infill bounds; optional actual mobile default/street/NT and desktop screenshots. See docs/STREET_INFILL_V045.md.
