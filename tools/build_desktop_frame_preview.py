@@ -20,6 +20,10 @@ old='{ const o=overview(),f=cityFrame("taipei");controls.maxDistance=o.dist;ENV.
 new='{ const o=overview(),desktop=stage.clientWidth>860,f=desktop?o:cityFrame("taipei");controls.maxDistance=o.dist;ENV.fit?.(o.dist);entered=desktop?null:"taipei";camera.position.copy(f.pos);controls.target.copy(f.target);controls.update();stage.classList.toggle("pano",desktop); }'
 assert old in s
 s=s.replace(old,new,1).replace('content="0.4.7"','content="0.4.8"',1).replace('橋梁接岸美術修整預覽 v0.4.7','桌面全景視角預覽 v0.4.8',1)
+import sys
+sys.path.insert(0,str(R))
+from tools.preview_brand_copy import apply
+s=apply(s)
 (p/'greater-taipei-v0.4.8.html').write_text(s)
 print('Built v0.4.8 desktop reference panorama')
 if __name__=='__main__':pass
