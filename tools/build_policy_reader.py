@@ -26,10 +26,10 @@ def build_reader(city_id=None):
  html=apply(html,two=True)
  if city_id=='taipei':
   import re
-  title='蔣萬安政策與政績整理｜台北安可・政策市'
-  desc='整理蔣萬安在臺北市的交通、住宅都更、育兒托育、教育與長照等政策及任內政績，分別標示內容性質、時程、原始來源與查核日期。'
+  title='蔣萬安政見、政策與政績整理｜台北安可・政策市'
+  desc='整理蔣萬安在臺北市的交通、住宅都更、育兒托育、教育與長照等政見、政策及任內政績，分別標示內容性質、時程、原始來源與查核日期。'
   url='https://tpencore.tw/chiang-wan-an.html'
-  html=html.replace('臺北市與新北市政策、政績整理','蔣萬安政策與政績整理').replace('以臺北市為主，連結新北市，依主題閱讀政策內容、時程及原始來源。',desc).replace('大台北政策清單｜台北安可',title).replace('https://tpencore.tw/2d.html',url)
+  html=html.replace('臺北市與新北市政策、政績整理','蔣萬安政見、政策與政績整理').replace('以臺北市為主，連結新北市，依主題閱讀政策內容、時程及原始來源。',desc).replace('大台北政策清單｜台北安可',title).replace('https://tpencore.tw/2d.html',url)
   html=re.sub(r'(<meta (?:name|property)="(?:description|og:description|twitter:description)" content=")[^"]*',lambda m:m[1]+desc,html)
   def schema(m):
    data=json.loads(m[1])
@@ -38,5 +38,6 @@ def build_reader(city_id=None):
      node['name']=title;node['description']=desc;node['about']=[{'@type':'Person','name':'蔣萬安'},{'@type':'Place','name':'臺北市'}]
    return '<script type="application/ld+json">'+json.dumps(data,ensure_ascii=False)+'</script>'
   html=re.sub(r'<script type="application/ld\+json">(.*?)</script>',schema,html,flags=re.S)
+  html=html.replace('</h1>', '</h1><p>本頁將「政見」與「政策承諾」作為尚待推動的主張整理；任內政績則另外標示。各項是否已完成，仍以列出的來源與進度說明為準。</p>',1)
   html=html.replace('<nav aria-label="政策主題">','<p><a href="/2d.html">閱讀臺北、新北完整政策清單</a></p><nav aria-label="政策主題">')
  return html,count
