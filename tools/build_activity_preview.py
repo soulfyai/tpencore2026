@@ -23,6 +23,15 @@ s=s.replace('</style>','''</style><style>
 .hi-policy-menu button{display:block;width:100%;text-align:left}.hi-data-help{margin:16px 0}.hi-data-help summary{cursor:pointer;font-weight:700}.hi-intro{max-height:calc(100dvh - 48px);overflow:auto}
 @media(max-width:860px){.hi-policy,.hi-clock{width:100%}.hi-policy>button,.hi-clock-trigger{width:100%}.hi-policy-menu{position:static;width:auto;box-shadow:none}.hi-policy-menu .hi-mode-label{display:inline}.hi-policy-menu .hi-mode-short{display:none}}
 </style>''',1)
+# Keep preview sharing metadata aligned with the production identity.
+import re,sys
+sys.path.insert(0,str(R/'tools'))
+from production_metadata import TITLE,DESCRIPTION,IMAGE
+preview_title=TITLE+'｜v0.4.9 預覽'
+s=re.sub(r'<title>.*?</title>','<title>'+preview_title+'</title>',s,count=1)
+for key,value in {'description':DESCRIPTION,'og:site_name':'台北安可','og:title':preview_title,'og:description':DESCRIPTION,'og:url':'https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.9.html','og:image':IMAGE,'og:image:secure_url':IMAGE,'og:image:alt':'大台北雙城互動政策地圖：臺北市、新北市與連接橋梁。','twitter:title':preview_title,'twitter:description':DESCRIPTION,'twitter:image':IMAGE}.items():
+ s=re.sub(r'(<meta (?:name|property)="'+re.escape(key)+r'" content=")[^"]*(">)',lambda m:m[1]+value+m[2],s)
+assert '北北基桃' not in s and '四座 3D' not in s
 (P/'greater-taipei-v0.4.9.html').write_text(s)
 art=(P/'v046-art.js').read_text().replace('v044-taipei-life.js','v049-taipei-life.js').replace('v044-regional-life.js','v049-regional-life.js');(P/'v049-art.js').write_text(art)
 for city in ['taipei','regional']:
