@@ -589,3 +589,6 @@ User approved policy dropdown/help consolidation and Time in top toolbar; no pro
 
 ## v0.4.10 additive remote sea/air lanes
 User explicitly says preserve all existing actors/routes; only add. New remote helper attached to copied v049 transport with independent actors and shared paused clock. Original40 moving vessels+4 static boats and16 flights untouched. Added12 higher-altitude transit aircraft; sea lanes sampled against coast buffers, decorative islets and bridges, oriented toward default-view upper-left/lower-right plus crossing diagonal. Browser verifies original40/16 actors preserved, new12 vessels/12 planes across6 open-water lanes (before final extra bridge clearance filter); no JS exception. Production still v048 promoted2.1.1. New independent preview v0.4.10.
+
+## v0.4.11 cute marine wildlife preview
+Additive stylized oversized dolphins/whales,8 animals on validated open-water lanes, staggered jump/surface/spout cycles, rings and instanced spray. Shared transport clock preserves pause behavior. Ships within5 native units suppress surfacing to avoid intersections. Existing40 moving+4 static ships,16 coastal+12 remote flights,12 remote vessels retained. Node cycle/finite/pause/ship-clearance checks pass. Browser integration confirms8 animals and all prior actor counts. No production promotion; independent v0.4.11.
