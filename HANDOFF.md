@@ -592,3 +592,6 @@ User explicitly says preserve all existing actors/routes; only add. New remote h
 
 ## v0.4.11 cute marine wildlife preview
 Additive stylized oversized dolphins/whales,8 animals on validated open-water lanes, staggered jump/surface/spout cycles, rings and instanced spray. Shared transport clock preserves pause behavior. Ships within5 native units suppress surfacing to avoid intersections. Existing40 moving+4 static ships,16 coastal+12 remote flights,12 remote vessels retained. Node cycle/finite/pause/ship-clearance checks pass. Browser integration confirms8 animals and all prior actor counts. No production promotion; independent v0.4.11.
+
+## v0.4.12 lower-right panorama activity
+User especially wants panorama lower-right filled while retaining existing traffic. Added world-space life patch using ray/sea intersections from approved panorama camera (including mobile panorama function), coast/islet clearance and spaced anchors. At900x600 browser verified8 anchors in x.64–.96,y.53–.90,5 boats and3 planes; original actor counts unchanged. Dedicated remaining anchors for marine wildlife avoid sharing boat centers. New scene activity uses existing transport clock. Ships cruise small open-water loops, aircraft higher crossing loops, marine staggered resurfacing. Independent preview only; production unchanged.
