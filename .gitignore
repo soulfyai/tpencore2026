@@ -8,3 +8,6 @@ __pycache__/
 node_modules/
 out/
 .claude/worktrees/
+
+# Generated local preview copy; canonical models live in assets/.
+/prototypes/assets/art-v030/

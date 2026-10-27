@@ -1,0 +1,12 @@
+{
+  "name": "Taipei 101 art reconstruction",
+  "version": "1.0.0",
+  "author": "TPEncore original procedural asset",
+  "source": "tools/art/build_taipei101.py",
+  "height_metres": 508,
+  "note": "Artistic reconstruction; not a surveyed architectural model. No external purchased model or image used.",
+  "meshes": 20,
+  "vertices": 25656,
+  "faces": 7898,
+  "bytes": 892896
+}
