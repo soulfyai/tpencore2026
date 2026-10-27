@@ -78,6 +78,7 @@ def package(output):
     # A public HTTPS image is required by social crawlers; data URIs do not work.
     # Host on existing Pages so already-installed NAS updaters need no new asset step.
     (output / "social-preview.jpg").write_bytes((ROOT / "assets/social-preview.jpg").read_bytes())
+    (output / "social-preview-v2.1.3.png").write_bytes((ROOT / "assets/social_preview.png").read_bytes())
     (output / "social-preview-v2.1.1.jpg").write_bytes((ROOT / "assets/social-preview.jpg").read_bytes())
     (output / "robots.txt").write_text("User-agent: *\nAllow: /\nSitemap: https://tpencore.tw/sitemap.xml\n")
     (output / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://tpencore.tw/</loc></url><url><loc>https://tpencore.tw/2d.html</loc></url></urlset>')

@@ -29,7 +29,7 @@ sys.path.insert(0,str(R/'tools'))
 from production_metadata import TITLE,DESCRIPTION,IMAGE
 preview_title=TITLE+'｜v0.4.9 預覽'
 s=re.sub(r'<title>.*?</title>','<title>'+preview_title+'</title>',s,count=1)
-for key,value in {'description':DESCRIPTION,'og:site_name':'台北安可','og:title':preview_title,'og:description':DESCRIPTION,'og:url':'https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.9.html','og:image':IMAGE,'og:image:secure_url':IMAGE,'og:image:alt':'大台北雙城互動政策地圖：臺北市、新北市與連接橋梁。','twitter:title':preview_title,'twitter:description':DESCRIPTION,'twitter:image':IMAGE}.items():
+for key,value in {'description':DESCRIPTION,'og:site_name':'台北安可','og:title':preview_title,'og:description':DESCRIPTION,'og:url':'https://soulfyai.github.io/tpencore2026/greater-taipei-v0.4.9.html','og:image':IMAGE,'og:image:secure_url':IMAGE,'og:image:alt':'政策市：不只看選舉，更要看政策。探索城市政策，看見更好的未來。','twitter:title':preview_title,'twitter:description':DESCRIPTION,'twitter:image':IMAGE,'og:image:type':'image/png','og:image:width':'1733','og:image:height':'907'}.items():
  s=re.sub(r'(<meta (?:name|property)="'+re.escape(key)+r'" content=")[^"]*(">)',lambda m:m[1]+value+m[2],s)
 assert '北北基桃' not in s and '四座 3D' not in s
 (P/'greater-taipei-v0.4.9.html').write_text(s)
