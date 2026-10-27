@@ -68,6 +68,13 @@ def package(output):
         shutil.copy2(archive, output / "previews" / archive.name)
     from promote_greater_taipei import promote
     promote(output)
+    from build_policy_reader import build_reader
+    candidate_html,candidate_count=build_reader('taipei')
+    assert candidate_count==62
+    (output / "chiang-wan-an.html").write_text(candidate_html)
+    from candidate_home import integrate
+    candidate_home=integrate((output / "index.html").read_text()).replace('<meta charset="utf-8">','<meta charset="utf-8"><meta name="robots" content="noindex,nofollow">',1)
+    (output / "candidate-home-preview.html").write_text(candidate_home)
     mockups = ROOT / "docs" / "mockups"
     if mockups.exists():
         shutil.copytree(mockups, output / "mockups", dirs_exist_ok=True)
@@ -86,6 +93,10 @@ def package(output):
     with zipfile.ZipFile(output / "tpencore-seo-files.zip", "w", zipfile.ZIP_DEFLATED) as z:
         for name in ["robots.txt", "sitemap.xml", "llms.txt"]:
             z.write(output / name, name)
+    candidate_sitemap=(output / "sitemap.xml").read_text().replace('</urlset>','<url><loc>https://tpencore.tw/chiang-wan-an.html</loc></url></urlset>')
+    with zipfile.ZipFile(output / "tpencore-candidate-page.zip", "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(output / "chiang-wan-an.html", "chiang-wan-an.html")
+        z.writestr('sitemap.xml',candidate_sitemap)
     (output / ".nojekyll").touch()
     (output / "site-config.json").write_text((ROOT / "site-config.json").read_text(encoding="utf-8"), encoding="utf-8")
     (output / "counter.php.txt").write_bytes((ROOT / "deploy/counter.php").read_bytes())
