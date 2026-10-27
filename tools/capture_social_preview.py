@@ -21,12 +21,12 @@ HTMLCanvasElement.prototype.getContext=function(type,options){return original.ca
     pg.route('**/fonts.g*/**',lambda r:r.abort())
     pg.route('**/site-config.json',lambda r:r.fulfill(json={}))
     errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
-    pg.goto(f'http://127.0.0.1:{server.server_port}/index3d.html',wait_until='commit')
+    pg.goto(f'http://127.0.0.1:{server.server_port}/out/site/index.html',wait_until='commit')
     pg.wait_for_function("document.getElementById('stage')?.classList.contains('ready')",timeout=300000,polling=100)
     pg.evaluate("""()=>{CITY3D.ENV.forced={minute:720,w:{code:1,cloud:20,wind:10,temp:27}};document.querySelector('.hi-intro').hidden=true;MAP3D.panorama();CITY3D.snapshot()}""")
     pg.locator('.hi-brandart img').evaluate('(img)=>img.decode()')
     assert pg.locator('#loading').is_hidden()
-    assert pg.locator('button.clabel').count()==4
+    assert pg.locator('button.clabel').count()==2
     pg.screenshot(path=str(ROOT/'assets/social-preview.jpg'),type='jpeg',quality=88,timeout=240000)
     assert not errors,errors
     b.close()
