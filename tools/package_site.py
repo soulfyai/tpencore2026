@@ -62,6 +62,8 @@ def package(output):
                     raise RuntimeError(f"Frozen preview file changed: {name}")
             snapshot.extractall(destination)
         shutil.copy2(archive, output / "previews" / archive.name)
+    from promote_greater_taipei import promote
+    promote(output)
     mockups = ROOT / "docs" / "mockups"
     if mockups.exists():
         shutil.copytree(mockups, output / "mockups", dirs_exist_ok=True)

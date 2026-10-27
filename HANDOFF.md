@@ -579,3 +579,6 @@ User rejected v0.5.0 and explicitly requested returning to v0.4.0. Resume work f
 
 ## v0.4.8 desktop framing
 - User reference: desktop Taipei front-left, New Taipei back-right, both bridges visible. Isolated v048 copies v047 bridge fixes, changes desktop (>860px) opening/Home/panorama only. Direction (1,.75,.15), perspective-fit actual coasts with margins. Phone framing retained. Builder integrated in package; prior pages unchanged. Desktop WebGL loaded without errors; camera position [110.831,75.919,36.718], target [10.006,.3,21.594] at1600x960. Production unchanged.
+
+## Production 2.1.0 — approved v0.4.8 promotion
+User explicitly authorized updating production. tools/promote_greater_taipei.py packages approved v048 as index/index3d, embeds 24 relative JS modules via importmap data URIs and JSON via data URIs, retaining NAS's existing fixed-file sync compatibility. Restores site-config.json for local music/counter preferences, removes noindex and preview title, promotes two-city 2D with home links. Prior v2.0.18 tag is rollback source. Production release verification ongoing.
