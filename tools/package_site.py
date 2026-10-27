@@ -97,6 +97,9 @@ def package(output):
     with zipfile.ZipFile(output / "tpencore-candidate-page.zip", "w", zipfile.ZIP_DEFLATED) as z:
         z.write(output / "chiang-wan-an.html", "chiang-wan-an.html")
         z.writestr('sitemap.xml',candidate_sitemap)
+    with zipfile.ZipFile(output / "tpencore-sync-update.zip", "w", zipfile.ZIP_DEFLATED) as z:
+        z.write(ROOT / "deploy/synology-update.sh", "synology-update.sh")
+        z.write(ROOT / "deploy/SYNC_UPGRADE.md", "SYNC_UPGRADE.md")
     (output / ".nojekyll").touch()
     (output / "site-config.json").write_text((ROOT / "site-config.json").read_text(encoding="utf-8"), encoding="utf-8")
     (output / "counter.php.txt").write_bytes((ROOT / "deploy/counter.php").read_bytes())
