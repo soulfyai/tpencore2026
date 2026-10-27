@@ -22,7 +22,7 @@ def promote(output):
  s=s.replace('new URL("v044-config.json",location.href)','new URL("site-config.json",location.href)')
  s=s.replace('<meta name="robots" content="noindex,nofollow">','')
  s=re.sub(r'<title>.*?</title>','<title>台北安可｜一起打造你我的大台北</title>',s,count=1)
- s=s.replace('content="0.4.12"','content="2.2.0"').replace('./v044-2d.html','./2d.html').replace('./greater-taipei-2d.html','./2d.html')
+ s=s.replace('content="0.4.12"','content="2.2.1"').replace('./v044-2d.html','./2d.html').replace('./greater-taipei-2d.html','./2d.html')
  s=transform(s)
  pattern=r'(<script type="importmap">)(.*?)(</script>)'
  def mapping(m):
@@ -31,7 +31,8 @@ def promote(output):
  s,n=re.subn(pattern,mapping,s,count=1,flags=re.S);assert n==1
  assert all(modules.values())
  assert 'brand-slogan' not in s
- s=apply(s)
+ from candidate_home import integrate
+ s=integrate(apply(s))
  for name in ['index.html','index3d.html']:(output/name).write_text(s)
  two=(P/'v044-2d.html').read_text().replace('<meta name="robots" content="noindex,nofollow">','')
  two=re.sub(r'(?:greater-taipei(?:-v[0-9.]+)?|v044)\.html','index.html',two)
