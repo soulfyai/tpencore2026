@@ -79,6 +79,12 @@ def package(output):
     # Host on existing Pages so already-installed NAS updaters need no new asset step.
     (output / "social-preview.jpg").write_bytes((ROOT / "assets/social-preview.jpg").read_bytes())
     (output / "social-preview-v2.1.1.jpg").write_bytes((ROOT / "assets/social-preview.jpg").read_bytes())
+    (output / "robots.txt").write_text("User-agent: *\nAllow: /\nSitemap: https://tpencore.tw/sitemap.xml\n")
+    (output / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://tpencore.tw/</loc></url><url><loc>https://tpencore.tw/2d.html</loc></url></urlset>')
+    (output / "llms.txt").write_text('# 台北安可\n\n以臺北市為主、連結新北市的政策與政績公開資訊索引。非政府或候選人官方網站。\n\n- [政策全文與原始來源](https://tpencore.tw/2d.html): 118項內容，21個主題。\n- [互動地圖](https://tpencore.tw/): 地圖與建築為視覺示意。\n\n引用時請保留政策與政績的區別，核對來源發布日期；不可將承諾當成已完成。資料查核日期2026-10-22。\n')
+    with zipfile.ZipFile(output / "tpencore-seo-files.zip", "w", zipfile.ZIP_DEFLATED) as z:
+        for name in ["robots.txt", "sitemap.xml", "llms.txt"]:
+            z.write(output / name, name)
     (output / ".nojekyll").touch()
     (output / "site-config.json").write_text((ROOT / "site-config.json").read_text(encoding="utf-8"), encoding="utf-8")
     (output / "counter.php.txt").write_bytes((ROOT / "deploy/counter.php").read_bytes())
