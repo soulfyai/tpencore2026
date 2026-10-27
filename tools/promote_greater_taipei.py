@@ -1,4 +1,4 @@
-"""Package approved v048 as self-contained NAS-compatible production pages."""
+"""Package approved v0412 as self-contained NAS-compatible production pages."""
 from pathlib import Path
 import base64,json,re
 from production_metadata import apply
@@ -18,11 +18,11 @@ def promote(output):
    return m[1]+m[2]+key+m[2]
   text=refs.sub(module,text)
   return datarefs.sub(lambda m:m[1]+uri((P/m[2].split('?')[0][2:]).read_bytes(),'application/json')+m[1],text)
- s=(P/'greater-taipei-v0.4.8.html').read_text()
+ s=(P/'greater-taipei-v0.4.12.html').read_text()
  s=s.replace('new URL("v044-config.json",location.href)','new URL("site-config.json",location.href)')
  s=s.replace('<meta name="robots" content="noindex,nofollow">','')
  s=re.sub(r'<title>.*?</title>','<title>台北安可｜一起打造你我的大台北</title>',s,count=1)
- s=s.replace('content="0.4.8"','content="2.1.3"').replace('./v044-2d.html','./2d.html').replace('./greater-taipei-2d.html','./2d.html')
+ s=s.replace('content="0.4.12"','content="2.2.0"').replace('./v044-2d.html','./2d.html').replace('./greater-taipei-2d.html','./2d.html')
  s=transform(s)
  pattern=r'(<script type="importmap">)(.*?)(</script>)'
  def mapping(m):
@@ -39,4 +39,4 @@ def promote(output):
  reader,count=build_reader()
  assert count==118
  (output/'2d.html').write_text(reader)
- print(f'Promoted v048 to production: {len(modules)} embedded modules, inline JSON, live NAS config retained')
+ print(f'Promoted v0412 to production: {len(modules)} embedded modules, inline JSON, live NAS config retained')
