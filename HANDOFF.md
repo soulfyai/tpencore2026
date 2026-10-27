@@ -598,3 +598,4 @@ User especially wants panorama lower-right filled while retaining existing traff
 
 ## Authorized production 2.2.0 promotion
 User explicitly approved v0.4.12 for production. Promoter now uses v0412, all28 local JS dependencies and JSON embedded for NAS fixed-file updater. SEO, uploaded policy banner, static118-item policy reader retained. Browser full scene and navigation pass: existing40 moving ships/16 coastal planes,12 remote ships/12 flights retained, panorama region5 ships/3 planes and marine life. Policy dropdown/list action, Time label, help data section checked. No JS exception; one isolated external resource network failure. Publishing as2.2.0; v2.1.3 rollback tag points at92fec2f.
+- Production2.2.0 published a961673, tagv2.2.0; Pages run40488001231 successful. NAS version.json confirmed2.2.0 at18:26 Taipei2026-10-27; homepage byte-equality with public release source verified. Uploaded social image v2.1.3 PNG and live config retained.
