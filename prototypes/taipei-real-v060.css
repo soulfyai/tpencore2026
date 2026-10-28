@@ -1,0 +1,53 @@
+/* tpencore2026 預覽 v0.6.0 擬真臺北。字型：建議在宿主頁面載入 Noto Sans TC（Google Fonts），未載入時自動退回系統字型 */
+
+/* 台北城市島：所有樣式限定在 .tpi-root 內，不影響宿主網站 */
+.tpi-root{
+  --sky-top:#3f9fe6; --sky-hz:#cdeaf8;
+  --ink:#f4f7fb; --pill:rgba(18,28,44,.84); --pill-line:rgba(255,255,255,.4);
+  --mark:rgba(255,255,255,.9); --mark-ink:#16202e;
+  --accent:#ffcf4a; --panel:rgba(14,22,36,.62);
+  --f-display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  color-scheme:dark;
+}
+.tpi-root{position:absolute;inset:0;overflow:hidden;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-hz) 60%);color:var(--ink);font-family:var(--f-display);overflow:hidden;transition:background .8s;}
+.tpi-root.tpi-night{--sky-top:#050a1c;--sky-hz:#1b2a52;}
+.tpi-root .tpi-canvas{position:absolute;inset:0;}
+.tpi-root .tpi-canvas canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab;}
+.tpi-root .tpi-canvas canvas:active{cursor:grabbing;}
+.tpi-root .tpi-pins{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.tpi-root .tpi-pin{position:absolute;left:0;top:0;pointer-events:auto;cursor:pointer;transform-origin:50% 100%;
+  background:var(--pill);color:var(--ink);border:1px solid var(--pill-line);
+  padding:5px 12px 6px;border-radius:999px;font:700 14px/1 var(--f-display);letter-spacing:.08em;
+  white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.28);transition:background .2s,color .2s;}
+.tpi-root .tpi-pin::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top:6px solid var(--pill);}
+.tpi-root .tpi-pin.tpi-mark{background:var(--mark);color:var(--mark-ink);border-color:rgba(0,0,0,.08);font:700 12px/1 var(--f-display);padding:4px 9px 5px;letter-spacing:.04em;}
+.tpi-root .tpi-pin.tpi-mark::after{border-top-color:var(--mark);}
+.tpi-root .tpi-pin:hover,.tpi-root .tpi-pin:focus-visible{background:var(--accent);color:#1a1405;outline:none;}
+.tpi-root .tpi-pin:hover::after,.tpi-root .tpi-pin:focus-visible::after{border-top-color:var(--accent);}
+.tpi-root .tpi-pins.tpi-nomarks .tpi-pin.tpi-mark{display:none;}
+.tpi-root .tpi-brand{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:calc(16px + env(safe-area-inset-left,0px));pointer-events:none;}
+.tpi-root .tpi-brand h1{margin:0;font:900 clamp(26px,4.4vw,42px)/1.05 var(--f-display);letter-spacing:.08em;color:#fff;
+  text-shadow:0 0 18px rgba(80,170,255,.75),0 2px 0 rgba(10,30,70,.6);}
+.tpi-root .tpi-brand p{margin:6px 0 0;font:700 13px/1.3 var(--f-display);letter-spacing:.16em;color:var(--accent);text-shadow:0 1px 3px rgba(0,0,0,.5);}
+.tpi-root .tpi-ctrls{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:calc(16px + env(safe-area-inset-right,0px));display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:62%;}
+.tpi-root .tpi-ctrls button{font:700 13px/1 var(--f-display);color:var(--ink);background:var(--panel);border:1px solid var(--pill-line);
+  padding:9px 14px;border-radius:999px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);letter-spacing:.05em;}
+.tpi-root .tpi-ctrls button[aria-pressed="true"]{background:var(--accent);color:#1a1405;border-color:var(--accent);}
+.tpi-root .tpi-ctrls button:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+.tpi-root .tpi-hint{position:absolute;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  font:500 12px/1.5 var(--f-display);color:var(--ink);background:var(--panel);border:1px solid rgba(255,255,255,.18);
+  padding:7px 12px;border-radius:10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);max-width:calc(100% - 32px);}
+.tpi-root .tpi-hint b{color:var(--accent);font-weight:700;}
+.tpi-root .tpi-loading{position:absolute;inset:0;display:grid;place-items:center;font:700 15px var(--f-display);letter-spacing:.2em;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+@media (max-width:520px){.tpi-root .tpi-ctrls button{padding:8px 10px;font-size:12px;}.tpi-root .tpi-pin{font-size:12px;padding:4px 9px 5px;}.tpi-root .tpi-pin.tpi-mark{font-size:11px;}.tpi-root .tpi-brand p{font-size:11px;}.tpi-root .tpi-hint{font-size:11px;}}
+@media (prefers-reduced-motion:reduce){.tpi-root .tpi-pin{transition:none;}}
+
+.tpi-root [hidden]{display:none!important}
+.tpi-root button{font-family:var(--f-display);}
+.tpi-root .tpi-pin.tpi-policy{display:flex;align-items:center;gap:6px;background:var(--policy,#1F4FB8);color:#fff;border-color:rgba(255,255,255,.75);padding:4px 11px 5px 5px;font:700 13px/1 var(--f-display);letter-spacing:.04em}
+.tpi-root .tpi-pin.tpi-policy b{display:grid;place-items:center;min-width:22px;height:22px;border-radius:999px;background:#fff;color:var(--policy,#1F4FB8);font:800 11px/1 var(--f-display);letter-spacing:0}
+.tpi-root .tpi-pin.tpi-policy::after{border-top-color:var(--policy,#1F4FB8)}
+.tpi-root .tpi-pin.tpi-policy.tpi-rec{background:#fff;color:var(--policy,#1F4FB8);border:1.5px solid var(--policy,#1F4FB8)}
+.tpi-root .tpi-pin.tpi-policy.tpi-rec b{background:var(--policy,#1F4FB8);color:#fff}
+.tpi-root .tpi-pin.tpi-policy.tpi-rec::after{border-top-color:var(--policy,#1F4FB8)}
+.tpi-root .tpi-pin.tpi-policy.is-active{box-shadow:0 0 0 3px var(--accent),0 4px 14px rgba(0,0,0,.3)}
