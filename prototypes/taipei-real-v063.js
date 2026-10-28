@@ -127,7 +127,7 @@ const did=(x,z)=>{const i=Math.floor((x+W/2)/W*DR),j=Math.floor((z+W/2)/W*DR);re
 
 /* ---------- surrounding region (New Taipei) rasters ---------- */
 const OX=-220,OZ=-190,OW=580,ORS=2,OM=OW*ORS;   // 2 px per unit
-let ntE=()=>0,mk2=()=>0,mkW2=()=>0,bk2=()=>0,reg2=()=>0,devAt=()=>0,devH=()=>0;
+let ntE=()=>0,mk2=()=>0,mkW2=()=>0,bk2=()=>0,reg2=()=>0,devAt=()=>0,devH=()=>0,softAt=()=>0;
 if(NB){const ER=canvas(OM),eg=ER.getContext('2d');eg.fillStyle='#000';eg.fillRect(0,0,OM,OM);
  const MAXE={烏來:1450,坪林:780,石碇:720,平溪:620,雙溪:560,貢寮:470,瑞芳:520,深坑:320,石門:280,三芝:330,金山:380,萬里:470,三峽:520,新店:470,汐止:260,林口:230,五股:200,泰山:190,土城:230,樹林:160,鶯歌:120,八里:330,淡水:240,板橋:0,三重:0,中和:90,永和:0,新莊:60,蘆洲:0,基隆:320};
  polysOf(eg,NB.districts,ORS,OX,OZ,k=>{const v=Math.round((MAXE[k]||200)/1500*255);return `rgb(${v},0,0)`;});
@@ -145,7 +145,11 @@ if(NB){const ER=canvas(OM),eg=ER.getContext('2d');eg.fillStyle='#000';eg.fillRec
  const nn=(A,x,z)=>{const i=Math.floor((x-OX)*ORS),j=Math.floor((z-OZ)*ORS);return i<0||j<0||i>=OM||j>=OM?0:A[j*OM+i];};
  // 已開發範圍（依衛星影像描繪）：平地、台地或河谷城鎮，h=地面海拔（公尺）
  const DV=[...(NB.dev||[]),...(NB.basins||[]).map(r=>[r,0])],BSc=canvas(OM),bs=BSc.getContext('2d'),PHc=canvas(OM),ph=PHc.getContext('2d');[bs,ph].forEach(g=>{g.fillStyle='#000';g.fillRect(0,0,OM,OM);});
- DV.forEach(([ring,h])=>{const r=ring.map(([lo,la])=>geo(lo,la));polysOf(bs,{d:[r]},ORS,OX,OZ,()=>'#fff');polysOf(ph,{d:[r]},ORS,OX,OZ,()=>{const v=Math.round(Math.min(1,h/600)*255);return `rgb(${v},0,0)`;});});
+ // h<0：山坡聚落——保留原地形但降低起伏，整片作為市區（不整平）
+ const SFc=canvas(OM),sf=SFc.getContext('2d');sf.fillStyle='#000';sf.fillRect(0,0,OM,OM);
+ DV.filter(([,h])=>h<0).forEach(([ring])=>polysOf(sf,{d:[ring.map(([lo,la])=>geo(lo,la))]},ORS,OX,OZ,()=>'#fff'));
+ let SF=new Float32Array(OM*OM);{const d=sf.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++)SF[i]=d[i*4]/255;}SF=blur(blur(SF,OM,3),OM,3);softAt=(x,z)=>bil(SF,x,z);
+ DV.filter(([,h])=>h>=0).forEach(([ring,h])=>{const r=ring.map(([lo,la])=>geo(lo,la));polysOf(bs,{d:[r]},ORS,OX,OZ,()=>'#fff');polysOf(ph,{d:[r]},ORS,OX,OZ,()=>{const v=Math.round(Math.min(1,h/600)*255);return `rgb(${v},0,0)`;});});
  let BS=new Float32Array(OM*OM),PH=new Float32Array(OM*OM);{const d=bs.getImageData(0,0,OM,OM).data,d2=ph.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++){BS[i]=d[i*4]/255;PH[i]=d2[i*4]/255*600;}}
  BS=blur(blur(BS,OM,3),OM,3);PH=blur(blur(PH,OM,3),OM,3);
  devAt=(x,z)=>bil(BS,x,z);devH=(x,z)=>{const b=bil(BS,x,z);return b>.02?bil(PH,x,z)/b:0;};
@@ -154,7 +158,7 @@ if(NB){const ER=canvas(OM),eg=ER.getContext('2d');eg.fillStyle='#000';eg.fillRec
  ntE=(x,z)=>{let e=bil(ED,x,z);if(e<1)return 0;e*=(1-.88*Math.min(1,bil(RV,x,z)*1.6))*(.5+.95*fbm(x*.035+11,z*.035-3));e+=e*.35*(ridged(x*.07,z*.07)-.5);
   for(const [fx,fz,r] of flats)e*=sm(r,r*1.9,Math.hypot(x-fx,z-fz));return Math.max(0,e);};}
 const isNT=(x,z)=>(Math.abs(x)<W/2&&Math.abs(z)<W/2)?did(x,z)>12:reg2(x,z)===2;
-const elevAll=(x,z,damp)=>{let e=elevM(x,z)*damp+ntE(x,z)*(NB?sm(.45,.93,mkW2(x,z)):1);if(NB){const dv=devAt(x,z);if(dv>.001&&isNT(x,z))e=e*(1-dv)+dv*devH(x,z);}return e;};
+const elevAll=(x,z,damp)=>{let e=elevM(x,z)*damp+ntE(x,z)*(NB?sm(.45,.93,mkW2(x,z)):1);if(NB&&isNT(x,z)){const sv=softAt(x,z);if(sv>.001)e*=1-.72*sv;const dv=devAt(x,z);if(dv>.001)e=e*(1-dv)+dv*devH(x,z);}return e;};
 
 /* ---------- elevation grids ---------- */
 const EH=new Float32Array(N*N),EL=new Float32Array(N*N),EM=new Float32Array(N*N);
@@ -215,7 +219,7 @@ function landUse(x,z){const L=gs(EL,x,z),e=gs(EM,x,z),sl=gs(SL,x,z),d=did(x,z);
   if(L<.5)return {t:'sea',L,e,sl,d};if(airport(x,z))return {t:'air',L,e,sl,d};
   const zo=zoneAt(x,z);if(zo&&L>.85)return {t:zo.kind,L,e,sl,d,zo};
   if(L>.5&&e<70&&bk(x,z))return {t:'bank',L,e,sl,d};
-  if(d>12){if(L>.9&&sl<.75&&devAt(x,z)>.5)return {t:'urban',L,e,sl,d};return e<35&&sl<.45&&L>.9?{t:'field',L,e,sl,d}:{t:'wild',L,e,sl,d};}
+  if(d>12){if(L>.9&&((sl<.75&&devAt(x,z)>.5)||(sl<1.05&&softAt(x,z)>.5)))return {t:'urban',L,e,sl,d};return e<35&&sl<.45&&L>.9?{t:'field',L,e,sl,d}:{t:'wild',L,e,sl,d};}
   if(d&&L>.9&&e<95&&sl<.5)return {t:'urban',L,e,sl,d};
   if(L<.9&&e<30)return {t:'bank',L,e,sl,d};
   return {t:'wild',L,e,sl,d};}
