@@ -78,6 +78,13 @@ const keelung=new THREE.CatmullRomCurve3([[-82,-27.5],[-75.1,-25.3],[-70.7,-21.8
 const jingmei=new THREE.CatmullRomCurve3([[52,82],[47.4,82.2],[38,81],[28.7,79.7],[22,78],[16,76.6],[11,77.2],[6.3,78.1],[0,80.5],[-4.9,82.2],[-9,80.5],[-12.3,78.1],[-17,75],[-21.3,72.4],[-24.5,70.5]].map(p=>V(p[0],p[1])));
 const shuangxi=new THREE.CatmullRomCurve3([[8,-25],[4.8,-21.8],[-0.5,-17.5],[-4.1,-15.3],[-10.1,-12],[-15,-10.6],[-19.8,-9.6],[-24.5,-8],[-28.8,-6.3],[-33.2,-3.4]].map(p=>V(p[0],p[1])));
 const RIVERS=[{c:keelung,w:3},{c:jingmei,w:2},{c:shuangxi,w:1.2}];
+/* 鄰接新北市（opts.neighbor）：淡水河、新店溪、大漢溪與基隆河上游，依真實經緯度 */
+const NB=opts.neighbor||null;
+if(NB){const cv=pts=>new THREE.CatmullRomCurve3(pts.map(([lo,la])=>{const [x,z]=geo(lo,la);return V(x,z);}));
+ RIVERS.push({c:cv([[121.372,25.196],[121.398,25.183],[121.414,25.172],[121.43,25.158],[121.446,25.138],[121.456,25.124],[121.465,25.112],[121.472,25.098],[121.484,25.083],[121.496,25.071],[121.503,25.062],[121.5,25.05],[121.492,25.044],[121.484,25.04]]),w:4.4,name:'淡水河'},
+  {c:cv([[121.484,25.04],[121.489,25.027],[121.497,25.019],[121.508,25.014],[121.52,25.008],[121.528,24.997],[121.534,24.983],[121.538,24.968],[121.536,24.955],[121.53,24.94],[121.534,24.92],[121.542,24.9],[121.55,24.875],[121.556,24.845]]),w:2.8,name:'新店溪'},
+  {c:cv([[121.484,25.04],[121.47,25.036],[121.459,25.027],[121.449,25.014],[121.438,24.998],[121.425,24.985],[121.405,24.968],[121.388,24.958],[121.37,24.952],[121.352,24.945],[121.335,24.925],[121.315,24.9],[121.3,24.875]]),w:3,name:'大漢溪'},
+  {c:cv([[121.623,25.064],[121.64,25.068],[121.655,25.065],[121.675,25.074],[121.7,25.083],[121.72,25.09],[121.742,25.1],[121.762,25.11],[121.783,25.115],[121.8,25.108]]),w:2.2,name:'基隆河上游'});}
 
 /* ---------- elevation (meters) ---------- */
 const PEAKS=[[-10,-70.7,1120,8,8],[-29,-74,1090,8,8],[-20,-86,1000,9,7],[6,-66,720,12,9],[-20,-53,640,4,4],[-15,-65,420,30,20],[17,-35,650,9,8],[20,-15,380,16,9],[5,-24,450,8,6],[-24,1.5,150,4,2.6],[12,51,330,7,4],[47,44,380,10,9],[24,92,420,16,10],[0,100,320,14,6],[-8,70,150,4,3],[-5,57.6,170,4,3],[-23.5,-14.6,70,1.6,1.6],[-50,-56,260,10,10],[38,-6,300,9,8]];
@@ -88,7 +95,8 @@ const MET=50; // meters per vertical unit (≈3.5× exaggeration)
 /* ---------- masks ---------- */
 function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h||w;return c;}
 function polys(g,sc,fill){for(const k in DIST){g.fillStyle=fill(k);DIST[k].forEach(r=>{g.beginPath();r.forEach((p,i)=>{const a=(p[0]+W/2)*sc,b=(p[1]+W/2)*sc;i?g.lineTo(a,b):g.moveTo(a,b);});g.closePath();g.fill();});}}
-const mc=canvas(MS),mg=mc.getContext('2d');mg.fillStyle='#000';mg.fillRect(0,0,MS,MS);polys(mg,S,()=>'#fff');
+function polysOf(g,obj,sc,ox,oz,fill){for(const k in obj){g.fillStyle=fill(k);obj[k].forEach(r=>{g.beginPath();r.forEach((p,i)=>{const a=(p[0]-ox)*sc,b=(p[1]-oz)*sc;i?g.lineTo(a,b):g.moveTo(a,b);});g.closePath();g.fill();});}}
+const mc=canvas(MS),mg=mc.getContext('2d');mg.fillStyle='#000';mg.fillRect(0,0,MS,MS);polys(mg,S,()=>'#fff');if(NB)polysOf(mg,NB.districts,S,-W/2,-W/2,()=>'#fff');
 mg.strokeStyle='#000';mg.lineCap=mg.lineJoin='round';
 RIVERS.forEach(r=>{mg.lineWidth=r.w*S;mg.beginPath();r.c.getPoints(300).forEach((p,i)=>{const a=(p.x+W/2)*S,b=(p.z+W/2)*S;i?mg.lineTo(a,b):mg.moveTo(a,b);});mg.stroke();});
 let mask=new Float32Array(MS*MS);{const d=mg.getImageData(0,0,MS,MS).data;for(let i=0;i<MS*MS;i++)mask[i]=d[i*4]/255;}
@@ -104,13 +112,40 @@ function mkW(x,z){const i=Math.round((x+W/2)*S),j=Math.round((z+W/2)*S);return i
 function mk(x,z){const fx=(x+W/2)*S-.5,fz=(z+W/2)*S-.5;if(fx<0||fz<0||fx>=MS-1||fz>=MS-1)return 0;
   const i=fx|0,j=fz|0,u=fx-i,v=fz-j,k=j*MS+i;return (mask[k]*(1-u)+mask[k+1]*u)*(1-v)+(mask[k+MS]*(1-u)+mask[k+MS+1]*u)*v;}
 // district id raster
-const DR=1024,dc=canvas(DR),dg=dc.getContext('2d');dg.fillStyle='#000';dg.fillRect(0,0,DR,DR);polys(dg,DR/W,k=>`rgb(${(DN.indexOf(k)+1)*20},0,0)`);
-const dd=dg.getImageData(0,0,DR,DR).data,DID=new Uint8Array(DR*DR);for(let i=0;i<DR*DR;i++)DID[i]=Math.round(dd[i*4]/20);
+const DR=1024,dc=canvas(DR),dg=dc.getContext('2d');dg.fillStyle='#000';dg.fillRect(0,0,DR,DR);if(NB)polysOf(dg,NB.districts,DR/W,-W/2,-W/2,()=>'rgb(234,0,0)');polys(dg,DR/W,k=>`rgb(${(DN.indexOf(k)+1)*18},0,0)`);
+const dd=dg.getImageData(0,0,DR,DR).data,DID=new Uint8Array(DR*DR);for(let i=0;i<DR*DR;i++)DID[i]=Math.round(dd[i*4]/18);
 const did=(x,z)=>{const i=Math.floor((x+W/2)/W*DR),j=Math.floor((z+W/2)/W*DR);return i<0||j<0||i>=DR||j>=DR?0:DID[j*DR+i];};
+
+/* ---------- surrounding region (New Taipei) rasters ---------- */
+const OX=-220,OZ=-190,OW=580,ORS=2,OM=OW*ORS;   // 2 px per unit
+let ntE=()=>0,mk2=()=>0,mkW2=()=>0,bk2=()=>0,reg2=()=>0;
+if(NB){const ER=canvas(OM),eg=ER.getContext('2d');eg.fillStyle='#000';eg.fillRect(0,0,OM,OM);
+ const MAXE={烏來:1450,坪林:780,石碇:720,平溪:620,雙溪:560,貢寮:470,瑞芳:520,深坑:320,石門:280,三芝:330,金山:380,萬里:470,三峽:520,新店:470,汐止:260,林口:230,五股:200,泰山:190,土城:230,樹林:160,鶯歌:120,八里:330,淡水:240,板橋:0,三重:0,中和:90,永和:0,新莊:60,蘆洲:0,基隆:320};
+ polysOf(eg,NB.districts,ORS,OX,OZ,k=>{const v=Math.round((MAXE[k]||200)/1500*255);return `rgb(${v},0,0)`;});
+ let ED=new Float32Array(OM*OM);{const d=eg.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++)ED[i]=d[i*4]/255*1500;}ED=blur(blur(ED,OM,9),OM,9);
+ const M2=canvas(OM),m2=M2.getContext('2d');m2.fillStyle='#000';m2.fillRect(0,0,OM,OM);polysOf(m2,NB.districts,ORS,OX,OZ,()=>'#fff');polysOf(m2,DIST,ORS,OX,OZ,()=>'#fff');
+ m2.strokeStyle='#000';m2.lineCap=m2.lineJoin='round';RIVERS.forEach(r=>{m2.lineWidth=r.w*ORS;m2.beginPath();r.c.getPoints(500).forEach((p,i)=>{const a=(p.x-OX)*ORS,b=(p.z-OZ)*ORS;i?m2.lineTo(a,b):m2.moveTo(a,b);});m2.stroke();});
+ let MK2=new Float32Array(OM*OM);{const d=m2.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++)MK2[i]=d[i*4]/255;}
+ const MW2=blur(blur(MK2,OM,16),OM,16);MK2=blur(blur(MK2,OM,2),OM,2);
+ const R2=canvas(OM),r2=R2.getContext('2d');r2.fillStyle='#000';r2.fillRect(0,0,OM,OM);r2.strokeStyle='#fff';r2.lineCap=r2.lineJoin='round';
+ RIVERS.forEach(r=>{r2.lineWidth=(r.w+(r.w>2?2.8:1.4))*ORS;r2.beginPath();r.c.getPoints(500).forEach((p,i)=>{const a=(p.x-OX)*ORS,b=(p.z-OZ)*ORS;i?r2.lineTo(a,b):r2.moveTo(a,b);});r2.stroke();});
+ const RB=new Uint8Array(OM*OM);let RV=new Float32Array(OM*OM);{const d=r2.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++){RB[i]=d[i*4]>127?1:0;RV[i]=d[i*4]/255;}}RV=blur(blur(RV,OM,14),OM,14);
+ const G2=canvas(OM),g2=G2.getContext('2d');g2.fillStyle='#000';g2.fillRect(0,0,OM,OM);polysOf(g2,NB.districts,ORS,OX,OZ,()=>'rgb(2,0,0)');polysOf(g2,DIST,ORS,OX,OZ,()=>'rgb(1,0,0)');
+ const RG=new Uint8Array(OM*OM);{const d=g2.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++)RG[i]=d[i*4];}
+ const bil=(A,x,z)=>{const fx=(x-OX)*ORS-.5,fz=(z-OZ)*ORS-.5;if(fx<0||fz<0||fx>=OM-1||fz>=OM-1)return 0;const i=fx|0,j=fz|0,u=fx-i,v=fz-j,k=j*OM+i;return (A[k]*(1-u)+A[k+1]*u)*(1-v)+(A[k+OM]*(1-u)+A[k+OM+1]*u)*v;};
+ const nn=(A,x,z)=>{const i=Math.floor((x-OX)*ORS),j=Math.floor((z-OZ)*ORS);return i<0||j<0||i>=OM||j>=OM?0:A[j*OM+i];};
+ const BSc=canvas(OM),bs=BSc.getContext('2d');bs.fillStyle='#000';bs.fillRect(0,0,OM,OM);
+ polysOf(bs,{b:(NB.basins||[]).map(r=>r.map(([lo,la])=>geo(lo,la)))},ORS,OX,OZ,()=>'#fff');
+ let BS=new Float32Array(OM*OM);{const d=bs.getImageData(0,0,OM,OM).data;for(let i=0;i<OM*OM;i++)BS[i]=d[i*4]/255;}BS=blur(blur(BS,OM,4),OM,4);
+ const flats=(NB.flats||[]).map(([lo,la,r])=>{const [x,z]=geo(lo,la);return [x,z,r];});
+ mk2=(x,z)=>bil(MK2,x,z);mkW2=(x,z)=>bil(MW2,x,z);bk2=(x,z)=>nn(RB,x,z);reg2=(x,z)=>nn(RG,x,z);
+ ntE=(x,z)=>{let e=bil(ED,x,z);if(e<1)return 0;e*=(1-.88*Math.min(1,bil(RV,x,z)*1.6))*(.5+.95*fbm(x*.035+11,z*.035-3));e+=e*.35*(ridged(x*.07,z*.07)-.5);
+  for(const [fx,fz,r] of flats)e*=sm(r,r*1.9,Math.hypot(x-fx,z-fz));e*=1-bil(BS,x,z);return Math.max(0,e);};}
+const elevAll=(x,z,damp)=>elevM(x,z)*damp+ntE(x,z)*(NB?sm(.45,.93,mkW2(x,z)):1);
 
 /* ---------- elevation grids ---------- */
 const EH=new Float32Array(N*N),EL=new Float32Array(N*N),EM=new Float32Array(N*N);
-for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=-W/2+i*CELL,z=-W/2+j*CELL,k=j*N+i,L=sm(.3,.7,mk(x,z)),e=L>0?elevM(x,z)*sm(.45,.93,mkW(x,z)):0;
+for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=-W/2+i*CELL,z=-W/2+j*CELL,k=j*N+i,L=sm(.3,.7,mk(x,z)),e=L>0?elevAll(x,z,sm(.45,.93,mkW(x,z))):0;
   EL[k]=L;EM[k]=e*L;EH[k]=-2.6+L*3.8+L*L*e/MET;}
 const SL=new Float32Array(N*N),HS=new Float32Array(N*N),AO=new Float32Array(N*N);
 {const blurred=blur(blur(EH,N,4),N,4),ld=new THREE.Vector3(.55,.75,.38).normalize();
@@ -165,6 +200,7 @@ function landUse(x,z){const L=gs(EL,x,z),e=gs(EM,x,z),sl=gs(SL,x,z),d=did(x,z);
   if(L<.5)return {t:'sea',L,e,sl,d};if(airport(x,z))return {t:'air',L,e,sl,d};
   const zo=zoneAt(x,z);if(zo&&L>.85)return {t:zo.kind,L,e,sl,d,zo};
   if(L>.5&&e<70&&bk(x,z))return {t:'bank',L,e,sl,d};
+  if(d===13)return e<40&&sl<.7?{t:'nt',L,e,sl,d}:{t:'wild',L,e,sl,d};
   if(d&&L>.9&&e<95&&sl<.5)return {t:'urban',L,e,sl,d};
   if(L<.9&&e<30)return {t:'bank',L,e,sl,d};
   return {t:'wild',L,e,sl,d};}
@@ -208,7 +244,7 @@ const floor=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000).rotateX(-Math.PI/2
 const waterMat=new THREE.MeshStandardMaterial({color:'#2d6a86',roughness:.05,metalness:.05,transparent:true,opacity:.9,normalMap:wn,normalScale:new THREE.Vector2(.22,.22)});
 const water=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000).rotateX(-Math.PI/2),waterMat);water.receiveShadow=true;scene.add(water);
 
-let riverBoats=[],ships=[],clouds=new THREE.Group(),pins=[],fly=null,wheels=[],flyer=new THREE.Group(),beacons=null,lander=null,flag=null,bulbs=[],walkers=[],walkB=null,walkH=null,carParts=null,carGlow=[],carData=[],carB=null,carC=null;
+let outer=null,namedBridges=[],riverBoats=[],ships=[],clouds=new THREE.Group(),pins=[],fly=null,wheels=[],flyer=new THREE.Group(),beacons=null,lander=null,flag=null,bulbs=[],walkers=[],walkB=null,walkH=null,carParts=null,carGlow=[],carData=[],carB=null,carC=null;
 const pm=new THREE.Matrix4(),pm2=new THREE.Matrix4(),m4=new THREE.Matrix4(),col=new THREE.Color(),YAX=new THREE.Vector3(0,1,0),qq=new THREE.Quaternion(),pv=new THREE.Vector3(),sv=new THREE.Vector3();
 
 function build(){
@@ -236,6 +272,7 @@ for(let j=0;j<TS;j++){const z=-W/2+(j+.5)/TS*W;for(let i=0;i<TS;i++){const x=-W/
   case 'field':{const fu=x*.88+z*.47,fv=-x*.47+z*.88,cu=Math.floor(fu/2.1),cv=Math.floor(fv/1.5);c=FIELD[Math.floor(hash(cu,cv)*FIELD.length)];
     if(fu-cu*2.1<.12||fv-cv*1.5<.1)c=[120,112,86];break;}
   case 'urban':{c=mix(C.lot,C.lot2,n);U[(j*TS+i)]=255;break;}
+  case 'nt':c=mix([200,211,164],[186,201,150],n);break;
   case 'bank':c=lu.L<.78?mix(C.sand,C.park,sm(.66,.78,lu.L)):mix(C.park,[150,190,110],n*.5);if(lu.L>.72&&Math.abs(Math.sin(x*.9+z*.4))<.04)c=C.path;break;
   case 'campus':{c=mix(C.park,C.g1,n*.4);const lx=x-lu.zo.x,lz=z-lu.zo.z;if(Math.abs(lz)<.55&&lx>-8&&lx<4)c=C.path;else if(Math.abs(lx+1.5)<.25||Math.abs(lz-4.2)<.22||Math.abs(lz+4.2)<.22)c=mix(C.path,c,.25);break;}
   default:{const hh=Math.min(1,lu.e/900),nn=fbm(x*.22,z*.22,3);c=mix(mix(C.g1,C.g2,nn),C.high,hh);
@@ -688,6 +725,7 @@ const TG={round:blobGeo([[0,1.05,0,1]],12,3),clump:blobGeo([[0,1.15,0,.85],[.55,
   pine:mergeG([[new THREE.ConeGeometry(.7,1.6,14).translate(0,1.1,0),y=>{const t=.66+.3*Math.min(1,y/2.4);return [t,t,t];}],[new THREE.ConeGeometry(.5,1.3,14).translate(0,1.9,0),y=>{const t=.74+.26*Math.min(1,y/2.6);return [t,t,t];}],[new THREE.CylinderGeometry(.07,.09,.5,8).translate(0,.25,0),()=>[.5,.38,.28]]]),
   palm:mergeG([[new THREE.CylinderGeometry(.05,.07,1.6,8).translate(0,.8,0),()=>[.62,.5,.38]],[new THREE.SphereGeometry(.42,12,8).scale(1,.45,1).translate(0,1.7,0),()=>[1,1,1]]])};
 /* continuous forest canopy over the mountains */
+let canopyTex=null,canopyNrm=null;
 const FD=new Float32Array(N*N);for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=-W/2+i*CELL,z=-W/2+j*CELL,lu=landUse(x,z);FD[j*N+i]=(lu.t==='wild'&&lu.L>.86&&lu.e>22)?1:0;}
 const FB=blur(FD,N,2);for(let k=0;k<N*N;k++)FB[k]=FD[k]?Math.max(FB[k],.5):0;
 {const cc=canvas(2048),cx=cc.getContext('2d');cx.fillStyle='#22441f';cx.fillRect(0,0,2048,2048);const CG=['#2b5127','#335b2c','#3c6631','#284a24','#467137','#507a3d','#37602e','#5a8146','#41532c'];
@@ -695,9 +733,45 @@ const FB=blur(FD,N,2);for(let k=0;k<N*N;k++)FB[k]=FD[k]?Math.max(FB[k],.5):0;
  const cd=cx.getImageData(0,0,2048,2048).data,nc=canvas(2048),nx=nc.getContext('2d'),ni=nx.createImageData(2048,2048),L=(x,y)=>{const i=(((y+2048)%2048)*2048+((x+2048)%2048))*4;return (cd[i]+cd[i+1]+cd[i+2])/765;};
  for(let y=0;y<2048;y++)for(let x=0;x<2048;x++){const i=(y*2048+x)*4,dx=(L(x+1,y)-L(x-1,y))*6,dy=(L(x,y+1)-L(x,y-1))*6,l=Math.hypot(dx,dy,1);ni.data[i]=(-dx/l*.5+.5)*255;ni.data[i+1]=(dy/l*.5+.5)*255;ni.data[i+2]=(1/l*.5+.5)*255;ni.data[i+3]=255;}
  nx.putImageData(ni,0,0);const cn=new THREE.CanvasTexture(nc);cn.anisotropy=8;
- const ct=new THREE.CanvasTexture(cc);ct.anisotropy=8;const cg2=new THREE.PlaneGeometry(W,W,N-1,N-1).rotateX(-Math.PI/2),cp=cg2.attributes.position;
+canopyTex=null;
+ const ct=new THREE.CanvasTexture(cc);ct.anisotropy=8;canopyTex=ct;canopyNrm=cn;const cg2=new THREE.PlaneGeometry(W,W,N-1,N-1).rotateX(-Math.PI/2),cp=cg2.attributes.position;
  for(let i=0;i<cp.count;i++){const x=cp.getX(i),z=cp.getZ(i),f=gs(FB,x,z),b=fbm(x*.6+9,z*.6-4,3);cp.setY(i,gs(EH,x,z)+(f<.25?-1.4:(.35+f*.7+b*.95*f)));}
  cg2.computeVertexNormals();if(EMB){const ix=cg2.index.array,keep=[];for(let i=0;i<ix.length;i+=3)if(FB[ix[i]]>.2||FB[ix[i+1]]>.2||FB[ix[i+2]]>.2)keep.push(ix[i],ix[i+1],ix[i+2]);cg2.setIndex(keep);}const can=new THREE.Mesh(cg2,new THREE.MeshStandardMaterial({map:ct,normalMap:cn,normalScale:new THREE.Vector2(1.6,1.6),roughness:.95,envMapIntensity:.35}));can.castShadow=true;can.receiveShadow=true;scene.add(can);}
+if(NB){const ON=291,OC=2,oEL=new Float32Array(ON*ON),oEM=new Float32Array(ON*ON),oEH=new Float32Array(ON*ON);
+ for(let j=0;j<ON;j++)for(let i=0;i<ON;i++){const x=OX+i*OC,z=OZ+j*OC,k=j*ON+i,L=sm(.3,.7,mk2(x,z)),e=L>0?elevAll(x,z,sm(.45,.93,mkW2(x,z))):0;oEL[k]=L;oEM[k]=e*L;oEH[k]=-2.6+L*3.8+L*L*e/MET;}
+ const og=(A,x,z)=>{const fx=(x-OX)/OC,fz=(z-OZ)/OC;if(fx<0||fz<0||fx>=ON-1||fz>=ON-1)return A[0];const i=fx|0,j=fz|0,u=fx-i,v=fz-j,k=j*ON+i;return (A[k]*(1-u)+A[k+1]*u)*(1-v)+(A[k+ON]*(1-u)+A[k+ON+1]*u)*v;};
+ outer={oEL,oEM,oEH,og};
+ const inWin=(x,z,m)=>Math.abs(x)<W/2-m&&Math.abs(z)<W/2-m;
+ // texture 2048² over the outer square, baked hillshade
+ const T2=2048,c2=canvas(T2),x2=c2.getContext('2d'),im2=x2.createImageData(T2,T2),D2=im2.data,ld=new THREE.Vector3(.55,.75,.38).normalize();
+ for(let j=0;j<T2;j++){const z=OZ+(j+.5)/T2*OW;for(let i=0;i<T2;i++){const x=OX+(i+.5)/T2*OW,k=(j*T2+i)*4,L=og(oEL,x,z),e=og(oEM,x,z),n=vn(x*.9,z*.9);let c;
+   if(L<.5)c=[30+(L*80|0),70+(L*100|0),92+(L*90|0)];
+   else if(L<.8&&e<30)c=[200,190,154];
+   else if(bk2(x,z)&&e<60)c=[150,186,112];
+   else if(e<40)c=mix([200,211,164],[186,201,150],n);
+   else{const hh=Math.min(1,e/1000),nn2=fbm(x*.2,z*.2,3);c=mix(mix([88,134,62],[50,100,48],nn2),[38,80,44],hh);}
+   const gx=(og(oEH,x+1,z)-og(oEH,x-1,z))/2,gz=(og(oEH,x,z+1)-og(oEH,x,z-1))/2,nl=Math.hypot(gx,1,gz),hs=Math.max(0,(-gx*ld.x+ld.y-gz*ld.z)/nl),f=L<.5?1:(.72+.4*hs)*(.94+.12*n);
+   D2[k]=c[0]*f;D2[k+1]=c[1]*f;D2[k+2]=c[2]*f;D2[k+3]=255;}}
+ x2.putImageData(im2,0,0);const t2=new THREE.CanvasTexture(c2);t2.anisotropy=8;
+ const geo2=new THREE.PlaneGeometry(OW,OW,ON-1,ON-1).rotateX(-Math.PI/2).translate(OX+OW/2,0,OZ+OW/2),p2=geo2.attributes.position;
+ for(let i=0;i<p2.count;i++){const x=p2.getX(i),z=p2.getZ(i);p2.setY(i,og(oEH,x,z)-(inWin(x,z,-.01)?.12:0));}geo2.computeVertexNormals();
+ {const ix=geo2.index.array,keep=[];for(let i=0;i<ix.length;i+=3){const a=ix[i],b=ix[i+1],c=ix[i+2];const cx=(p2.getX(a)+p2.getX(b)+p2.getX(c))/3,cz=(p2.getZ(a)+p2.getZ(b)+p2.getZ(c))/3;
+   if(inWin(cx,cz,2.5))continue;if(oEL[a]<.04&&oEL[b]<.04&&oEL[c]<.04)continue;keep.push(a,b,c);}geo2.setIndex(keep);}
+ const land2=new THREE.Mesh(geo2,new THREE.MeshStandardMaterial({map:t2,roughness:.96}));land2.receiveShadow=true;land2.name='region-terrain';scene.add(land2);
+ // forest canopy over New Taipei's mountains
+ const FD2=new Float32Array(ON*ON);for(let j=0;j<ON;j++)for(let i=0;i<ON;i++){const k=j*ON+i,x=OX+i*OC,z=OZ+j*OC;FD2[k]=(oEL[k]>.86&&oEM[k]>38&&!bk2(x,z))?1:0;}
+ const FB2=blur(FD2,ON,1);for(let k=0;k<ON*ON;k++)FB2[k]=FD2[k]?Math.max(FB2[k],.5):0;
+ const cgo=new THREE.PlaneGeometry(OW,OW,ON-1,ON-1).rotateX(-Math.PI/2).translate(OX+OW/2,0,OZ+OW/2),cpo=cgo.attributes.position;
+ for(let i=0;i<cpo.count;i++){const x=cpo.getX(i),z=cpo.getZ(i),f=og(FB2,x,z),b=fbm(x*.6+9,z*.6-4,3);cpo.setY(i,og(oEH,x,z)+(f<.25?-1.4:(.35+f*.7+b*.95*f))-(inWin(x,z,-.01)?.12:0));}
+ cgo.computeVertexNormals();{const ix=cgo.index.array,keep=[];for(let i=0;i<ix.length;i+=3){const a=ix[i],b=ix[i+1],c=ix[i+2];const cx=(cpo.getX(a)+cpo.getX(b)+cpo.getX(c))/3,cz=(cpo.getZ(a)+cpo.getZ(b)+cpo.getZ(c))/3;
+   if(inWin(cx,cz,2.5))continue;if(FB2[a]>.2||FB2[b]>.2||FB2[c]>.2)keep.push(a,b,c);}cgo.setIndex(keep);}
+ const uv2=cgo.attributes.uv;for(let i=0;i<uv2.count;i++)uv2.setXY(i,uv2.getX(i)*OW/W,uv2.getY(i)*OW/W);
+ const ctex=canopyTex.clone(),cnrm=canopyNrm.clone();[ctex,cnrm].forEach(t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping;t.needsUpdate=true;});
+ const can2=new THREE.Mesh(cgo,new THREE.MeshStandardMaterial({map:ctex,normalMap:cnrm,normalScale:new THREE.Vector2(1.6,1.6),roughness:.95,envMapIntensity:.35}));can2.castShadow=true;can2.receiveShadow=true;can2.name='region-forest';scene.add(can2);
+ // the two named Tamsui River bridges, at their real crossings
+ const tam=RIVERS.find(r=>r.name==='淡水河');const nearT=(lo,la)=>{const [x,z]=geo(lo,la);let bt=0,bd=1e9;for(let i=0;i<=400;i++){const p=tam.c.getPointAt(i/400),d=Math.hypot(p.x-x,p.z-z);if(d<bd){bd=d;bt=i/400;}}return bt;};
+ for(const [name,lo,la,kind] of [['關渡大橋',121.4615,25.1185,'rainbow'],['淡江大橋',121.4255,25.1655,'cable']]){const t=nearT(lo,la),p=tam.c.getPointAt(t);bridge(tam,t,kind);namedBridges.push({name,x:p.x,z:p.z,top:kind==='cable'?6.8:6.2});}
+}
 const TL={round:[],clump:[],pine:[],palm:[]};
 const LOWG=['#4a7f3a','#3f7436','#57893f','#5f8e45','#3a6b32','#527f3c'],MIDG=['#2f6a32','#3a7438','#2a5e2e','#456f38','#34622e'],HIGHG=['#264f30','#2e5a36','#22462c','#365f3e'],AUT=['#8f8a40','#a07a3a','#8a5a3a'];
 const STEP=MOBILE?1.05:.82;
@@ -863,7 +937,13 @@ const api={
   /** 嵌入模式：城市群組（城市單位，海平面 y=0）與逐幀更新 */
   root:embedRoot,update:dt=>animate(Math.min(dt,.05)),
   /** 嵌入模式：判斷城市座標點是否為陸地 */
-  isLand:(x,z)=>gs(EL,x,z)>.5,
+  isLand:(x,z)=>(Math.abs(x)<W/2-1&&Math.abs(z)<W/2-1)?gs(EL,x,z)>.5:(outer?outer.og(outer.oEL,x,z)>.5:false),
+  /** 經緯度轉城市座標 */
+  geo:(lon,lat)=>{const [x,z]=geo(lon,lat);return {x,z};},
+  /** 新北市平地取樣：給宿主規劃新北街廓用（城市座標） */
+  regionSample(x,z){if(!outer)return null;return {land:outer.og(outer.oEL,x,z),e:outer.og(outer.oEM,x,z),h:outer.og(outer.oEH,x,z),bank:!!bk2(x,z),region:reg2(x,z)};},
+  /** 淡水河上的具名橋梁（城市座標、頂部高度） */
+  namedBridges:()=>namedBridges.slice(),
   /** 第 i 位行人目前的城市座標（除錯、鏡頭導覽用） */
   walkerPosition(i){if(!walkB)return null;walkB.torso.getMatrixAt(i,m4);return new THREE.Vector3().setFromMatrixPosition(m4);},
   /** 飛到指定行政區或地標（名稱需與標籤一致） */
