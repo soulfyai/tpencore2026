@@ -4132,7 +4132,7 @@ const REAL_TAIPEI={};
  let cx0=1e9,cx1=-1e9,cz0=1e9,cz1=-1e9;for(const [x,z] of coast){cx0=Math.min(cx0,x);cx1=Math.max(cx1,x);cz0=Math.min(cz0,z);cz1=Math.max(cz1,z);}
  const tpIslands=islands.filter(i=>i.city==='taipei');
  const themes=tpIslands.map(i=>({id:i.t.id,name:i.t.name,kind:i.t.kind,area:i.t.area,no:i.t.no,items:i.t.items||[]}));
- const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:2.6});
+ const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:3.2});
  const g=real.root,lb=g.userData.landBounds;
  const k=Math.min((cx1-cx0)/(lb.maxX-lb.minX),(cz1-cz0)/(lb.maxZ-lb.minZ))*1.02;
  g.scale.setScalar(k);
@@ -4163,7 +4163,8 @@ const REAL_TAIPEI={};
   if(!p){LANDMARKS3D.splice(i,1);continue;}
   const c=toWorld(p.position);L.x=c.x-L.isl.c.x;L.z=c.z-L.isl.c.z;L.top=WATER_Y+p.top*k;}
  // Ships moored by the old Taipei art sit inside the hidden group; nothing else to move.
- REAL_TAIPEI.engine=real;REAL_TAIPEI.root=g;REAL_TAIPEI.scale=k;
+ controls.minDistance=.45; // 允許拉近到街道層級看清行人與車輛
+ REAL_TAIPEI.engine=real;window.REAL_TAIPEI=REAL_TAIPEI;REAL_TAIPEI.root=g;REAL_TAIPEI.scale=k;
  REAL_TAIPEI.isLandWorld=(x,z)=>{const v=g.worldToLocal(new THREE.Vector3(x,0,z));return real.isLand(v.x,v.z);};
 }
 APPROVED_ART.transport=await buildTransportNetwork(scene,APPROVED_ART.cities,transportPlan,SHIPS,rng,WATER_Y);
@@ -4772,7 +4773,7 @@ function renderFrame(now, forceRender = false) {
   const camDist = camera.position.distanceTo(controls.target);
   // A fixed 0.3 near plane loses millimetre-scale coast separation in panorama.
   // Keep close inspection intact, and spend depth precision on the visible city.
-  const near = THREE.MathUtils.clamp(camDist * 0.02, 0.3, 12);
+  const near = THREE.MathUtils.clamp(camDist * 0.02, 0.012, 12);
   if (Math.abs(camera.near - near) > 0.0001) { camera.near = near; camera.updateProjectionMatrix(); }
   followVisibleCity(camDist);
   stage.classList.toggle("far", camDist > 40);

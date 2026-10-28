@@ -27,7 +27,7 @@ const REAL_TAIPEI={};
  let cx0=1e9,cx1=-1e9,cz0=1e9,cz1=-1e9;for(const [x,z] of coast){cx0=Math.min(cx0,x);cx1=Math.max(cx1,x);cz0=Math.min(cz0,z);cz1=Math.max(cz1,z);}
  const tpIslands=islands.filter(i=>i.city==='taipei');
  const themes=tpIslands.map(i=>({id:i.t.id,name:i.t.name,kind:i.t.kind,area:i.t.area,no:i.t.no,items:i.t.items||[]}));
- const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:2.6});
+ const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:3.2});
  const g=real.root,lb=g.userData.landBounds;
  const k=Math.min((cx1-cx0)/(lb.maxX-lb.minX),(cz1-cz0)/(lb.maxZ-lb.minZ))*1.02;
  g.scale.setScalar(k);
@@ -58,7 +58,8 @@ const REAL_TAIPEI={};
   if(!p){LANDMARKS3D.splice(i,1);continue;}
   const c=toWorld(p.position);L.x=c.x-L.isl.c.x;L.z=c.z-L.isl.c.z;L.top=WATER_Y+p.top*k;}
  // Ships moored by the old Taipei art sit inside the hidden group; nothing else to move.
- REAL_TAIPEI.engine=real;REAL_TAIPEI.root=g;REAL_TAIPEI.scale=k;
+ controls.minDistance=.45; // 允許拉近到街道層級看清行人與車輛
+ REAL_TAIPEI.engine=real;window.REAL_TAIPEI=REAL_TAIPEI;REAL_TAIPEI.root=g;REAL_TAIPEI.scale=k;
  REAL_TAIPEI.isLandWorld=(x,z)=>{const v=g.worldToLocal(new THREE.Vector3(x,0,z));return real.isLand(v.x,v.z);};
 }
 """
@@ -84,6 +85,8 @@ def build():
     sub("APPROVED_ART.transport=await buildTransportNetwork(", REPLACE + "APPROVED_ART.transport=await buildTransportNetwork(")
     sub("APPROVED_ART.ao=artAO;", "APPROVED_ART.ao=artAO;" + UPDATE)
     sub('content="0.4.12"', f'content="{VERSION}"')
+    # 街道層級拉近：放寬鏡頭近裁切面下限（原本 0.3，拉近到 0.45 距離時會裁掉城市）
+    sub('const near = THREE.MathUtils.clamp(camDist * 0.02, 0.3, 12);', 'const near = THREE.MathUtils.clamp(camDist * 0.02, 0.012, 12);')
     import re
     s = re.sub(r'<title>.*?</title>', '<title>台北安可擬真臺北 v0.6.1</title>', s, count=1)
     OUT.write_text(s, encoding="utf-8")
