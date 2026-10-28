@@ -52,6 +52,8 @@ const pinsRoot = root.querySelector('.tpi-pins');
 const q = k => root.querySelector('[data-tpi="' + k + '"]') || document.createElement('button');
 const CW = () => Math.max(1, root.clientWidth), CH = () => Math.max(1, root.clientHeight);
 let raf = 0, disposed = false, ready = false;
+// 嵌入模式：不建立自己的畫布、天空、海、燈光與後製，只產生城市群組交給宿主場景（tpencore2026 正式站）
+const EMB = !!opts.embed;
 /* 行政區邊界：內政部鄉鎮界（taiwan-atlas），經緯度投影為平面，1 單位 ≈ 135 m */
 const DIST=opts.districts||DISTRICTS;
 const DN=['北投','士林','內湖','中山','大同','松山','南港','信義','大安','中正','萬華','文山'];
@@ -144,11 +146,11 @@ const HOME=[[/AI|產業|科技|數位/,'北投'],[/交通|捷運/,'中正'],[/�
  POL.forEach((t,i)=>{const key=(t.area||'')+t.name;let home=(HOME.find(([re])=>re.test(key))||[])[1];
   if(!home||(used[home]||0)>=2)home=DN.slice().sort((a,b)=>(used[a]||0)-(used[b]||0)||DN.indexOf(a)-DN.indexOf(b))[0];
   used[home]=(used[home]||0)+1;
-  const [cx,cz]=cent(home),R=3.3;
+  const [cx,cz]=cent(home),R=opts.campusRadius||3.3;
   // 先在指定行政區找空地；放不下（例如中正區被大型地標占滿）時，改放最靠近該區中心的其他行政區
   const search=strict=>{let best=null,bs=1e9;const hid=DN.indexOf(home)+1;
-   for(let z=-W/2;z<W/2;z+=1.2)for(let x=-W/2;x<W/2;x+=1.2){const id=did(x,z);if(!id||(strict&&id!==hid)||gs(EM,x,z)>60)continue;
-    let ok=true;for(let a=0;a<10&&ok;a++){const an=a/10*6.2832,px=x+Math.cos(an)*R,pz=z+Math.sin(an)*R;if(did(px,pz)!==id||gs(EL,px,pz)<.93||gs(EM,px,pz)>60||bk(px,pz)||airport(px,pz))ok=false;}
+   for(let z=-W/2;z<W/2;z+=1.2)for(let x=-W/2;x<W/2;x+=1.2){const id=did(x,z);if(!id||(strict&&id!==hid)||landUse(x,z).t!=='urban')continue;
+    let ok=true;for(let a=0;a<12&&ok;a++){const an=a/12*6.2832;for(const rr of [R,R*.55]){const px=x+Math.cos(an)*rr,pz=z+Math.sin(an)*rr;if(did(px,pz)!==id||landUse(px,pz).t!=='urban'){ok=false;break;}}}
     if(!ok||ZONES.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+R+(o.kind==='policy'?3:1.2)))continue;
     const sc=Math.hypot(x-cx,z-cz)+hash(i*31+Math.round(x*3),Math.round(z*3))*2;if(sc<bs){bs=sc;best=[x,z,DN[id-1]];}}return best;};
   const best=search(true)||search(false);
@@ -176,14 +178,14 @@ function roadAt(x,z,d){const p=DP[DN[d-1]];if(!p)return 0;const c=Math.cos(p[0])
 
 /* ---------- three ---------- */
 const app=root.querySelector('.tpi-canvas');
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,opts.maxPixelRatio||2));renderer.setSize(CW(),CH());
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.78;app.appendChild(renderer.domElement);
+const renderer=EMB?opts.renderer:new THREE.WebGLRenderer({antialias:true,alpha:true});
+if(!EMB){renderer.setPixelRatio(Math.min(devicePixelRatio,opts.maxPixelRatio||2));renderer.setSize(CW(),CH());
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.78;app.appendChild(renderer.domElement);}
 const MOBILE=Math.min(innerWidth,innerHeight)<600;
 const scene=new THREE.Scene();const DAYFOG=new THREE.Color('#c9d8e4'),NIGHTFOG=new THREE.Color('#1b2a52');
 scene.fog=new THREE.Fog(DAYFOG,480,1500);
 const camera=new THREE.PerspectiveCamera(40,CW()/CH(),2,3000);
-const controls=new THREE.OrbitControls(camera,renderer.domElement);
+const controls=new THREE.OrbitControls(camera,EMB?document.createElement('div'):renderer.domElement);
 Object.assign(controls,{enableDamping:true,dampingFactor:.07,maxPolarAngle:1.38,minDistance:10,maxDistance:560,autoRotate:true,autoRotateSpeed:.35,zoomSpeed:.9});
 function homeView(){const f=CW()/CH()<.8?1.25:1;return {pos:new THREE.Vector3(-18*f,175*f,232*f),tgt:new THREE.Vector3(0,0,4)};}
 {const h=homeView();camera.position.copy(h.pos);controls.target.copy(h.tgt);}
@@ -192,7 +194,7 @@ const sun=new THREE.DirectionalLight('#fff0d6',2.3*Math.PI);sun.position.set(110
 Object.assign(sun.shadow.camera,{left:-130,right:130,top:130,bottom:-130,near:10,far:500});
 const SM=MOBILE?2048:4096;sun.shadow.mapSize.set(SM,SM);sun.shadow.bias=-.0005;sun.shadow.normalBias=.035;scene.add(sun);
 const sky=new THREE.Sky();sky.scale.setScalar(2400);{const u=sky.material.uniforms;u.turbidity.value=4.5;u.rayleigh.value=1.25;u.mieCoefficient.value=.004;u.mieDirectionalG.value=.82;u.sunPosition.value.copy(sun.position).normalize();}scene.add(sky);
-let envTex=null;{const pm=new THREE.PMREMGenerator(renderer),es=new THREE.Scene(),s2=new THREE.Sky();s2.scale.setScalar(900);Object.keys(sky.material.uniforms).forEach(k=>{const v=sky.material.uniforms[k].value;s2.material.uniforms[k].value=v&&v.clone?v.clone():v;});es.add(s2);envTex=pm.fromScene(es,0,1,2000).texture;scene.environment=envTex;}
+let envTex=null;if(!EMB){const pm=new THREE.PMREMGenerator(renderer),es=new THREE.Scene(),s2=new THREE.Sky();s2.scale.setScalar(900);Object.keys(sky.material.uniforms).forEach(k=>{const v=sky.material.uniforms[k].value;s2.material.uniforms[k].value=v&&v.clone?v.clone():v;});es.add(s2);envTex=pm.fromScene(es,0,1,2000).texture;scene.environment=envTex;}
 const nightMats=[];const nightable=(mat,d,n)=>{nightMats.push({mat,d,n});mat.emissiveIntensity=d;return mat;};
 
 // water with procedural ripple normals
@@ -249,6 +251,7 @@ tg.putImageData(img,0,0);eg.putImageData(eimg,0,0);
 const tTex=new THREE.CanvasTexture(tc),eTex=new THREE.CanvasTexture(ec);tTex.anisotropy=eTex.anisotropy=8;
 const tgeo=new THREE.PlaneGeometry(W,W,N-1,N-1).rotateX(-Math.PI/2),pa=tgeo.attributes.position;
 for(let i=0;i<pa.count;i++){const x=pa.getX(i),z=pa.getZ(i);pa.setY(i,gs(EH,x,z));}tgeo.computeVertexNormals();
+if(EMB){const ix=tgeo.index.array,keep=[];for(let i=0;i<ix.length;i+=3)if(EL[ix[i]]>.04||EL[ix[i+1]]>.04||EL[ix[i+2]]>.04)keep.push(ix[i],ix[i+1],ix[i+2]);tgeo.setIndex(keep);}
 const land=new THREE.Mesh(tgeo,nightable(new THREE.MeshStandardMaterial({map:tTex,emissiveMap:eTex,emissive:'#ffffff',roughness:.96}),0,.6));
 land.receiveShadow=true;scene.add(land);
 
@@ -659,7 +662,7 @@ const FB=blur(FD,N,2);for(let k=0;k<N*N;k++)FB[k]=FD[k]?Math.max(FB[k],.5):0;
  nx.putImageData(ni,0,0);const cn=new THREE.CanvasTexture(nc);cn.anisotropy=8;
  const ct=new THREE.CanvasTexture(cc);ct.anisotropy=8;const cg2=new THREE.PlaneGeometry(W,W,N-1,N-1).rotateX(-Math.PI/2),cp=cg2.attributes.position;
  for(let i=0;i<cp.count;i++){const x=cp.getX(i),z=cp.getZ(i),f=gs(FB,x,z),b=fbm(x*.6+9,z*.6-4,3);cp.setY(i,gs(EH,x,z)+(f<.25?-1.4:(.35+f*.7+b*.95*f)));}
- cg2.computeVertexNormals();const can=new THREE.Mesh(cg2,new THREE.MeshStandardMaterial({map:ct,normalMap:cn,normalScale:new THREE.Vector2(1.6,1.6),roughness:.95,envMapIntensity:.35}));can.castShadow=true;can.receiveShadow=true;scene.add(can);}
+ cg2.computeVertexNormals();if(EMB){const ix=cg2.index.array,keep=[];for(let i=0;i<ix.length;i+=3)if(FB[ix[i]]>.2||FB[ix[i+1]]>.2||FB[ix[i+2]]>.2)keep.push(ix[i],ix[i+1],ix[i+2]);cg2.setIndex(keep);}const can=new THREE.Mesh(cg2,new THREE.MeshStandardMaterial({map:ct,normalMap:cn,normalScale:new THREE.Vector2(1.6,1.6),roughness:.95,envMapIntensity:.35}));can.castShadow=true;can.receiveShadow=true;scene.add(can);}
 const TL={round:[],clump:[],pine:[],palm:[]};
 const LOWG=['#4a7f3a','#3f7436','#57893f','#5f8e45','#3a6b32','#527f3c'],MIDG=['#2f6a32','#3a7438','#2a5e2e','#456f38','#34622e'],HIGHG=['#264f30','#2e5a36','#22462c','#365f3e'],AUT=['#8f8a40','#a07a3a','#8a5a3a'];
 const STEP=MOBILE?1.05:.82;
@@ -693,7 +696,7 @@ scene.traverse(o=>{if(!o.material)return;(Array.isArray(o.material)?o.material:[
 const pinsEl=pinsRoot;
 const addPin=(name,x,z,kind,yo)=>{const el=document.createElement('button');el.type='button';el.className='tpi-pin'+(kind==='mark'?' tpi-mark':'');el.textContent=name;
   const pos=new THREE.Vector3(x,Math.max(Hh(x,z),1)+(yo||3.2),z),go=()=>flyTo(new THREE.Vector3(x,Math.max(Hh(x,z),0),z),kind==='mark'?32:55),
-    info={name,type:kind==='mark'?'landmark':'district',position:{x,y:Math.max(Hh(x,z),0),z}};
+    info={name,type:kind==='mark'?'landmark':'district',position:{x,y:Math.max(Hh(x,z),0),z},top:pos.y};
   el.addEventListener('click',()=>{if(typeof opts.onSelect==='function'&&opts.onSelect(info)===false)return;go();});pinsEl.appendChild(el);pins.push({el,pos,name,info,go});};
 [['北投',-47,-40],['士林',-27,-20],['內湖',20,5],['中山',-18,18],['大同',-37,17],['松山',2,24],['南港',36,34],['信義',10,49],['大安',-12,52],['中正',-30,50],['萬華',-49,45],['文山',2,84]].forEach(([n,x,z])=>addPin(n,x,z,'dist',4));
 addPin('陽明山',-10,-70.7,'mark',4);addPin('台北 101',L101.x,L101.z,'mark',45);
@@ -703,7 +706,7 @@ addPin('松山機場',AP.x,AP.z+4.3,'mark',2);
   el.className='tpi-pin tpi-policy'+(t.kind==='record'?' tpi-rec':'');el.innerHTML='<b>'+String(t.no||pno).padStart(2,'0')+'</b><span>'+String(t.name).replace(/^政績・/,'')+'</span>';
   el.setAttribute('aria-label',(t.kind==='record'?'任內政績 ':'政見 ')+t.name);
   const gy=Math.max(Hh(z.x,z.z),0),pos=new THREE.Vector3(z.x,Math.max(gy,1)+6.5,z.z),go=()=>flyTo(new THREE.Vector3(z.x,gy,z.z),30),
-    info={name:t.name,type:'policy',id:t.id,theme:t,district:z.home,position:{x:z.x,y:gy,z:z.z}};
+    info={name:t.name,type:'policy',id:t.id,theme:t,district:z.home,position:{x:z.x,y:gy,z:z.z},radius:z.r,top:gy+1.8};
   el.addEventListener('click',()=>{if(typeof opts.onSelect==='function'&&opts.onSelect(info)===false)return;go();});pinsEl.appendChild(el);pins.push({el,pos,name:t.name,info,go,id:t.id});});}addPin('內湖科技園區',11.6,4.4,'mark',3);{const [x,z]=geo(121.509,25.056);addPin('大稻埕',x-1.5,z,'mark',3);}{const [x,z]=geo(121.588,24.968);addPin('貓空',x,z,'mark',3);}
 }
 
@@ -726,13 +729,13 @@ function setNight(v){night=!!v;bNight.setAttribute('aria-pressed',night);root.cl
   nightMats.forEach(n=>n.mat.emissiveIntensity=night?n.n:n.d);}
 bNight.onclick=()=>setNight(!night);
 const onResize=()=>{const w=CW(),h=CH();camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);if(composer)composer.setSize(w,h);};
-const ro=typeof ResizeObserver!=='undefined'?new ResizeObserver(onResize):null;if(ro)ro.observe(root);else addEventListener('resize',onResize);
+const ro=EMB?null:typeof ResizeObserver!=='undefined'?new ResizeObserver(onResize):null;if(ro)ro.observe(root);else if(!EMB)addEventListener('resize',onResize);
 /* ---------- post: ambient occlusion, bloom, display transform ---------- */
 const cloudScene=new THREE.Scene();
 let composer=null,saoPass=null,bloomPass=null,HQ=opts.quality?opts.quality==='high':!MOBILE;
 const OUT={uniforms:{tDiffuse:{value:null}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
  fragmentShader:'uniform sampler2D tDiffuse;varying vec2 vUv;void main(){vec3 c=texture2D(tDiffuse,vUv).rgb;float d=length(vUv-0.5);c*=1.0-0.2*smoothstep(0.42,0.85,d);gl_FragColor=vec4(c,1.0);}'};
-try{if(opts.postprocessing!==false){const w=CW(),h=CH(),pr=renderer.getPixelRatio();
+try{if(opts.postprocessing!==false&&!EMB){const w=CW(),h=CH(),pr=renderer.getPixelRatio();
   const rt=new THREE.WebGLRenderTarget(w*pr,h*pr,{type:THREE.HalfFloatType,samples:4});composer=new THREE.EffectComposer(renderer,rt);composer.setPixelRatio(pr);composer.setSize(w,h);
   saoPass=new THREE.SSAOPass(scene,camera,w*pr,h*pr);saoPass.beautyRenderTarget.dispose();saoPass.beautyRenderTarget=new THREE.WebGLRenderTarget(w*pr,h*pr,{type:THREE.HalfFloatType,samples:4});
   saoPass.kernelRadius=2.5;saoPass.minDistance=.00008;saoPass.maxDistance=.008;composer.addPass(saoPass);
@@ -742,7 +745,7 @@ const bHQ=q('hq');if(!composer)bHQ.hidden=true;bHQ.setAttribute('aria-pressed',H
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)setRotate(false);
 
 const clock=new THREE.Clock(),v3=new THREE.Vector3();let tA=0;const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
-function loop(){if(disposed)return;raf=requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);tA+=dt;
+function animate(dt){tA+=dt;
   if(fly){fly.t=Math.min(1,fly.t+dt/1.3);const e=ease(fly.t);camera.position.lerpVectors(fly.p0,fly.p1,e);controls.target.lerpVectors(fly.t0,fly.t1,e);if(fly.t>=1)fly=null;}
   controls.update();wn.offset.set(tA*.004,tA*.0025);
   wheels.forEach((w,i)=>w.rotation.z+=dt*(i?.12:-.1));
@@ -753,14 +756,25 @@ function loop(){if(disposed)return;raf=requestAnimationFrame(loop);const dt=Math
     lander.visible=T<.8;const x=AP.x+u*AP.c,z=AP.z+u*AP.s;lander.position.set(x,Math.max(Hh(x,z),1.25)+.16+h,z);lander.rotation.z=h>0?.06:0;}
   if(flag){const a=flag.geometry.attributes.position,b=flag.userData.base;for(let i=0;i<a.count;i++){const x=b[i*3];a.array[i*3+2]=Math.sin(x*2.4-tA*5)*.2*(x/3);}a.needsUpdate=true;flag.geometry.computeVertexNormals();}
   if(carB){carData.forEach((c,i)=>{const d=(c[5]+tA*c[6])%c[4];qq.setFromAxisAngle(YAX,Math.atan2(-c[3],c[2]));m4.compose(pv.set(c[0]+c[2]*d,c[7]-.03,c[1]+c[3]*d),qq,sv.set(1,1,1));carB.setMatrixAt(i,m4);carC.setMatrixAt(i,m4);});carB.instanceMatrix.needsUpdate=carC.instanceMatrix.needsUpdate=true;}
-  clouds.rotation.y+=dt*.005;if(HQ&&composer)composer.render();else{renderer.render(scene,camera);renderer.autoClear=false;renderer.render(cloudScene,camera);renderer.autoClear=true;}
+  clouds.rotation.y+=dt*.005;}
+function loop(){if(disposed)return;raf=requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);animate(dt);
+  if(HQ&&composer)composer.render();else{renderer.render(scene,camera);renderer.autoClear=false;renderer.render(cloudScene,camera);renderer.autoClear=true;}
   const w=CW(),h=CH();
   pins.forEach(p=>{if(p.el.classList.contains('tpi-mark')&&pinsRoot.classList.contains('tpi-nomarks'))return;
     v3.copy(p.pos).project(camera);const vis=v3.z<1&&Math.abs(v3.x)<1.15&&Math.abs(v3.y)<1.15;p.el.hidden=!vis;
     if(vis){const d=camera.position.distanceTo(p.pos),sc=Math.max(.7,Math.min(1.12,170/d));p.el.style.transform=`translate(${(v3.x*.5+.5)*w}px,${(-v3.y*.5+.5)*h}px) translate(-50%,-100%) scale(${sc})`;p.el.style.zIndex=Math.round((1-v3.z)*1e5);}});}
 if(opts.autoRotate===false)setRotate(false);if(opts.night)setNight(true);if(opts.landmarkLabels===false)setLandmarkLabels(false);
-raf=requestAnimationFrame(()=>setTimeout(()=>{if(disposed)return;build();const ld=root.querySelector('.tpi-loading');if(ld)ld.remove();ready=true;loop();if(typeof opts.onReady==='function')opts.onReady(api);},30));
+if(EMB){build();ready=true;}else raf=requestAnimationFrame(()=>setTimeout(()=>{if(disposed)return;build();const ld=root.querySelector('.tpi-loading');if(ld)ld.remove();ready=true;loop();if(typeof opts.onReady==='function')opts.onReady(api);},30));
+let embedRoot=null;
+if(EMB){embedRoot=new THREE.Group();embedRoot.name='taipei-real-city';const skip=new Set([hemi,sun,sky,floor,water,flyer,...ships]);
+  [...scene.children].forEach(o=>{if(!skip.has(o))embedRoot.add(o);});
+  let mnx=1e9,mxx=-1e9,mnz=1e9,mxz=-1e9;Object.values(DIST).forEach(rs=>rs.forEach(r=>r.forEach(([x,z])=>{mnx=Math.min(mnx,x);mxx=Math.max(mxx,x);mnz=Math.min(mnz,z);mxz=Math.max(mxz,z);})));
+  embedRoot.userData.landBounds={minX:mnx,maxX:mxx,minZ:mnz,maxZ:mxz};}
 const api={
+  /** 嵌入模式：城市群組（城市單位，海平面 y=0）與逐幀更新 */
+  root:embedRoot,update:dt=>animate(Math.min(dt,.05)),
+  /** 嵌入模式：判斷城市座標點是否為陸地 */
+  isLand:(x,z)=>gs(EL,x,z)>.5,
   /** 飛到指定行政區或地標（名稱需與標籤一致） */
   flyTo(name){const p=pins.find(p=>p.name===name);if(p){p.go();return true;}return false;},
   resetView,setNight,setAutoRotate:setRotate,setLandmarkLabels,

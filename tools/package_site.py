@@ -36,6 +36,7 @@ def package(output):
     runpy.run_path(str(ROOT / "tools/build_district_craft_v2.py"), run_name="__main__")
     runpy.run_path(str(ROOT / "tools/build_landmark_assets_v030.py"), run_name="__main__")
     runpy.run_path(str(ROOT / "tools/build_taipei_real_preview.py"), run_name="__main__")
+    runpy.run_path(str(ROOT / "tools/build_taipei_real_shell_preview.py"), run_name="__main__")
     output.mkdir(parents=True, exist_ok=True)
     shutil.copytree(ROOT / "assets/art-v030", output / "assets/art-v030", dirs_exist_ok=True)
     prefix = ('<!doctype html>\n<html lang="zh-Hant">\n'
@@ -53,7 +54,7 @@ def package(output):
                  "newtaipei-preview-data.json", "keelung-preview-data.json", "taoyuan-preview-data.json", "aircraft-review-data.json", "review-models.js", "model-study.html", "model-study.js",
                  "skyline-study.html", "skyline-study.js", "urban-buildings.js", "organic-district.js",
                  "street-art-kit.js", "taipei-architecture.js", "taipei-landmarks.js", "taipei-preview-data.json",
-                 "taipei-real-v0.6.0.html", "taipei-real-v060.js", "taipei-real-v060.css", "taipei-real-v060-districts.js"]:
+                 "taipei-real-v0.6.0.html", "taipei-real-v060.js", "taipei-real-v060.css", "taipei-real-v060-districts.js", "greater-taipei-v0.6.1.html"]:
         (output / name).write_bytes((ROOT / "prototypes" / name).read_bytes())
     # Versioned previews come from immutable archives, never today's generated files.
     for archive in sorted((ROOT / "archives").glob("preview-*.zip")):
