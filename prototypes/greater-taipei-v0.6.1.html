@@ -4132,7 +4132,7 @@ const REAL_TAIPEI={};
  let cx0=1e9,cx1=-1e9,cz0=1e9,cz1=-1e9;for(const [x,z] of coast){cx0=Math.min(cx0,x);cx1=Math.max(cx1,x);cz0=Math.min(cz0,z);cz1=Math.max(cz1,z);}
  const tpIslands=islands.filter(i=>i.city==='taipei');
  const themes=tpIslands.map(i=>({id:i.t.id,name:i.t.name,kind:i.t.kind,area:i.t.area,no:i.t.no,items:i.t.items||[]}));
- const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:4.6});
+ const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:2.6});
  const g=real.root,lb=g.userData.landBounds;
  const k=Math.min((cx1-cx0)/(lb.maxX-lb.minX),(cz1-cz0)/(lb.maxZ-lb.minZ))*1.02;
  g.scale.setScalar(k);
@@ -4208,8 +4208,10 @@ let artWidth=0,artHeight=0;
 APPROVED_ART.render=()=>{const w=stage.clientWidth,h=stage.clientHeight;if(w!==artWidth||h!==artHeight){artWidth=w;artHeight=h;artComposer.setSize(w,h);const aoRatio=renderer.getPixelRatio()*.5;artAO.setSize(Math.ceil(w*aoRatio),Math.ceil(h*aoRatio));}updateArtLight();artSky.position.copy(camera.position);artComposer.render();};
 APPROVED_ART.update=(dt,time,moving)=>{APPROVED_ART.transport.update(dt,time,moving);APPROVED_ART.panoramaLife?.update(APPROVED_ART.transport.clock,[...APPROVED_ART.transport.vessels,...APPROVED_ART.transport.remote.vessels]);if(moving&&artSun&&time-artShadowTime>.25){artShadowTime=time;artSun.shadow.needsUpdate=true;}for(const c of APPROVED_ART.cities.values()){c.flag.userData.update?.(time,moving);c.life.setEnabled(moving);c.life.update(dt);if(moving)c.airTraffic?.update(dt);}if(moving)for(const [i,b]of APPROVED_ART.boats.entries()){b.root.position.y=b.base.y+Math.sin(time*.7+i)*.045;b.root.rotation.z=Math.sin(time*.5+i)*.012;}};
 APPROVED_ART.ao=artAO;
-{const nativeUpdate=APPROVED_ART.update;let realNight=null;
- APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}if(moving)REAL_TAIPEI.engine.update(dt);};}
+{const nativeUpdate=APPROVED_ART.update;let realNight=null;const lightBase=new Map(),lightSet=new Map();
+ let lights=null,envMats=null,envNight=-1;const dimNature=()=>{if(!lights){lights=[];scene.traverse(o=>{if(o.isHemisphereLight||o.isDirectionalLight||o.isAmbientLight)lights.push(o);});}const night=ENV.state?.night||0,f=1-.82*night;if(Math.abs(night-envNight)>.01){envNight=night;if(!envMats){envMats=new Map();scene.traverse(o=>{if(o.isMesh)for(const m of [o.material].flat())if(m&&m.isMeshStandardMaterial&&!envMats.has(m))envMats.set(m,m.envMapIntensity);});}envMats.forEach((v,m)=>m.envMapIntensity=v*(1-.85*night));}lights.forEach(o=>{
+  if(!lightSet.has(o)||Math.abs(o.intensity-lightSet.get(o))>1e-6)lightBase.set(o,o.intensity);const v=lightBase.get(o)*f;o.intensity=v;lightSet.set(o,v);});};
+ APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
 
 APPROVED_ART.streetFrame=(city='taipei')=>{const c=APPROVED_ART.cities.get(city),S=c.plan.scale,offset=c.root.position;
 const choices=c.streetDetails.sites.filter(s=>s.w>=7&&s.height>=8&&s.height<=30);
