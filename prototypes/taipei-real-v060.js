@@ -580,8 +580,9 @@ const L101=ZM['台北101'];
    fg.fillStyle='#000095';fg.beginPath();fg.arc(75,50,16.5,0,7);fg.fill();fg.fillStyle='#ffffff';fg.beginPath();fg.arc(75,50,14,0,7);fg.fill();
    const ft=new THREE.CanvasTexture(fc);ft.anisotropy=4;const fgeo=new THREE.PlaneGeometry(3,2,24,12).translate(1.5,0,0);
    flag=new THREE.Mesh(fgeo,nightable(new THREE.MeshStandardMaterial({map:ft,emissiveMap:ft,emissive:'#ffffff',side:THREE.DoubleSide,roughness:.7}),0,.55));
-   flag.userData.base=fgeo.attributes.position.array.slice();flag.scale.set(1.1,.72,1.1);flag.position.set(.05,y+3.68,0);flag.castShadow=true;t.add(flag);
-   const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,2.6,6),new THREE.MeshStandardMaterial({color:'#e6ecef',metalness:.7,roughness:.3}));pole.position.set(0,y+3.6,0);t.add(pole);}
+   const FS=opts.flagScale||1,PL=2.6+1.44*(FS-1); // opts.flagScale enlarges the 101 flag; the pole grows so the flag stays above the spire
+   flag.userData.base=fgeo.attributes.position.array.slice();flag.scale.set(1.1*FS,.72*FS,1.1*FS);flag.position.set(.05,y+2.3+PL-.5-.72*FS,0);flag.castShadow=true;t.add(flag);
+   const pole=new THREE.Mesh(new THREE.CylinderGeometry(.045*Math.sqrt(FS),.045*Math.sqrt(FS),PL,6),new THREE.MeshStandardMaterial({color:'#e6ecef',metalness:.7,roughness:.3}));pole.position.set(0,y+2.3+PL/2,0);t.add(pole);}
   t.position.set(L101.x,Hh(L101.x,L101.z)-.2,L101.z);t.scale.set(1.05,1.6,1.05);scene.add(t);}
 const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.6});
 function grp(x,z,ry,parts,sc){sc=sc||1.6;const g=new THREE.Group(),zn=ZONES.find(o=>Math.hypot(o.x-x,o.z-z)<.05),rr=zn?zn.r-.5:0;let gy=Hh(x,z);for(let k=0;k<16&&rr;k++){const a=k/16*6.2832;gy=Math.min(gy,Hh(x+Math.cos(a)*rr,z+Math.sin(a)*rr));}

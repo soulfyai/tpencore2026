@@ -36,7 +36,8 @@ UPDATE = r"""
  const newCourse=(f)=>{const c=window.REAL_TAIPEI?.focus101||{x:0,z:0},R=85,a=rnd()*Math.PI*2,b=a+Math.PI+(rnd()-.5)*1.4,off=(rnd()-.5)*50,px=-Math.sin(a),pz=Math.cos(a);
   f.ax=c.x+Math.cos(a)*R+px*off;f.az=c.z+Math.sin(a)*R+pz*off;f.bx=c.x+Math.cos(b)*R+px*off*.4;f.bz=c.z+Math.sin(b)*R+pz*off*.4;f.len=Math.hypot(f.bx-f.ax,f.bz-f.az);
   f.y=WATER_Y+7+rnd()*9;f.speed=3.2+rnd()*2.8;f.t=0;f.wait=4+rnd()*40;f.yaw=Math.atan2(f.bx-f.ax,f.bz-f.az);};
- const flyPlanes=(dt,moving)=>{for(const root of planeList()){let f=flights.get(root);if(!f){f={};newCourse(f);f.wait=rnd()*30;flights.set(root,f);}
+ const flyPlanes=(dt,moving)=>{const all=planeList();for(let i=0;i<all.length;i++){const root=all[i];if(i%2){root.visible=false;continue;} // half the aircraft
+  let f=flights.get(root);if(!f){f={};newCourse(f);f.wait=rnd()*30;flights.set(root,f);}
   if(!moving){root.visible=false;continue;}
   if(f.wait>0){f.wait-=dt;root.visible=false;continue;}
   f.t+=dt*f.speed/f.len;if(f.t>=1){newCourse(f);root.visible=false;continue;}
@@ -46,12 +47,15 @@ UPDATE = r"""
 
 
 POSTER_CSS = """
-.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){background:#fff!important;color:#14213D!important;border:2px solid color-mix(in srgb,var(--c) 70%,#fff)!important;box-shadow:0 4px 14px rgba(16,36,67,.28)!important;text-shadow:none!important;font:800 26px/1.2 var(--f-body)!important;padding:10px 22px 10px 18px!important;gap:12px!important;border-radius:14px!important}
-.hi .stage .tlabel b,.hi .stage.far .tlabel:not(.sel):not(.hot) b,.hi .stage.city-view .tlabel:not([hidden]) b{font:800 22px var(--f-mono)!important;color:var(--c)!important}
-.hi .stage .tlabel span,.hi .stage.far .tlabel:not(.sel):not(.hot) span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:26px!important;color:#14213D!important;max-width:none!important;white-space:nowrap!important}
+@media (min-width:861px){.hi .hi-toolbar{gap:2px;padding:4px;border-radius:14px;align-items:center;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
+ .hi .hi-toolbar .hi-maptools,.hi .hi-toolbar .hi-modes{background:none;box-shadow:none;backdrop-filter:none;padding:0;border-radius:0}
+ .hi .hi-toolbar .hi-modes{border-left:1px solid var(--line);padding-left:6px;margin-left:4px}}
+.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){background:#fff!important;color:#14213D!important;border:2px solid color-mix(in srgb,var(--c) 70%,#fff)!important;box-shadow:0 4px 14px rgba(16,36,67,.28)!important;text-shadow:none!important;font:800 13px/1.2 var(--f-body)!important;padding:5px 11px 5px 9px!important;gap:6px!important;border-radius:8px!important;border-width:1.5px!important}
+.hi .stage .tlabel b,.hi .stage.far .tlabel:not(.sel):not(.hot) b,.hi .stage.city-view .tlabel:not([hidden]) b{font:800 11px var(--f-mono)!important;color:var(--c)!important}
+.hi .stage .tlabel span,.hi .stage.far .tlabel:not(.sel):not(.hot) span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:13px!important;color:#14213D!important;max-width:none!important;white-space:nowrap!important}
 .hi .stage .tlabel:hover,.hi .stage .tlabel.sel,.hi .stage .tlabel.hot{background:var(--c)!important;border-color:#fff!important}
 .hi .stage .tlabel:hover span,.hi .stage .tlabel.sel span,.hi .stage .tlabel.hot span,.hi .stage .tlabel:hover b,.hi .stage .tlabel.sel b,.hi .stage .tlabel.hot b{color:#fff!important}
-@media (max-width:860px){.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){font-size:15px!important;padding:5px 11px 5px 9px!important;gap:6px!important;border-radius:10px!important}.hi .stage .tlabel span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:15px!important}.hi .stage .tlabel b,.hi .stage.city-view .tlabel:not([hidden]) b{font-size:13px!important}}
+@media (max-width:860px){.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){font-size:12px!important;padding:4px 9px 4px 7px!important;gap:5px!important;border-radius:8px!important}.hi .stage .tlabel span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:12px!important}.hi .stage .tlabel b,.hi .stage.city-view .tlabel:not([hidden]) b{font-size:10px!important}}
 .hi .hi-count{display:grid!important;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:10px;align-items:end}
 .hi .hi-stat{display:flex;flex-direction:column;gap:2px}
 .hi .hi-stat b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
@@ -77,7 +81,9 @@ def build():
         s = s.replace(a, b, count)
 
     sub('import * as THREE from "three";\n', 'import * as THREE from "three";\n' + base["IMPORT"])
-    sub("APPROVED_ART.transport=await buildTransportNetwork(", base["REPLACE"] + "APPROVED_ART.transport=await buildTransportNetwork(")
+    replace = base["REPLACE"].replace("campusRadius:5.4,", "flagScale:2,campusRadius:5.4,")  # 101 flag twice as large
+    assert "flagScale:2" in replace
+    sub("APPROVED_ART.transport=await buildTransportNetwork(", replace + "APPROVED_ART.transport=await buildTransportNetwork(")
     sub("APPROVED_ART.ao=artAO;", "APPROVED_ART.ao=artAO;" + UPDATE)
     sub('content="0.4.12"', f'content="{VERSION}"')
     sub('const near = THREE.MathUtils.clamp(camDist * 0.02, 0.3, 12);', 'const near = THREE.MathUtils.clamp(camDist * 0.02, 0.012, 12);')
@@ -130,7 +136,7 @@ def build():
         'const o=overview(),desktop=true,f=o;controls.maxDistance=o.dist*1.5;ENV.fit?.(o.dist*1.5);entered=null;camera.position.copy(f.pos);controls.target.copy(f.target);controls.update();stage.classList.toggle("pano",desktop);')
     sub("function armPanoramaOrbit() { if(stage.clientWidth>860)return; panoramaOrbit.armed=true;", "function armPanoramaOrbit() { panoramaOrbit.armed=true;")
     sub("if(now-panoramaOrbit.waitingSince<5000)return false;\n  const step=Math.min(Math.max(0,dt)*Math.PI*2/180,Math.PI*2-panoramaOrbit.angle);",
-        "if(now-panoramaOrbit.waitingSince<1500)return false;\n  const step=Math.max(0,dt)*Math.PI*2/180; // one revolution every 3 minutes, continuous")
+        "if(now-panoramaOrbit.waitingSince<1500)return false;\n  const step=Math.max(0,dt)*Math.PI*2/360; // one revolution every 6 minutes, continuous")
     sub("  if(panoramaOrbit.angle>=Math.PI*2-1e-9)stopPanoramaOrbit();\n", "")
     # Faster first paint:
     # 1) the two brand logos were inlined as ~1.6 MB PNG data URIs, each twice (8.8 MB of the 9.6 MB page);
@@ -190,7 +196,7 @@ def build():
     sub("pop.append(cand, count, chips);", "pop.append(cand, count, el(\"p\", \"hi-pop-note\", independence));")
     sub("intro.hidden = false; // Explain", "intro.hidden = true; // v0.6.4: stats card and policy list open instead; help stays on the ? button. Explain")
     # 6) Policy list and stats card open on arrival (list on desktop; on phones it would cover the map).
-    sub("  UI.followCity=(c)=>{", "  setPop(true);if(innerWidth>860)setMode(\"list\");\n  UI.followCity=(c)=>{")
+    sub("  UI.followCity=(c)=>{", "  setPop(true);\n  UI.followCity=(c)=>{")
     s = re.sub(r'<title>.*?</title>', '<title>台北安可擬真臺北 v0.6.4</title>', s, count=1)
     OUT.write_text(s, encoding="utf-8")
     print(f"Built v{VERSION} realistic Taipei only (New Taipei and bridges removed) -> {OUT.relative_to(ROOT)}")

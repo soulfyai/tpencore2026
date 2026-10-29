@@ -194,12 +194,15 @@ html.hi.booting .loading{position:fixed;inset:0;z-index:70;visibility:visible;di
 .loading-brand{position:relative;flex:none;aspect-ratio:2158 / 729;width:min(520px,100%);padding:0;border:0;background:none;box-shadow:none;line-height:0}
 .loading-brand picture{display:block;width:100%;height:100%}
 html.hi:not(.booting) .loading{display:none}
-.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){background:#fff!important;color:#14213D!important;border:2px solid color-mix(in srgb,var(--c) 70%,#fff)!important;box-shadow:0 4px 14px rgba(16,36,67,.28)!important;text-shadow:none!important;font:800 26px/1.2 var(--f-body)!important;padding:10px 22px 10px 18px!important;gap:12px!important;border-radius:14px!important}
-.hi .stage .tlabel b,.hi .stage.far .tlabel:not(.sel):not(.hot) b,.hi .stage.city-view .tlabel:not([hidden]) b{font:800 22px var(--f-mono)!important;color:var(--c)!important}
-.hi .stage .tlabel span,.hi .stage.far .tlabel:not(.sel):not(.hot) span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:26px!important;color:#14213D!important;max-width:none!important;white-space:nowrap!important}
+@media (min-width:861px){.hi .hi-toolbar{gap:2px;padding:4px;border-radius:14px;align-items:center;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(6px);box-shadow:0 6px 20px rgba(20,33,61,.12)}
+ .hi .hi-toolbar .hi-maptools,.hi .hi-toolbar .hi-modes{background:none;box-shadow:none;backdrop-filter:none;padding:0;border-radius:0}
+ .hi .hi-toolbar .hi-modes{border-left:1px solid var(--line);padding-left:6px;margin-left:4px}}
+.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){background:#fff!important;color:#14213D!important;border:2px solid color-mix(in srgb,var(--c) 70%,#fff)!important;box-shadow:0 4px 14px rgba(16,36,67,.28)!important;text-shadow:none!important;font:800 13px/1.2 var(--f-body)!important;padding:5px 11px 5px 9px!important;gap:6px!important;border-radius:8px!important;border-width:1.5px!important}
+.hi .stage .tlabel b,.hi .stage.far .tlabel:not(.sel):not(.hot) b,.hi .stage.city-view .tlabel:not([hidden]) b{font:800 11px var(--f-mono)!important;color:var(--c)!important}
+.hi .stage .tlabel span,.hi .stage.far .tlabel:not(.sel):not(.hot) span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:13px!important;color:#14213D!important;max-width:none!important;white-space:nowrap!important}
 .hi .stage .tlabel:hover,.hi .stage .tlabel.sel,.hi .stage .tlabel.hot{background:var(--c)!important;border-color:#fff!important}
 .hi .stage .tlabel:hover span,.hi .stage .tlabel.sel span,.hi .stage .tlabel.hot span,.hi .stage .tlabel:hover b,.hi .stage .tlabel.sel b,.hi .stage .tlabel.hot b{color:#fff!important}
-@media (max-width:860px){.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){font-size:15px!important;padding:5px 11px 5px 9px!important;gap:6px!important;border-radius:10px!important}.hi .stage .tlabel span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:15px!important}.hi .stage .tlabel b,.hi .stage.city-view .tlabel:not([hidden]) b{font-size:13px!important}}
+@media (max-width:860px){.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){font-size:12px!important;padding:4px 9px 4px 7px!important;gap:5px!important;border-radius:8px!important}.hi .stage .tlabel span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:12px!important}.hi .stage .tlabel b,.hi .stage.city-view .tlabel:not([hidden]) b{font-size:10px!important}}
 .hi .hi-count{display:grid!important;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:10px;align-items:end}
 .hi .hi-stat{display:flex;flex-direction:column;gap:2px}
 .hi .hi-stat b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
@@ -4153,7 +4156,7 @@ const REAL_TAIPEI={};
  let cx0=1e9,cx1=-1e9,cz0=1e9,cz1=-1e9;for(const [x,z] of coast){cx0=Math.min(cx0,x);cx1=Math.max(cx1,x);cz0=Math.min(cz0,z);cz1=Math.max(cz1,z);}
  const tpIslands=islands.filter(i=>i.city==='taipei');
  const themes=tpIslands.map(i=>({id:i.t.id,name:i.t.name,kind:i.t.kind,area:i.t.area,no:i.t.no,items:i.t.items||[]}));
- const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:3.2});
+ const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),flagScale:2,campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:3.2});
  const g=real.root,lb=g.userData.landBounds;
  const k=Math.min((cx1-cx0)/(lb.maxX-lb.minX),(cz1-cz0)/(lb.maxZ-lb.minZ))*1.02;
  g.scale.setScalar(k);
@@ -4247,7 +4250,8 @@ APPROVED_ART.ao=artAO;
  const newCourse=(f)=>{const c=window.REAL_TAIPEI?.focus101||{x:0,z:0},R=85,a=rnd()*Math.PI*2,b=a+Math.PI+(rnd()-.5)*1.4,off=(rnd()-.5)*50,px=-Math.sin(a),pz=Math.cos(a);
   f.ax=c.x+Math.cos(a)*R+px*off;f.az=c.z+Math.sin(a)*R+pz*off;f.bx=c.x+Math.cos(b)*R+px*off*.4;f.bz=c.z+Math.sin(b)*R+pz*off*.4;f.len=Math.hypot(f.bx-f.ax,f.bz-f.az);
   f.y=WATER_Y+7+rnd()*9;f.speed=3.2+rnd()*2.8;f.t=0;f.wait=4+rnd()*40;f.yaw=Math.atan2(f.bx-f.ax,f.bz-f.az);};
- const flyPlanes=(dt,moving)=>{for(const root of planeList()){let f=flights.get(root);if(!f){f={};newCourse(f);f.wait=rnd()*30;flights.set(root,f);}
+ const flyPlanes=(dt,moving)=>{const all=planeList();for(let i=0;i<all.length;i++){const root=all[i];if(i%2){root.visible=false;continue;} // half the aircraft
+  let f=flights.get(root);if(!f){f={};newCourse(f);f.wait=rnd()*30;flights.set(root,f);}
   if(!moving){root.visible=false;continue;}
   if(f.wait>0){f.wait-=dt;root.visible=false;continue;}
   f.t+=dt*f.speed/f.len;if(f.t>=1){newCourse(f);root.visible=false;continue;}
@@ -4447,7 +4451,7 @@ function updatePanoramaOrbit(now,dt) {
   if(A.state.selTheme||A.state.selItem||A.state.selFlow){stopPanoramaOrbit();return false;} // single city: being 'in' Taipei does not stop the orbit
   if(panoramaOrbit.waitingSince===null){panoramaOrbit.waitingSince=now;return false;}
   if(now-panoramaOrbit.waitingSince<1500)return false;
-  const step=Math.max(0,dt)*Math.PI*2/180; // one revolution every 3 minutes, continuous
+  const step=Math.max(0,dt)*Math.PI*2/360; // one revolution every 6 minutes, continuous
   const offset=camera.position.clone().sub(controls.target);
   offset.applyAxisAngle(new THREE.Vector3(0,1,0),-step);
   camera.position.copy(controls.target).add(offset);
@@ -5223,7 +5227,7 @@ const UI = {};
     MAP3D.flyTo(target,pos);
   };
 
-  setPop(true);if(innerWidth>860)setMode("list");
+  setPop(true);
   UI.followCity=(c)=>{
     if(c===LIVE)return;
     if(A.state.selTheme||A.state.selItem||A.state.selFlow||!tour.hidden)UI.dismissOverlays();
