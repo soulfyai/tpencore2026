@@ -23,9 +23,9 @@ base = runpy.run_path(str(ROOT / "tools" / "build_taipei_real_shell_preview.py")
 UPDATE = r"""
 {const nativeUpdate=APPROVED_ART.update;let realNight=null;const lightBase=new Map(),lightSet=new Map();let lights=null,envMats=null,envKey='';
  const moon=new THREE.DirectionalLight('#aec6ff',0);moon.name='moonlight';moon.position.set(-70,140,-50);scene.add(moon);scene.add(moon.target);
- window.NIGHT_LOOK=window.NIGHT_LOOK||{dim:.55,env:.6,moon:.9};
+ window.NIGHT_LOOK=window.NIGHT_LOOK||{dim:.45,env:.55,moon:1.6,day:.35};
  const dimNature=()=>{const L=window.NIGHT_LOOK;if(!lights){lights=[];scene.traverse(o=>{if((o.isHemisphereLight||o.isDirectionalLight||o.isAmbientLight)&&o!==moon)lights.push(o);});}
-  const night=ENV.state?.night||0,f=1-L.dim*night,key=night.toFixed(2)+'/'+L.env;
+  const night=ENV.state?.night||0,f=(1-L.dim*night)*(1+(L.day||0)*(1-night)),key=night.toFixed(2)+'/'+L.env;
   if(key!==envKey){envKey=key;if(!envMats){envMats=new Map();scene.traverse(o=>{if(o.isMesh)for(const m of [o.material].flat())if(m&&m.isMeshStandardMaterial&&!envMats.has(m))envMats.set(m,m.envMapIntensity);});}envMats.forEach((v,m)=>m.envMapIntensity=v*(1-L.env*night));}
   lights.forEach(o=>{if(!lightSet.has(o)||Math.abs(o.intensity-lightSet.get(o))>1e-6)lightBase.set(o,o.intensity);const v=lightBase.get(o)*f;o.intensity=v;lightSet.set(o,v);});
   moon.intensity=L.moon*night;};
@@ -42,7 +42,11 @@ UPDATE = r"""
   if(f.wait>0){f.wait-=dt;root.visible=false;continue;}
   f.t+=dt*f.speed/f.len;if(f.t>=1){newCourse(f);root.visible=false;continue;}
   root.position.set(f.ax+(f.bx-f.ax)*f.t,f.y,f.az+(f.bz-f.az)*f.t);root.rotation.set(0,f.yaw,0);root.visible=true;}};
- APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);flyPlanes(dt,moving);const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
+ // Night glow: bloom on bright windows, lamps and lit roads (off in daylight so water glints never bloom).
+ const bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.75,.55,.82);bloom.enabled=false;artComposer.insertPass(bloom,artComposer.passes.length-1);
+ const bloomSize=()=>{const pr=Math.min(renderer.getPixelRatio(),1.5)*.5;bloom.setSize(Math.max(64,stage.clientWidth*pr|0),Math.max(64,stage.clientHeight*pr|0));};bloomSize();addEventListener('resize',bloomSize);
+ const glow=()=>{const night=ENV.state?.night||0;bloom.enabled=night>.25;bloom.strength=.55*night;bloom.threshold=1.;bloom.radius=.5;};
+ APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);flyPlanes(dt,moving);glow();const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
 """
 
 
@@ -82,8 +86,8 @@ def build():
         assert s.count(a) >= 1, a[:80]
         s = s.replace(a, b, count)
 
-    sub('import * as THREE from "three";\n', 'import * as THREE from "three";\n' + base["IMPORT"])
-    replace = base["REPLACE"].replace("campusRadius:5.4,", "flagScale:2,campusRadius:5.4,")  # 101 flag twice as large
+    sub('import * as THREE from "three";\n', 'import * as THREE from "three";\n' + base["IMPORT"] + "import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';\n")
+    replace = base["REPLACE"].replace("campusRadius:5.4,", "flagScale:2,windowScale:.5,windowVariety:true,streetLamps:true,campusRadius:5.4,")  # 101 flag twice as large
     assert "flagScale:2" in replace
     sub("APPROVED_ART.transport=await buildTransportNetwork(", replace + "APPROVED_ART.transport=await buildTransportNetwork(")
     sub("APPROVED_ART.ao=artAO;", "APPROVED_ART.ao=artAO;" + UPDATE)

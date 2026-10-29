@@ -59,6 +59,8 @@ const DIST=opts.districts||DISTRICTS;
 const DN=['北投','士林','內湖','中山','大同','松山','南港','信義','大安','中正','萬華','文山'];
 const DP={北投:[.55,7.8,1.7],士林:[.25,7.8,1.9],內湖:[-.2,8.8,2.1],中山:[0,7.8,2.5],大同:[.02,6.8,1.8],松山:[0,8.3,2.5],南港:[.15,8.8,1.9],信義:[0,8.3,2.3],大安:[0,8.3,2.5],中正:[.05,7.8,2.3],萬華:[.32,6.8,1.7],文山:[.42,7.8,1.9]};
 const W=240,MS=768,S=MS/W,N=361,CELL=W/(N-1),TS=2048;
+// 夜景細節（預設關閉，維持 v0.6.1 外觀）：windowScale 縮小窗格、windowVariety 窗燈色溫與亮度各異、streetLamps 路燈與路面光圈
+const WSC=opts.windowScale||1,WVAR=!!opts.windowVariety,SLAMP=!!opts.streetLamps;
 
 /* ---------- utils ---------- */
 function hash(i,j){let n=Math.imul(i,374761393)+Math.imul(j,668265263);n=Math.imul(n^(n>>>13),1274126177);n^=n>>>16;return (n>>>0)/4294967295;}
@@ -308,8 +310,13 @@ landMat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,{uUrban:{value:urbanTex},
    if(rv>.5&&ru<.5){paint=max(paint,(wv>1.?1.-smoothstep(.022-fw,.022+fw,abs(mv-wv*.5)):0.)*step(fract(u/1.1),.5));
      float near=step(mu,wu+.3)+step(B-.3,mu);paint=max(paint,min(near,1.)*step(.5,fract(v*9.))*step(.06,mv)*step(mv,wv-.06));}
    vec3 col=mix(diffuseColor.rgb,vec3(.62,.61,.58),curb);col=mix(col,asph,road);col=mix(col,vec3(.86,.86,.84),paint*road);
-   diffuseColor.rgb=mix(diffuseColor.rgb,col,smoothstep(.35,.6,um));roadGlow=road*(art?1.:.55)*smoothstep(.35,.6,um);}}`).replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n totalEmissiveRadiance+=emissive*vec3(1.,.62,.3)*roadGlow*.55;');};
-landMat.customProgramCacheKey=()=>'tpi-land-roads-v1';
+   diffuseColor.rgb=mix(diffuseColor.rgb,col,smoothstep(.35,.6,um));roadGlow=road*(art?1.:.55)*smoothstep(.35,.6,um);
+   #ifdef SLAMP
+   {float pu=fract(v/1.3)-.5,pv=fract(u/1.3)-.5,poolU=exp(-pu*pu*28.),poolV=exp(-pv*pv*28.);float pool=ru>rv?poolU:poolV;
+    roadGlow=(road*(art?1.:.75)*(.12+1.1*pool)+curb*pool*.7)*smoothstep(.35,.6,um);}
+   #endif
+   }}`).replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\n totalEmissiveRadiance+=emissive*vec3(1.,.62,.3)*roadGlow*.55;');};
+if(SLAMP)landMat.defines={SLAMP:''};landMat.customProgramCacheKey=()=>'tpi-land-roads-v1'+(SLAMP?'L':'');
 const land=new THREE.Mesh(tgeo,landMat);
 land.receiveShadow=true;scene.add(land);
 
@@ -378,10 +385,18 @@ function patch(mat,fw,fh,ws){mat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,
  diffuseColor.rgb*=mix(0.55,1.0,smoothstep(0.0,1.6,vLocalY))*mix(0.94,1.0,smoothstep(0.0,6.0,vLocalY));
 #endif`).replace('#include <emissivemap_fragment>',`#ifdef USE_EMISSIVEMAP
  vec2 wcell=floor(vEmissiveMapUv*vec2(4.0,8.0));float wr=fract(sin(dot(wcell,vec2(12.9898,78.233))+dot(floor(vWorldXZ),vec2(3.17,7.31)))*43758.5453);
+#ifdef WINVAR
+ vec3 em=texture2D(emissiveMap,vEmissiveMapUv).rgb;float lum=max(em.r,max(em.g,em.b));
+ float w2=fract(sin(dot(wcell,vec2(91.7,27.3))+dot(floor(vWorldXZ),vec2(5.1,1.7)))*24634.6),w3=fract(wr*7.31+w2*3.17);
+ vec3 tint=w2<.5?vec3(1.,.78,.48):w2<.76?vec3(1.,.93,.8):w2<.9?vec3(.72,.86,1.):vec3(1.,.58,.32);
+ totalEmissiveRadiance*=lum*tint*(1.0-vRoof)*step(0.52,wr)*(0.25+0.95*w3*w3);
+#else
  totalEmissiveRadiance*=texture2D(emissiveMap,vEmissiveMapUv).rgb*(1.0-vRoof)*step(0.42,wr)*(0.45+0.55*wr);
+#endif
  totalEmissiveRadiance+=emissive*vec3(1.0,0.72,0.42)*0.9*(1.0-smoothstep(0.16,0.3,vLocalY))*(1.0-vRoof);
 #endif`);};
- mat.customProgramCacheKey=()=>'fac160'+fw+'_'+fh+'_'+ws;}
+ if(WVAR)mat.defines={...(mat.defines||{}),WINVAR:''};
+ mat.customProgramCacheKey=()=>'fac160'+fw+'_'+fh+'_'+ws+(WVAR?'v':'');}
 
 /* ---------- geometries ---------- */
 function prism(){const p=[-.5,0,-.5,-.5,0,.5,-.5,1,0, .5,0,.5,.5,0,-.5,.5,1,0, -.5,0,.5,.5,0,.5,.5,1,0, -.5,0,.5,.5,1,0,-.5,1,0, .5,0,-.5,-.5,0,-.5,-.5,1,0, .5,0,-.5,-.5,1,0,.5,1,0];
@@ -396,7 +411,7 @@ const beaconM=nightable(new THREE.MeshStandardMaterial({color:'#ff3a2a',emissive
 const groups={};
 function put(g,mt,x,y,z,sx,sy,sz,ry,c){const key=g+'|'+mt;(groups[key]||(groups[key]={g,mt,list:[]})).list.push([x,y,z,sx,sy,sz,ry,c]);}
 function flush(){Object.values(groups).forEach(gr=>{let mat;
-  if(typeof gr.mt==='number'){const f=FT[gr.mt];mat=nightable(new THREE.MeshStandardMaterial({map:f.m,emissiveMap:f.em,roughnessMap:f.rm,normalMap:f.nm,normalScale:new THREE.Vector2(1.3,1.3),emissive:'#ffffff',roughness:1,metalness:gr.mt===1?.5:.05,envMapIntensity:gr.mt===1?1:.6}),0,.9);patch(mat,f.fw,f.fh,WS[gr.g]||1);}
+  if(typeof gr.mt==='number'){const f=FT[gr.mt];mat=nightable(new THREE.MeshStandardMaterial({map:f.m,emissiveMap:f.em,roughnessMap:f.rm,normalMap:f.nm,normalScale:new THREE.Vector2(1.3,1.3),emissive:'#ffffff',roughness:1,metalness:gr.mt===1?.5:.05,envMapIntensity:gr.mt===1?1:.6}),0,.9);patch(mat,f.fw*WSC,f.fh*WSC,WS[gr.g]||1);}
   else mat=gr.mt==='metal'?metalM:gr.mt==='beacon'?beaconM:gr.mt==='lamp'?lampM:gr.mt==='led'?ledM:plainM;
   const im=new THREE.InstancedMesh(typeof gr.mt==='number'&&gr.g==='box'?GEO.rbox:GEO[gr.g],mat,gr.list.length);
   gr.list.forEach((b,i)=>{qq.setFromAxisAngle(YAX,b[6]);m4.compose(pv.set(b[0],b[1],b[2]),qq,sv.set(b[3],b[4],b[5]));im.setMatrixAt(i,m4);im.setColorAt(i,col.set(b[7]||'#ffffff'));});
@@ -545,6 +560,9 @@ DN.forEach((nm,di)=>{const [ang,B]=DP[nm],c=Math.cos(ang),s=Math.sin(ang),id=di+
     {const vm=iv*B+B/2,um=iu*B+B/2;for(const [uu,vv,dx,dz,L] of [[iu*B+wu+.07,iv*B+wv,-s,c,B-wv],[iu*B+B-.07,iv*B+wv,-s,c,B-wv],[iu*B+wu,iv*B+wv+.07,c,s,B-wu],[iu*B+wu,iv*B+B-.07,c,s,B-wu]]){
       const x0=uu*c-vv*s,z0=uu*s+vv*c,mx=x0+dx*L/2,mz=z0+dz*L/2;if(did(mx,mz)===id&&urb(mx,mz)&&rnd()<.55)walkPaths.push([x0,z0,dx,dz,L]);}}
     if(wu>1)for(let t=0;t<B;t+=1.3){const u=iu*B-.05,v=iv*B+t,x=u*c-v*s,z=u*s+v*c;if(rnd()<.35&&did(x,z)===id&&urb(x,z))streetTrees.push([x,z]);}
+    if(SLAMP){const lamp=(x,z)=>{if(did(x,z)!==id||!urb(x,z))return;const y=Hh(x,z)-.05;put('tank','metal',x,y,z,.025,.34,.025,0,'#8d949a');put('bead','lamp',x,y+.35,z,.07,.05,.07,0);};
+     for(let m=Math.ceil((iv*B+wv)/1.3-.5);(m+.5)*1.3<iv*B+B-.2;m++){const v=(m+.5)*1.3,u=m%2?iu*B-.07:iu*B+wu+.07;lamp(u*c-v*s,u*s+v*c);}
+     for(let m=Math.ceil((iu*B+wu)/1.3-.5);(m+.5)*1.3<iu*B+B-.2;m++){const u=(m+.5)*1.3,v=m%2?iv*B-.07:iv*B+wv+.07;lamp(u*c-v*s,u*s+v*c);}}
     if(wv>1)for(let t=0;t<B;t+=1.3){const u=iu*B+t,v=iv*B-.05,x=u*c-v*s,z=u*s+v*c;if(rnd()<.35&&did(x,z)===id&&urb(x,z))streetTrees.push([x,z]);}
     if(carData.length<700){
     if(wu>1)[[.28,1],[.72,-1]].forEach(([f,sg])=>{if(rnd()<.6){const u=iu*B+wu*f,v0=iv*B+wv,L=B-wv,mx=u*c-(v0+L/2)*s,mz=u*s+(v0+L/2)*c;if(did(mx,mz)===id&&urb(mx,mz)){const vs=sg>0?v0:v0+L;carData.push([u*c-vs*s,u*s+vs*c,-s*sg,c*sg,L,rnd()*L,.5+rnd()*.5,Hh(mx,mz)]);}}});

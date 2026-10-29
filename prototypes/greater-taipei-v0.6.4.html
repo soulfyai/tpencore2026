@@ -820,6 +820,7 @@ if(h){if(themeById.has(h))openTheme(h);else if(items.has(h))openItem(h);else if(
 <script type="module" onerror="window.cityLoadFailed()">
 import * as THREE from "three";
 import {createTaipeiIsland as createRealTaipei} from './taipei-real-v060.js?rev=2';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {createPanoramaLife} from "./panorama-life-v0412.js";
 import {buildTransportNetwork} from './transport-network-v0411.js?rev=1';
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -4158,7 +4159,7 @@ const REAL_TAIPEI={};
  let cx0=1e9,cx1=-1e9,cz0=1e9,cz1=-1e9;for(const [x,z] of coast){cx0=Math.min(cx0,x);cx1=Math.max(cx1,x);cz0=Math.min(cz0,z);cz1=Math.max(cz1,z);}
  const tpIslands=islands.filter(i=>i.city==='taipei');
  const themes=tpIslands.map(i=>({id:i.t.id,name:i.t.name,kind:i.t.kind,area:i.t.area,no:i.t.no,items:i.t.items||[]}));
- const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),flagScale:2,campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:3.2});
+ const real=createRealTaipei(document.createElement('div'),{embed:true,renderer,postprocessing:false,ui:false,policies:themes,cityColor:cityHex('taipei'),flagScale:2,windowScale:.5,windowVariety:true,streetLamps:true,campusRadius:5.4,campusHeight:2.2,nightBoost:1.15,carScale:1.5,walkerScale:3.2});
  const g=real.root,lb=g.userData.landBounds;
  const k=Math.min((cx1-cx0)/(lb.maxX-lb.minX),(cz1-cz0)/(lb.maxZ-lb.minZ))*1.02;
  g.scale.setScalar(k);
@@ -4239,9 +4240,9 @@ APPROVED_ART.update=(dt,time,moving)=>{APPROVED_ART.transport.update(dt,time,mov
 APPROVED_ART.ao=artAO;
 {const nativeUpdate=APPROVED_ART.update;let realNight=null;const lightBase=new Map(),lightSet=new Map();let lights=null,envMats=null,envKey='';
  const moon=new THREE.DirectionalLight('#aec6ff',0);moon.name='moonlight';moon.position.set(-70,140,-50);scene.add(moon);scene.add(moon.target);
- window.NIGHT_LOOK=window.NIGHT_LOOK||{dim:.55,env:.6,moon:.9};
+ window.NIGHT_LOOK=window.NIGHT_LOOK||{dim:.45,env:.55,moon:1.6,day:.35};
  const dimNature=()=>{const L=window.NIGHT_LOOK;if(!lights){lights=[];scene.traverse(o=>{if((o.isHemisphereLight||o.isDirectionalLight||o.isAmbientLight)&&o!==moon)lights.push(o);});}
-  const night=ENV.state?.night||0,f=1-L.dim*night,key=night.toFixed(2)+'/'+L.env;
+  const night=ENV.state?.night||0,f=(1-L.dim*night)*(1+(L.day||0)*(1-night)),key=night.toFixed(2)+'/'+L.env;
   if(key!==envKey){envKey=key;if(!envMats){envMats=new Map();scene.traverse(o=>{if(o.isMesh)for(const m of [o.material].flat())if(m&&m.isMeshStandardMaterial&&!envMats.has(m))envMats.set(m,m.envMapIntensity);});}envMats.forEach((v,m)=>m.envMapIntensity=v*(1-L.env*night));}
   lights.forEach(o=>{if(!lightSet.has(o)||Math.abs(o.intensity-lightSet.get(o))>1e-6)lightBase.set(o,o.intensity);const v=lightBase.get(o)*f;o.intensity=v;lightSet.set(o,v);});
   moon.intensity=L.moon*night;};
@@ -4258,7 +4259,11 @@ APPROVED_ART.ao=artAO;
   if(f.wait>0){f.wait-=dt;root.visible=false;continue;}
   f.t+=dt*f.speed/f.len;if(f.t>=1){newCourse(f);root.visible=false;continue;}
   root.position.set(f.ax+(f.bx-f.ax)*f.t,f.y,f.az+(f.bz-f.az)*f.t);root.rotation.set(0,f.yaw,0);root.visible=true;}};
- APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);flyPlanes(dt,moving);const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
+ // Night glow: bloom on bright windows, lamps and lit roads (off in daylight so water glints never bloom).
+ const bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.75,.55,.82);bloom.enabled=false;artComposer.insertPass(bloom,artComposer.passes.length-1);
+ const bloomSize=()=>{const pr=Math.min(renderer.getPixelRatio(),1.5)*.5;bloom.setSize(Math.max(64,stage.clientWidth*pr|0),Math.max(64,stage.clientHeight*pr|0));};bloomSize();addEventListener('resize',bloomSize);
+ const glow=()=>{const night=ENV.state?.night||0;bloom.enabled=night>.25;bloom.strength=.55*night;bloom.threshold=1.;bloom.radius=.5;};
+ APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);flyPlanes(dt,moving);glow();const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
 
 APPROVED_ART.streetFrame=(city='taipei')=>{const c=APPROVED_ART.cities.get(city),S=c.plan.scale,offset=c.root.position;
 const choices=c.streetDetails.sites.filter(s=>s.w>=7&&s.height>=8&&s.height<=30);
