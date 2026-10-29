@@ -42,6 +42,8 @@ def package(output):
     runpy.run_path(str(ROOT / "tools/build_taipei_real_v064_preview.py"), run_name="__main__")
     output.mkdir(parents=True, exist_ok=True)
     shutil.copytree(ROOT / "assets/art-v030", output / "assets/art-v030", dirs_exist_ok=True)
+    for asset in sorted((ROOT / "prototypes/assets").glob("*-v064-*")):  # v0.6.4 logos and loading posters
+        (output / "assets").mkdir(parents=True, exist_ok=True); shutil.copy2(asset, output / "assets" / asset.name)
     prefix = ('<!doctype html>\n<html lang="zh-Hant">\n'
               '<meta charset="utf-8">\n'
               '<meta name="viewport" content="width=device-width, initial-scale=1">\n')

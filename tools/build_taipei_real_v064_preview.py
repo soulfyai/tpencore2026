@@ -150,14 +150,15 @@ def build():
     # 2) shaders compile asynchronously before the first frame;
     # 3) the loading page is the pre-rendered default view (day or night by Taipei time), out of focus, with the
     #    status pill in the centre until the live 3D takes over in place.
-    from PIL import Image
     assets = P / "assets"
     def logo(match):
         raw = base64.b64decode(match.group(1))
-        im = Image.open(io.BytesIO(raw))
-        name = "brand-v064-mobile.webp" if im.size[0] < 2000 else "brand-v064-desktop.webp"
+        width = int.from_bytes(raw[16:20], "big")  # PNG IHDR width
+        name = "brand-v064-mobile.webp" if width < 2000 else "brand-v064-desktop.webp"
         out = assets / name
         if not out.exists():
+            from PIL import Image  # only needed when the committed WebP files are missing (CI has them)
+            im = Image.open(io.BytesIO(raw))
             w = 760 if "mobile" in name else 1086
             im.resize((w, round(im.size[1] * w / im.size[0])), Image.LANCZOS).save(out, "WEBP", quality=90, method=6)
         return "assets/" + name
