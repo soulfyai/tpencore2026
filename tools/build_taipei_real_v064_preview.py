@@ -29,11 +29,35 @@ UPDATE = r"""
   if(key!==envKey){envKey=key;if(!envMats){envMats=new Map();scene.traverse(o=>{if(o.isMesh)for(const m of [o.material].flat())if(m&&m.isMeshStandardMaterial&&!envMats.has(m))envMats.set(m,m.envMapIntensity);});}envMats.forEach((v,m)=>m.envMapIntensity=v*(1-L.env*night));}
   lights.forEach(o=>{if(!lightSet.has(o)||Math.abs(o.intensity-lightSet.get(o))>1e-6)lightBase.set(o,o.intensity);const v=lightBase.get(o)*f;o.intensity=v;lightSet.set(o,v);});
   moon.intensity=L.moon*night;};
- APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
+ // Aircraft: instead of endless circles, each plane appears at a random time, crosses the map on a straight
+ // course at its own height and speed, leaves the view, and comes back later on a different course.
+ const flights=new Map(),FV=new THREE.Vector3(),rnd=Math.random;
+ const planeList=()=>[...(APPROVED_ART.transport?.planes||[]),...(APPROVED_ART.transport?.remote?.planes||[]),...(APPROVED_ART.panoramaLife?.planes||[])].map(p=>p.root).filter(Boolean);
+ const newCourse=(f)=>{const c=window.REAL_TAIPEI?.focus101||{x:0,z:0},R=85,a=rnd()*Math.PI*2,b=a+Math.PI+(rnd()-.5)*1.4,off=(rnd()-.5)*50,px=-Math.sin(a),pz=Math.cos(a);
+  f.ax=c.x+Math.cos(a)*R+px*off;f.az=c.z+Math.sin(a)*R+pz*off;f.bx=c.x+Math.cos(b)*R+px*off*.4;f.bz=c.z+Math.sin(b)*R+pz*off*.4;f.len=Math.hypot(f.bx-f.ax,f.bz-f.az);
+  f.y=WATER_Y+7+rnd()*9;f.speed=3.2+rnd()*2.8;f.t=0;f.wait=4+rnd()*40;f.yaw=Math.atan2(f.bx-f.ax,f.bz-f.az);};
+ const flyPlanes=(dt,moving)=>{for(const root of planeList()){let f=flights.get(root);if(!f){f={};newCourse(f);f.wait=rnd()*30;flights.set(root,f);}
+  if(!moving){root.visible=false;continue;}
+  if(f.wait>0){f.wait-=dt;root.visible=false;continue;}
+  f.t+=dt*f.speed/f.len;if(f.t>=1){newCourse(f);root.visible=false;continue;}
+  root.position.set(f.ax+(f.bx-f.ax)*f.t,f.y,f.az+(f.bz-f.az)*f.t);root.rotation.set(0,f.yaw,0);root.visible=true;}};
+ APPROVED_ART.update=(dt,time,moving)=>{nativeUpdate(dt,time,moving);flyPlanes(dt,moving);const n=(ENV.state?.night||0)>.5;if(n!==realNight){realNight=n;REAL_TAIPEI.engine.setNight(n);}dimNature();if(moving)REAL_TAIPEI.engine.update(dt);};}
 """
 
 
 POSTER_CSS = """
+.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){background:#fff!important;color:#14213D!important;border:2px solid color-mix(in srgb,var(--c) 70%,#fff)!important;box-shadow:0 4px 14px rgba(16,36,67,.28)!important;text-shadow:none!important;font:800 26px/1.2 var(--f-body)!important;padding:10px 22px 10px 18px!important;gap:12px!important;border-radius:14px!important}
+.hi .stage .tlabel b,.hi .stage.far .tlabel:not(.sel):not(.hot) b,.hi .stage.city-view .tlabel:not([hidden]) b{font:800 22px var(--f-mono)!important;color:var(--c)!important}
+.hi .stage .tlabel span,.hi .stage.far .tlabel:not(.sel):not(.hot) span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:26px!important;color:#14213D!important;max-width:none!important;white-space:nowrap!important}
+.hi .stage .tlabel:hover,.hi .stage .tlabel.sel,.hi .stage .tlabel.hot{background:var(--c)!important;border-color:#fff!important}
+.hi .stage .tlabel:hover span,.hi .stage .tlabel.sel span,.hi .stage .tlabel.hot span,.hi .stage .tlabel:hover b,.hi .stage .tlabel.sel b,.hi .stage .tlabel.hot b{color:#fff!important}
+@media (max-width:860px){.hi .stage .tlabel,.hi .stage.far .tlabel:not(.sel):not(.hot),.hi .stage.city-view .tlabel:not([hidden]){font-size:15px!important;padding:5px 11px 5px 9px!important;gap:6px!important;border-radius:10px!important}.hi .stage .tlabel span,.hi .stage.city-view .tlabel:not([hidden]) span{font-size:15px!important}.hi .stage .tlabel b,.hi .stage.city-view .tlabel:not([hidden]) b{font-size:13px!important}}
+.hi .hi-count{display:grid!important;grid-template-columns:1fr 1fr;gap:4px 18px;margin-top:10px;align-items:end}
+.hi .hi-stat{display:flex;flex-direction:column;gap:2px}
+.hi .hi-stat b{font:800 44px/1 var(--f-display);color:var(--c,var(--c-taipei));letter-spacing:-.02em}
+.hi .hi-stat span{font-size:13px;line-height:1.3;color:var(--muted)}
+.hi .hi-pop-note{margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line);font-size:12px;line-height:1.45;color:var(--muted)}
+@media (max-width:860px){.hi .hi-stat b{font-size:30px}.hi .hi-stat span{font-size:11.5px}.hi .hi-pop-note{font-size:11px}}
 html.hi.booting .loading{background:#8cc6ee url("assets/poster-v064-day-wide.jpg") center/cover no-repeat;padding-bottom:9vh}
 html.hi.booting.poster-night .loading{background-color:#16233f;background-image:url("assets/poster-v064-night-wide.jpg")}
 @media (max-aspect-ratio:1/1){html.hi.booting .loading{background-image:url("assets/poster-v064-day-tall.jpg")}html.hi.booting.poster-night .loading{background-image:url("assets/poster-v064-night-tall.jpg")}}
@@ -134,6 +158,39 @@ def build():
         "document.documentElement.classList.add('hi','booting');"
         "try{const h=+new Intl.DateTimeFormat('en-GB',{hour:'numeric',hourCycle:'h23',timeZone:'Asia/Taipei'}).format(new Date());if(h<6||h>=18)document.documentElement.classList.add('poster-night');}catch(e){}")
     sub("html.hi:not(.booting) .loading{display:none}", "html.hi:not(.booting) .loading{display:none}" + POSTER_CSS)
+    # ---- 2026-10-29 round: rotation, labels, stats card, drawer, flows, planes ----
+    # 1) The slow orbit runs even with the stats card / policy list open; only touching the map (or picking a
+    #    theme / entering a city) stops it, and the Panorama button restarts it.
+    sub("if(document.hidden||fly||UI.hasOverlays?.()||document.documentElement.classList.contains(\"booting\")){",
+        "if(document.hidden||fly||document.documentElement.classList.contains(\"booting\")){")
+    sub("if(entered!==null||A.state.selTheme||A.state.selItem||A.state.selFlow){stopPanoramaOrbit();return false;}",
+        "if(A.state.selTheme||A.state.selItem||A.state.selFlow){stopPanoramaOrbit();return false;} // single city: being 'in' Taipei does not stop the orbit")
+    sub("""for(const type of ["pointerdown","wheel","keydown"]){
+  document.addEventListener(type,()=>{
+    // Closing the initial help leaves a fresh five-second viewing interval.
+    if(panoramaOrbit.angle>0||!UI.hasOverlays?.())stopPanoramaOrbit();
+    else panoramaOrbit.waitingSince=null;
+  },{capture:true,passive:true});
+}""", """for(const type of ["pointerdown","wheel"])stage.addEventListener(type,stopPanoramaOrbit,{passive:true}); // only touching the map stops the orbit""")
+    sub("""  if(document.hidden&&panoramaOrbit.angle>0)stopPanoramaOrbit();
+""", "")
+    # 4) No candidate tab: the drawer opens on the policy list.
+    sub('<button role="tab" data-tab="cands" aria-selected="true" aria-controls="pbody">候選人</button>\n        <button role="tab" data-tab="list" aria-selected="false" aria-controls="pbody">政策清單</button>',
+        '<button role="tab" data-tab="list" aria-selected="true" aria-controls="pbody">政策清單</button>')
+    sub('let cityFilter="", selTheme=null, selFlow=null, selItem=null, tab="cands"', 'let cityFilter="", selTheme=null, selFlow=null, selItem=null, tab="list"')
+    # 5) Cross-city items involving Taipei are listed (partner cities by name); the map-line sentence is gone.
+    sub('const flows=(D.flows.flows||[]).filter(f=>(f.cities||[]).filter(x=>cityById.has(x)).length>=2);',
+        'const flows=(D.flows.flows||[]).filter(f=>(f.cities||[]).some(x=>cityById.has(x)));const cityNameOf=c=>(cityById.get(c)||D.cities.find(x=>x.city===c)||{}).cityName||c;')
+    s = s.replace("cityById.get(c)?.cityName||c", "cityNameOf(c)")
+    sub("參選人公開提到、需要兩個以上城市一起推動的計畫。地圖上的紅線連接相關城市；線型代表依據來源。", "參選人公開提到、需要兩個以上城市一起推動的計畫。")
+    # 3) Stats card under the logo: open by default, both counts at the same large size, single-city layout;
+    #    it also carries the independence statement now that the help card no longer opens on arrival.
+    sub("count.innerHTML = `<b>${rows.length}</b><span>項政見與政績<br>${liveThemes.length} 個政策區塊</span>`;",
+        "count.innerHTML = `<div class=\"hi-stat\"><b>${rows.length}</b><span>項政見與政績</span></div><div class=\"hi-stat\"><b>${liveThemes.length}</b><span>個政策區塊</span></div>`;")
+    sub("pop.append(cand, count, chips);", "pop.append(cand, count, el(\"p\", \"hi-pop-note\", independence));")
+    sub("intro.hidden = false; // Explain", "intro.hidden = true; // v0.6.4: stats card and policy list open instead; help stays on the ? button. Explain")
+    # 6) Policy list and stats card open on arrival (list on desktop; on phones it would cover the map).
+    sub("  UI.followCity=(c)=>{", "  setPop(true);if(innerWidth>860)setMode(\"list\");\n  UI.followCity=(c)=>{")
     s = re.sub(r'<title>.*?</title>', '<title>台北安可擬真臺北 v0.6.4</title>', s, count=1)
     OUT.write_text(s, encoding="utf-8")
     print(f"Built v{VERSION} realistic Taipei only (New Taipei and bridges removed) -> {OUT.relative_to(ROOT)}")
