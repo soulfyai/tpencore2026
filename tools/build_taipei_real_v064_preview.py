@@ -62,13 +62,15 @@ POSTER_CSS = """
 .hi .hi-stat span{font-size:13px;line-height:1.3;color:var(--muted)}
 .hi .hi-pop-note{margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line);font-size:12px;line-height:1.45;color:var(--muted)}
 @media (max-width:860px){.hi .hi-stat b{font-size:30px}.hi .hi-stat span{font-size:11.5px}.hi .hi-pop-note{font-size:11px}}
-html.hi.booting .loading{background:#8cc6ee url("assets/poster-v064-day-wide.jpg") center/cover no-repeat;padding-bottom:9vh}
-html.hi.booting.poster-night .loading{background-color:#16233f;background-image:url("assets/poster-v064-night-wide.jpg")}
-@media (max-aspect-ratio:1/1){html.hi.booting .loading{background-image:url("assets/poster-v064-day-tall.jpg")}html.hi.booting.poster-night .loading{background-image:url("assets/poster-v064-night-tall.jpg")}}
+html.hi.booting .loading{background:#8cc6ee;overflow:hidden;flex-direction:row;justify-content:center;align-items:center;gap:10px;padding:0}
+html.hi.booting.poster-night .loading{background:#16233f}
+html.hi.booting .loading::before{content:"";position:absolute;inset:-30px;z-index:-1;background:url("assets/poster-v064-day-wide.jpg") center/cover no-repeat;filter:blur(9px) saturate(1.05);transform:scale(1.04)}
+html.hi.booting.poster-night .loading::before{background-image:url("assets/poster-v064-night-wide.jpg")}
+@media (max-aspect-ratio:1/1){html.hi.booting .loading::before{background-image:url("assets/poster-v064-day-tall.jpg")}html.hi.booting.poster-night .loading::before{background-image:url("assets/poster-v064-night-tall.jpg")}}
 html.hi.booting .loading .loading-brand,html.hi.booting .loading>small{display:none}
-html.hi.booting .loading .loading-spinner{width:22px;height:22px;border-width:3px}
-html.hi.booting .loading{flex-direction:row;gap:10px;justify-content:center;align-items:flex-end}
-html.hi.booting .loading .loading-status{background:rgba(255,255,255,.88);color:#102c50;padding:9px 18px;border-radius:999px;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.15)}
+html.hi.booting .loading .loading-spinner{display:none}
+html.hi.booting .loading .loading-status{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.92);color:#102c50;padding:11px 22px 11px 16px;border-radius:999px;font-size:15px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+html.hi.booting .loading .loading-status::before{content:"";width:16px;height:16px;border:2.5px solid #102c5030;border-top-color:#1F4FB8;border-radius:50%;animation:loading-spin 1s linear infinite}
 """
 
 
@@ -142,8 +144,8 @@ def build():
     # 1) the two brand logos were inlined as ~1.6 MB PNG data URIs, each twice (8.8 MB of the 9.6 MB page);
     #    serve them as small WebP files instead (shared by the loading screen and the header, cached once);
     # 2) shaders compile asynchronously before the first frame;
-    # 3) the loading page becomes the pre-rendered default view (day or night by Taipei time) with a small status
-    #    pill, so the city is on screen immediately and the live 3D takes over in place.
+    # 3) the loading page is the pre-rendered default view (day or night by Taipei time), out of focus, with the
+    #    status pill in the centre until the live 3D takes over in place.
     from PIL import Image
     assets = P / "assets"
     def logo(match):
