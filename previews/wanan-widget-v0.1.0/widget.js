@@ -213,6 +213,7 @@ textarea::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);op
   }
 
   const states = {
+    media_lookup: {complete: '已查閱近期媒體新聞標題', no_results: '近期媒體新聞尚無相關內容', unavailable: '媒體新聞資料目前無法讀取'},
     curated_lookup: {complete: '已查閱公開話題整理', no_results: '話題整理尚無相關內容', unavailable: '話題整理目前無法讀取'},
     material_lookup: {complete: '已查閱台北政見與政績整理', no_results: '政見整理尚無此項', unavailable: '政見整理目前無法讀取'},
     policy_lookup: {complete: '已查閱政策資料', no_results: '政策資料庫尚無此項資料', unavailable: '政策資料目前無法讀取'},
@@ -241,7 +242,16 @@ textarea::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);op
     state.textContent = data.used_for_answer === false && data.status === 'complete' ? '已定位相關資料，本輪另查其他來源' : label;
     if (data.type === 'material_lookup' && /^\d{4}-\d{2}-\d{2}$/.test(data.checked_at || '')) state.textContent += ' · 查核至 ' + data.checked_at;
     if (data.type === 'policy_lookup' && /^\d{4}-\d{2}-\d{2}$/.test(data.dataset_updated_at || '')) state.textContent += ' · 整理於 ' + data.dataset_updated_at;
-    if (data.status !== 'complete') el.querySelector('.note').before(state);
+    if (data.type === 'media_lookup') {
+      const date = value => {
+        const parsed = typeof value === 'string' ? new Date(value) : null;
+        return parsed && Number.isFinite(parsed.getTime()) ? new Intl.DateTimeFormat('sv-SE', {timeZone: 'Asia/Taipei'}).format(parsed) : '';
+      };
+      const published = date(data.latest_published_at), checked = date(data.checked_at);
+      if (published) state.textContent += ' · 最新發布 ' + published;
+      if (checked) state.textContent += '（同步 ' + checked + '）';
+    }
+    if (data.status !== 'complete' || (data.type === 'media_lookup' && data.used_for_answer !== false)) el.querySelector('.note').before(state);
     if (data.used_for_answer === false || data.status !== 'complete' || !Array.isArray(data.sources)) return;
     el.querySelectorAll('.sources').forEach(node => node.remove());
     const sources = document.createElement('ol');
