@@ -34,7 +34,7 @@ button,textarea{font:inherit;color:inherit}
 .launcher img{display:block;width:auto;height:264px;filter:drop-shadow(0 4px 8px rgba(20,37,62,.35));transition:transform .15s ease-out}
 .launcher:hover img{transform:translateY(-3px)}
 .launcher .tag{margin-top:2px;white-space:nowrap;padding:0 8px;border-radius:999px;background:var(--brand);color:#fff;font-size:11px;line-height:18px}
-.launcher:focus-visible,.panel button:focus-visible,.panel textarea:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+.launcher:focus-visible,.panel button:focus-visible,.panel textarea:focus-visible{outline:2px solid #168bff;outline-offset:2px;box-shadow:0 0 0 4px rgba(22,139,255,.14),0 0 14px rgba(22,139,255,.5)}
 .launcher[aria-expanded="true"]{display:none}
 .panel{display:flex;flex-direction:column;width:min(400px,calc(100vw - 32px));height:min(620px,calc(100vh - ${bottom}px - 40px));
   border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 12px 40px rgba(20,37,62,.3);overflow:hidden}
