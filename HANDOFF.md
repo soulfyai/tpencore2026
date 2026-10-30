@@ -640,3 +640,8 @@ User explicitly approved v0.4.12 for production. Promoter now uses v0412, all28 
 - Branch `preview/wanan-widget-v0.1.0` starts at production main 68838d0, not feature/wanan-widget. Adds four independently named HTML copies and a pinned left-side widget script, noindex and preview navigation.
 - Production four-page bytes, old previews, NAS fixed-file sync list and existing payloads remain unchanged; only version metadata varies. See docs/WANAN_WIDGET_PREVIEW.md and tools/check_wanan_preview.py.
 - Main publication still needs explicit user confirmation. No main push, Pages dispatch, NAS operation or real model acceptance is implied by local fixture tests.
+
+## 2026-10-30 Preview music off and desktop widget drawer avoidance
+- Isolated preview copies disable automatic music and gesture auto-start; explicit music button stays functional.
+- Desktop widget right inset80px (40px further left); policy drawer open moves it left of actual drawer with16px gap, closing restores it. Mobile remains unchanged.
+- Preview-only layout.js adapter and scoped CSS variable; production four pages and NAS are untouched. Public daily topics are only a proposal: docs/WANAN_PUBLIC_TOPICS.md, no collection or report publishing enabled.
