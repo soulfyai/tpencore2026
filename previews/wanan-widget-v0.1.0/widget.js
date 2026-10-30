@@ -68,6 +68,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
 .send:disabled{opacity:.5;cursor:default}
 .status{margin:0;padding:0 12px 8px;color:var(--muted);font-size:11px;min-height:0}
 .status:empty{display:none}
+.credit{flex:none;margin:0;padding:0 12px 8px;text-align:right;font:400 10px/1.5 var(--f-body,"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif);color:var(--muted)}
 @media (max-width:600px){
   .panel{inset:0;width:100%;height:100dvh;border-radius:0;border:0;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
@@ -103,6 +104,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
     <button class="stop" type="button" hidden>停止</button>
   </form>
   <p class="status" role="status"></p>
+  <p class="credit">AI Powered by SoulfyAI</p>
 </section>`;
   root.querySelectorAll('img').forEach(image => { image.src = figure; });
   const $ = selector => root.querySelector(selector);
