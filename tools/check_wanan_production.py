@@ -27,5 +27,5 @@ for name in PAGES:
         assert '<b>非官方萬安政策市</b><br>資料更新至 ' in html,name
     preview=(site/('wanan-widget-v0.1.0-'+name)).read_text()
     assert 'noindex,nofollow' in preview and 'data-wanan-production=' not in preview,name
-assert json.loads((site/'version.json').read_text())['version']=='2.4.0'
+assert json.loads((site/'version.json').read_text())['version']=='2.4.1'
 print('PASS: four self-contained production chats, reviewed topics, music off, production SEO/navigation and isolated previews')
