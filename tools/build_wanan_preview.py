@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PAGES = ('index.html', 'index3d.html', '2d.html', 'chiang-wan-an.html')
 PREFIX = 'wanan-widget-v0.1.0-'
-TAG = '<script src="wanan-widget-v0.1.0.js?v=blue-focus1" data-wanan-base="https://chat.tpencore.tw/" data-wanan-side="right" defer></script>'
+TAG = '<script src="wanan-widget-v0.1.0.js?v=typing-dots1" data-wanan-base="https://chat.tpencore.tw/" data-wanan-side="right" defer></script>'
 
 def apply(output):
     baseline = {}
