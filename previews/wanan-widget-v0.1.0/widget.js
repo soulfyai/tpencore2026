@@ -208,6 +208,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   }
 
   const states = {
+    curated_lookup: {complete: '已查閱公開話題整理', no_results: '話題整理尚無相關內容', unavailable: '話題整理目前無法讀取'},
     material_lookup: {complete: '已查閱台北政見與政績整理', no_results: '政見整理尚無此項', unavailable: '政見整理目前無法讀取'},
     policy_lookup: {complete: '已查閱政策資料', no_results: '政策資料庫尚無此項資料', unavailable: '政策資料目前無法讀取'},
     news_lookup: {complete: '已查閱市長新聞稿', no_results: '收錄新聞尚無相關內容', unavailable: '新聞資料目前無法讀取'},
