@@ -25,7 +25,7 @@
   const root = host.attachShadow({mode: 'open'});
   root.innerHTML = `
 <style>
-:host{--ink:#14253e;--muted:#5b6b7f;--line:#d9e2ec;--brand:#173b5a;--soft:#f3f7fb;--warn:#a33a2c;
+:host{color-scheme:only light;--ink:#14253e;--muted:#5b6b7f;--line:#d9e2ec;--brand:#173b5a;--soft:#f3f7fb;--warn:#a33a2c;
   font:15px/1.6 system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink)}
 *{box-sizing:border-box}
 button,textarea{font:inherit;color:inherit}
@@ -65,7 +65,8 @@ header img{width:auto;height:48px;margin:-4px 0}
 .sources a{color:#145caf;overflow-wrap:anywhere}
 .retry{margin-top:6px;min-height:36px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-size:12px}
 form{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;border-top:1px solid var(--line)}
-textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border:1px solid var(--line);border-radius:12px;font-size:16px}
+textarea{background:#fff;color:var(--ink);-webkit-text-fill-color:var(--ink);caret-color:var(--ink);color-scheme:only light;appearance:none;flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border:1px solid var(--line);border-radius:12px;font-size:16px}
+textarea::placeholder{color:var(--muted);-webkit-text-fill-color:var(--muted);opacity:1}
 .send,.stop{min-width:56px;min-height:44px;border:0;border-radius:12px;background:var(--brand);color:#fff;cursor:pointer}
 .stop{background:var(--warn)}
 .send:disabled{opacity:.5;cursor:default}
