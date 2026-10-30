@@ -31,4 +31,4 @@ for name in PAGES:
     assert 'https://soulfyai.github.io/tpencore2026/' + PREFIX + name in preview
     for target in PAGES:
         assert 'href="' + target + '"' not in preview
-print('PASS: original site payloads unchanged; four separate left-side widget previews')
+print('PASS: original site payloads unchanged; four separate right-side widget previews')
