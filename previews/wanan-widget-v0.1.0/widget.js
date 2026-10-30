@@ -47,7 +47,7 @@ header img{width:auto;height:48px;margin:-4px 0}
 .icon,.reset{min-width:44px;min-height:44px;border:0;border-radius:10px;background:transparent;cursor:pointer}
 .reset{font-size:12px;color:var(--muted)}
 .icon{font-size:22px;line-height:1}
-.log{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:12px;display:flex;flex-direction:column;gap:10px}
+.log{flex:1;overflow-anchor:none;overflow-y:auto;overscroll-behavior:contain;padding:12px;display:flex;flex-direction:column;gap:10px}
 .intro{text-align:center;color:var(--muted);font-size:13px;padding:8px 4px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px}
 .chips button{min-height:36px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;font-size:13px}
@@ -109,6 +109,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   const launcher = $('.launcher');
   const panel = $('.panel');
   const log = $('.log');
+  const introTemplate = $('.intro').cloneNode(true);
   const input = $('textarea');
   const send = $('.send');
   const stop = $('.stop');
@@ -142,6 +143,27 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   panel.addEventListener('keydown', event => {
     if (event.key === 'Escape') { event.preventDefault(); close(); }
   });
+
+  let latestReply = null;
+  let followReply = true;
+  let scrollFrame = 0;
+  function revealReply() {
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      if (!followReply || !latestReply || panel.hidden) return;
+      const viewport = log.getBoundingClientRect();
+      const reply = latestReply.getBoundingClientRect();
+      const top = log.scrollTop + reply.top - viewport.top - log.clientTop - 12;
+      const bottom = log.scrollTop + reply.bottom - viewport.top - log.clientTop + 12;
+      log.scrollTop = Math.max(0, Math.min(top, bottom - log.clientHeight));
+    });
+  }
+  // Let readers scroll through a long reply without the next token pulling them back.
+  for (const event of ['wheel', 'touchmove', 'pointerdown']) {
+    log.addEventListener(event, () => { followReply = false; }, {passive: true});
+  }
+  new ResizeObserver(revealReply).observe(log);
 
   function bubble(text, role) {
     const el = document.createElement('div');
@@ -257,6 +279,9 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
       input.value = '';
     }
     const el = retryTarget || bubble('', 'assistant');
+    latestReply = el;
+    followReply = true;
+    revealReply();
     el.className = 'msg assistant';
     el.querySelectorAll('.retry,.state,.context,.sources').forEach(node => node.remove());
     const content = el.querySelector('.content');
@@ -288,13 +313,12 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
         if (event === '[DONE]') { completed = true; return; }
         if (!event) return;
         const data = JSON.parse(event);
-        if (Object.hasOwn(states, data.type)) { showRetrieval(el, data); return; }
+        if (Object.hasOwn(states, data.type)) { showRetrieval(el, data); revealReply(); return; }
         if (data.error) throw Error(diagnostic(data, '模型連線中斷，請重試。'));
         const delta = data.choices?.[0]?.delta?.content;
         if (typeof delta === 'string') answer += delta;
-        const follow = log.scrollHeight - log.clientHeight - log.scrollTop <= 48;
         content.textContent = conversational(answer) || '…';
-        if (follow) log.scrollTop = log.scrollHeight;
+        revealReply();
       };
       while (!completed) {
         const {value, done} = await reader.read();
@@ -338,6 +362,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
       }
       controller = null;
       busy(false);
+      revealReply();
     }
   }
 
@@ -350,13 +375,22 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
       submit(input.value);
     }
   });
-  root.querySelectorAll('.chips button').forEach(button => { button.onclick = () => submit(button.textContent); });
+  function bindTopics() {
+    root.querySelectorAll('.chips button').forEach(button => { button.onclick = () => submit(button.textContent); });
+  }
+  bindTopics();
   stop.onclick = () => controller?.abort();
   reset.onclick = () => {
     if (controller) return;
     history = [];
     status.textContent = '';
-    log.querySelectorAll('.msg').forEach(el => el.remove());
+    latestReply = null;
+    followReply = true;
+    if (scrollFrame) cancelAnimationFrame(scrollFrame);
+    scrollFrame = 0;
+    log.replaceChildren(introTemplate.cloneNode(true));
+    bindTopics();
+    log.scrollTop = 0;
     input.value = '';
   };
   document.body.append(host);
