@@ -45,9 +45,13 @@ def apply(output):
         at = html.lower().rfind(marker)
         assert at >= 0
         html = html[:at] + TAG + '<script src="wanan-widget-layout-v0.1.0.js?v=reply3" defer></script>' + html[at:]
+        if name in ('index.html', 'index3d.html'):
+            html = html.replace('</html>', '<script src="wanan-hot-topics-v0.1.0.js?v=topics1" defer></script></html>')
         assert html.count(TAG) == 1 and '獨立整理' in html
         (output / (PREFIX + name)).write_text(html, encoding='utf-8')
         assert page.read_bytes() == original, name
     (output / 'wanan-widget-v0.1.0.js').write_bytes((ROOT / 'previews/wanan-widget-v0.1.0/widget.js').read_bytes())
     (output / 'wanan-widget-layout-v0.1.0.js').write_bytes((ROOT / 'previews/wanan-widget-v0.1.0/layout.js').read_bytes())
+    for ext in ('js', 'json'):
+        (output / ('wanan-hot-topics-v0.1.0.' + ext)).write_bytes((ROOT / ('previews/wanan-widget-v0.1.0/topics.' + ext)).read_bytes())
     (output / 'wanan-widget-v0.1.0-manifest.json').write_text(json.dumps({'production_sha256': baseline, 'widget_source': 'wanan_digitwin@0010a3e with preview layout adapter', 'published': False}, indent=2) + '\n')
