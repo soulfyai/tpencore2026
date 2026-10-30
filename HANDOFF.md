@@ -645,3 +645,7 @@ User explicitly approved v0.4.12 for production. Promoter now uses v0412, all28 
 - Isolated preview copies disable automatic music and gesture auto-start; explicit music button stays functional.
 - Desktop widget right inset80px (40px further left); policy drawer open moves it left of actual drawer with16px gap, closing restores it. Mobile remains unchanged.
 - Preview-only layout.js adapter and scoped CSS variable; production four pages and NAS are untouched. Public daily topics are only a proposal: docs/WANAN_PUBLIC_TOPICS.md, no collection or report publishing enabled.
+
+## 2026-10-30 Widget follows loading readiness (2.4.5)
+- User requested blurred/disabled chat during initial page load. Shared layout adapter follows existing html.booting, sets host inert/aria-busy and blurs only visible Shadow DOM elements (not host, preserving fixed positioning).
+- Actual packaged-page Chromium desktop1280/mobile390 checks held the 3D engine to simulate slow loading: pointer and focus blocked; removing the real readiness class restores chat; drawer and non-3D pages unaffected. Production package check passed. Browser test simulates readiness transition; not a new 3D performance benchmark.
