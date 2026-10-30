@@ -200,6 +200,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   }
 
   function showRetrieval(el, data) {
+    if (data.status === 'complete' && data.used_for_answer !== false) el.querySelectorAll('.state').forEach(node => node.remove());
     const state = document.createElement('small');
     state.className = 'state';
     const label = data.code === 'SEARCH_DISABLED' ? '目前未啟用網路查詢' : states[data.type][data.status] || states[data.type].unavailable;
