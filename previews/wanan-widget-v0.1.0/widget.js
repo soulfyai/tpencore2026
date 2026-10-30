@@ -200,32 +200,22 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   }
 
   function showRetrieval(el, data) {
+    if (data.status === 'complete' && data.used_for_answer !== false) el.querySelectorAll('.state').forEach(node => node.remove());
     const state = document.createElement('small');
     state.className = 'state';
     const label = data.code === 'SEARCH_DISABLED' ? '目前未啟用網路查詢' : states[data.type][data.status] || states[data.type].unavailable;
     state.textContent = data.used_for_answer === false && data.status === 'complete' ? '已定位相關資料，本輪另查其他來源' : label;
     if (data.type === 'material_lookup' && /^\d{4}-\d{2}-\d{2}$/.test(data.checked_at || '')) state.textContent += ' · 查核至 ' + data.checked_at;
     if (data.type === 'policy_lookup' && /^\d{4}-\d{2}-\d{2}$/.test(data.dataset_updated_at || '')) state.textContent += ' · 整理於 ' + data.dataset_updated_at;
-    el.querySelector('.note').before(state);
-    if (data.type === 'material_lookup' && data.status === 'complete' && Array.isArray(data.items)) {
-      const context = document.createElement('ul');
-      context.className = 'context';
-      const labels = {policy: '政見', record: '任內政績'};
-      for (const record of data.items.slice(0, 4)) {
-        if (typeof record?.name !== 'string') continue;
-        const item = document.createElement('li');
-        item.textContent = record.name.slice(0, 120) + '｜' + (labels[record.contentKind] || '待確認');
-        context.append(item);
-      }
-      if (context.childElementCount) state.after(context);
-    }
+    if (data.status !== 'complete') el.querySelector('.note').before(state);
     if (data.used_for_answer === false || data.status !== 'complete' || !Array.isArray(data.sources)) return;
     el.querySelectorAll('.sources').forEach(node => node.remove());
     const sources = document.createElement('ol');
     sources.className = 'sources';
     sources.setAttribute('aria-label', '本次查詢來源');
     const seen = new Set();
-    for (const source of data.sources.slice(0, 8)) {
+    for (const source of data.sources) {
+      if (sources.childElementCount >= 5) break;
       const url = safeLink(source);
       if (!url || seen.has(url.href)) continue;
       seen.add(url.href);
