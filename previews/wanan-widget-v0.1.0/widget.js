@@ -29,7 +29,7 @@
   font:15px/1.6 system-ui,-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:var(--ink)}
 *{box-sizing:border-box}
 button,textarea{font:inherit;color:inherit}
-.launcher,.panel{pointer-events:auto;position:fixed;${side}:max(40px,env(safe-area-inset-${side}));bottom:calc(${bottom}px + env(safe-area-inset-bottom))}
+.launcher,.panel{pointer-events:auto;position:fixed;${side}:var(--wanan-inline-inset,max(40px,env(safe-area-inset-${side})));bottom:calc(${bottom}px + env(safe-area-inset-bottom))}
 .launcher{display:flex;flex-direction:column;align-items:center;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation}
 .launcher img{display:block;width:auto;height:264px;filter:drop-shadow(0 4px 8px rgba(20,37,62,.35));transition:transform .15s ease-out}
 .launcher:hover img{transform:translateY(-3px)}
