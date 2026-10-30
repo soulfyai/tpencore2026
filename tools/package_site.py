@@ -87,6 +87,8 @@ def package(output):
     from candidate_home import integrate
     candidate_home=integrate((output / "index.html").read_text()).replace('<meta charset="utf-8">','<meta charset="utf-8"><meta name="robots" content="noindex,nofollow">',1)
     (output / "candidate-home-preview.html").write_text(candidate_home)
+    from wanan_widget import apply as add_wanan_widget
+    add_wanan_widget(output)
     mockups = ROOT / "docs" / "mockups"
     if mockups.exists():
         shutil.copytree(mockups, output / "mockups", dirs_exist_ok=True)
