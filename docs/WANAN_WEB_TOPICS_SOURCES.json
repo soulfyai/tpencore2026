@@ -1,0 +1,74 @@
+{
+  "checked_at": "2026-10-30",
+  "search_tool": "gpt-5-search-api via existing fixed OpenAI endpoint",
+  "search_batches": 4,
+  "selection": "近期政策、公共爭議與採訪提問，排除無法取得原文及未核實的個人指控；不宣稱代表全網。",
+  "sources": [
+    {
+      "url": "https://www.cna.com.tw/news/aipl/202610080126.aspx",
+      "status": 200,
+      "title": "蔣萬安提遷移松山機場　交通部：需就國家角度整體評估 | 政治 | 中央社 CNA",
+      "sha256": "86a6f73786f568048acdc54180d7b586617ed0ab4ddee987edd292716f35a6e0"
+    },
+    {
+      "url": "https://www.cna.com.tw/news/aloc/202610160212.aspx",
+      "status": 200,
+      "title": "沈伯洋指都更新政出口窄無解　蔣萬安：將增105名人力 | 地方 | 中央社 CNA",
+      "sha256": "951fc807cea558fc8ab11165972e1e67d3495262d2fd6ffe133f6b266ce5100a"
+    },
+    {
+      "url": "https://news.tvbs.com.tw/politics/4037699",
+      "status": 200,
+      "title": "遭爆4年未曾出席「園長會議」　蔣萬安喊即刻安排：下次必到",
+      "sha256": "e390d01bc44a64fe94e07e6a21fc8ead85bdef083fc243636537e8088ca248ec"
+    },
+    {
+      "url": "https://www.parenting.com.tw/article/6002700",
+      "status": 200,
+      "title": "台北市長蔣萬安拚連任，從三寶爸的育兒經到市政總體檢",
+      "sha256": "1bbe2c7fe515b516a15bc72c2e60bd3cec7b184093585e9de14640d45f8331df"
+    },
+    {
+      "url": "https://www.cna.com.tw/news/aloc/202610150361.aspx",
+      "status": 200,
+      "title": "蔣萬安感謝柯文哲政績　承諾續辦社宅 | 地方 | 中央社 CNA",
+      "sha256": "9389b27cc82ac9f2ea16d73c400bf06f8dec56d67ae010d91d80a9f384f786f8"
+    },
+    {
+      "url": "https://www.businesstoday.com.tw/article/category/183027/post/202610080036/",
+      "status": 200,
+      "title": "影／蔣萬安上郭正亮專訪，為何被酸「不如問GPT」？是否輕敵、鼠患、兒虐、松機遷移、砍樹…8個問與答一次看 - 今周刊",
+      "sha256": "bf3f9b036819c4712e7765708b06be9128444613292303833e1b8491cf52bc73"
+    },
+    {
+      "url": "https://www.businesstoday.com.tw/article/category/183027/post/202610190046/",
+      "status": 200,
+      "title": "蔣萬安被問選得辛苦？細數政績後趙少康趕著「幫回答」！誰是幫寫稿的惡人？自曝2028不在規劃內…專訪重點 - 今周刊",
+      "sha256": "c114c22f80d2ab9ba9565c33d6972dd3603f2bac8cda03301f74daa2bd3a6d8b"
+    },
+    {
+      "url": "https://news.tvbs.com.tw/politics/4038961",
+      "status": 200,
+      "title": "謝震武當面辣問「回答跟題目有沒有搭？」　蔣萬安正面反擊背稿、問A答B爭議",
+      "sha256": "211683fb06c67de5839ee010e5ed130205117b4a74f4fcf786ea1861eec73180"
+    },
+    {
+      "url": "https://www.cna.com.tw/news/aloc/202610190275.aspx",
+      "status": 200,
+      "title": "選總統？蔣萬安：目前沒規劃　盧秀燕值得擔重擔 | 地方 | 中央社 CNA",
+      "sha256": "e57e69e2c5b6460500f93090cb2f4f1df2104416cdd4fe5a28220f047c3d6b0d"
+    },
+    {
+      "url": "https://www.cna.com.tw/news/aloc/202610280332.aspx",
+      "status": 200,
+      "title": "蔣萬安偕妻接受王偉忠專訪　談電視辯論會坦言有點緊張 | 地方 | 中央社 CNA",
+      "sha256": "374e68fb2cd2b2717deba76216a9599873dfe13d42ce3cefb7fb8ad8ac0a8cd4"
+    },
+    {
+      "url": "https://news.pts.org.tw/article/831943",
+      "status": 200,
+      "title": "蔣萬安出席公辦托嬰中心啟用 沈伯洋質疑為選舉彌補幼教界 ｜ 公視新聞 PNN",
+      "sha256": "aa2c2c298e9ec7f18ff9b79de532218f60c5081fe5afbb1221802f5becc25d54"
+    }
+  ]
+}

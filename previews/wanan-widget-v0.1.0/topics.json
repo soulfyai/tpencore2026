@@ -1,1 +1,171 @@
-{"status":"not_started","reviewed":false,"period":null,"updated_at":null,"topics":[]}
+{
+  "status": "published",
+  "reviewed": true,
+  "mode": "editorial_web",
+  "period": "2026-10-08～2026-10-28 報導",
+  "updated_at": "2026-10-30",
+  "methodology": "依公開媒體採訪與報導選出十個討論主題；編號為整理順序，並非全網聲量、民調或本站聊天排名。",
+  "topics": [
+    {
+      "id": "airport",
+      "title": "松山機場遷建與 AI 園區",
+      "summary": "蔣萬安提出遷移松機、原址打造 AI 園區的構想。交通部回應須整體評估民航、離島交通、國防與救災需求；焦點是配套與可行性，目前屬提案。",
+      "sources": [
+        {
+          "title": "蔣萬安提遷移松山機場　交通部：需就國家角度整體評估",
+          "publisher": "中央社",
+          "url": "https://www.cna.com.tw/news/aipl/202610080126.aspx",
+          "published_at": "2026-10-08",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "renewal",
+      "title": "都更門檻降低，審議量能跟得上嗎？",
+      "summary": "沈伯洋質疑只放寬都更入口，未必能解決審議瓶頸。蔣萬安回應將增加都更處人力、加速整合與審查；新增員額與新制進度仍須追蹤。",
+      "sources": [
+        {
+          "title": "沈伯洋指都更新政出口窄無解　蔣萬安：將增105名人力",
+          "publisher": "中央社",
+          "url": "https://www.cna.com.tw/news/aloc/202610160212.aspx",
+          "published_at": "2026-10-16",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "nursery",
+      "title": "園長會議與幼教第一線溝通",
+      "summary": "媒體報導市長未親自出席園長會議，引發溝通方式討論。蔣萬安解釋過往由教育局代表，表示將安排親自參與；公視另報導幼教團體交流及對手的批評。",
+      "sources": [
+        {
+          "title": "遭爆4年未曾出席「園長會議」　蔣萬安喊即刻安排：下次必到",
+          "publisher": "TVBS",
+          "url": "https://news.tvbs.com.tw/politics/4037699",
+          "published_at": "2026-10-18",
+          "checked_at": "2026-10-30"
+        },
+        {
+          "title": "蔣萬安出席公辦托嬰中心啟用 沈伯洋質疑為選舉彌補幼教界 ｜ 公視新聞 PNN",
+          "publisher": "公視新聞",
+          "url": "https://news.pts.org.tw/article/831943",
+          "published_at": "2026-10-19",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "parenting",
+      "title": "育兒減少工時，家長與企業用得上嗎？",
+      "summary": "《親子天下》專訪談到企業參與、員工申請及同事負擔等疑問。蔣萬安承認執行有困難，表示會調整協助；討論重點是福利能否落實為家庭可用的時間。",
+      "sources": [
+        {
+          "title": "台北市長蔣萬安拚連任，從三寶爸的育兒經到市政總體檢",
+          "publisher": "親子天下",
+          "url": "https://www.parenting.com.tw/article/6002700",
+          "published_at": "2026-10-15",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "housing",
+      "title": "社會住宅延續與幸福住宅資格",
+      "summary": "黃國昌專訪詢問是否持續興辦社宅。蔣萬安肯定前任建設基礎並承諾續推，也談到新婚與育有幼兒家庭優先入住；承諾與後續實際供給需分開檢視。",
+      "sources": [
+        {
+          "title": "蔣萬安感謝柯文哲政績　承諾續辦社宅",
+          "publisher": "中央社",
+          "url": "https://www.cna.com.tw/news/aloc/202610150361.aspx",
+          "published_at": "2026-10-15",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "school-food",
+      "title": "免費午餐、鮮奶與校園食安",
+      "summary": "近期專訪整理了福利資源分配與校園午餐食安的質疑。蔣萬安將免費午餐、鮮奶定位為友善育兒政策，並以抽驗結果回應食安指控；這裡呈現報導中的說法，非另作事件鑑定。",
+      "sources": [
+        {
+          "title": "台北市長蔣萬安拚連任，從三寶爸的育兒經到市政總體檢",
+          "publisher": "親子天下",
+          "url": "https://www.parenting.com.tw/article/6002700",
+          "published_at": "2026-10-15",
+          "checked_at": "2026-10-30"
+        },
+        {
+          "title": "影／蔣萬安上郭正亮專訪，為何被酸「不如問GPT」？是否輕敵、鼠患、兒虐、松機遷移、砍樹…8個問與答一次看 - 今周刊",
+          "publisher": "今周刊",
+          "url": "https://www.businesstoday.com.tw/article/category/183027/post/202610080036/",
+          "published_at": "2026-10-08",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "technology",
+      "title": "輝達北士科與市政成果如何歸屬",
+      "summary": "受訪時，蔣萬安談到輝達進駐北士科，並提及前任規劃、企業協議及中央協助。公開討論也涉及成果如何向市民說明，以及產業構想與後續執行的差距。",
+      "sources": [
+        {
+          "title": "選總統？蔣萬安：目前沒規劃　盧秀燕值得擔重擔",
+          "publisher": "中央社",
+          "url": "https://www.cna.com.tw/news/aloc/202610190275.aspx",
+          "published_at": "2026-10-19",
+          "checked_at": "2026-10-30"
+        },
+        {
+          "title": "蔣萬安被問選得辛苦？細數政績後趙少康趕著「幫回答」！誰是幫寫稿的惡人？自曝2028不在規劃內…專訪重點 - 今周刊",
+          "publisher": "今周刊",
+          "url": "https://www.businesstoday.com.tw/article/category/183027/post/202610190046/",
+          "published_at": "2026-10-19",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "interviews",
+      "title": "問答是否切題？備詢與受訪風格",
+      "summary": "謝震武專訪直接追問回答是否對題，以及外界的背稿質疑。蔣萬安回應議會備詢是即問即答；焦點是說明政策的方式與對問題的直接回應，並非已證實有背稿。",
+      "sources": [
+        {
+          "title": "謝震武當面辣問「回答跟題目有沒有搭？」　蔣萬安正面反擊背稿、問A答B爭議",
+          "publisher": "TVBS",
+          "url": "https://news.tvbs.com.tw/politics/4038961",
+          "published_at": "2026-10-21",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "future",
+      "title": "2028 規劃與市長任期的政治提問",
+      "summary": "在《少康戰情室》專訪中，蔣萬安被問到2028總統選舉，表示目前沒有這項規劃、專注連任。這是受訪當時的表態，不據此推定未來參選安排。",
+      "sources": [
+        {
+          "title": "選總統？蔣萬安：目前沒規劃　盧秀燕值得擔重擔",
+          "publisher": "中央社",
+          "url": "https://www.cna.com.tw/news/aloc/202610190275.aspx",
+          "published_at": "2026-10-19",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    },
+    {
+      "id": "debate",
+      "title": "電視辯論準備與媒體專訪",
+      "summary": "王偉忠專訪談到10月31日電視辯論的準備、交叉提問與時間壓力。蔣萬安表示會安排時間準備；截至本次整理日辯論尚未舉行，不預判表現或勝負。",
+      "sources": [
+        {
+          "title": "蔣萬安偕妻接受王偉忠專訪　談電視辯論會坦言有點緊張",
+          "publisher": "中央社",
+          "url": "https://www.cna.com.tw/news/aloc/202610280332.aspx",
+          "published_at": "2026-10-28",
+          "checked_at": "2026-10-30"
+        }
+      ]
+    }
+  ]
+}

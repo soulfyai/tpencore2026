@@ -23,15 +23,30 @@
         const data=await response.json();
         if(data.status==='not_started'){message('熱門討論整理尚未啟用，已有的聊天不會回溯統計。開始收錄並完成審閱後，這裡將顯示前十大話題。');return;}
         if(data.status!=='published'||data.reviewed!==true||!Array.isArray(data.topics)||typeof data.period!=='string')throw Error();
+        const editorial=data.mode==='editorial_web';
+        title.textContent=editorial?'十大網路話題':'熱門話題';
+        note.textContent=editorial?'依公開媒體採訪與報導整理，編號不代表聲量排名；不等同民調或本站聊天統計。':'聊天參與者的意見彙整，不代表全體市民；不是正式陳情受理紀錄。';
         const ids=new Set();
         const topics=data.topics.filter(t=>{
-          if(typeof t?.id!=='string'||ids.has(t.id)||typeof t.title!=='string'||typeof t.summary!=='string'||!Number.isSafeInteger(t.conversations)||t.conversations<1)return false;
+          if(typeof t?.id!=='string'||ids.has(t.id)||typeof t.title!=='string'||typeof t.summary!=='string'||(!editorial&&(!Number.isSafeInteger(t.conversations)||t.conversations<1))||(editorial&&!Array.isArray(t.sources)))return false;
           ids.add(t.id);return true;
-        }).sort((a,b)=>b.conversations-a.conversations||a.id.localeCompare(b.id)).slice(0,10);
-        subtitle.textContent='前十大熱門討論 · '+data.period.slice(0,80)+'（台北時間）';
+        });
+        if(!editorial)topics.sort((a,b)=>b.conversations-a.conversations||a.id.localeCompare(b.id));
+        topics.splice(10);
+        subtitle.textContent=(editorial?'網路話題整理 · ':'前十大熱門討論 · ')+data.period.slice(0,80)+(editorial?' · 更新 '+String(data.updated_at||'').slice(0,10):'（台北時間）');
         if(!topics.length){message('這個統計期間尚無可公布的話題。');return;}
         const list=document.createElement('ol');
-        for(const t of topics){const li=document.createElement('li'),h=document.createElement('h3'),p=document.createElement('p'),n=document.createElement('small');h.textContent=t.title.slice(0,100);p.textContent=t.summary.slice(0,400);n.textContent=t.conversations+' 個不同對話';li.append(h,p,n);list.append(li);}
+        for(const t of topics){
+          const li=document.createElement('li'),h=document.createElement('h3'),p=document.createElement('p');h.textContent=t.title.slice(0,100);p.textContent=t.summary.slice(0,400);li.append(h,p);
+          if(editorial){
+            for(const ref of t.sources.slice(0,3)){
+              let url;try{url=new URL(ref.url);}catch{continue;}
+              if(url.protocol!=='https:'||url.username||url.password||typeof ref.title!=='string')continue;
+              const line=document.createElement('p'),a=document.createElement('a');a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=String(ref.publisher||url.hostname)+' · '+String(ref.published_at||'').slice(0,10)+'｜'+ref.title.slice(0,140);line.className='summary';line.append(a);li.append(line);
+            }
+          }else{const n=document.createElement('small');n.textContent=t.conversations+' 個不同對話';li.append(n);}
+          list.append(li);
+        }
         content.replaceChildren(list);
       }catch{message('熱門話題暫時無法讀取，請稍後重新開啟。');}
     }
