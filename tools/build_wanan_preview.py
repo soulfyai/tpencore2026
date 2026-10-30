@@ -16,6 +16,11 @@ def apply(output):
         original = page.read_bytes()
         baseline[name] = hashlib.sha256(original).hexdigest()
         html = original.decode('utf-8')
+        # Preview branding only; retain the policy dataset's checked date binding.
+        html = html.replace(
+            '<b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 ',
+            '<b>非官方萬安政策市</b><br>資料更新至 ',
+        )
         if name in ('index.html', 'index3d.html'):
             assert html.count('autoStartPending=true') == 1
             assert html.count('if(config.musicAutoplay===false)stopAutoStart();else playMusic(true);') == 1
