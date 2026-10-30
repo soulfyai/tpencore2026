@@ -107,7 +107,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
     <button class="stop" type="button" hidden>停止</button>
   </form>
   <p class="status" role="status"></p>
-  <p class="credit">AI Powered by SoulfyAI</p>
+  <p class="credit">Powered by SoulfyAI</p>
 </section>`;
   root.querySelectorAll('img').forEach(image => { image.src = figure; });
   const $ = selector => root.querySelector(selector);
@@ -217,7 +217,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
 
   // Sources are listed under the reply; inline markers such as [1] or ［2］ are dropped
   // from display and history so the conversation reads naturally.
-  const conversational = text => text.replace(/[ \t]*[\[［]\d{1,2}[\]］]/g, '');
+  const conversational = text => text.replace(/—+/g, '，').replace(/，{2,}/g, '，').replace(/[ \t]*[\[［]\d{1,2}[\]］]/g, '');
 
   function safeLink(source) {
     if (typeof source?.url !== 'string' || typeof source?.title !== 'string') return null;
