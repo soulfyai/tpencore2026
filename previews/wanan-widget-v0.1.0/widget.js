@@ -120,7 +120,9 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   const stop = $('.stop');
   const reset = $('.reset');
   const status = $('.status');
+  const newConversationId = () => typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, c => (Number(c) ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> Number(c) / 4).toString(16));
   let history = [];
+  let conversationId = newConversationId();
   let controller = null;
 
   // Clicks, typing and scrolling inside the widget must not reach the host
@@ -200,7 +202,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
     if ([...text].length > 3000) throw Error('訊息太長，請縮短後再送出。');
     let body;
     do {
-      body = JSON.stringify({messages: [...turns, {role: 'user', content: text}]});
+      body = JSON.stringify({conversation_id: conversationId, messages: [...turns, {role: 'user', content: text}]});
       if (new TextEncoder().encode(body).length <= 32000) return body;
       if (!turns.length) throw Error('訊息太長，請縮短後再送出。');
       turns.splice(0, 2);
@@ -401,6 +403,7 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   reset.onclick = () => {
     if (controller) return;
     history = [];
+    conversationId = newConversationId();
     status.textContent = '';
     latestReply = null;
     followReply = true;
