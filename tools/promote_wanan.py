@@ -8,6 +8,22 @@ ASSETS = ROOT / 'previews/wanan-widget-v0.1.0'
 PAGES = ('index.html', 'index3d.html', '2d.html', 'chiang-wan-an.html')
 
 
+PAGEVIEW_SCRIPT = r"""(() => {
+  // 3D pages already record visits; this adapter is only for the other two pages.
+  if (!/^(?:www\.)?tpencore\.tw$/i.test(location.hostname)) return;
+  fetch(new URL('site-config.json', location.href), {credentials:'omit',cache:'no-store'})
+    .then(response => response.ok ? response.json() : null)
+    .then(config => {
+      if (!config || config.counterEnabled === false) return;
+      let url;
+      try { url = new URL(config.counterUrl || 'counter.php', location.href); } catch { return; }
+      if (url.origin !== location.origin || url.username || url.password) return;
+      fetch(url, {method:'POST',credentials:'omit',cache:'no-store',headers:{Accept:'application/json'},signal:AbortSignal.timeout(10000)})
+        .catch(() => {});
+    }).catch(() => {});
+})();"""
+
+
 def inline_script(code, attributes=''):
     # HTML parsers recognize the close tag even inside JS strings/comments.
     return '<script' + attributes + '>' + re.sub(r'</script', r'<\\/script', code, flags=re.I) + '</script>'
@@ -39,7 +55,7 @@ def promote(output):
         closing = '</body>' if '</body>' in html.lower() else '</html>'
         at = html.lower().rfind(closing)
         assert at >= 0, name
-        scripts = bundle + (inline_script(topics) if name in ('index.html','index3d.html') else '')
+        scripts = bundle + (inline_script(topics) if name in ('index.html','index3d.html') else inline_script(PAGEVIEW_SCRIPT, ' data-tpencore-pageview="1"'))
         html = html[:at] + scripts + html[at:]
         path.write_text(html)
     print('Promoted approved Wanan chat to four self-contained production pages')
