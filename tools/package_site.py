@@ -89,6 +89,8 @@ def package(output):
     (output / "candidate-home-preview.html").write_text(candidate_home)
     from build_wanan_preview import apply as build_wanan_preview
     build_wanan_preview(output)
+    from promote_wanan import promote as promote_wanan
+    promote_wanan(output)
     mockups = ROOT / "docs" / "mockups"
     if mockups.exists():
         shutil.copytree(mockups, output / "mockups", dirs_exist_ok=True)
