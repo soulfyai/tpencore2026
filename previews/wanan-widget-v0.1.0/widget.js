@@ -97,7 +97,9 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
       <div class="chips" aria-label="試試這些開場">
         <button type="button">你有什麼具體政見？</button>
         <button type="button">任內做了哪些事？</button>
+        <button type="button">最近有什麼市長新聞</button>
         <button type="button">來一句萬安金句</button>
+        <button type="button">晚餐的選擇，你有沒有輕敵</button>
       </div>
     </div>
   </div>
