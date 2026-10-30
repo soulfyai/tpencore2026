@@ -56,6 +56,9 @@ header img{width:auto;height:48px;margin:-4px 0}
 .assistant{align-self:flex-start;background:var(--soft)}
 .assistant.error .note{color:var(--warn)}
 .label{display:block;color:var(--muted);font-size:11px}
+.typing-dots{display:inline-flex;gap:7px;align-items:center;min-height:24px;color:var(--brand)}
+.typing-dots span{font-size:22px;line-height:1}
+@media (prefers-reduced-motion:no-preference){.typing-dots span{animation:typing-dot 1.2s ease-in-out infinite;animation-delay:var(--delay)}@keyframes typing-dot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}}
 .note:empty{display:none}
 .note,.state{display:block;margin-top:6px;color:var(--muted);font-size:11px;white-space:normal}
 .context,.sources{margin:6px 0 0;padding-left:18px;font-size:11px;color:var(--muted);white-space:normal}
@@ -288,7 +291,18 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
     el.querySelectorAll('.retry,.state,.context,.sources').forEach(node => node.remove());
     const content = el.querySelector('.content');
     const note = el.querySelector('.note');
-    content.textContent = '正在想怎麼接這一題…';
+    const dots = document.createElement('span');
+    dots.className = 'typing-dots';
+    dots.setAttribute('role', 'status');
+    dots.setAttribute('aria-label', '回覆中');
+    for (let i = 0; i < 5; i++) {
+      const dot = document.createElement('span');
+      dot.textContent = '.';
+      dot.setAttribute('aria-hidden', 'true');
+      dot.style.setProperty('--delay', (i * .12) + 's');
+      dots.append(dot);
+    }
+    content.replaceChildren(dots);
     note.textContent = '';
     let answer = '';
     let reader;
@@ -318,8 +332,9 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
         if (Object.hasOwn(states, data.type)) { showRetrieval(el, data); revealReply(); return; }
         if (data.error) throw Error(diagnostic(data, '模型連線中斷，請重試。'));
         const delta = data.choices?.[0]?.delta?.content;
-        if (typeof delta === 'string') answer += delta;
-        content.textContent = conversational(answer) || '…';
+        if (typeof delta !== 'string' || !delta) return;
+        answer += delta;
+        if (conversational(answer)) content.textContent = conversational(answer);
         revealReply();
       };
       while (!completed) {
