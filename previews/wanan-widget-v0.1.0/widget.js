@@ -74,7 +74,8 @@ textarea{flex:1;min-height:44px;max-height:120px;resize:none;padding:10px;border
   .launcher img{height:198px}
   .launcher{${side}:max(20px,env(safe-area-inset-${side}))}
 }
-@media (prefers-reduced-motion:reduce){.launcher img{transition:none}}
+@media (min-width:861px) and (prefers-reduced-motion:no-preference){.launcher,.panel{transition:${side} .32s ease}}
+@media (prefers-reduced-motion:reduce){.launcher,.panel,.launcher img{transition:none}}
 @media (prefers-reduced-motion:no-preference){.panel{animation:rise .16s ease-out}@keyframes rise{from{opacity:0;transform:translateY(8px)}}}
 </style>
 <button class="launcher" type="button" aria-expanded="false" aria-controls="panel" aria-label="開啟萬安陪你說（非官方 AI 改編角色）">
