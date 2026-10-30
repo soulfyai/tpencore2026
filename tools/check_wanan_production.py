@@ -25,7 +25,11 @@ for name in PAGES:
         assert 'const snapshot = {"status": "published"' in html,name
         assert 'autoStartPending=true' not in html,name
         assert '<b>非官方萬安政策市</b><br>資料更新至 ' in html,name
+    if name in ('2d.html','chiang-wan-an.html'):
+        assert html.count('data-tpencore-pageview="1"')==1,name
+    else:
+        assert 'data-tpencore-pageview=' not in html,name
     preview=(site/('wanan-widget-v0.1.0-'+name)).read_text()
     assert 'noindex,nofollow' in preview and 'data-wanan-production=' not in preview,name
-assert json.loads((site/'version.json').read_text())['version']=='2.4.1'
+assert json.loads((site/'version.json').read_text())['version']==(Path(__file__).resolve().parents[1]/'VERSION').read_text().strip()
 print('PASS: four self-contained production chats, reviewed topics, music off, production SEO/navigation and isolated previews')
