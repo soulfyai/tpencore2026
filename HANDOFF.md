@@ -635,3 +635,8 @@ User explicitly approved v0.4.12 for production. Promoter now uses v0412, all28 
 - User approved v0.6.4 and asked to update GitHub and production (2026-10-29). `tools/promote_greater_taipei.py` now packages `greater-taipei-v0.6.4.html` (30 embedded modules, inline JSON, logos/loading posters embedded as data URIs for the NAS fixed-file updater; three.js from the pinned CDN). VERSION 2.3.0, CHANGELOG updated. Production index ≈4.3 MB (was ≈13 MB, mostly duplicated inline PNG logos).
 - Loading posters are low-res (blurred background only). `prototypes/assets/*-v064-*` are also copied to the Pages root for the preview page.
 - Verified locally from out/site (desktop 1440×900, phone 390×844): loads, no page errors, Taipei only, stats card open, 12 policy tags, no city sign.
+
+## 2026-10-30 Pending isolated AI萬安 preview v0.1.0
+- Branch `preview/wanan-widget-v0.1.0` starts at production main 68838d0, not feature/wanan-widget. Adds four independently named HTML copies and a pinned left-side widget script, noindex and preview navigation.
+- Production four-page bytes, old previews, NAS fixed-file sync list and existing payloads remain unchanged; only version metadata varies. See docs/WANAN_WIDGET_PREVIEW.md and tools/check_wanan_preview.py.
+- Main publication still needs explicit user confirmation. No main push, Pages dispatch, NAS operation or real model acceptance is implied by local fixture tests.
