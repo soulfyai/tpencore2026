@@ -78,6 +78,12 @@ def package(output):
                     raise RuntimeError(f"Frozen preview file changed: {name}")
             snapshot.extractall(destination)
         shutil.copy2(archive, output / "previews" / archive.name)
+    from policy_audit import prepare
+    prepare()
+    import unittest
+    suite = unittest.defaultTestLoader.discover(str(ROOT / 'tests'))
+    if not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful():
+        raise RuntimeError('政策查核與接線測試未通過，停止發布')
     from promote_greater_taipei import promote
     promote(output)
     from build_policy_reader import build_reader
@@ -126,3 +132,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "out/site")
     package(parser.parse_args().output)
+

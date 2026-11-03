@@ -33,7 +33,8 @@ class LiveTopicsTests(unittest.TestCase):
                 self.assertIn('/api/public/topics', result)
                 self.assertIn('await fetch(source', result)
                 self.assertIn('const fallbackSnapshot = {', result)
-                self.assertIn('政策逐項查核至', result)
+                self.assertIn('政策每日查核：', result)
+                self.assertIn('其餘資料基準查核日', result)
                 self.assertIn('2026-10-22', result)
                 self.assertIn('新聞／話題查核至', result)
 
