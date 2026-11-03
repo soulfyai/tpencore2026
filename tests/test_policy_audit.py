@@ -87,6 +87,15 @@ class PolicyAuditTests(unittest.TestCase):
         for item_id in ('tp-childcare-2', 'tp-childcare-3', 'tp-childcare-4'):
             self.assertEqual(result[item_id][1]['contentKind'], 'record')
 
+    def test_full_reader_renders_unknown_source_dates_and_real_corrections(self):
+        from build_policy_reader import build_reader
+        html, count = build_reader()
+        self.assertEqual(count, 118)
+        self.assertIn('日期未註明', html)
+        self.assertIn('2006年10月3日', html)
+        self.assertIn('政策查核：待查核', html)
+        self.assertNotIn('1995 年簽約', html)
+
     def test_public_note_escapes_source_text(self):
         item = {'policyAudit': {'status': 'needs_followup', 'checked_at': None, 'note': '<script>bad</script>'}}
         self.assertIn('&lt;script&gt;', audit.item_note(item))

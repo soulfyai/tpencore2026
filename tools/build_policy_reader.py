@@ -17,7 +17,7 @@ def build_reader(city_id=None):
     count+=1;refs=[]
     for sid in it.get('sources',t.get('sources',[])):
      src=sources.get(sid)
-     if src and src['url'].startswith('https://'):refs.append(f'<li><a href="{e(src["url"],quote=True)}" rel="noopener noreferrer">{e(src["title"])}</a> — {e(src.get("publisher",""))} {e(src.get("date",""))}</li>')
+     if src and src['url'].startswith('https://'):refs.append(f'<li><a href="{e(src["url"],quote=True)}" rel="noopener noreferrer">{e(src["title"])}</a> — {e(src.get("publisher",""))} {e(src.get("date") or "日期未註明")}</li>')
     facts=''.join('<li>'+e(str(f))+'</li>' for f in it.get('facts',[]))
     kind='任內政績' if it.get('contentKind')=='record' else '政策與承諾'
     items.append(f'<article id="{e(it["id"])}"><h3>{e(it["name"])}</h3><p class="meta">{kind}｜{e(city["candidate"])}</p><p>{e(it.get("plain",""))}</p>'+('<p>時程／進度：'+e(it['phase'])+'</p>' if it.get('phase') else '')+item_note(it)+f'<ul>{facts}</ul><details><summary>原始來源（{len(refs)}）</summary><ul>{"".join(refs)}</ul></details></article>')
