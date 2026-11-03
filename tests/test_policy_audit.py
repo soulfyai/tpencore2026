@@ -96,6 +96,26 @@ class PolicyAuditTests(unittest.TestCase):
         self.assertIn('政策查核：待查核', html)
         self.assertNotIn('1995 年簽約', html)
 
+    def test_3d_inline_panel_receives_the_same_policy_corrections(self):
+        corpus=json.loads((ROOT/'prototypes/v044-art-data.json').read_text())
+        old=copy.deepcopy(corpus)
+        for city in old:
+            for theme in city['city']['themes']:
+                for item in theme['items']:
+                    item.pop('policyAudit',None)
+                    if item['id']=='tp-rec-sport-1': item['facts']=['1995 年簽約']
+        payload={'cities':[c['city'] for c in old],'meta':{},'flows':{}}
+        html='const D = '+json.dumps(payload,ensure_ascii=False)+';\n  <dl class="kv">${i.who?'
+        result=audit.apply_page(html,corpus)
+        start=result.index('const D = ')+len('const D = ')
+        data,_=json.JSONDecoder().raw_decode(result[start:])
+        items={i['id']:i for c in data['cities'] for t in c['themes'] for i in t['items']}
+        self.assertEqual(len(items),118)
+        self.assertIn('2006年10月3日',items['tp-rec-sport-1']['facts'][0])
+        self.assertEqual(items['tp-ai-5']['policyAudit']['status'],'needs_followup')
+        self.assertIn('esc(i.policyAudit.note)',result)
+        with self.assertRaises(ValueError): audit.apply_page('const D = {"cities":[]};',corpus)
+
     def test_public_note_escapes_source_text(self):
         item = {'policyAudit': {'status': 'needs_followup', 'checked_at': None, 'note': '<script>bad</script>'}}
         self.assertIn('&lt;script&gt;', audit.item_note(item))

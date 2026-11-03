@@ -152,3 +152,21 @@ def item_note(item):
     state = '已核對' if audit['status'] in DONE else '待查核'
     return '<p class="meta">政策查核：' + escape(state + (' ' + checked if checked else '') +
             '。' + audit['note']) + '</p>'
+
+
+def apply_page(html, corpus):
+    """Replace the UI's inline copy too, not only the scene's fetched JSON."""
+    import re
+    match = re.search(r'const D\s*=\s*', html)
+    if not match: raise ValueError('3D政策面板資料入口不存在')
+    payload, length = json.JSONDecoder().raw_decode(html[match.end():])
+    old_ids = {item['id'] for city in payload['cities'] for theme in city['themes'] for item in theme['items']}
+    if old_ids != set(inventory(corpus)): raise ValueError('3D面板與政策庫ID不一致')
+    payload['cities'] = [copy.deepcopy(city['city']) for city in corpus]
+    encoded = json.dumps(payload, ensure_ascii=False).replace('<', r'\u003c')
+    html = html[:match.end()] + encoded + html[match.end()+length:]
+    hook = '  <dl class="kv">${i.who?'
+    if html.count(hook) != 1: raise ValueError('3D逐項查核顯示入口不符')
+    note = '''  ${i.policyAudit?`<p class="meta">政策查核：${esc(i.policyAudit.status.startsWith("verified_")?"已核對":"待查核")} ${esc((i.policyAudit.checked_at||"").slice(0,10))}。${esc(i.policyAudit.note)}</p>`:""}
+'''
+    return html.replace(hook, note+hook, 1)

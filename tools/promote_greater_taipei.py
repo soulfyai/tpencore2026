@@ -24,6 +24,9 @@ def promote(output):
   text=assetrefs.sub(lambda m:uri((P/m[0]).read_bytes(),'image/webp' if m[0].endswith('.webp') else 'image/jpeg'),text)
   return datarefs.sub(lambda m:m[1]+uri((P/m[2].split('?')[0][2:]).read_bytes(),'application/json')+m[1],text)
  s=(P/'greater-taipei-v0.6.4.html').read_text()
+ if (ROOT/'data/policy-audit/current.json').exists():
+  from policy_audit import apply_page
+  s=apply_page(s,json.loads((P/'v044-art-data.json').read_text()))
  s=s.replace('new URL("v044-config.json",location.href)','new URL("site-config.json",location.href)')
  s=s.replace('<meta name="robots" content="noindex,nofollow">','')
  s=re.sub(r'<title>.*?</title>','<title>台北安可｜一起打造你我的大台北</title>',s,count=1)
