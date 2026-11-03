@@ -649,3 +649,10 @@ User explicitly approved v0.4.12 for production. Promoter now uses v0412, all28 
 ## 2026-10-30 Widget follows loading readiness (2.4.5)
 - User requested blurred/disabled chat during initial page load. Shared layout adapter follows existing html.booting, sets host inert/aria-busy and blurs only visible Shadow DOM elements (not host, preserving fixed positioning).
 - Actual packaged-page Chromium desktop1280/mobile390 checks held the 3D engine to simulate slow loading: pointer and focus blocked; removing the real readiness class restores chat; drawer and non-3D pages unaffected. Production package check passed. Browser test simulates readiness transition; not a new 3D performance benchmark.
+
+
+## 2026-11-04 政策市共享新聞話題接口（2.4.6）
+- 使用者在本次對話明確同意將已審閱的接線修正發布正式站，取代此修正先前「不修改正式網站」限制；不擴及自動改寫政策主庫。
+- 話題面板每次載入／開啟，直接讀取 https://chat.tpencore.tw/api/public/topics 的已核對事件，最多10件，按報導日期整理，不冒稱聲量排名或聊天統計。
+- 正式四頁區分政策逐項查核日期與新聞／話題查核日期；接口失敗明示歷史快照與原日期。內嵌快照只作失敗備援，沿用NAS固定檔案同步。
+- 三項接線測試及JavaScript語法檢查通過；完整網站由既有Pages流程先建置驗證，再發布，另核對NAS正式頁面與資料接口。聊天NAS接口已實測9件、查核至2026-11-03，既有SQLite指紋吻合。
