@@ -44,6 +44,10 @@ def promote(output):
         html = path.read_text()
         assert 'data-wanan-production=' not in html, name
         html = html.replace('<b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 ', '<b>非官方萬安政策市</b><br>政策逐項查核至 ')
+        if name in ('2d.html', 'chiang-wan-an.html'):
+            html, count = re.subn(r'資料查核日期：(\d{4}-\d{2}-\d{2})。',
+                r'政策逐項查核至：<span id="checked">\1</span>。', html, count=1)
+            assert count == 1, name + ': policy freshness marker missing'
         if name in ('index.html','index3d.html'):
             assert html.count('autoStartPending=true') == 1
             assert html.count('if(config.musicAutoplay===false)stopAutoStart();else playMusic(true);') == 1

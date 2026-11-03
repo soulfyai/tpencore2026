@@ -40,7 +40,7 @@
   function init() {
     const menu = document.querySelector('.hi-policy-menu');
     const aside = document.querySelector('aside.panel');
-    if (!menu || !aside) return true;
+    if (!menu || !aside) return false;
     if (menu.querySelector('[data-wanan-topics]')) return true;
     const style = document.createElement('style');
     style.textContent = `.wanan-topics{display:none;padding:28px 20px 20px;overflow:auto;min-height:0;color:var(--ink);font:14px/1.7 system-ui,sans-serif}.wanan-topics h2{font-size:22px;margin:0 0 4px}.wanan-topics .summary{font-size:12px;color:var(--muted)}.wanan-topics ol{padding:0;list-style:none;counter-reset:rank}.wanan-topics li{counter-increment:rank;padding:16px 0;border-top:1px solid var(--line)}.wanan-topics li h3{font-size:16px;margin:0}.wanan-topics li h3:before{content:counter(rank,decimal-leading-zero) ' ';color:var(--muted)}.wanan-topics li p{margin:6px 0}.wanan-topics .empty{padding:24px 0}.wanan-topics-open aside.panel>.tabs,.wanan-topics-open aside.panel>.pbody{display:none}.wanan-topics-open .wanan-topics{display:block}`;
@@ -96,6 +96,6 @@
     new MutationObserver(()=>{if(document.documentElement.classList.contains('wanan-topics-open')&&!document.documentElement.classList.contains('drawer-open'))document.documentElement.classList.remove('wanan-topics-open');}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
     return true;
   }
-  if(!init()){const observer=new MutationObserver(()=>{if(init())observer.disconnect();});observer.observe(document.body,{childList:true,subtree:true});}
+  if(!init()){const observer=new MutationObserver(()=>{if(init())observer.disconnect();});observer.observe(document.body,{childList:true,subtree:true});setTimeout(()=>observer.disconnect(),15000);}
 })();
 

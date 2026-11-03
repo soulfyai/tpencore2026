@@ -21,7 +21,8 @@ class LiveTopicsTests(unittest.TestCase):
             for name in ('widget.js', 'layout.js'):
                 (assets / name).write_text('/* fixture */')
             html = '<!doctype html><body><b>獨立整理，非任何候選人或政黨官方網站</b>・資料查核至 <span id="checked">2026-10-22</span><script>let autoStartPending=true;if(config.musicAutoplay===false)stopAutoStart();else playMusic(true);</script></body>'
-            for name in promoter.PAGES: (root / name).write_text(html)
+            for name in promoter.PAGES:
+                (root / name).write_text(html if name in ('index.html','index3d.html') else '<!doctype html><body><p>收錄62項內容。資料查核日期：2026-10-22。</p></body>')
             old = promoter.ASSETS
             try:
                 promoter.ASSETS = assets
@@ -48,7 +49,7 @@ const checked={textContent:'2026-10-22',after(...nodes){for(const n of nodes)if(
 const document={currentScript:{src:'https://tpencore.tw/topics.js'},
   getElementById(id){return id==='checked'?checked:markers[id];},
   createElement(){return {};},querySelector(){return null;}};
-vm.runInNewContext(input.code,{document,URL,AbortSignal,location:{href:'https://tpencore.tw/'},
+vm.runInNewContext(input.code,{document,URL,AbortSignal,MutationObserver:class{observe(){} disconnect(){}},setTimeout:()=>0,location:{href:'https://tpencore.tw/'},
   fetch:async(url,options)=>{calls.push({url:String(url),options:{cache:options.cache,credentials:options.credentials}});if(input.fail)throw Error();return {ok:true,json:async()=>input.live};}});
 setImmediate(()=>process.stdout.write(JSON.stringify({text:markers['wanan-news-checked'].textContent,policy:checked.textContent,calls})));
 '''
