@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "audit_date": "2026-11-04",
-  "checked_at": "2026-11-04T01:07:28+08:00",
+  "checked_at": "2026-11-04T08:47:14+08:00",
   "scope": [
     "taipei",
     "newtaipei"
   ],
-  "note": "逐項對照既有公開原文並補查可取得的新資料；已核對不等於施政成效均有獨立證明。未核實現行資格、實際進度或缺直接來源的項目列待查，不以HTTP成功冒充核實。",
+  "note": "本輪優先續查6項待補文件，解決4項並保留2項待查；另讀取中選會候選人資格公告確認當屆名單。資料庫仍只涵蓋既有臺北蔣萬安與新北李四川政策項，不把資料庫範圍誤稱為完整候選人比較。所有核對限於原始發布、主管機關現行規定與可取得更新，不代表獨立全面成效驗證。",
   "baseline_source": {
     "file": "prototypes/v044-art-data.json",
     "commit": "88b7031169e208fb5928035626f007f7f4effebc"
@@ -101,9 +101,236 @@
       "city": "taipei",
       "tier": "news",
       "checkedAt": "2026-11-04"
+    },
+    {
+      "id": "pa-birth-current-law",
+      "url": "https://laws.gov.taipei/Law/LawSearch/LawArticleContent/FL081869",
+      "title": "臺北市生育補助發放辦法",
+      "publisher": "臺北市政府法規查詢系統",
+      "date": "2026-09-03",
+      "city": "taipei",
+      "tier": "official",
+      "checkedAt": "2026-11-04"
+    },
+    {
+      "id": "pa-workhours-current",
+      "url": "https://bola.gov.taipei/News_Content.aspx?n=43965B542D565B91&s=F16E42CDF16B98B9&sms=DCBBE05FAB91EBA0",
+      "title": "育兒減少工時不減薪補助：申請與核銷",
+      "publisher": "臺北市政府勞動局",
+      "date": null,
+      "city": "taipei",
+      "tier": "official",
+      "checkedAt": "2026-11-04"
+    },
+    {
+      "id": "pa-egg-current",
+      "url": "https://health.gov.taipei/cp.aspx?n=B9E2BC16F7EB04A3",
+      "title": "人工生殖及醫療性凍卵補助須知",
+      "publisher": "臺北市政府衛生局",
+      "date": null,
+      "city": "taipei",
+      "tier": "official",
+      "checkedAt": "2026-11-04"
+    },
+    {
+      "id": "pa-nt-shulin-industry",
+      "url": "https://www.cna.com.tw/news/aipl/202610100222.aspx",
+      "title": "李四川拚雙北AI科技廊帶 蘇巧慧攻鶯歌商圈觀光",
+      "publisher": "中央通訊社",
+      "date": "2026-10-10",
+      "city": "newtaipei",
+      "tier": "news",
+      "checkedAt": "2026-11-04"
     }
   ],
-  "overrides": {},
+  "overrides": {
+    "tp-rec-transport-2": {
+      "facts": [
+        "市府稱依 100 個易肇事路口比較，正交路口每萬車事故與死傷數比圓環少 63%",
+        "市府模擬：晨峰延滯約 127 秒降至 101 秒，昏峰由 124 秒升至 194 秒，增闢第五車道後預估約 130 秒",
+        "公視通車報導記載多數方向機車可直接左轉，福和橋往羅斯福路方向仍需待轉；現行動線以現場標線號誌為準",
+        "行人團體、部分學者與里長對公車效率、標線替代方案與巷弄出入提出不同意見",
+        "未取得可獨立核對的通車後事故原始統計，不以模擬減幅當實際成效"
+      ]
+    },
+    "tp-rec-transport-5": {
+      "facts": [
+        "交通局稱2025年市政滿意度調查中有75.7%市民肯定行人改善。",
+        "民進黨議員批評標線型人行道劃設缺乏整體規劃；關注道路標線改造的劉冠頡認為部分生活道路宜採人車共用，市府則傾向逐步改為實體人行道。"
+      ]
+    },
+    "tp-housing-1": {
+      "phase": "已宣布規劃，正式施行程序待確認",
+      "facts": [
+        "市府提出公辦都更首階段意願門檻由75%降至50%，以利進場評估與試算",
+        "後續試算意願及模擬選配仍有90%門檻",
+        "初期意願比不同於都市更新條例的法定同意比例"
+      ],
+      "sources": [
+        "tp-s6",
+        "tp-s7",
+        "tp-s8",
+        "pa-housing-announcement",
+        "pa-housing-consent"
+      ]
+    },
+    "tp-housing-2": {
+      "phase": "政策宣布，個案仍須法定程序",
+      "facts": [
+        "市府提出基地至少3000平方公尺，且位於捷運場站或水岸周邊等條件",
+        "基準容積擬由225%提高至300%，並導入公共服務回饋"
+      ],
+      "sources": [
+        "tp-s6",
+        "tp-s7",
+        "tp-s8",
+        "pa-housing-announcement"
+      ]
+    },
+    "tp-housing-3": {
+      "phase": "規劃願景",
+      "sources": [
+        "tp-s7",
+        "tp-s8",
+        "pa-housing-announcement"
+      ]
+    },
+    "tp-housing-4": {
+      "phase": "示範基地規劃",
+      "sources": [
+        "tp-s7",
+        "pa-housing-announcement"
+      ]
+    },
+    "tp-housing-5": {
+      "phase": "示範基地規劃",
+      "sources": [
+        "tp-s7",
+        "pa-housing-announcement"
+      ]
+    },
+    "tp-housing-7": {
+      "plain": "市府規劃增加都更處正式人力並成立專責科室，以加速審議。",
+      "phase": "規劃擴編，實際到位待核實",
+      "facts": [
+        "更新處表示將增加正式人力及專責科室",
+        "未取得實際增員已全部到位的文件"
+      ],
+      "sources": [
+        "tp-s8",
+        "pa-housing-delivery"
+      ]
+    },
+    "tp-rec-housing-3": {
+      "plain": "原報導記載南港機廠1區1442戶已分批入住；2區288戶動工，兩區合計規劃1730戶。",
+      "phase": "1區分批入住；2區興建中（依原報導）"
+    },
+    "tp-childcare-1": {
+      "phase": "2026年底新增量能目標；另提出四年後免抽籤承諾",
+      "facts": [
+        "盤點16處學校與公共空間",
+        "新增620個公托名額",
+        "2026年底前新增16處公托",
+        "公托目標由92處增至108處，可收托2628名幼兒",
+        "11月3日專訪報導載蔣萬安承諾朝四年後公托免抽籤目標努力",
+        "此為競選承諾，不代表目前每個家庭均可免抽籤入托"
+      ],
+      "sources": [
+        "tp-s15",
+        "tp-s16",
+        "pa-family-latest"
+      ]
+    },
+    "tp-childcare-2": {
+      "contentKind": "record",
+      "plain": "臺北市新生兒電子臨托券已開放申請，符合資格者至多取得8小時定點臨托服務。",
+      "phase": "2026年9月1日起開放申請",
+      "facts": [
+        "申請期間自2026年9月1日9時至2027年12月31日，必要時得延長",
+        "對象為2026年1月1日以後出生、滿6個月未滿1歲且設籍臺北市的新生兒",
+        "每人至多8小時，效期至滿2歲前一日；中正區晚間據點另須每小時自付100元"
+      ],
+      "sources": [
+        "tp-s15",
+        "pa-childcare-voucher"
+      ]
+    },
+    "tp-childcare-3": {
+      "contentKind": "record",
+      "plain": "臺北市友善托育補助已加碼，實際補助依送托類型及申請資格審核。",
+      "phase": "2026年7月1日起新標準",
+      "facts": [
+        "公辦民營社區公共托育家園每月友善托育補助自4000元提高為6000元",
+        "準公共托育每月友善托育補助自5000元提高為8000元",
+        "有其他兄姊者依服務類型加發，補助總額不得超過實際支付金額"
+      ],
+      "sources": [
+        "tp-s15",
+        "pa-childcare-subsidy"
+      ]
+    },
+    "tp-childcare-4": {
+      "contentKind": "record",
+      "plain": "臺北市對符合資格孕婦提供RSV疫苗補助，對符合資格嬰幼兒提供RSV長效型單株抗體補助。",
+      "phase": "2026年7月1日開始實施",
+      "facts": [
+        "疫苗對象為設籍北市低收及中低收入戶、懷孕28至36週之孕婦",
+        "抗體對象須符合第2類兒童醫療補助資格及年齡／重症風險條件，且生母未接受北市RSV疫苗公費補助"
+      ],
+      "sources": [
+        "tp-s15",
+        "pa-health-rsv"
+      ]
+    },
+    "tp-rec-welfare-1": {
+      "plain": "市長於2026年9月受訪表示，臨時托育據點由上任前4處增至45處。"
+    },
+    "tp-rec-welfare-2": {
+      "plain": "市府稱自2026年7月起，符合資格的第二胎以上家庭享公共及準公共托育月費零負擔。",
+      "facts": [
+        "申請資格、送托類型及補助上限仍依社會局規定",
+        "友善托育補助與其他補助合計不得超過實際支付金額"
+      ],
+      "sources": [
+        "tp-s21",
+        "tp-s15",
+        "pa-childcare-subsidy",
+        "pa-city-july"
+      ]
+    },
+    "tp-rec-welfare-3": {
+      "sources": [
+        "tp-s13",
+        "tp-s14",
+        "pa-senior-current"
+      ]
+    },
+    "tp-rec-sport-1": {
+      "facts": [
+        "2006年10月3日簽約、2011年開工，歷經多任市長；2015年曾下令停工",
+        "2023年取得使用執照，同年11月舉辦首場開放萬人觀賽的棒球賽"
+      ]
+    },
+    "tp-rec-sport-2": {
+      "facts": [
+        "賽前報導預計有107國、超過2.5萬名選手及隨行人員參加，不能當作賽後實際參與人數"
+      ]
+    },
+    "nt-family-6": {
+      "phase": "當選後試辦承諾",
+      "facts": [
+        "規劃每週三14時至21時辦理，對象為2至12歲兒童",
+        "家長出示當日運動中心消費證明，規劃提供2小時免費臨托"
+      ]
+    },
+    "nt-education-3": {
+      "phase": "既有措施2027年度起；另提加碼承諾",
+      "facts": [
+        "報導載市府已宣布2027年度起每年8次免費心理諮商，特殊個案最高12次",
+        "李四川承諾再提高次數，但原文未提出新數字"
+      ]
+    }
+  },
   "entries": [
     {
       "id": "tp-transport-1",
@@ -277,16 +504,7 @@
           "finding": "核對「公館圓環改正交路口」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "facts": [
-          "市府稱依 100 個易肇事路口比較，正交路口每萬車事故與死傷數比圓環少 63%",
-          "市府模擬：晨峰延滯約 127 秒降至 101 秒，昏峰由 124 秒升至 194 秒，增闢第五車道後預估約 130 秒",
-          "公視通車報導記載多數方向機車可直接左轉，福和橋往羅斯福路方向仍需待轉；現行動線以現場標線號誌為準",
-          "行人團體、部分學者與里長對公車效率、標線替代方案與巷弄出入提出不同意見",
-          "未取得可獨立核對的通車後事故原始統計，不以模擬減幅當實際成效"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-rec-transport-3",
@@ -356,13 +574,7 @@
           "finding": "核對「以里為單位行人友善」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "facts": [
-          "交通局稱2025年市政滿意度調查中有75.7%市民肯定行人改善。",
-          "民進黨議員批評標線型人行道劃設缺乏整體規劃；關注道路標線改造的劉冠頡認為部分生活道路宜採人車共用，市府則傾向逐步改為實體人行道。"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-housing-1",
@@ -412,22 +624,7 @@
           "finding": "核對「公辦都更門檻降至5成」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "已宣布規劃，正式施行程序待確認",
-        "facts": [
-          "市府提出公辦都更首階段意願門檻由75%降至50%，以利進場評估與試算",
-          "後續試算意願及模擬選配仍有90%門檻",
-          "初期意願比不同於都市更新條例的法定同意比例"
-        ],
-        "sources": [
-          "tp-s6",
-          "tp-s7",
-          "tp-s8",
-          "pa-housing-announcement",
-          "pa-housing-consent"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-housing-2",
@@ -469,20 +666,7 @@
           "finding": "核對「大街廓都更容積300%」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "政策宣布，個案仍須法定程序",
-        "facts": [
-          "市府提出基地至少3000平方公尺，且位於捷運場站或水岸周邊等條件",
-          "基準容積擬由225%提高至300%，並導入公共服務回饋"
-        ],
-        "sources": [
-          "tp-s6",
-          "tp-s7",
-          "tp-s8",
-          "pa-housing-announcement"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-housing-3",
@@ -516,15 +700,7 @@
           "finding": "核對「15分鐘生活圈」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "規劃願景",
-        "sources": [
-          "tp-s7",
-          "tp-s8",
-          "pa-housing-announcement"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-housing-4",
@@ -550,14 +726,7 @@
           "finding": "核對「中山行政園區」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "示範基地規劃",
-        "sources": [
-          "tp-s7",
-          "pa-housing-announcement"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-housing-5",
@@ -583,14 +752,7 @@
           "finding": "核對「南港新行政中心」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "示範基地規劃",
-        "sources": [
-          "tp-s7",
-          "pa-housing-announcement"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-housing-7",
@@ -616,19 +778,7 @@
           "finding": "核對「都更處人力擴編」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "plain": "市府規劃增加都更處正式人力並成立專責科室，以加速審議。",
-        "phase": "規劃擴編，實際到位待核實",
-        "facts": [
-          "更新處表示將增加正式人力及專責科室",
-          "未取得實際增員已全部到位的文件"
-        ],
-        "sources": [
-          "tp-s8",
-          "pa-housing-delivery"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-rec-housing-1",
@@ -690,11 +840,7 @@
           "finding": "核對「南港機廠社宅完工入住」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "plain": "原報導記載南港機廠1區1442戶已分批入住；2區288戶動工，兩區合計規劃1730戶。",
-        "phase": "1區分批入住；2區興建中（依原報導）"
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-ai-1",
@@ -780,27 +926,23 @@
       "id": "tp-ai-5",
       "city": "taipei",
       "status": "needs_followup",
-      "checked_at": "2026-11-04T01:07:28+08:00",
-      "note": "已讀建照申請舊報導及11月3日相關回應，仍未取得可核對最新開工及供電進度的正式文件。",
+      "checked_at": "2026-11-04T08:47:14+08:00",
+      "note": "已讀11月2日北市府土地權利說明及台電供電方案報導；可確認地上權登記與供電規劃，但仍無正式文件證明輝達總部已動工或目前工程完成度。",
       "evidence": [
         {
-          "url": "https://udn.com/news/story/6656/9751416",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:02.537164+00:00",
+          "url": "https://sec.gov.taipei/News_Content.aspx?n=49B4C3242CB7658C&s=3A9B1A21EF246ABF&sms=72544237BBE4C5F6",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "4f2910e115ef7a46d8ac5d77684da751f170157a23cbdeb10378f1af6cc70f9b",
-          "finding": "核對「輝達總部儘速動工」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取市府回應：2026-03-12完成專案設定地上權登記；內容不等於建築工程已動工。"
         },
         {
-          "url": "https://www.bnext.com.tw/article/92509/taipei-mayor-2026-shen-chiang-tech-policy",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:47:55.266638+00:00",
+          "url": "https://www.cna.com.tw/news/afe/202605270384.aspx",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "54ef54ff6dcecb3a4da5646c245f078d8417faa57984fcd14f41e67ec6fbe8fe",
-          "finding": "核對「輝達總部儘速動工」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取台電方案：永久設施工期約6至7年並同步推動臨時變電所；黃仁勳當時僅稱預計2026年底動工。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates"
+      "verification_scope": "land_right_and_power_plan_only_not_construction_completion"
     },
     {
       "id": "tp-ai-6",
@@ -922,23 +1064,7 @@
           "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "2026年底新增量能目標；另提出四年後免抽籤承諾",
-        "facts": [
-          "盤點16處學校與公共空間",
-          "新增620個公托名額",
-          "2026年底前新增16處公托",
-          "公托目標由92處增至108處，可收托2628名幼兒",
-          "11月3日專訪報導載蔣萬安承諾朝四年後公托免抽籤目標努力",
-          "此為競選承諾，不代表目前每個家庭均可免抽籤入托"
-        ],
-        "sources": [
-          "tp-s15",
-          "tp-s16",
-          "pa-family-latest"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-childcare-2",
@@ -964,21 +1090,7 @@
           "finding": "核對「8小時免費臨托券」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "contentKind": "record",
-        "plain": "臺北市新生兒電子臨托券已開放申請，符合資格者至多取得8小時定點臨托服務。",
-        "phase": "2026年9月1日起開放申請",
-        "facts": [
-          "申請期間自2026年9月1日9時至2027年12月31日，必要時得延長",
-          "對象為2026年1月1日以後出生、滿6個月未滿1歲且設籍臺北市的新生兒",
-          "每人至多8小時，效期至滿2歲前一日；中正區晚間據點另須每小時自付100元"
-        ],
-        "sources": [
-          "tp-s15",
-          "pa-childcare-voucher"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-childcare-3",
@@ -1004,21 +1116,7 @@
           "finding": "核對「托育補助加碼」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "contentKind": "record",
-        "plain": "臺北市友善托育補助已加碼，實際補助依送托類型及申請資格審核。",
-        "phase": "2026年7月1日起新標準",
-        "facts": [
-          "公辦民營社區公共托育家園每月友善托育補助自4000元提高為6000元",
-          "準公共托育每月友善托育補助自5000元提高為8000元",
-          "有其他兄姊者依服務類型加發，補助總額不得超過實際支付金額"
-        ],
-        "sources": [
-          "tp-s15",
-          "pa-childcare-subsidy"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-childcare-4",
@@ -1044,20 +1142,7 @@
           "finding": "核對「RSV疫苗補助」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "contentKind": "record",
-        "plain": "臺北市對符合資格孕婦提供RSV疫苗補助，對符合資格嬰幼兒提供RSV長效型單株抗體補助。",
-        "phase": "2026年7月1日開始實施",
-        "facts": [
-          "疫苗對象為設籍北市低收及中低收入戶、懷孕28至36週之孕婦",
-          "抗體對象須符合第2類兒童醫療補助資格及年齡／重症風險條件，且生母未接受北市RSV疫苗公費補助"
-        ],
-        "sources": [
-          "tp-s15",
-          "pa-health-rsv"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-childcare-5",
@@ -1101,10 +1186,7 @@
           "finding": "核對「臨托據點擴增」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "plain": "市長於2026年9月受訪表示，臨時托育據點由上任前4處增至45處。"
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-rec-welfare-2",
@@ -1146,98 +1228,91 @@
           "finding": "核對「第2胎公托免費」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "plain": "市府稱自2026年7月起，符合資格的第二胎以上家庭享公共及準公共托育月費零負擔。",
-        "facts": [
-          "申請資格、送托類型及補助上限仍依社會局規定",
-          "友善托育補助與其他補助合計不得超過實際支付金額"
-        ],
-        "sources": [
-          "tp-s21",
-          "tp-s15",
-          "pa-childcare-subsidy",
-          "pa-city-july"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-rec-welfare-4",
       "city": "taipei",
-      "status": "needs_followup",
-      "checked_at": "2026-11-04T01:07:28+08:00",
-      "note": "舊來源可確認2023年加倍方案，但尚未取得本日現行生育獎勵申請辦法，資格與金額需續查。",
+      "status": "verified_updated",
+      "checked_at": "2026-11-04T08:47:14+08:00",
+      "note": "已讀115年9月3日修正施行的現行自治規則，金額、設籍條件、申請期限及死產補助均依條文明列；這是資格與發放規定核對，不是政策成效評估。",
       "evidence": [
         {
-          "url": "https://city.gvm.com.tw/article/100885",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:11.782454+00:00",
+          "url": "https://laws.gov.taipei/Law/LawSearch/LawArticleContent/FL081869",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "a6e978f0df4e24ad5d6b25255c072aaca81b6b098d6565b0a70ada7d2ccccf9f",
-          "finding": "核對「生育獎勵金加倍」對應原文；發布或引述與實施成果分開判讀。"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/617160",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:12.291561+00:00",
-          "method": "source_pages_read",
-          "body_sha256": "13b065941a93d1fc7b355374e7bd0c2227bf7130dd294b87d023b67259c58f50",
-          "finding": "核對「生育獎勵金加倍」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取第3、4、7條：確認設籍條件、申請期限、各胎次金額及死產補助；修正日期為2026-09-03。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates"
+      "verification_scope": "current_rule_text_only_not_outcome_validation",
+      "changes": {
+        "plain": "現行辦法規定，符合資格者第一名新生兒補助4萬元、第二名4.5萬元、第三名以後每名5萬元；2026年9月3日起，懷孕滿20週以上死產且符合設籍條件者，不分胎次補助4萬元。",
+        "facts": [
+          "新生兒須完成臺北市出生登記或初設戶籍登記，且申請時仍設籍臺北市。",
+          "新生兒父或母自出生或預產日前10個月至申請時應連續設籍臺北市；申請時設籍臺北市且期間在臺北、新北或基隆連續設籍者，視為符合連續設籍條件。",
+          "出生登記一般應於出生次日起60日內申請；有正當理由經核准可延至1年，初設戶籍則於出生次日起1年內申請。"
+        ],
+        "phase": "現行辦法（2026年9月3日修正施行）",
+        "contentKind": "record",
+        "sources": [
+          "tpr-s8",
+          "tpr-s9",
+          "pa-birth-current-law"
+        ]
+      }
     },
     {
       "id": "tp-rec-misc-4",
       "city": "taipei",
-      "status": "needs_followup",
-      "checked_at": "2026-11-04T01:07:28+08:00",
-      "note": "舊報導申請期限為2026年6月30日，尚未取得本日是否續辦、受理及經費餘額的正式公告。",
+      "status": "verified_updated",
+      "checked_at": "2026-11-04T08:47:14+08:00",
+      "note": "已讀勞動局現行專區，確認2026年度申請已於6月30日截止；僅獲核准單位得依期程執行並於2027年2月17日前核銷，不能描述為目前仍開放申請。",
       "evidence": [
         {
-          "url": "https://www.1111.com.tw/news/jobns/164603",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:12.550058+00:00",
+          "url": "https://bola.gov.taipei/News_Content.aspx?n=43965B542D565B91&s=F16E42CDF16B98B9&sms=DCBBE05FAB91EBA0",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "b0b42894e5318889e57dcaf6a036431f41eeb162c65f8856382cc61f8c4bb7a0",
-          "finding": "核對「育兒減少工時補助」對應原文；發布或引述與實施成果分開判讀。"
-        },
-        {
-          "url": "https://udn.com/news/story/7241/9556216",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:16.124213+00:00",
-          "method": "source_pages_read",
-          "body_sha256": "4bab15149f9d24a4fe8461101adae16dd336cb4ffd6d4cae1fd62101e8f2e911",
-          "finding": "核對「育兒減少工時補助」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取申請與核銷段落：申請期2026-03-01至06-30，已核准單位核銷截止2027-02-17。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates"
+      "verification_scope": "current_application_and_reimbursement_rules_not_program_outcome",
+      "changes": {
+        "plain": "臺北市2026年度育兒減少工時不減薪補助，符合計畫資格的雇主可讓家有12歲以下子女的員工每日減少1小時工時且不減薪，市府補助減少工資的8成；本年度新申請已截止。",
+        "facts": [
+          "2026年度申請期間為3月1日至6月30日，逾期不受理。",
+          "已獲補助單位須在員工執行完畢後，於2027年2月17日前辦理經費核銷。",
+          "先前報導稱截至2026年6月9日有376家企業參與；這是當時統計，不代表目前仍可申請。"
+        ],
+        "phase": "2026年度申請已截止；核銷至2027年2月17日",
+        "contentKind": "record",
+        "sources": [
+          "tpr-s10",
+          "tpr-s11",
+          "pa-workhours-current"
+        ]
+      }
     },
     {
       "id": "tp-education-1",
       "city": "taipei",
       "status": "needs_followup",
-      "checked_at": "2026-11-04T01:07:28+08:00",
-      "note": "已讀白皮書相關報導，暑假完成教室螢幕的計畫時點已過，未取得全數驗收文件；不能確認目前完成度。",
+      "checked_at": "2026-11-04T08:47:14+08:00",
+      "note": "已讀AI教育白皮書及11月3日教育局研習原文；可確認AI課程與教師研習持續推進，但白皮書所稱暑假完成全市教室大螢幕仍缺全數驗收文件，不能宣稱完成。",
       "evidence": [
         {
-          "url": "https://udn.com/news/story/7323/9605903",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:47:50.066007+00:00",
+          "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=B469C4B80810E020&sms=72544237BBE4C5F6",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "2ff18b40c0cb7c2d58fe64fd47330f931a03d9582dfd7309d2910cbd545e28b5",
-          "finding": "核對「AI教育白皮書」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取白皮書發布稿：92億元為四年規劃，教室螢幕為預定於當年暑假完成的目標。"
         },
         {
-          "url": "https://www.bnext.com.tw/article/92509/taipei-mayor-2026-shen-chiang-tech-policy",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:47:55.266638+00:00",
+          "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=F5BEC815EAB019CD&sms=72544237BBE4C5F6",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "54ef54ff6dcecb3a4da5646c245f078d8417faa57984fcd14f41e67ec6fbe8fe",
-          "finding": "核對「AI教育白皮書」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取2026-11-03教育局稿：11月4日起辦4場100人研習，預期產出10套課程包及5種以上AI助理；未提供螢幕全數驗收證明。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates"
+      "verification_scope": "official_rollout_material_but_missing_full_acceptance_document"
     },
     {
       "id": "tp-education-2",
@@ -1469,14 +1544,7 @@
           "finding": "核對「敬老卡點數調升」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "sources": [
-          "tp-s13",
-          "tp-s14",
-          "pa-senior-current"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-rec-welfare-5",
@@ -1580,13 +1648,7 @@
           "finding": "核對「大巨蛋啟用」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "facts": [
-          "2006年10月3日簽約、2011年開工，歷經多任市長；2015年曾下令停工",
-          "2023年取得使用執照，同年11月舉辦首場開放萬人觀賽的棒球賽"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-rec-sport-2",
@@ -1612,12 +1674,7 @@
           "finding": "核對「雙北世界壯年運動會」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "facts": [
-          "賽前報導預計有107國、超過2.5萬名選手及隨行人員參加，不能當作賽後實際參與人數"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "tp-youth-1",
@@ -1720,20 +1777,32 @@
     {
       "id": "tp-rec-misc-6",
       "city": "taipei",
-      "status": "needs_followup",
-      "checked_at": "2026-11-04T01:07:28+08:00",
-      "note": "舊報導支持曾試辦癌友凍卵補助，但現行年度資格、額度及是否可併領尚待主管機關文件。",
+      "status": "verified_updated",
+      "checked_at": "2026-11-04T08:47:14+08:00",
+      "note": "已讀衛生局現行須知，分開記錄2026年底前舊制與2027年1月1日起擴大方案；未把未來新制寫成已生效。",
       "evidence": [
         {
-          "url": "https://news.pts.org.tw/article/729125",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:21.102803+00:00",
+          "url": "https://health.gov.taipei/cp.aspx?n=B9E2BC16F7EB04A3",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "08881040acf5ac316a7ca718633ed927ebadd31dcc6eb5fbab27f555418622d9",
-          "finding": "核對「癌症病人凍卵補助」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取補助須知：確認2026年底前癌症適用的3.2萬元舊制，以及2027-01-01起疾病範圍與7.2萬元新制。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates"
+      "verification_scope": "current_and_announced_future_eligibility_text_not_effectiveness",
+      "changes": {
+        "plain": "2026年12月31日前完成取卵者，現行醫療性凍卵補助適用設籍臺北市、未滿41歲且癌症治療可能影響生育力的生理女性，一生一次、最高3.2萬元；2027年1月1日起預定擴大適用疾病範圍與額度。",
+        "facts": [
+          "2026年底前舊制為凍卵療程2萬元，加上4年每年3,000元保存費，合計最高3.2萬元。",
+          "2027年1月1日起新制適用設籍臺北市、25歲以上未滿41歲且因疾病或治療有生育風險者，療程6萬元、保存費1.2萬元，合計最高7.2萬元；此項為未來生效規定。",
+          "補助一生以一次為限，完成療程後6個月內申請。"
+        ],
+        "phase": "2026舊制實施中；2027年1月1日起擴大新制",
+        "contentKind": "record",
+        "sources": [
+          "tpr-s23",
+          "pa-egg-current"
+        ]
+      }
     },
     {
       "id": "tp-rec-environment-1",
@@ -2339,14 +2408,7 @@
           "finding": "核對「運動中心免費臨托」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "當選後試辦承諾",
-        "facts": [
-          "規劃每週三14時至21時辦理，對象為2至12歲兒童",
-          "家長出示當日運動中心消費證明，規劃提供2小時免費臨托"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "nt-family-7",
@@ -2690,14 +2752,7 @@
           "finding": "核對「教師心理支持」對應原文；發布或引述與實施成果分開判讀。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates",
-      "changes": {
-        "phase": "既有措施2027年度起；另提加碼承諾",
-        "facts": [
-          "報導載市府已宣布2027年度起每年8次免費心理諮商，特殊個案最高12次",
-          "李四川承諾再提高次數，但原文未提出新數字"
-        ]
-      }
+      "verification_scope": "original_publication_and_available_updates"
     },
     {
       "id": "nt-education-4",
@@ -3040,20 +3095,30 @@
     {
       "id": "nt-community-6",
       "city": "newtaipei",
-      "status": "needs_followup",
-      "checked_at": "2026-11-04T01:07:28+08:00",
-      "note": "已讀引用文章，但所列樹林觀光與產業轉型細節缺少直接支持，保留待查，不追加推定內容。",
+      "status": "verified_updated",
+      "checked_at": "2026-11-04T08:47:14+08:00",
+      "note": "已讀中央社完整報導，原資料將李四川的樹林產業與交通主張誤寫成觀光政策；已移除無直接來源支持的觀光敘述，保留穩定ID。",
       "evidence": [
         {
-          "url": "https://cna.com.tw/news/aloc/202610030114.aspx",
-          "read_at": "2026-11-04T01:07:28+08:00",
-          "accessed_at": "2026-11-03T16:48:25.790587+00:00",
+          "url": "https://www.cna.com.tw/news/aipl/202610100222.aspx",
+          "read_at": "2026-11-04T08:47:14+08:00",
           "method": "source_pages_read",
-          "body_sha256": "60b018ef674dbf623459d9685c37f67e93f2dff11a175a8c9855827988886e50",
-          "finding": "核對「樹林觀光與產業轉型」對應原文；發布或引述與實施成果分開判讀。"
+          "finding": "實際讀取第343至357行：李四川談樹林軌道、科學城與AI廊帶；鶯歌觀光是蘇巧慧主張。"
         }
       ],
-      "verification_scope": "original_publication_and_available_updates"
+      "verification_scope": "reported_campaign_statement_not_independent_feasibility_review",
+      "changes": {
+        "plain": "李四川提出推動樹林火車站立體化及鐵路地下化，並規劃大漢溪捷運縱貫線串聯樹林與新北第二行政中心；另以大柑園科學城、蘆社大橋及快速道路串接雙北AI科技產業聚落。",
+        "facts": [
+          "中央社報導中，樹林相關主張是交通建設與AI科技產業廊帶；觀光主張屬同篇報導的蘇巧慧鶯歌行程。",
+          "本輪未查得李四川提出『整合樹林在地文化與自然資源強化觀光』的直接原文，因此移除舊敘述。"
+        ],
+        "phase": "競選政見",
+        "contentKind": "policy",
+        "sources": [
+          "pa-nt-shulin-industry"
+        ]
+      }
     }
   ]
 }
