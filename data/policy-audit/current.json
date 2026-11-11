@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "audit_date": "2026-11-10",
-  "checked_at": "2026-11-10T08:13:24+08:00",
+  "audit_date": "2026-11-11",
+  "checked_at": "2026-11-11T08:22:19+08:00",
   "scope": [
     "taipei",
     "newtaipei"
   ],
-  "note": "本輪逐項盤點台北62項、新北56項，優先續查2項needs_followup，並重新讀取既有原始發布與主管機關資料；115個既有來源中實讀113個，2個遠見頁回傳202，另為電動公車項目改讀臺北市交通局官方原文。中選會確認臺北6名、新北3名候選人資格；最近24小時未見足以改寫政策主庫的新承諾或實施文件。更正北投機廠共享充電場啟用當日電動公車數為官方所載886輛。輝達北士科仍缺建照核發／正式開工文件；全市智慧大螢幕仍缺逐校或整體驗收文件，兩項續列待查。核對範圍限於原始發布、現行資格與可取得更新，不等同獨立全面成效驗證。",
+  "note": "本輪逐項盤點臺北62項、新北56項，重讀68個不重複來源頁面以覆蓋118個穩定ID，並優先續查2項needs_followup。中選會確認臺北6名、新北3名正式候選人資格。最近24小時新增沈伯洋都市原住民族政策，以及新北市長候選人都更、社宅、青年與交通主張的原文報導；兩者未提供足以改寫既有穩定ID之實施文件，故只累積為新來源。既有116項原文判讀未見需更正；輝達北士科仍缺建照核發／申報開工文件，全市智慧大螢幕仍缺逐校清冊或整體驗收文件，兩項續列待查。核對範圍限於原始發布、現行資格與可取得更新，不等同獨立全面成效驗證。",
   "baseline_source": {
     "file": "prototypes/v044-art-data.json",
     "commit": "f6cc8c3f13662190cbc64f1eb533387049c6e7cb"
@@ -281,6 +281,26 @@
       "date": "2025-07-02",
       "checkedAt": "2026-11-10",
       "tier": "official"
+    },
+    {
+      "id": "pa-tp-shen-indigenous-20261110",
+      "city": "taipei",
+      "url": "https://www.cna.com.tw/news/aloc/202611100323.aspx",
+      "title": "沈伯洋推原民政見 盼打造多元共融都市原住民城市",
+      "publisher": "中央社",
+      "date": "2026-11-10",
+      "checkedAt": "2026-11-11",
+      "tier": "news"
+    },
+    {
+      "id": "pa-nt-mayor-policy-roundup-20261110",
+      "city": "newtaipei",
+      "url": "https://news.pts.org.tw/article/835153",
+      "title": "針對老屋都更、青年就業等議題 新北市長候選人各提解方",
+      "publisher": "公視新聞",
+      "date": "2026-11-10",
+      "checkedAt": "2026-11-11",
+      "tier": "news"
     }
   ],
   "overrides": {
@@ -643,6 +663,12 @@
         "nt-s23",
         "pa-nt-li-danhai-20261108"
       ]
+    },
+    "tp-rec-environment-2": {
+      "plain": "北投機廠電動公車共享充電場2025年7月2日啟用，設11個充電柱、22個充電席位；市府當日資料稱全市電動公車達886輛。",
+      "sources": [
+        "pa-tp-beitou-ebus-20250702"
+      ]
     }
   },
   "entries": [
@@ -650,33 +676,17 @@
       "id": "tp-transport-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/6656/9751416",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:25+08:00",
           "method": "source_pages_read",
           "finding": "核對「捷運六線齊發」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "805255fbbae755b323474c364536b640f82abe0bd7329d527dee0a1e100a4a6a"
-        },
-        {
-          "url": "https://www.bnext.com.tw/article/92509/taipei-mayor-2026-shen-chiang-tech-policy",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「捷運六線齊發」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "f398dac219e97695e85829e99dc1832896facba0e8f8d100f955fca834086bf5"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610210140.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「捷運六線齊發」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "383dccdebe3802779d2025420d344318589fa304911dacb1ec3de98638898a30"
+          "accessed_at": "2026-11-11T08:20:25+08:00",
+          "body_sha256": "8310a6b1c045e747d60520256e58876b24af89de4b6cbf075fc93d4c6fc6a70f"
         }
       ]
     },
@@ -684,17 +694,17 @@
       "id": "tp-transport-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/820556",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:16+08:00",
           "method": "source_pages_read",
           "finding": "核對「萬大線第一期」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "3c9b3192e14bee0656a22531024dcc94ae37b98ca912a2deb8de51cc2d31fb6c"
+          "accessed_at": "2026-11-11T08:20:16+08:00",
+          "body_sha256": "dc8bf93927664decc7a6a9d6bfb8e783db31a3a783846169fb4a7415635b6075"
         }
       ]
     },
@@ -702,17 +712,17 @@
       "id": "tp-transport-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/820556",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:16+08:00",
           "method": "source_pages_read",
           "finding": "核對「新列車優先調度」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "3c9b3192e14bee0656a22531024dcc94ae37b98ca912a2deb8de51cc2d31fb6c"
+          "accessed_at": "2026-11-11T08:20:16+08:00",
+          "body_sha256": "dc8bf93927664decc7a6a9d6bfb8e783db31a3a783846169fb4a7415635b6075"
         }
       ]
     },
@@ -720,33 +730,17 @@
       "id": "tp-transport-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9580326",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「無人自駕公車」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "79b5f37d5919870c254772434ef5b1c4f243c7d53ee74824424b57bf7a02714f"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/814192",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「無人自駕公車」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "4fc9873f52bd001ebf7154b2fe641e2eac8433de5e3d3983b8807e25a6e2caca"
-        },
-        {
-          "url": "https://www.bnext.com.tw/article/92509/taipei-mayor-2026-shen-chiang-tech-policy",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「無人自駕公車」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "f398dac219e97695e85829e99dc1832896facba0e8f8d100f955fca834086bf5"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "a5cfcedba42a1cd738425833d974dc195cd3bd993d248263669d54f881c3d91a"
         }
       ]
     },
@@ -754,17 +748,17 @@
       "id": "tp-transport-5",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610080124.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「松機舊址交通改造」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "69c3f604a0c638c68494c1b3eab772ae35336eb44b940c062258b3d8e91d0e44"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "c769e77ca8dfbe58a63874c49e11cb67e007f5c83320bb5545cb185de90a0e7e"
         }
       ]
     },
@@ -772,17 +766,17 @@
       "id": "tp-rec-transport-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://www.dot.gov.taipei/News_Content.aspx?n=D739A9F6B5C0AB95&s=04B25B85DA07B318",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取交通局發布資料：2024年7月3日闢駛內科—南軟雙園巴士；今天另核對大臺北公車現行班表仍列此路線。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e949c0ff8c2512ad9d204d2032b155936075b52ecef7c32f8a39d2f42f0cd941"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "1d7c92900c9f28551d6ebbb39561a1b9594f6c1099bd6d7cfd1b935f0dec39b1"
         }
       ]
     },
@@ -790,25 +784,17 @@
       "id": "tp-rec-transport-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/772694",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「公館圓環改正交路口」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b167e33356fcb91537008b212a737fbc8a75cc4ca0e710ee3f4c2ecf2a6aea31"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/774340",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「公館圓環改正交路口」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "aeec67178066e193b5126bd2708189e12f86b09248a6cd01c57379502e009f2b"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "9253dfcce233c0a95311836776655d31d5e3fc7ab1957f51761cd6b9a877ae4a"
         }
       ]
     },
@@ -816,25 +802,17 @@
       "id": "tp-rec-transport-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202608300078.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「信義線東延段通車」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "df96dc5126be333a0cbe2078d4a0af1480c7f6ee1adddfad1d06bd3b5bd932c8"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/ahel/202608300170.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「信義線東延段通車」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "c962740b8f4f5676ed9c317622be32163d99f353c6306b41816f91ec16ef7001"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "6627a7977259556616bf8f272f269d84f4d495ae58502700a99676222dec476d"
         }
       ]
     },
@@ -842,17 +820,17 @@
       "id": "tp-rec-transport-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.mirrormedia.mg/story/20240226edi017",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「YouBike半小時免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9a8c1a4d2c77c5bdf27ead9aeba0d27f0d93ca582f55b57f92737b72decb7a24"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "952d053c378c4c36d8faf273782bf6e91c06aaaed7651f51f99c91f692ed866a"
         }
       ]
     },
@@ -860,33 +838,17 @@
       "id": "tp-rec-transport-5",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_update_and_prior_reporting_not_independent_outcome_audit",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/828300",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:17+08:00",
           "method": "source_pages_read",
           "finding": "核對「以里為單位行人友善」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "c1c894b0fa100f3c5b7a417be581085526343f3ec84b7249b0b45295aa83425f"
-        },
-        {
-          "url": "https://udn.com/news/story/7323/9567862",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「以里為單位行人友善」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e67b633f4d0f7d3b13700bc74191c679ee4da5707551ae15f68331198b8a8d4d"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=2044902FC839D045&s=23F1B1AFD0EB68C8&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取11月4日官方稿：1.0尚有未完成項目，2.0方向為高齡友善、速度管理及人行環境連續性；稿中也承認部分指標下滑。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d7d42c472ef5f9b946f3c7b4709833e554a7579a505f0a3adb2dff34c348ff91"
+          "accessed_at": "2026-11-11T08:20:17+08:00",
+          "body_sha256": "2814f50d2139b246cf878c3ffd2f60f4ff229604f43fe915c83d6aea1efd5fd1"
         }
       ]
     },
@@ -894,49 +856,17 @@
       "id": "tp-housing-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610160099.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:33+08:00",
           "method": "source_pages_read",
           "finding": "核對「公辦都更門檻降至5成」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "ff3fab0b1d9ea36daf6c6a798e4a64ae0be69a05a0ff1e9e1bbe1ad99630b5d2"
-        },
-        {
-          "url": "https://udn.com/news/story/7323/9819370",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「公辦都更門檻降至5成」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d6043e3d16006d693c76803fffaa85d12b2ddf0097dc79a0a1278ee3616f7324"
-        },
-        {
-          "url": "https://www.ettoday.net/news/20261016/3255981.htm",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「公辦都更門檻降至5成」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "82810bd0c94d7a62ab02749951149dc6d5fdac3a95b95f9ef1524925d4e6b26e"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=2044902FC839D045&s=C628D074125A7699&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「公辦都更門檻降至5成」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "08ffb717f866586e28fca082513f50924c0a8834cd218439cc40b74801acf2cd"
-        },
-        {
-          "url": "https://uro.gov.taipei/News_Content.aspx?n=FDB0CAB1DD42E805&s=E0946179F1CA1C47&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「公辦都更門檻降至5成」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9e8a18acb22b543b26150a39461ff5d9e32ae24d1f2285b3688d2a5542556044"
+          "accessed_at": "2026-11-11T08:20:33+08:00",
+          "body_sha256": "ff56e1a23ce02ce1b654d6c8278ea3f5264716a164fd17c6e89801a089b62fa9"
         }
       ]
     },
@@ -944,41 +874,17 @@
       "id": "tp-housing-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610160099.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:33+08:00",
           "method": "source_pages_read",
           "finding": "核對「大街廓都更容積300%」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "ff3fab0b1d9ea36daf6c6a798e4a64ae0be69a05a0ff1e9e1bbe1ad99630b5d2"
-        },
-        {
-          "url": "https://udn.com/news/story/7323/9819370",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大街廓都更容積300%」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d6043e3d16006d693c76803fffaa85d12b2ddf0097dc79a0a1278ee3616f7324"
-        },
-        {
-          "url": "https://www.ettoday.net/news/20261016/3255981.htm",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大街廓都更容積300%」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "82810bd0c94d7a62ab02749951149dc6d5fdac3a95b95f9ef1524925d4e6b26e"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=2044902FC839D045&s=C628D074125A7699&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大街廓都更容積300%」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "08ffb717f866586e28fca082513f50924c0a8834cd218439cc40b74801acf2cd"
+          "accessed_at": "2026-11-11T08:20:33+08:00",
+          "body_sha256": "ff56e1a23ce02ce1b654d6c8278ea3f5264716a164fd17c6e89801a089b62fa9"
         }
       ]
     },
@@ -986,33 +892,17 @@
       "id": "tp-housing-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9819370",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「15分鐘生活圈」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d6043e3d16006d693c76803fffaa85d12b2ddf0097dc79a0a1278ee3616f7324"
-        },
-        {
-          "url": "https://www.ettoday.net/news/20261016/3255981.htm",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「15分鐘生活圈」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "82810bd0c94d7a62ab02749951149dc6d5fdac3a95b95f9ef1524925d4e6b26e"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=2044902FC839D045&s=C628D074125A7699&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「15分鐘生活圈」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "08ffb717f866586e28fca082513f50924c0a8834cd218439cc40b74801acf2cd"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "cdd31a741d25c0e9e1a3240b0569150b0e46287f0591019ed9b0a7a4b2a5398f"
         }
       ]
     },
@@ -1020,25 +910,17 @@
       "id": "tp-housing-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9819370",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「中山行政園區」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d6043e3d16006d693c76803fffaa85d12b2ddf0097dc79a0a1278ee3616f7324"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=2044902FC839D045&s=C628D074125A7699&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「中山行政園區」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "08ffb717f866586e28fca082513f50924c0a8834cd218439cc40b74801acf2cd"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "cdd31a741d25c0e9e1a3240b0569150b0e46287f0591019ed9b0a7a4b2a5398f"
         }
       ]
     },
@@ -1046,25 +928,17 @@
       "id": "tp-housing-5",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9819370",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「南港新行政中心」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d6043e3d16006d693c76803fffaa85d12b2ddf0097dc79a0a1278ee3616f7324"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=2044902FC839D045&s=C628D074125A7699&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「南港新行政中心」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "08ffb717f866586e28fca082513f50924c0a8834cd218439cc40b74801acf2cd"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "cdd31a741d25c0e9e1a3240b0569150b0e46287f0591019ed9b0a7a4b2a5398f"
         }
       ]
     },
@@ -1072,25 +946,17 @@
       "id": "tp-housing-7",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.ettoday.net/news/20261016/3255981.htm",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「都更處人力擴編」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "82810bd0c94d7a62ab02749951149dc6d5fdac3a95b95f9ef1524925d4e6b26e"
-        },
-        {
-          "url": "https://uro.gov.taipei/News_Content.aspx?n=FDB0CAB1DD42E805&s=D1447611E6D11BEC&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「都更處人力擴編」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "3d5cf8f58d15ccbd40c36682b910df8637c523122a22385c0cfa777d6c4e3a20"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "09248d0980deb9adc170ea85b28717743e82803eb3a94a73f54b9ae7de0ecf15"
         }
       ]
     },
@@ -1098,17 +964,17 @@
       "id": "tp-rec-housing-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9819370",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「都更與電梯案量」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d6043e3d16006d693c76803fffaa85d12b2ddf0097dc79a0a1278ee3616f7324"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "cdd31a741d25c0e9e1a3240b0569150b0e46287f0591019ed9b0a7a4b2a5398f"
         }
       ]
     },
@@ -1116,17 +982,17 @@
       "id": "tp-rec-housing-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7241/9599970",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:25+08:00",
           "method": "source_pages_read",
           "finding": "核對「老宅加裝電梯補助加碼」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5942edfe35b8a597567894bb2f4e0d45caa009794170b3cdd0eb0ec8c702bcc5"
+          "accessed_at": "2026-11-11T08:20:25+08:00",
+          "body_sha256": "c789cb3db3c87f7076663f6a4244a52a37fe5c8fa1b6c5b3decc5f9300ff243e"
         }
       ]
     },
@@ -1134,25 +1000,17 @@
       "id": "tp-rec-housing-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9214132",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「南港機廠社宅完工入住」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "618b3e6ce5825888fe781c02bd6213fce9e98433a883a7c7ab0ae9ec4af2c6c6"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202311230231.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「南港機廠社宅完工入住」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d32c553e630ecc1834b87f0c13f5bce038e26566b4d2b0d48df2e0cdc7efd08a"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "06cc622b459e7ce800fc2548877b92f7f992567cedd9c868dcd6b7320685a7d9"
         }
       ]
     },
@@ -1160,25 +1018,17 @@
       "id": "tp-ai-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610080124.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「松機遷移建AI園區」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "69c3f604a0c638c68494c1b3eab772ae35336eb44b940c062258b3d8e91d0e44"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610210140.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「松機遷移建AI園區」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "383dccdebe3802779d2025420d344318589fa304911dacb1ec3de98638898a30"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "c769e77ca8dfbe58a63874c49e11cb67e007f5c83320bb5545cb185de90a0e7e"
         }
       ]
     },
@@ -1186,17 +1036,17 @@
       "id": "tp-ai-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610080124.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「解除限高帶動更新」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "69c3f604a0c638c68494c1b3eab772ae35336eb44b940c062258b3d8e91d0e44"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "c769e77ca8dfbe58a63874c49e11cb67e007f5c83320bb5545cb185de90a0e7e"
         }
       ]
     },
@@ -1204,17 +1054,17 @@
       "id": "tp-ai-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610120220.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「松機遷移配套」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6c4ec835a71d48fa7fdfc6ac95c881e177c62ab999927c15eb0610f4f64e5097"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "92d83e4737005e9b9965f5454e2ad10b241cb3cb19a4bea18427917f564f6b72"
         }
       ]
     },
@@ -1222,17 +1072,17 @@
       "id": "tp-ai-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610120220.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「松南營區招商」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6c4ec835a71d48fa7fdfc6ac95c881e177c62ab999927c15eb0610f4f64e5097"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "92d83e4737005e9b9965f5454e2ad10b241cb3cb19a4bea18427917f564f6b72"
         }
       ]
     },
@@ -1240,30 +1090,30 @@
       "id": "tp-ai-5",
       "city": "taipei",
       "status": "needs_followup",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀地上權、市府總質詢進度與供電方案原文，並搜尋最近24小時更新；仍只可確認地上權已取得、建照為預先掛件，投資計畫與設計待完備。未取得建照核發、申報開工或正式工程文件，故不把預先掛件或動工預期判作已開工。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪重讀地上權、市府總質詢進度與供電方案原文，並搜尋最近24小時更新；仍只可確認地上權已取得、建照為預先掛件，投資計畫與設計待完備。未取得建照核發、申報開工或正式工程文件，故不把預先掛件或動工預期判作已開工。",
       "verification_scope": "land_right_preliminary_permit_filing_and_power_plan_only_not_permit_issuance_or_construction_completion",
       "evidence": [
         {
           "url": "https://sec.gov.taipei/News_Content.aspx?n=49B4C3242CB7658C&s=3A9B1A21EF246ABF&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:22:19+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取市府回應：2026-03-12完成專案設定地上權登記；內容不等於建築工程已動工。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "accessed_at": "2026-11-11T08:22:19+08:00",
           "body_sha256": "8110ab7d71db024eb4e9193b63ac041b6da9d24e3ea24809002ee7ae18ad682d"
         },
         {
           "url": "https://www.cna.com.tw/news/afe/202605270384.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:22:19+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取台電方案：永久設施工期約6至7年並同步推動臨時變電所；黃仁勳當時僅稱預計2026年底動工。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "accessed_at": "2026-11-11T08:22:19+08:00",
           "body_sha256": "b455daad9f5ba7da2bdd442bb0c66d6e845bdd51b4f1f005dcc8e6aee0ccdc49"
         },
         {
           "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=287E90CBA9A80ED6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:22:19+08:00",
+          "accessed_at": "2026-11-11T08:22:19+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取市府2026-09-14總質詢稿：輝達投資計畫與建築設計仍待完備，建照僅為預先掛件，後續都市設計與審議仍在進行；不等於建照核發或已開工。",
           "body_sha256": "ad6a78c968035f2db6782bc0aef215a4fc49b85636e21dea2a8f991bc733fd89"
@@ -1274,25 +1124,17 @@
       "id": "tp-ai-6",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://newtalk.tw/news/view/2026-09-03/1057562",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:18+08:00",
           "method": "source_pages_read",
           "finding": "核對「南軟內科北士科廊帶」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "73424ff876346c92a76689b934049e83678da087613bb4f44fb43f836e3433cf"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610080124.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「南軟內科北士科廊帶」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "69c3f604a0c638c68494c1b3eab772ae35336eb44b940c062258b3d8e91d0e44"
+          "accessed_at": "2026-11-11T08:20:18+08:00",
+          "body_sha256": "df08ceda2d5c5f728f0ead6e93157dd8dbe53af348580823cad8b045e00047c1"
         }
       ]
     },
@@ -1300,17 +1142,17 @@
       "id": "tp-ai-7",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=37621CB498C33429&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:42+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取市府論壇稿：市府稱編列5年10億元競爭型預算，鼓勵各局處提出AI創新應用。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "7ce8dcf3f0508358abce0e8875eb3d8d7f312cbbf23c9cd55406948da41ce84e"
+          "accessed_at": "2026-11-11T08:20:42+08:00",
+          "body_sha256": "9ad92fef3f20d53be1c6bab985a1e1443b2a8b0d6d9ec8f3496d18983da3bf13"
         }
       ]
     },
@@ -1318,25 +1160,17 @@
       "id": "tp-rec-misc-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.bnext.com.tw/article/92509/taipei-mayor-2026-shen-chiang-tech-policy",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:29+08:00",
           "method": "source_pages_read",
           "finding": "核對「輝達總部落腳北士科」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "f398dac219e97695e85829e99dc1832896facba0e8f8d100f955fca834086bf5"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610210140.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「輝達總部落腳北士科」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "383dccdebe3802779d2025420d344318589fa304911dacb1ec3de98638898a30"
+          "accessed_at": "2026-11-11T08:20:29+08:00",
+          "body_sha256": "19e85877cb98389e4a76a355f3045b83da4e0171a45c19d75c4e91098691acf0"
         }
       ]
     },
@@ -1344,17 +1178,17 @@
       "id": "tp-rec-misc-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=B59FFD712F7C58AC",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取1999發布稿：研考會稱AI輔助將查詢時間由20秒降至2秒；此為市府成效說法，非獨立效能驗證。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e54dfb78e58e012ae02c81e93be6e6972c51b1ca56d2196640720a29d27aea8c"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "962892df05c46adc117aceba157c55af69dd4254629de933dee8c2f52a7f0346"
         }
       ]
     },
@@ -1362,33 +1196,17 @@
       "id": "tp-childcare-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/801527",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:16+08:00",
           "method": "source_pages_read",
           "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b77f645c393cf5f795da08160f2579c9cee86ea8634f9aacb9cb150dd3789f18"
-        },
-        {
-          "url": "https://wantrich.chinatimes.com/news/20260401900172-420501",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a9836cfea0c599eaf34bbe50019f28810c7b8f3dc5e603b7f2eef9ae59269d34"
-        },
-        {
-          "url": "https://www.nownews.com/news/6888933",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "de0a6d9e65f973e0b9210663210b16daf7db14a16317871d81dc2c72cf442e56"
+          "accessed_at": "2026-11-11T08:20:16+08:00",
+          "body_sha256": "6092c3c428bb65232069967ed2e7deec3d78c75614792a941ede26d2caa15618"
         }
       ]
     },
@@ -1396,25 +1214,17 @@
       "id": "tp-childcare-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/801527",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:16+08:00",
           "method": "source_pages_read",
           "finding": "核對「8小時免費臨托券」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b77f645c393cf5f795da08160f2579c9cee86ea8634f9aacb9cb150dd3789f18"
-        },
-        {
-          "url": "https://dosw.gov.taipei/News_Content.aspx?n=B2FFCD51DE49E16C&s=0D9B2035F304EBE3&sms=09BA849A6400B3FA",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「8小時免費臨托券」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "f8c053243c4d128a8066a28c25ebc5a7d50e2685d43b9f1c0c4990ea0ad99be0"
+          "accessed_at": "2026-11-11T08:20:16+08:00",
+          "body_sha256": "6092c3c428bb65232069967ed2e7deec3d78c75614792a941ede26d2caa15618"
         }
       ]
     },
@@ -1422,25 +1232,17 @@
       "id": "tp-childcare-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/801527",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:16+08:00",
           "method": "source_pages_read",
           "finding": "核對「托育補助加碼」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b77f645c393cf5f795da08160f2579c9cee86ea8634f9aacb9cb150dd3789f18"
-        },
-        {
-          "url": "https://dosw.gov.taipei/cp.aspx?n=46A2CAA8E124546D&s=1ADF41E184075E8A",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「托育補助加碼」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "cfcdef0a93a7373071e2a5630cebe7d87466b372fa6076e3e2829a204e527dac"
+          "accessed_at": "2026-11-11T08:20:16+08:00",
+          "body_sha256": "6092c3c428bb65232069967ed2e7deec3d78c75614792a941ede26d2caa15618"
         }
       ]
     },
@@ -1448,25 +1250,17 @@
       "id": "tp-childcare-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/801527",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:16+08:00",
           "method": "source_pages_read",
           "finding": "核對「RSV疫苗補助」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b77f645c393cf5f795da08160f2579c9cee86ea8634f9aacb9cb150dd3789f18"
-        },
-        {
-          "url": "https://health.gov.taipei/cp.aspx?n=6C8A17ACE04EDE26&s=076FBE7D030901D9",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「RSV疫苗補助」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "4f0e8f44a375b431c6499665af92ca4f6cffa14a89645b51531f96b4f568c28b"
+          "accessed_at": "2026-11-11T08:20:16+08:00",
+          "body_sha256": "6092c3c428bb65232069967ed2e7deec3d78c75614792a941ede26d2caa15618"
         }
       ]
     },
@@ -1474,17 +1268,17 @@
       "id": "tp-childcare-5",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202603200066.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:33+08:00",
           "method": "source_pages_read",
           "finding": "核對「雙北育兒合作」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "768ffa9f72b4735cf3bd8fcb97088ff6016ec871993289416dca7bd4ec5bcfe9"
+          "accessed_at": "2026-11-11T08:20:33+08:00",
+          "body_sha256": "1c8d3e97cdee32d1f4bb7d25e0d3c3706a736babe8c14796bbf5dd071f23ca7b"
         }
       ]
     },
@@ -1492,25 +1286,17 @@
       "id": "tp-rec-welfare-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/6656/9751416",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:25+08:00",
           "method": "source_pages_read",
           "finding": "核對「臨托據點擴增」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "805255fbbae755b323474c364536b640f82abe0bd7329d527dee0a1e100a4a6a"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/801527",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「臨托據點擴增」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b77f645c393cf5f795da08160f2579c9cee86ea8634f9aacb9cb150dd3789f18"
+          "accessed_at": "2026-11-11T08:20:25+08:00",
+          "body_sha256": "8310a6b1c045e747d60520256e58876b24af89de4b6cbf075fc93d4c6fc6a70f"
         }
       ]
     },
@@ -1518,41 +1304,17 @@
       "id": "tp-rec-welfare-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/6656/9751416",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:25+08:00",
           "method": "source_pages_read",
           "finding": "核對「第2胎公托免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "805255fbbae755b323474c364536b640f82abe0bd7329d527dee0a1e100a4a6a"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/801527",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「第2胎公托免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b77f645c393cf5f795da08160f2579c9cee86ea8634f9aacb9cb150dd3789f18"
-        },
-        {
-          "url": "https://dosw.gov.taipei/cp.aspx?n=46A2CAA8E124546D&s=1ADF41E184075E8A",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「第2胎公托免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "cfcdef0a93a7373071e2a5630cebe7d87466b372fa6076e3e2829a204e527dac"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=AEBD9DC537051B10&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「第2胎公托免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a938accb2dcf0971253977ea1248db002e3d82128e4bc07eb0308930c7c56faf"
+          "accessed_at": "2026-11-11T08:20:25+08:00",
+          "body_sha256": "8310a6b1c045e747d60520256e58876b24af89de4b6cbf075fc93d4c6fc6a70f"
         }
       ]
     },
@@ -1560,17 +1322,17 @@
       "id": "tp-rec-welfare-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "current_rule_text_only_not_outcome_validation",
       "evidence": [
         {
           "url": "https://laws.gov.taipei/Law/LawSearch/LawArticleContent/FL081869",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取第3、4、7條：確認設籍條件、申請期限、各胎次金額及死產補助；修正日期為2026-09-03。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "3e63bcf64af10f503d6d123cb6135b1a941768b22952497dacf2fadbc05c9928"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "260cbc02d79bbd2fe38b59c90bdcae6f49599b0adb3db67ea43aafac51d21905"
         }
       ]
     },
@@ -1578,17 +1340,17 @@
       "id": "tp-rec-misc-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "current_application_and_reimbursement_rules_not_program_outcome",
       "evidence": [
         {
           "url": "https://bola.gov.taipei/News_Content.aspx?n=43965B542D565B91&s=F16E42CDF16B98B9&sms=DCBBE05FAB91EBA0",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取申請與核銷段落：申請期2026-03-01至06-30，已核准單位核銷截止2027-02-17。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "78e0fa82668f34cdedc042ea69438a092318a88afd611cb8835f4aee091f9c94"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "a693247c47078b57ef076dbbb759e3b7a332504b0dfe6f3529c1d8c9656f7bda"
         }
       ]
     },
@@ -1596,41 +1358,33 @@
       "id": "tp-education-1",
       "city": "taipei",
       "status": "needs_followup",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀AI教育白皮書、研習、教育科技展與單校場域原文，並搜尋主管機關更新；可確認白皮書曾以2026年暑假完成小一至高三智慧大螢幕為目標，也可確認課程、平台、設備與師培持續推進，但仍未取得全市逐校或整體驗收文件。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪重讀AI教育白皮書、教育科技展與單校智慧教室資料，並搜尋最近24小時更新；原文可證明全市智慧大螢幕為既定推動目標，且有培訓、展示與單校建置案例，但仍未取得逐校清冊或全市整體驗收文件，故不宣稱全市已完成。",
       "verification_scope": "official_rollout_and_single_school_material_but_missing_citywide_screen_acceptance_document",
       "evidence": [
         {
           "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=B469C4B80810E020&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:22:19+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取白皮書發布稿：92億元為四年規劃，教室螢幕為預定於當年暑假完成的目標。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "accessed_at": "2026-11-11T08:22:19+08:00",
           "body_sha256": "9684dbada2c72bfecbbc1021a1b93b32e42c659c86111f8dd1ef7a8ab36523ce"
         },
         {
           "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=F5BEC815EAB019CD&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:22:19+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取2026-11-03教育局稿：11月4日起辦4場100人研習，預期產出10套課程包及5種以上AI助理；未提供螢幕全數驗收證明。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "accessed_at": "2026-11-11T08:22:19+08:00",
           "body_sha256": "4e0261cf17954665d2366faf4d9fb2ba86226a4763ac002310d1d50b68c46edd"
         },
         {
           "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=839C6FC197CAEF71&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:22:19+08:00",
+          "accessed_at": "2026-11-11T08:22:19+08:00",
           "method": "source_pages_read",
           "finding": "教育局11月5日稿列出AI平台、課程教材、教學載具、網路、場域與師資培力，並預告11月12日至15日展覽；未提供全市智慧大螢幕逐校驗收或完成證明。",
           "body_sha256": "74d32416464d7e760d461c6813be4c1869f5ee7a30483f79954d35e64515024a"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=4019B250864DD01F",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取教育局2026-10-16稿：中山國中以企業捐贈設備啟用一間AI智匯教室；此為單校場域成果，不能證明全市教室設備均已驗收。",
-          "body_sha256": "80ebc5169068f3a023193519411c8f56839e37e555c80fd903bd768d3c5c6666"
         }
       ]
     },
@@ -1638,17 +1392,17 @@
       "id": "tp-education-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9605903",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「北士科AI教育中心」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "3ce295261ff6cf445c949adea4a56916606ee1217423bf298474bf71f9233125"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "2589b9a3f3967135b64e7a3123cfb04e412568c527b1418dc58032d97fbbebcd"
         }
       ]
     },
@@ -1656,25 +1410,17 @@
       "id": "tp-rec-education-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.taiwannews.com.tw/zh/news/6413735",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "核對「生生喝鮮奶擴大至國中」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "81f6d24f7869bd10ebc524df305a41d299a52a3f08f0d882fa8752ac7d8f2ed4"
-        },
-        {
-          "url": "https://www.businesstoday.com.tw/article/category/183035/post/202608310010/",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「生生喝鮮奶擴大至國中」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6f4993dd4d5d31d7695a93faf02d9fd3a8f49ae90e652fd9e5bbfa14e6988883"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "d1c7c9275bcf3a2f0e330dcb234c8599c97342e682b9565c023cfe2a1355f11d"
         }
       ]
     },
@@ -1682,49 +1428,17 @@
       "id": "tp-rec-education-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.storm.mg/lifestyle/11172322",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "核對「國中小營養午餐免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "23fade9d7478873090ba3797afdbb14ccd98d6b0cfc27a8de3b59e262aa4a4e7"
-        },
-        {
-          "url": "https://news.tvbs.com.tw/politics/3168122",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「國中小營養午餐免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "1c45e3ea4584e9095ade1af2743451c8ece2366f6844ed07ac6df343ae5f6893"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/820457",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「國中小營養午餐免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "0f1a902440895e85efd08a2b5d88f9a3f309f5d4861a648bb434d48fecb6e34f"
-        },
-        {
-          "url": "https://www.mirrormedia.mg/external/setn_1923061",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「國中小營養午餐免費」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a5f990b0b87db957198ab4ddd302efe289b5ea48531f8131a2cff016324d2231"
-        },
-        {
-          "url": "https://www.nexttv.com.tw/NextTV/News/Home/Politics/2026-11-05/2516892.html",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取11月5日報導：校方稱2公克為建議量，教育局說明另袋分發為過敏考量，市長要求依營養師意見檢討並減輕教師負擔。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "53ef39e2ea1fc5ebce8c4289d67366147bf09be10586dab3d537821f6a53f931"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "d5f041342fd0e181173d6d138fb83597ef743a6aa6b5534c15c1664324191de9"
         }
       ]
     },
@@ -1732,33 +1446,17 @@
       "id": "tp-senior-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.storm.mg/article/11145182",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "核對「敬老卡通路擴大」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9a75f1370863a146cbbdaaf3dfea8ded526ce47a2d8e08f0fa427c93864f29fc"
-        },
-        {
-          "url": "https://udn.com/news/amp/story/7323/9581933",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「敬老卡通路擴大」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6f46ab0b046900cd0316c82adc6ebb43f5698b46e369bb960dc1da3c2cb406f8"
-        },
-        {
-          "url": "https://newtalk.tw/news/view/2026-09-03/1057562",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「敬老卡通路擴大」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "73424ff876346c92a76689b934049e83678da087613bb4f44fb43f836e3433cf"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "aa93ce947839903d13f85324aaf7d51afe4d982e95c0e28a521cc43134e54cb8"
         }
       ]
     },
@@ -1766,25 +1464,17 @@
       "id": "tp-senior-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.storm.mg/article/11145182",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "核對「敬老卡交通加碼」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9a75f1370863a146cbbdaaf3dfea8ded526ce47a2d8e08f0fa427c93864f29fc"
-        },
-        {
-          "url": "https://udn.com/news/amp/story/7323/9581933",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「敬老卡交通加碼」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6f46ab0b046900cd0316c82adc6ebb43f5698b46e369bb960dc1da3c2cb406f8"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "aa93ce947839903d13f85324aaf7d51afe4d982e95c0e28a521cc43134e54cb8"
         }
       ]
     },
@@ -1792,33 +1482,17 @@
       "id": "tp-senior-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.storm.mg/article/11145182",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "核對「二代卡點數累積」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9a75f1370863a146cbbdaaf3dfea8ded526ce47a2d8e08f0fa427c93864f29fc"
-        },
-        {
-          "url": "https://udn.com/news/amp/story/7323/9581933",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「二代卡點數累積」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6f46ab0b046900cd0316c82adc6ebb43f5698b46e369bb960dc1da3c2cb406f8"
-        },
-        {
-          "url": "https://newtalk.tw/news/view/2026-09-03/1057562",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「二代卡點數累積」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "73424ff876346c92a76689b934049e83678da087613bb4f44fb43f836e3433cf"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "aa93ce947839903d13f85324aaf7d51afe4d982e95c0e28a521cc43134e54cb8"
         }
       ]
     },
@@ -1826,17 +1500,17 @@
       "id": "tp-senior-4",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://newtalk.tw/news/view/2026-09-03/1057562",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:18+08:00",
           "method": "source_pages_read",
           "finding": "核對「照顧孩子長輩三年計畫」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "73424ff876346c92a76689b934049e83678da087613bb4f44fb43f836e3433cf"
+          "accessed_at": "2026-11-11T08:20:18+08:00",
+          "body_sha256": "df08ceda2d5c5f728f0ead6e93157dd8dbe53af348580823cad8b045e00047c1"
         }
       ]
     },
@@ -1844,33 +1518,17 @@
       "id": "tp-rec-welfare-3",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.storm.mg/article/11145182",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "核對「敬老卡點數調升」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9a75f1370863a146cbbdaaf3dfea8ded526ce47a2d8e08f0fa427c93864f29fc"
-        },
-        {
-          "url": "https://udn.com/news/amp/story/7323/9581933",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「敬老卡點數調升」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6f46ab0b046900cd0316c82adc6ebb43f5698b46e369bb960dc1da3c2cb406f8"
-        },
-        {
-          "url": "https://dosw.gov.taipei/cp.aspx?n=59C18B4C973AED21",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「敬老卡點數調升」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "d123f6361af42f38d5153fb1c62a7b810985c147abc0dd1d1594e3d38209d76d"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "aa93ce947839903d13f85324aaf7d51afe4d982e95c0e28a521cc43134e54cb8"
         }
       ]
     },
@@ -1878,17 +1536,17 @@
       "id": "tp-rec-welfare-5",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://dosw.gov.taipei/News_Content.aspx?n=6CA16D3397A7A302&s=D2D367F6D828744D&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取社會局原文：2023年6月搬遷廣慈園區，日照量能由24人增至120人並試辦3床夜間喘息。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "709e77107d70dfe3cd32ccebfea9d77def7121ca82e97be8bde035ab1d12a9c9"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "b6c565077cdc44f39a8ac8ea0fd89cb6b573baf8b6ae78b68106eb118fd4d6a1"
         }
       ]
     },
@@ -1896,25 +1554,17 @@
       "id": "tp-sports-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.pts.org.tw/article/822493",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:17+08:00",
           "method": "source_pages_read",
           "finding": "核對「12強賽在台北」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "1be75738258bb6f660021522cf7a90a5731e9b216a66c9ca0fc91b4044d23737"
-        },
-        {
-          "url": "https://udn.com/news/story/6656/9751416",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「12強賽在台北」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "805255fbbae755b323474c364536b640f82abe0bd7329d527dee0a1e100a4a6a"
+          "accessed_at": "2026-11-11T08:20:17+08:00",
+          "body_sha256": "baf14732a939007c82bac5f1edcedb650c5cf3582e4257bdb8407a98a4785d58"
         }
       ]
     },
@@ -1922,25 +1572,17 @@
       "id": "tp-sports-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202610160123.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「奧運最終資格賽」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "fc5ff9d84a458b7a0dfc6b59ad62b6b658b07a2a09c8602c3cb334ec9ae3285a"
-        },
-        {
-          "url": "https://news.pts.org.tw/article/822493",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「奧運最終資格賽」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "1be75738258bb6f660021522cf7a90a5731e9b216a66c9ca0fc91b4044d23737"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "1073c30b160325252bc072f05889b0211f9e95ed094d83a804c9fcaf4326efd9"
         }
       ]
     },
@@ -1948,33 +1590,17 @@
       "id": "tp-rec-sport-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202610160123.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「大巨蛋啟用」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "fc5ff9d84a458b7a0dfc6b59ad62b6b658b07a2a09c8602c3cb334ec9ae3285a"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610210140.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大巨蛋啟用」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "383dccdebe3802779d2025420d344318589fa304911dacb1ec3de98638898a30"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202311180025.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大巨蛋啟用」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "60a070d21fe4797ead36e0cc0b6571d8feded56665f765a70b573d103116df09"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "1073c30b160325252bc072f05889b0211f9e95ed094d83a804c9fcaf4326efd9"
         }
       ]
     },
@@ -1982,25 +1608,17 @@
       "id": "tp-rec-sport-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6672363",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「雙北世界壯年運動會」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5f1aaf3f8db72d3393daa2f9455e7424a3608c8be118eb4c4436ecfe4497f970"
-        },
-        {
-          "url": "https://www.nownews.com/news/6681789",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「雙北世界壯年運動會」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "883ea033e855459b61089cbf7376927a607909faed752ef451a9f20c722b8e6c"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "3563daeccd7ed2455150006924899e2a0d4a940b2fc7848e7f022ad6472606d8"
         }
       ]
     },
@@ -2008,17 +1626,17 @@
       "id": "tp-youth-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://youth.gov.taipei/announcement/news/3f5df8e6-00ad-49d7-bc0b-f177a3736f94",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:49+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取青年局原文：2026年海外實習擴至4國16城市及17個合作機構，領域包含AI與農業育種等。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "ba314988b36041f48ea6a8e94931c8769d626d1ca3a9fa21b79387bd8d617e6a"
+          "accessed_at": "2026-11-11T08:20:49+08:00",
+          "body_sha256": "48b4553d87876b6578c73f1f62f87ed4bd4edac54c81a20e29afd31c9bd6c47c"
         }
       ]
     },
@@ -2026,17 +1644,17 @@
       "id": "tp-youth-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://youth.gov.taipei/announcement/news/3e24fea3-36c6-4698-abdb-d7e9beca61b1",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:48+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取青年局回應：列出創業活動補助、市集與貸款利息補貼等既有措施；成效數字為機關自述。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a1f1a79926eb55ed270147a3fb440de8d98dfeaf769740b3497cf103eb498404"
+          "accessed_at": "2026-11-11T08:20:48+08:00",
+          "body_sha256": "cc6423f57f26049836e41169071aac29b9f6ffe46ca311529a2285649ccdc2e7"
         }
       ]
     },
@@ -2044,17 +1662,17 @@
       "id": "tp-rec-misc-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_source_and_available_updates",
       "evidence": [
         {
           "url": "https://youth.gov.taipei/announcement/news/489ee33b-5995-4aa4-a625-2ae796847b16",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:49+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取青年局三週年資料：青年局於2024年6月1日成立，業務涵蓋國際交流、公共參與與職涯發展。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "8edd7b45275c7ba39857849628598e3447cc717e3195a80f8064d0e8e800a582"
+          "accessed_at": "2026-11-11T08:20:49+08:00",
+          "body_sha256": "d29c61396c5098f014f5f6e5e537096c20357dc3abae0f8ae0a98cd54e1cee7d"
         }
       ]
     },
@@ -2062,17 +1680,17 @@
       "id": "tp-health-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.businesstoday.com.tw/article/category/183027/post/202608270003/",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「吸菸區整體規劃」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b29d1098548957d545153fb9e0cb79d15430e194c7413e46ba7ba317ac49d1fe"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "8423af3850fcfce74975f8a7b7266b957459aa7984e46078e0c606e9214c9198"
         }
       ]
     },
@@ -2080,25 +1698,17 @@
       "id": "tp-health-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "official_case_response_and_plan_terms_not_independent_citywide_outcome_validation",
       "evidence": [
         {
           "url": "https://news.tvbs.com.tw/politics/3168122",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:18+08:00",
           "method": "source_pages_read",
           "finding": "核對「校園午餐食材把關」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "1c45e3ea4584e9095ade1af2743451c8ece2366f6844ed07ac6df343ae5f6893"
-        },
-        {
-          "url": "https://www.gov.taipei/News_Content.aspx?n=F0DDAF49B89E9413&s=501DFBF453174D5D&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "教育局稿明載成淵高中供餐問題已裁罰、終止契約並重新招標；另列府級督導委員會、2027年2月調升指導費、再增聘15名營養師及2026至2028年設備投入等四項精進，包含已處置與未來規劃。",
-          "body_sha256": "95057b9a4adcbfb00a1d6e955382cc3b9bc2340f18deef923f138912d3e56a82"
+          "accessed_at": "2026-11-11T08:20:18+08:00",
+          "body_sha256": "f0199e32b24d5170ea06addd592830f71b8cad6330d86c0141b027924504ae6b"
         }
       ]
     },
@@ -2106,17 +1716,17 @@
       "id": "tp-rec-misc-6",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "current_and_announced_future_eligibility_text_not_effectiveness",
       "evidence": [
         {
           "url": "https://health.gov.taipei/cp.aspx?n=B9E2BC16F7EB04A3",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取補助須知：確認2026年底前癌症適用的3.2萬元舊制，以及2027-01-01起疾病範圍與7.2萬元新制。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "90a7a789c6b045371eb68acd3c4a7207912836d8d4a0662a176f8bd8aeda744b"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "e059ef8cd6eec014c771c5613f23a541c80cfa5e9079ce994733a94c4219dba1"
         }
       ]
     },
@@ -2124,41 +1734,35 @@
       "id": "tp-rec-environment-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9236427",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「家戶廚餘收運改制」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "deb0fa543756c7210cc924b3ba6e7dfb709c4e59227ae44e73986f0f93a20505"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "057eb9baaca2d5cad1a59333167a77427b26489f0b0f1f96a81249f1e008f57d"
         }
       ]
     },
     {
       "id": "tp-rec-environment-2",
       "city": "taipei",
-      "status": "verified_updated",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "重讀臺北市交通局／公運處官方啟用稿：北投機廠共享充電場於2025年7月2日啟用，設11個充電柱、22個充電席位；官方當日資料稱全市電動公車886輛，故將原整理的897輛更正為886輛，並改引官方來源。",
-      "changes": {
-        "plain": "北投機廠電動公車共享充電場2025年7月2日啟用，設11個充電柱、22個充電席位；市府當日資料稱全市電動公車達886輛。",
-        "sources": [
-          "pa-tp-beitou-ebus-20250702"
-        ]
-      },
+      "status": "verified_unchanged",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪重讀臺北市交通局／公運處官方啟用稿，仍載北投機廠共享充電場於2025年7月2日啟用、設11個充電柱與22個充電席位，且當日全市電動公車為886輛；未見足以改動更正內容的新文件。",
       "verification_scope": "official_launch_date_chargers_slots_and_same_day_citywide_bus_count_not_independent_performance_audit",
       "evidence": [
         {
           "url": "https://dot.gov.taipei/News_Content.aspx?n=D739A9F6B5C0AB95&s=D2699F50C3D7D37E&sms=72544237BBE4C5F6",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
+          "accessed_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "官方原文載明場域2025年7月2日啟用，設11個充電柱、22個充電席位，並稱當日全市電動公車達886輛；支持啟用事實與數量更正，不延伸為減碳成效驗證。",
-          "body_sha256": "1f181f53867ac3dbea167f5041ef74e4d88d81eb9cd4cfe9e9cabf3b5748de74"
+          "body_sha256": "1e299f7e227ff2ca0fb241e7f92d7dd749ab60c293a37d5dca768a41539bb154"
         }
       ]
     },
@@ -2166,17 +1770,17 @@
       "id": "tp-rec-culture-1",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://n.yam.com/Article/20250701345124",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「成立北捷遊憩公司」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5929242b60343a533c99f839d74699920c182f46562d9571ed4f97e205ac154b"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "17d897558a61068118ef379abda6fa45f89c50e8dd441fb88dcff0d1b5ca0877"
         }
       ]
     },
@@ -2184,17 +1788,17 @@
       "id": "tp-rec-culture-2",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://news.tvbs.com.tw/politics/2390373",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:18+08:00",
           "method": "source_pages_read",
           "finding": "核對「動物園門票調整」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5883469555474ba71415dff54b6cddf258326a4c206558bbbca034234185e2d0"
+          "accessed_at": "2026-11-11T08:20:18+08:00",
+          "body_sha256": "77796d65739e2913dd99300fb9ae5fb71fed7b2ee72eccbdb0803ed0a7d69adf"
         }
       ]
     },
@@ -2202,17 +1806,17 @@
       "id": "tp-rec-misc-5",
       "city": "taipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7323/9267717",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "核對「智慧災害應變平台上線」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "0f7fcc999f67e8946d73ffe86cb2455171826318bc33c7a2440e9e366146353d"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "af47d15dfb363c85de4ab3c16cea1d206774d994228a5749aa1b483759f3f74f"
         }
       ]
     },
@@ -2220,25 +1824,17 @@
       "id": "nt-transport-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「汐東線加速南延」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
-        },
-        {
-          "url": "https://www.ettoday.net/news/20260607/3179239.htm",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「汐東線加速南延」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9f31b20be0f21e942865fd4c265f92b763e6ed9e4562426f1a00ad444f22d22a"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "7e704bfd98f691fed19419292fa79aa8c0e7b9a24021a91f824bf70c2c696c28"
         }
       ]
     },
@@ -2246,33 +1842,17 @@
       "id": "nt-transport-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「大漢溪捷運縱貫線」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202610030114.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大漢溪捷運縱貫線」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "95a26811b44d6ed11b83a98effb69f933b9e4f28a3d7e73d9ccd9f4f19f73c58"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9653165",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「大漢溪捷運縱貫線」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "956a4b17db1f215b4d240d9a75d60596b51009c5c8b86b49ffb9783b90761f22"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "7e704bfd98f691fed19419292fa79aa8c0e7b9a24021a91f824bf70c2c696c28"
         }
       ]
     },
@@ -2280,25 +1860,17 @@
       "id": "nt-transport-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9653165",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「淡北快線」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "956a4b17db1f215b4d240d9a75d60596b51009c5c8b86b49ffb9783b90761f22"
-        },
-        {
-          "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「淡北快線」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "a3ec1523db08124d5bf69320a73a6b4b7ee633574c7e43289aaa4c7347031420"
         }
       ]
     },
@@ -2306,33 +1878,17 @@
       "id": "nt-transport-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「蘆社大橋與跨河輕軌」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9654262",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「蘆社大橋與跨河輕軌」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "19e0556be63a9a2a0b336e0b554f80c685ac5721dd0a1887194f6d4b82cb6374"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202610030114.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「蘆社大橋與跨河輕軌」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "95a26811b44d6ed11b83a98effb69f933b9e4f28a3d7e73d9ccd9f4f19f73c58"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "7e704bfd98f691fed19419292fa79aa8c0e7b9a24021a91f824bf70c2c696c28"
         }
       ]
     },
@@ -2340,33 +1896,17 @@
       "id": "nt-transport-5",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「中和光復線南北延伸」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202609270167.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「中和光復線南北延伸」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "87ec75fe92285a314db9c6535b0e38a7c9089789c421ba250baeba509271448b"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9637577",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「中和光復線南北延伸」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "18e96f5b9eaaa8d6a3cefd02814e321b76e8e5e70a02b034ed2014c5984b7a4a"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "7e704bfd98f691fed19419292fa79aa8c0e7b9a24021a91f824bf70c2c696c28"
         }
       ]
     },
@@ -2374,25 +1914,17 @@
       "id": "nt-transport-6",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「深坑輕軌延伸石碇」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202609270167.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「深坑輕軌延伸石碇」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "87ec75fe92285a314db9c6535b0e38a7c9089789c421ba250baeba509271448b"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "7e704bfd98f691fed19419292fa79aa8c0e7b9a24021a91f824bf70c2c696c28"
         }
       ]
     },
@@ -2400,17 +1932,17 @@
       "id": "nt-transport-7",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202610030114.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「林口與八里輕軌」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "95a26811b44d6ed11b83a98effb69f933b9e4f28a3d7e73d9ccd9f4f19f73c58"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "41e42e85491dbe6786f31288b6c4de61b0101c436098c9e26c9adee3bb9dbdf5"
         }
       ]
     },
@@ -2418,17 +1950,17 @@
       "id": "nt-transport-8",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9653165",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「樹林鐵路地下化」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "956a4b17db1f215b4d240d9a75d60596b51009c5c8b86b49ffb9783b90761f22"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "a3ec1523db08124d5bf69320a73a6b4b7ee633574c7e43289aaa4c7347031420"
         }
       ]
     },
@@ -2436,25 +1968,17 @@
       "id": "nt-housing-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://money.udn.com/money/amp/story/5621/9748277",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「捷運場站整合開發」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "496e25a1df01eabe8b67e0c2123ea68a89eadb4dc3a06f9b7a8c31c38ccfa802"
-        },
-        {
-          "url": "https://www.nownews.com/news/6865278",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「捷運場站整合開發」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "25d6f7107994dcf62693ed5b0e516420bd884f6746ab1822706245efae46a4e8"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "111c7e676df4cbd7c4e355666409e12dff68c714414542a5862af72409572df6"
         }
       ]
     },
@@ -2462,17 +1986,17 @@
       "id": "nt-housing-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://money.udn.com/money/amp/story/5621/9748277",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「開發案社宅回饋」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "496e25a1df01eabe8b67e0c2123ea68a89eadb4dc3a06f9b7a8c31c38ccfa802"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "111c7e676df4cbd7c4e355666409e12dff68c714414542a5862af72409572df6"
         }
       ]
     },
@@ -2480,17 +2004,17 @@
       "id": "nt-housing-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://money.udn.com/money/amp/story/5621/9748277",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「企業興辦勞工宅」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "496e25a1df01eabe8b67e0c2123ea68a89eadb4dc3a06f9b7a8c31c38ccfa802"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "111c7e676df4cbd7c4e355666409e12dff68c714414542a5862af72409572df6"
         }
       ]
     },
@@ -2498,17 +2022,17 @@
       "id": "nt-housing-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://money.udn.com/money/amp/story/5621/9748277",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「婚育家庭社宅延住」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "496e25a1df01eabe8b67e0c2123ea68a89eadb4dc3a06f9b7a8c31c38ccfa802"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "111c7e676df4cbd7c4e355666409e12dff68c714414542a5862af72409572df6"
         }
       ]
     },
@@ -2516,17 +2040,17 @@
       "id": "nt-housing-5",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://money.udn.com/money/amp/story/5621/9748277",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:10+08:00",
           "method": "source_pages_read",
           "finding": "核對「高齡友善社宅」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "496e25a1df01eabe8b67e0c2123ea68a89eadb4dc3a06f9b7a8c31c38ccfa802"
+          "accessed_at": "2026-11-11T08:20:10+08:00",
+          "body_sha256": "111c7e676df4cbd7c4e355666409e12dff68c714414542a5862af72409572df6"
         }
       ]
     },
@@ -2534,33 +2058,17 @@
       "id": "nt-housing-6",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202608190134.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「府級都更推動委員會」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5f06fa5d47e31c89e0a5dd968bb759ab6b3f0a673f3034a464ef20263d5effe7"
-        },
-        {
-          "url": "https://udn.com/news/story/6656/9702412",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「府級都更推動委員會」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "7d26ec1adbb9431a2355dc0d3121da6b3be30e03ab9f9736dd580b00661926c8"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9858839",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取11月5日專訪：李四川將都更障礙歸納為參與意願、政府審查、容積與法令限制；內容是政策論述，不是委員會成立證明。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "aec25f8b31e401125d09381f2ea5714df9b90dc6a5de39f6d4409f0361f2deb4"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "049e91f8e8d6f8e346e8e24b297210daebaa0de70f43566d86cb2fb39332fa79"
         }
       ]
     },
@@ -2568,25 +2076,17 @@
       "id": "nt-housing-7",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/6656/9702412",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:25+08:00",
           "method": "source_pages_read",
           "finding": "核對「都更容積調派平台」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "7d26ec1adbb9431a2355dc0d3121da6b3be30e03ab9f9736dd580b00661926c8"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202608190134.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「都更容積調派平台」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5f06fa5d47e31c89e0a5dd968bb759ab6b3f0a673f3034a464ef20263d5effe7"
+          "accessed_at": "2026-11-11T08:20:25+08:00",
+          "body_sha256": "991ab940a28849e3bc2c7749aa2f54b4eda2b74d62325c111132c3196657ff40"
         }
       ]
     },
@@ -2594,33 +2094,17 @@
       "id": "nt-housing-8",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202608190134.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「危老單一窗口」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5f06fa5d47e31c89e0a5dd968bb759ab6b3f0a673f3034a464ef20263d5effe7"
-        },
-        {
-          "url": "https://udn.com/news/story/6656/9702412",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「危老單一窗口」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "7d26ec1adbb9431a2355dc0d3121da6b3be30e03ab9f9736dd580b00661926c8"
-        },
-        {
-          "url": "https://www.ntpc.gov.tw/ch/home.jsp?dataserno=9e25eb721ecf6c0c20564d162de38404&id=e8ca970cde5c00e1",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取新北市府11月5日稿：既有整建維護補助涵蓋立面、耐震與電梯，每案最高1,500萬元；截至10月申請765案、核定676案。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "384c42665748a5f468b5ab0007473c75bc6e26b91c013b08405648b9722eb407"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "049e91f8e8d6f8e346e8e24b297210daebaa0de70f43566d86cb2fb39332fa79"
         }
       ]
     },
@@ -2628,33 +2112,17 @@
       "id": "nt-family-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9389587",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:20+08:00",
           "method": "source_pages_read",
           "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5b5482dd5228dadbbba1586d0e6d46b956cadd689db9cec3b7b57e44f73e3a98"
-        },
-        {
-          "url": "https://news.tvbs.com.tw/politics/3155218",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "8491232647e83e499213e878320d160db1b20827185cb6fd1dfcda8ef10e13a9"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9665749",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「校校有公托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "dffc7fc75033fdab8f2bfeb7dca2d3810e3c99ccf7adfa19325c734eb2395d8e"
+          "accessed_at": "2026-11-11T08:20:20+08:00",
+          "body_sha256": "f2c6ba1189f3e4fefd7a60f2110acbcbe7eb0fea0cb612172090e019c76b951d"
         }
       ]
     },
@@ -2662,17 +2130,17 @@
       "id": "nt-family-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9641070",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「好孕專車延長」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "dbc19471d2211cac7bf66459591420866f537eff30fa3b4eb9c5dfd789f63891"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "0e7d83f758af37850e86940bb1393c79f23a28d6a036379a79dd5d350d4079a1"
         }
       ]
     },
@@ -2680,17 +2148,17 @@
       "id": "nt-family-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9655393",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「產前篩檢加碼」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "bfe501880f12808854a767bcf04eee9358ba69cfe9dfbb9dd7bef5371efcfa56"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "2b1974b6e74c9897f917d4bea346c23b72f9a1c532180f2f2595d45f5389c7e6"
         }
       ]
     },
@@ -2698,17 +2166,17 @@
       "id": "nt-family-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9655393",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「解凍卵補助提高」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "bfe501880f12808854a767bcf04eee9358ba69cfe9dfbb9dd7bef5371efcfa56"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "2b1974b6e74c9897f917d4bea346c23b72f9a1c532180f2f2595d45f5389c7e6"
         }
       ]
     },
@@ -2716,17 +2184,17 @@
       "id": "nt-family-5",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9655393",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「高風險孕產與孕期心理」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "bfe501880f12808854a767bcf04eee9358ba69cfe9dfbb9dd7bef5371efcfa56"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "2b1974b6e74c9897f917d4bea346c23b72f9a1c532180f2f2595d45f5389c7e6"
         }
       ]
     },
@@ -2734,17 +2202,17 @@
       "id": "nt-family-6",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9641070",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「運動中心免費臨托」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "dbc19471d2211cac7bf66459591420866f537eff30fa3b4eb9c5dfd789f63891"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "0e7d83f758af37850e86940bb1393c79f23a28d6a036379a79dd5d350d4079a1"
         }
       ]
     },
@@ -2752,25 +2220,17 @@
       "id": "nt-family-7",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9641070",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「親子成長館與玩水設施」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "dbc19471d2211cac7bf66459591420866f537eff30fa3b4eb9c5dfd789f63891"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9665749",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「親子成長館與玩水設施」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "dffc7fc75033fdab8f2bfeb7dca2d3810e3c99ccf7adfa19325c734eb2395d8e"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "0e7d83f758af37850e86940bb1393c79f23a28d6a036379a79dd5d350d4079a1"
         }
       ]
     },
@@ -2778,25 +2238,17 @@
       "id": "nt-elderly-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610050261.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「敬老卡悠遊卡化」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "cae8b3a45ea7213ae9c4d26ec293f155076d6ffd3478cc1ca9a93c50eb06cae7"
-        },
-        {
-          "url": "https://www.ettoday.net/news/20260513/3165454.htm",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「敬老卡悠遊卡化」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a23405c0747135a4df9d20654caff8f512894b1ad1215ba50653695246d29c46"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "bd4d2aed299ef88e8cf7e6cc41721bf8915be64d33a6138f0e5dd10611e3baf2"
         }
       ]
     },
@@ -2804,25 +2256,17 @@
       "id": "nt-elderly-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://newtalk.tw/news/view/2026-10-09/1064616",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:20+08:00",
           "method": "source_pages_read",
           "finding": "核對「高齡安心六大檢查」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e6463c986b9f05fb00360eaf6669b65d86c5d9ce67e86891b583ab8ab6f1db05"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202610190224.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「高齡安心六大檢查」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a022ea54f7174ce55454a5048fae52ed17555ce5eb79c917447a7d501cae887e"
+          "accessed_at": "2026-11-11T08:20:20+08:00",
+          "body_sha256": "26cf2a9553584eec1a1eacc555e1dd2a88b632038fe67e4971e42fcb40eabea1"
         }
       ]
     },
@@ -2830,25 +2274,17 @@
       "id": "nt-elderly-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://newtalk.tw/news/view/2026-10-09/1064616",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:20+08:00",
           "method": "source_pages_read",
           "finding": "核對「AI主動發掘高齡風險」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e6463c986b9f05fb00360eaf6669b65d86c5d9ce67e86891b583ab8ab6f1db05"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202610190224.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「AI主動發掘高齡風險」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a022ea54f7174ce55454a5048fae52ed17555ce5eb79c917447a7d501cae887e"
+          "accessed_at": "2026-11-11T08:20:20+08:00",
+          "body_sha256": "26cf2a9553584eec1a1eacc555e1dd2a88b632038fe67e4971e42fcb40eabea1"
         }
       ]
     },
@@ -2856,25 +2292,17 @@
       "id": "nt-elderly-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://newtalk.tw/news/view/2026-10-09/1064616",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:20+08:00",
           "method": "source_pages_read",
           "finding": "核對「新北銀髮人才中心」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e6463c986b9f05fb00360eaf6669b65d86c5d9ce67e86891b583ab8ab6f1db05"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202610190224.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「新北銀髮人才中心」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "a022ea54f7174ce55454a5048fae52ed17555ce5eb79c917447a7d501cae887e"
+          "accessed_at": "2026-11-11T08:20:20+08:00",
+          "body_sha256": "26cf2a9553584eec1a1eacc555e1dd2a88b632038fe67e4971e42fcb40eabea1"
         }
       ]
     },
@@ -2882,25 +2310,17 @@
       "id": "nt-health-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9626687",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「蘆洲醫院」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6ae124752a308d83bf45770d3b14aafe152f58c449c2b3141ff9af6ca7cb8e83"
-        },
-        {
-          "url": "https://udn.com/news/story/124652/9654262",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「蘆洲醫院」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "19e0556be63a9a2a0b336e0b554f80c685ac5721dd0a1887194f6d4b82cb6374"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "a1c680d080ff7fc9feae7bbe8345ce920fe72b2f368ab9bc51781fb37066ed7e"
         }
       ]
     },
@@ -2908,25 +2328,17 @@
       "id": "nt-health-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "candidate_pledge_separated_from_existing_signed_project",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9626687",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「板橋醫療園區」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6ae124752a308d83bf45770d3b14aafe152f58c449c2b3141ff9af6ca7cb8e83"
-        },
-        {
-          "url": "https://wedid.ntpc.gov.tw/Governance/Detail/n4DwlWD7v0BE",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取新北市政府施政成果網：板橋醫療園區2026年10月5日完成簽約；頁面沒有證明已完工營運。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "b76b6c400dae479ad5af1771215078830fb2b73e173ed67c45c0a00063c23891"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "a1c680d080ff7fc9feae7bbe8345ce920fe72b2f368ab9bc51781fb37066ed7e"
         }
       ]
     },
@@ -2934,25 +2346,17 @@
       "id": "nt-health-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9626687",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「淡海醫院與高齡照護」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6ae124752a308d83bf45770d3b14aafe152f58c449c2b3141ff9af6ca7cb8e83"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202611080150.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取中央社11月8日報導：李四川重申淡海二、三期高科技園區、串聯北士科與輝達的AI科技廊帶，以及淡海醫院與高齡復健照護中心；均屬競選承諾，報導未證明已實施或完工。",
-          "body_sha256": "1e472788c87a5a673a78dc0d892b5b2bd4eb3235dc12eab24e01aba432ef36df"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "a1c680d080ff7fc9feae7bbe8345ce920fe72b2f368ab9bc51781fb37066ed7e"
         }
       ]
     },
@@ -2960,17 +2364,17 @@
       "id": "nt-health-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9626687",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「土城醫療園區擴大」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6ae124752a308d83bf45770d3b14aafe152f58c449c2b3141ff9af6ca7cb8e83"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "a1c680d080ff7fc9feae7bbe8345ce920fe72b2f368ab9bc51781fb37066ed7e"
         }
       ]
     },
@@ -2978,25 +2382,17 @@
       "id": "nt-health-5",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9626687",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「恩主公醫院擴建」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6ae124752a308d83bf45770d3b14aafe152f58c449c2b3141ff9af6ca7cb8e83"
-        },
-        {
-          "url": "https://udn.com/vote2026/story/124652/9837928",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取10月26日報導：李四川提出協助恩主公醫院擴建以強化溪南醫療；原文只證實承諾。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "96c79f15e8ee066a99813ed43cf58e9a275b21984112ab81f63d0bc88b4a1636"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "a1c680d080ff7fc9feae7bbe8345ce920fe72b2f368ab9bc51781fb37066ed7e"
         }
       ]
     },
@@ -3004,17 +2400,17 @@
       "id": "nt-health-6",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7266/9628670",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:26+08:00",
           "method": "source_pages_read",
           "finding": "核對「兒少護牙」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "fe7a103f040b37ade59c00240ad879e93e090fb80e54b9d94bac9277c1867447"
+          "accessed_at": "2026-11-11T08:20:26+08:00",
+          "body_sha256": "aee9c1aae09fb8ae283b8653f3572d458597fd35dc2489880ca4c8da8258ef0d"
         }
       ]
     },
@@ -3022,17 +2418,17 @@
       "id": "nt-health-7",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7266/9628670",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:26+08:00",
           "method": "source_pages_read",
           "finding": "核對「產婦與弱勢長者護牙」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "fe7a103f040b37ade59c00240ad879e93e090fb80e54b9d94bac9277c1867447"
+          "accessed_at": "2026-11-11T08:20:26+08:00",
+          "body_sha256": "aee9c1aae09fb8ae283b8653f3572d458597fd35dc2489880ca4c8da8258ef0d"
         }
       ]
     },
@@ -3040,17 +2436,17 @@
       "id": "nt-health-8",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/7266/9628670",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:26+08:00",
           "method": "source_pages_read",
           "finding": "核對「失能失智口腔照護」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "fe7a103f040b37ade59c00240ad879e93e090fb80e54b9d94bac9277c1867447"
+          "accessed_at": "2026-11-11T08:20:26+08:00",
+          "body_sha256": "aee9c1aae09fb8ae283b8653f3572d458597fd35dc2489880ca4c8da8258ef0d"
         }
       ]
     },
@@ -3058,17 +2454,17 @@
       "id": "nt-education-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9602986",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「AI校園」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "974c083d3b1a12a2f6c425cece9fc72f8d8927a4800be00fc6fc91140f105989"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "3871ec2632989d2e85f2b67c4764e442e59fa6a98e30f87a9d63f753c381b91f"
         }
       ]
     },
@@ -3076,17 +2472,17 @@
       "id": "nt-education-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9602986",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「小班教學再降」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "974c083d3b1a12a2f6c425cece9fc72f8d8927a4800be00fc6fc91140f105989"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "3871ec2632989d2e85f2b67c4764e442e59fa6a98e30f87a9d63f753c381b91f"
         }
       ]
     },
@@ -3094,17 +2490,17 @@
       "id": "nt-education-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9602986",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「教師心理支持」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "974c083d3b1a12a2f6c425cece9fc72f8d8927a4800be00fc6fc91140f105989"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "3871ec2632989d2e85f2b67c4764e442e59fa6a98e30f87a9d63f753c381b91f"
         }
       ]
     },
@@ -3112,17 +2508,17 @@
       "id": "nt-education-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202610030114.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「八里國中遷校」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "95a26811b44d6ed11b83a98effb69f933b9e4f28a3d7e73d9ccd9f4f19f73c58"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "41e42e85491dbe6786f31288b6c4de61b0101c436098c9e26c9adee3bb9dbdf5"
         }
       ]
     },
@@ -3130,49 +2526,17 @@
       "id": "nt-industry-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6854480",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「雙AI產業廊帶」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "36ea6fe1cb7b0c0ca1756127b0e452bf45f02d188ac95f43791eec9dd6dfce33"
-        },
-        {
-          "url": "https://www.nownews.com/news/6874539",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「雙AI產業廊帶」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e6e8769e438d8bb475a4af5a7424bba4d93bba96a56614c6da03442fa38605ec"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610110138.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「雙AI產業廊帶」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9f347ba11d823571afa8e4b25792d01c4ccc2c6130acbd7a678847d9f5862318"
-        },
-        {
-          "url": "https://www.taiwannews.com.tw/zh/news/6472384",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取11月5日專訪整理：李四川再次提出以南巨蛋城、北科學城串聯AI產業廊帶；沒有新增執行或完工文件。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "5da8916d1bf209c4a23dca96e85e6492119160f7496d9c0ef8f07c9a06986202"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202611080150.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取中央社11月8日報導：李四川重申淡海二、三期高科技園區、串聯北士科與輝達的AI科技廊帶，以及淡海醫院與高齡復健照護中心；均屬競選承諾，報導未證明已實施或完工。",
-          "body_sha256": "1e472788c87a5a673a78dc0d892b5b2bd4eb3235dc12eab24e01aba432ef36df"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "e63f323839c263bc5aa9b6321c68aab1522eae92828a64608e3e8cea0daf7249"
         }
       ]
     },
@@ -3180,33 +2544,17 @@
       "id": "nt-industry-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9653165",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「淡海科學城」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "956a4b17db1f215b4d240d9a75d60596b51009c5c8b86b49ffb9783b90761f22"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aipl/202610110138.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「淡海科學城」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "9f347ba11d823571afa8e4b25792d01c4ccc2c6130acbd7a678847d9f5862318"
-        },
-        {
-          "url": "https://www.cna.com.tw/news/aloc/202611080150.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取中央社11月8日報導：李四川重申淡海二、三期高科技園區、串聯北士科與輝達的AI科技廊帶，以及淡海醫院與高齡復健照護中心；均屬競選承諾，報導未證明已實施或完工。",
-          "body_sha256": "1e472788c87a5a673a78dc0d892b5b2bd4eb3235dc12eab24e01aba432ef36df"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "a3ec1523db08124d5bf69320a73a6b4b7ee633574c7e43289aaa4c7347031420"
         }
       ]
     },
@@ -3214,17 +2562,17 @@
       "id": "nt-industry-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6854480",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「產業專區倍增」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "36ea6fe1cb7b0c0ca1756127b0e452bf45f02d188ac95f43791eec9dd6dfce33"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "e63f323839c263bc5aa9b6321c68aab1522eae92828a64608e3e8cea0daf7249"
         }
       ]
     },
@@ -3232,17 +2580,17 @@
       "id": "nt-industry-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202609270167.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "核對「新店寶高園區二期」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "87ec75fe92285a314db9c6535b0e38a7c9089789c421ba250baeba509271448b"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "f15c8c4c4ec8da31740d81d79cd02dd083e204794ac8b00b14f089dddbccc197"
         }
       ]
     },
@@ -3250,17 +2598,17 @@
       "id": "nt-industry-5",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.nownews.com/news/6854480",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:43+08:00",
           "method": "source_pages_read",
           "finding": "核對「無人機與AI電競」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "36ea6fe1cb7b0c0ca1756127b0e452bf45f02d188ac95f43791eec9dd6dfce33"
+          "accessed_at": "2026-11-11T08:20:43+08:00",
+          "body_sha256": "e63f323839c263bc5aa9b6321c68aab1522eae92828a64608e3e8cea0daf7249"
         }
       ]
     },
@@ -3268,25 +2616,17 @@
       "id": "nt-industry-6",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9653165",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:24+08:00",
           "method": "source_pages_read",
           "finding": "核對「新北巨蛋城與小巨蛋」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "956a4b17db1f215b4d240d9a75d60596b51009c5c8b86b49ffb9783b90761f22"
-        },
-        {
-          "url": "https://www.nownews.com/news/6874539",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "核對「新北巨蛋城與小巨蛋」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e6e8769e438d8bb475a4af5a7424bba4d93bba96a56614c6da03442fa38605ec"
+          "accessed_at": "2026-11-11T08:20:24+08:00",
+          "body_sha256": "a3ec1523db08124d5bf69320a73a6b4b7ee633574c7e43289aaa4c7347031420"
         }
       ]
     },
@@ -3294,17 +2634,17 @@
       "id": "nt-industry-7",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9661847",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:25+08:00",
           "method": "source_pages_read",
           "finding": "核對「青創貸款提高」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "1c457aae46bb04c158c04c1a9d16eb01e1dd6636b611775c74660a222f21c596"
+          "accessed_at": "2026-11-11T08:20:25+08:00",
+          "body_sha256": "3965ac98e3cdff5131f6f78122a4399ddb91edff39713638ed27f6e4a666ac42"
         }
       ]
     },
@@ -3312,17 +2652,17 @@
       "id": "nt-industry-8",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202608050318.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:37+08:00",
           "method": "source_pages_read",
           "finding": "核對「農業輔導與品牌」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "4bd26ac348e8cfc18ff71f48ebc0f4d23a40f2d5e7f7b70780c46ebcda172a31"
+          "accessed_at": "2026-11-11T08:20:37+08:00",
+          "body_sha256": "9d173355c9cbfafeede4d3ada201134650b8520a4662bd9264e033fa24eac5a6"
         }
       ]
     },
@@ -3330,25 +2670,17 @@
       "id": "nt-disaster-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "candidate_increment_separated_from_existing_official_measures",
       "evidence": [
         {
           "url": "https://udn.com/vote2026/story/124652/9593451",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取候選主張：三道防線分為平時整備、災中AI應變及災後精準補強，屬持續強化承諾。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "94b99c07854916a5197d2774d1ae853130fc762b37e1acda31bca80e243fbfa4"
-        },
-        {
-          "url": "https://www.ntpc.gov.tw/ch/home.jsp?dataserno=202604020021&id=28",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取新北水利局原文：現有智慧防汛平台已啟動，並列出清淤、抽水站、感測器與透保水設施等既有措施。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e66fde7a687d570eede9d72333483c8d58950abd38e04176c01508f39f9fe18b"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "37a0f72c461616c9974eb48315c2b71ec3c8aa0b15921d5e21b27632acd7da41"
         }
       ]
     },
@@ -3356,25 +2688,17 @@
       "id": "nt-disaster-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "candidate_increment_separated_from_existing_official_measures",
       "evidence": [
         {
           "url": "https://udn.com/vote2026/story/124652/9593451",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取候選主張：三道防線分為平時整備、災中AI應變及災後精準補強，屬持續強化承諾。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "94b99c07854916a5197d2774d1ae853130fc762b37e1acda31bca80e243fbfa4"
-        },
-        {
-          "url": "https://www.ntpc.gov.tw/ch/home.jsp?dataserno=202604020021&id=28",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取新北水利局原文：現有智慧防汛平台已啟動，並列出清淤、抽水站、感測器與透保水設施等既有措施。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e66fde7a687d570eede9d72333483c8d58950abd38e04176c01508f39f9fe18b"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "37a0f72c461616c9974eb48315c2b71ec3c8aa0b15921d5e21b27632acd7da41"
         }
       ]
     },
@@ -3382,25 +2706,17 @@
       "id": "nt-disaster-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "candidate_increment_separated_from_existing_official_measures",
       "evidence": [
         {
           "url": "https://udn.com/vote2026/story/124652/9593451",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:28+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取候選主張：三道防線分為平時整備、災中AI應變及災後精準補強，屬持續強化承諾。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "94b99c07854916a5197d2774d1ae853130fc762b37e1acda31bca80e243fbfa4"
-        },
-        {
-          "url": "https://www.ntpc.gov.tw/ch/home.jsp?dataserno=202604020021&id=28",
-          "read_at": "2026-11-10T08:13:24+08:00",
-          "method": "source_pages_read",
-          "finding": "實際讀取新北水利局原文：現有智慧防汛平台已啟動，並列出清淤、抽水站、感測器與透保水設施等既有措施。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "e66fde7a687d570eede9d72333483c8d58950abd38e04176c01508f39f9fe18b"
+          "accessed_at": "2026-11-11T08:20:28+08:00",
+          "body_sha256": "37a0f72c461616c9974eb48315c2b71ec3c8aa0b15921d5e21b27632acd7da41"
         }
       ]
     },
@@ -3408,17 +2724,17 @@
       "id": "nt-community-1",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202606270179.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:36+08:00",
           "method": "source_pages_read",
           "finding": "核對「原住民住宅與文化園區」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "c2755c6a8fae3461039b1c92858bad3c68fc99803fc0c73721c28554fb4eb2b1"
+          "accessed_at": "2026-11-11T08:20:36+08:00",
+          "body_sha256": "8e08c9995db607aaed5e3c8a31acebf9cabe4de3f3c9eed8efc55b8d271c540a"
         }
       ]
     },
@@ -3426,17 +2742,17 @@
       "id": "nt-community-2",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aloc/202606270179.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:36+08:00",
           "method": "source_pages_read",
           "finding": "核對「原住民傳統運動」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "c2755c6a8fae3461039b1c92858bad3c68fc99803fc0c73721c28554fb4eb2b1"
+          "accessed_at": "2026-11-11T08:20:36+08:00",
+          "body_sha256": "8e08c9995db607aaed5e3c8a31acebf9cabe4de3f3c9eed8efc55b8d271c540a"
         }
       ]
     },
@@ -3444,17 +2760,17 @@
       "id": "nt-community-3",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9570752",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:22+08:00",
           "method": "source_pages_read",
           "finding": "核對「客家政見」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "ad6d5f00c508627939aa1d717354c065ac74e9255280909d90f0ef795fac5f4b"
+          "accessed_at": "2026-11-11T08:20:22+08:00",
+          "body_sha256": "ace504e43d8490d080ef5720fce481caf4db482b06c6613b6b3896ec4733c51a"
         }
       ]
     },
@@ -3462,17 +2778,17 @@
       "id": "nt-community-4",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://newtalk.tw/news/view/2026-06-21/1042463",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:18+08:00",
           "method": "source_pages_read",
           "finding": "核對「水湳洞金瓜石台車」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "6c5615caada4f031adc0c672fd69bbacd13fbc12e4706347449cb36c235266cc"
+          "accessed_at": "2026-11-11T08:20:18+08:00",
+          "body_sha256": "9da834c4440dc9ee6b6bf26e3da55dbaa8c3b76dd47c7d651bde30ce4927068e"
         }
       ]
     },
@@ -3480,17 +2796,17 @@
       "id": "nt-community-5",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "original_publication_and_available_updates",
       "evidence": [
         {
           "url": "https://udn.com/news/story/124652/9515797",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:20+08:00",
           "method": "source_pages_read",
           "finding": "核對「無菸害商圈」對應原文；發布或引述與實施成果分開判讀。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "7164f626fe5d06faf5b26c6578c640c8fa98ad4ef3132381ab6b4658bc363af2"
+          "accessed_at": "2026-11-11T08:20:20+08:00",
+          "body_sha256": "4b645e91ae6f7b34bf0d6dd2ad2864c4ea07fcd522caec03f074e53ae905dac9"
         }
       ]
     },
@@ -3498,20 +2814,19 @@
       "id": "nt-community-6",
       "city": "newtaipei",
       "status": "verified_unchanged",
-      "checked_at": "2026-11-10T08:13:24+08:00",
-      "note": "今日重讀對應原始發布、主管機關現行說明及可取得更新；未見足以改動此項內容的新文件。核對限於原文與可取得資料，非獨立全面成效驗證。",
+      "checked_at": "2026-11-11T08:22:19+08:00",
+      "note": "本輪已重讀對應原始發布、主管機關現行說明或可取得的候選人原話頁面，並比對最近24小時更新；未見足以改動此項政策內容、實施階段或成效表述的新文件。核對限於來源原文與可取得更新，非獨立全面成效驗證。",
       "verification_scope": "reported_campaign_statement_not_independent_feasibility_review",
       "evidence": [
         {
           "url": "https://www.cna.com.tw/news/aipl/202610100222.aspx",
-          "read_at": "2026-11-10T08:13:24+08:00",
+          "read_at": "2026-11-11T08:20:32+08:00",
           "method": "source_pages_read",
           "finding": "實際讀取第343至357行：李四川談樹林軌道、科學城與AI廊帶；鶯歌觀光是蘇巧慧主張。",
-          "accessed_at": "2026-11-10T08:13:24+08:00",
-          "body_sha256": "7212ed593408b85e866217bc658c89517b670da05c6b52fecfa30c6b5ccbf431"
+          "accessed_at": "2026-11-11T08:20:32+08:00",
+          "body_sha256": "7de1a4fafea8d46a0c47eba6d00ade024b8aab204abb8abcd41886c59076e073"
         }
       ]
     }
   ]
 }
-
